@@ -1,0 +1,3 @@
+using gcc ;
+
+alias all : project2 netfs ;
