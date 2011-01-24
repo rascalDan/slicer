@@ -1,3 +1,66 @@
 using gcc ;
 
+import type : register ;
+import generators : register-standard ;
+
+import type ; 
+import generators ; 
+import feature ; 
+import "class" : new ; 
+import scanner ; 
+type.register SLICE : ice ; 
+class slice-scanner : scanner 
+{ 
+    import path property-set regex scanner type virtual-target ; 
+    rule __init__ ( includes * ) 
+    { 
+        scanner.__init__ ; 
+        self.includes = $(includes) ; 
+    } 
+    rule pattern ( ) 
+    { 
+        return "^[ \t]*#[ \t]*include[ ]*(<(.*)>|\"(.*)\")" ; 
+    } 
+    rule process ( target : matches * : binding ) 
+    { 
+        local included = [ regex.transform $(matches) : "\"(.*)\"" : 1 ] ; 
+        local g = [ on $(target) return $(HDRGRIST) ] ; 
+        local b = [ NORMALIZE_PATH $(binding:D) ] ; 
+        local g2 = $(g)"#"$(b) ; 
+        included = $(included:G=$(g2)) ; 
+        #this seems to add the dependency ok to the tree, but 
+        #I can't get these new dependencies to build 
+        #I've seen virtual-target.register but I don't have access to properties 
+        #and project names to do that here. 
+        INCLUDES $(target) : $(included) ; 
+        scanner.propagate $(__name__) : $(matches) : $(target) ; 
+    } 
+} 
+scanner.register slice-scanner : include ; 
+type.set-scanner SLICE : slice-scanner ; 
+class slice-generator : generator 
+{ 
+    import "class" : new ; 
+    rule __init__ ( * : * ) 
+    { 
+        generator.__init__ $(1) : $(2) : $(3) : $(4) : $(5) : $(6) : $(7) : $(8) : $(9) ; 
+    } 
+    rule run ( project name ? : property-set : sources * ) 
+    { 
+        #could I register new virtual targets here? The problem is I can't seem to 
+        #be able to get the list of includes that the scanner built from anywhere 
+            return [ generator.run $(project) $(name) : $(property-set) : $(sources) ] ; 
+    } 
+    rule generated-targets ( sources + : property-set : project name ? ) 
+    { 
+        return [ generator.generated-targets $(sources) : $(property-set) : $(project) $(name) ] ; 
+    } 
+} 
+generators.register [ new slice-generator slice.slice2cpp : SLICE : CPP H ] ; 
+actions slice.slice2cpp 
+{ 
+  slice2cpp --checksum --output-dir $(1[1]:D) $(2) 
+} 
+IMPORT $(__name__) : slice.slice2cpp : : slice.slice2cpp ;
+
 alias all : project2 netfs ;
