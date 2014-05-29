@@ -1,0 +1,16 @@
+alias libxmlpp : : : :
+	<cflags>"`pkg-config --cflags libxml++-2.6`"
+	<linkflags>"`pkg-config --libs libxml++-2.6`" ;
+lib boost_system ;
+lib boost_filesystem ;
+lib IceUtil ;
+
+lib slicer-xml :
+	[ glob *.cpp ]
+	:
+	<include>..
+	<library>boost_system
+	<library>boost_filesystem
+	<library>IceUtil
+	<library>libxmlpp
+	;

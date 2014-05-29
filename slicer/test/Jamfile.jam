@@ -1,0 +1,3 @@
+import testing ;
+
+run do-slicer.cpp ../slicer//slicer : : types.ice ;

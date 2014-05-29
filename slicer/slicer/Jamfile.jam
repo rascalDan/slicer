@@ -1,0 +1,17 @@
+lib Slice ;
+lib IceUtil ;
+lib boost_system ;
+lib boost_filesystem ;
+
+lib slicer :
+	[ glob *.cpp ]
+	:
+	<library>Slice
+	<library>IceUtil
+	<library>boost_system
+	<library>boost_filesystem
+	: :
+	<include>..
+	<library>boost_system
+	<library>boost_filesystem
+	;
