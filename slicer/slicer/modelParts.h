@@ -132,6 +132,11 @@ namespace Slicer {
 			{
 			}
 
+			ModelPartForClass(IceInternal::Handle<T> * h) :
+				ModelObject(*h)
+			{
+			}
+
 			virtual void Create() override
 			{
 				ModelObject = new T();
@@ -151,6 +156,11 @@ namespace Slicer {
 		public:
 			ModelPartForStruct(T & o) :
 				ModelObject(o)
+			{
+			}
+
+			ModelPartForStruct(T * o) :
+				ModelObject(*o)
 			{
 			}
 
@@ -208,6 +218,12 @@ namespace Slicer {
 				sequence(s)
 			{
 			}
+
+			ModelPartForSequence(T * s) :
+				sequence(*s)
+			{
+			}
+
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
 				BOOST_FOREACH(auto & element, sequence) {
@@ -267,6 +283,12 @@ namespace Slicer {
 				dictionary(d)
 			{
 			}
+
+			ModelPartForDictionary(T * d) :
+				dictionary(*d)
+			{
+			}
+
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
 				BOOST_FOREACH(auto & pair, dictionary) {
