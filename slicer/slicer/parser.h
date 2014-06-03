@@ -14,9 +14,9 @@ namespace Slicer {
 
 			static void Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
 
-			void leadIn();
+			virtual bool visitUnitStart(const Slice::UnitPtr&) override;
 
-			void leadOut();
+			virtual void visitUnitEnd(const Slice::UnitPtr&) override;
 
 			virtual bool visitModuleStart(const Slice::ModulePtr & m) override;
 

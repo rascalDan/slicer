@@ -1,3 +1,59 @@
 import testing ;
 
-run do-slicer.cpp ../slicer//slicer : : types.ice ;
+lib dl ;
+lib pthread ;
+lib Ice ;
+lib IceUtil ;
+lib boost_system ;
+lib boost_filesystem ;
+lib slicer-test : : <name>slicertypes <search>bin/slicer ;
+
+lib types :
+	types.ice
+	:
+	<library>pthread
+	<library>Ice
+	<library>IceUtil
+	;
+
+lib common :
+	helpers.cpp
+	../../libmisc/misc.cpp
+	:
+	<library>dl
+	<library>boost_system
+	<library>boost_filesystem
+	: :
+	<library>boost_filesystem
+	<library>boost_system
+	;
+
+unit-test do-slicer :
+	types
+	common
+	do-slicer.cpp
+	:
+	<library>dl
+	<include>..
+	<library>pthread
+	<library>Ice
+	<library>IceUtil
+	<library>../slicer//slicer
+	<implicit-dependency>types
+	;
+
+unit-test run-slicer :
+	run-slicer.cpp
+	types
+	common
+	:
+	<implicit-dependency>types
+	<dependency>do-slicer
+	<library>slicer-test
+	<include>..
+	<library>pthread
+	<library>Ice
+	<library>IceUtil
+	<library>../slicer//slicer
+	<library>../xml//slicer-xml
+;
