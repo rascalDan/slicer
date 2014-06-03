@@ -5,6 +5,9 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <Slice/CPlusPlusUtil.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/filesystem/convenience.hpp>
+
+namespace fs = boost::filesystem;
 
 namespace Slicer {
 	Slicer::Slicer(FILE * c) :
@@ -12,16 +15,20 @@ namespace Slicer {
 	{
 	}
 
-	void
-	Slicer::leadIn()
+	bool
+	Slicer::visitUnitStart(const Slice::UnitPtr & u)
 	{
+		fs::path topLevelFile(u->topLevelFile());
+
 		fprintf(cpp, "// Begin Slicer code\n\n");
+		fprintf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string().c_str());
 		fprintf(cpp, "#include <slicer/modelParts.h>\n\n");
 		fprintf(cpp, "namespace Slicer {\n");
+		return true;
 	}
 
 	void
-	Slicer::leadOut()
+	Slicer::visitUnitEnd(const Slice::UnitPtr&)
 	{
 		fprintf(cpp, "}\n\n");
 		fprintf(cpp, "// End Slicer code\n\n");
@@ -258,9 +265,7 @@ namespace Slicer {
 		}
 
 		Slicer s(cppfile.get());
-		s.leadIn();
 		u->visit(&s, false);
-		s.leadOut();
 
 		u->destroy();
 	}

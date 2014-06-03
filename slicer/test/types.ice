@@ -17,10 +17,6 @@ module TestModule {
 		int a;
 		int b;
 	};
-	class Optionals {
-		optional(1) int simple;
-		optional(2) StructType str;
-	};
 	sequence<ClassType> Classes;
 	sequence<StructType> Structs;
 	dictionary<int, ClassType> ClassMap;
