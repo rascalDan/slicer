@@ -4,6 +4,7 @@
 #include <Ice/Config.h>
 #include <IceUtil/Shared.h>
 #include <IceUtil/Handle.h>
+#include <IceUtil/Optional.h>
 #include <Ice/Handle.h>
 #include <Slice/Parser.h>
 #include <stdexcept>
@@ -65,6 +66,8 @@ namespace Slicer {
 	template<typename T>
 	class ModelPartForSimple : public ModelPart {
 		public:
+			typedef T element_type;
+
 			ModelPartForSimple(T & h) :
 				Member(h)
 			{
@@ -80,6 +83,70 @@ namespace Slicer {
 
 		private:
 			T & Member;
+	};
+
+	template<typename T>
+	class ModelPartForOptional : public ModelPart {
+		public:
+			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h) :
+				OptionalMember(h)
+			{
+				if (OptionalMember) {
+					modelPart = new T(*OptionalMember);
+				}
+			}
+			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
+				OptionalMember(*h)
+			{
+				if (OptionalMember) {
+					modelPart = new T(*OptionalMember);
+				}
+			}
+			virtual void OnEachChild(const ChildHandler & ch)
+			{
+				if (OptionalMember) {
+					modelPart->OnEachChild(ch);
+				}
+			}
+			virtual void Complete() override
+			{
+				if (OptionalMember) {
+					modelPart->Complete();
+				}
+			}
+			virtual void Create() override
+			{
+				if (!OptionalMember) {
+					OptionalMember = typename T::element_type();
+					modelPart = new T(*OptionalMember);
+					modelPart->Create();
+				}
+			}
+			virtual ModelPartPtr GetChild(const std::string & name) override
+			{
+				if (OptionalMember) {
+					return modelPart->GetChild(name);
+				}
+				return NULL;
+			}
+			virtual void SetValue(ValueSourcePtr s) override
+			{
+				if (OptionalMember) {
+					modelPart->SetValue(s);
+				}
+			}
+			virtual void GetValue(ValueTargetPtr s) override
+			{
+				if (!OptionalMember) {
+					OptionalMember = typename T::element_type();
+					modelPart = new T(*OptionalMember);
+				}
+				modelPart->GetValue(s);
+			}
+
+		private:
+			IceUtil::Optional< typename T::element_type > & OptionalMember;
+			ModelPartPtr modelPart;
 	};
 
 	template<typename T>
@@ -125,35 +192,39 @@ namespace Slicer {
 	};
 	
 	template<typename T>
-	class ModelPartForClass : public ModelPartForComplex<T> {
+	class ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
 		public:
-			ModelPartForClass(IceInternal::Handle<T> & h) :
+			typedef T element_type;
+
+			ModelPartForClass(T & h) :
 				ModelObject(h)
 			{
 			}
 
-			ModelPartForClass(IceInternal::Handle<T> * h) :
+			ModelPartForClass(T * h) :
 				ModelObject(*h)
 			{
 			}
 
 			virtual void Create() override
 			{
-				ModelObject = new T();
+				ModelObject = new typename T::element_type();
 			}
 
-			T & GetModel() override
+			typename T::element_type & GetModel() override
 			{
 				return *ModelObject;
 			}
 
 		private:
-			IceInternal::Handle<T> & ModelObject;
+			T & ModelObject;
 	};
 
 	template<typename T>
 	class ModelPartForStruct : public ModelPartForComplex<T> {
 		public:
+			typedef T element_type;
+
 			ModelPartForStruct(T & o) :
 				ModelObject(o)
 			{
@@ -181,7 +252,7 @@ namespace Slicer {
 			{
 			}
 
-			ModelPartForClassRoot(IceInternal::Handle<T> o) :
+			ModelPartForClassRoot(T o) :
 				ModelPartForClass<T>(ModelObject)
 			{
 				ModelObject = o;
@@ -201,19 +272,21 @@ namespace Slicer {
 				ch(rootName, new ModelPartForClass<T>(ModelObject));
 			}
 
-			T & GetModel() override
+			typename T::element_type & GetModel() override
 			{
 				return *ModelObject;
 			}
 
 		private:
-			IceInternal::Handle<T> ModelObject;
+			T ModelObject;
 			static std::string rootName;
 	};
 
 	template<typename T>
 	class ModelPartForSequence : public ModelPart {
 		public:
+			typedef T element_type;
+
 			ModelPartForSequence(T & s) :
 				sequence(s)
 			{
@@ -279,6 +352,8 @@ namespace Slicer {
 	template<typename T>
 	class ModelPartForDictionary : public ModelPart {
 		public:
+			typedef T element_type;
+
 			ModelPartForDictionary(T & d) :
 				dictionary(d)
 			{

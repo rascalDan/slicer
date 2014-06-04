@@ -11,7 +11,7 @@ namespace Slicer {
 	IceInternal::Handle<Object>
 	Deserialize(const boost::filesystem::path & path)
 	{
-		IceUtil::Handle<ModelPartForClassRoot<Object>> root = new ModelPartForClassRoot<Object>();
+		IceUtil::Handle<ModelPartForClassRoot<IceInternal::Handle<Object>>> root = new ModelPartForClassRoot<IceInternal::Handle<Object>>();
 		SerializerPtr serializer = new Serializer();
 		serializer->Deserialize(path, root);
 		return &root->GetModel();
@@ -21,7 +21,7 @@ namespace Slicer {
 	void
 	Serialize(IceInternal::Handle<Object> object, const boost::filesystem::path & path)
 	{
-		IceUtil::Handle<ModelPartForClassRoot<Object>> root = new ModelPartForClassRoot<Object>(object);
+		IceUtil::Handle<ModelPartForClassRoot<IceInternal::Handle<Object>>> root = new ModelPartForClassRoot<IceInternal::Handle<Object>>(object);
 		SerializerPtr serializer = new Serializer();
 		serializer->Serialize(path, root);
 	}

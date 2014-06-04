@@ -58,18 +58,34 @@ namespace Slicer {
 			fprintf(cpp, "\t\t{ \"%s\", ",
 					name ? name->c_str() : dm->name().c_str());
 			auto type = dm->type();
-			fprintf(cpp, "new ModelPartForClass< %s::%s >::Hook< %s, &%s::%s::%s, ",
-				modulePath().c_str(), c->name().c_str(),
-				Slice::typeToString(type).c_str(),
+			fprintf(cpp, "new ModelPartForClass< %s::%sPtr >::Hook< ",
+				modulePath().c_str(), c->name().c_str());
+			if (dm->optional()) {
+				fprintf(cpp, "::IceUtil::Optional< %s >",
+						Slice::typeToString(type).c_str());
+			}
+			else {
+				fprintf(cpp, "%s",
+						Slice::typeToString(type).c_str());
+			}
+			fprintf(cpp, ", &%s::%s::%s, ",
 				modulePath().c_str(), c->name().c_str(), dm->name().c_str());
+			if (dm->optional()) {
+				fprintf(cpp, "ModelPartForOptional< ");
+			}
 			createNewModelPartPtrFor(type);
-			fprintf(cpp, " >() },\n");
+			fprintf(cpp, "< %s",
+					Slice::typeToString(type).c_str());
+			if (dm->optional()) {
+				fprintf(cpp, " > ");
+			}
+			fprintf(cpp, " > >() },\n");
 		}
 		fprintf(cpp, "\t};\n");
 		
 		fprintf(cpp, "template<>\n");
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
-		fprintf(cpp, "std::string ModelPartForClassRoot< %s::%s >::rootName(\"%s\");\n\n",
+		fprintf(cpp, "std::string ModelPartForClassRoot< %s::%sPtr >::rootName(\"%s\");\n\n",
 				modulePath().c_str(), c->name().c_str(),
 				name ? name->c_str() : c->name().c_str());
 		return true;
@@ -96,7 +112,8 @@ namespace Slicer {
 				Slice::typeToString(type).c_str(),
 				modulePath().c_str(), c->name().c_str(), dm->name().c_str());
 			createNewModelPartPtrFor(type);
-			fprintf(cpp, " >() },\n");
+			fprintf(cpp, " < %s > >() },\n",
+				Slice::typeToString(type).c_str());
 		}
 		fprintf(cpp, "\t};\n\n");
 		
@@ -123,18 +140,19 @@ namespace Slicer {
 		fprintf(cpp, "\tsequence.push_back(%s());\n",
 					Slice::typeToString(s->type()).c_str());
 		fprintf(cpp, "\treturn new ");
-		createNewModelPartPtrFor(s->type());
-		fprintf(cpp, "(sequence.back());\n}\n\n");
-
+		auto etype = s->type();
+		createNewModelPartPtrFor(etype);
+		fprintf(cpp, "< %s >(sequence.back());\n}\n\n",
+				Slice::typeToString(etype).c_str());
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartPtr\n");
 		fprintf(cpp, "ModelPartForSequence< %s::%s >::elementModelPart(typename %s::%s::value_type & e) const {\n",
 				modulePath().c_str(), s->name().c_str(),
 				modulePath().c_str(), s->name().c_str());
-		auto etype = s->type();
 		fprintf(cpp, "\treturn new ");
 		createNewModelPartPtrFor(etype);
-		fprintf(cpp, "(e);\n}\n\n");
+		fprintf(cpp, "< %s >(e);\n}\n\n",
+				Slice::typeToString(etype).c_str());
 		fprintf(cpp, "template<>\n");
 		auto ename = metaDataValue("slicer:element:", s->getMetaData());
 		fprintf(cpp, "std::string ModelPartForSequence< %s::%s >::elementName(\"%s\");\n\n",
@@ -169,7 +187,8 @@ namespace Slicer {
 				Slice::typeToString(ktype).c_str(),
 				modulePath().c_str(), d->name().c_str());
 		createNewModelPartPtrFor(ktype);
-		fprintf(cpp, " >() },\n\t\t{ \"%s\", ",
+		fprintf(cpp, "< %s > >() },\n\t\t{ \"%s\", ",
+				Slice::typeToString(ktype).c_str(),
 				vname ? vname->c_str() : "value");
 		auto vtype = d->valueType();
 		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, &ModelPartForDictionaryElement< %s::%s >::value, ",
@@ -177,7 +196,8 @@ namespace Slicer {
 				Slice::typeToString(vtype).c_str(),
 				modulePath().c_str(), d->name().c_str());
 		createNewModelPartPtrFor(vtype);
-		fprintf(cpp, " >() },\n");
+		fprintf(cpp, "< %s > >() },\n",
+				Slice::typeToString(vtype).c_str());
 		fprintf(cpp, "\t};\n");
 		fprintf(cpp, "\n");
 	}
@@ -193,24 +213,19 @@ namespace Slicer {
 	Slicer::createNewModelPartPtrFor(const Slice::TypePtr & type) const
 	{
 		if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForSimple< %s >",
-					Slice::typeToString(type).c_str());
+			fprintf(cpp, "ModelPartForSimple ");
 		}
 		else if (auto complexClass = Slice::ClassDeclPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForClass< %s::element_type >",
-					Slice::typeToString(type).c_str());
+			fprintf(cpp, "ModelPartForClass ");
 		}
 		else if (auto complexStruct = Slice::StructPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForStruct< %s >",
-					Slice::typeToString(type).c_str());
+			fprintf(cpp, "ModelPartForStruct ");
 		}
 		else if (auto sequence = Slice::SequencePtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForSequence< %s >",
-					Slice::typeToString(type).c_str());
+			fprintf(cpp, "ModelPartForSequence ");
 		}
 		else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForDictionary< %s >",
-					Slice::typeToString(type).c_str());
+			fprintf(cpp, "ModelPartForDictionary ");
 		}
 	}
 
