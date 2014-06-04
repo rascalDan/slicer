@@ -21,6 +21,13 @@ module TestModule {
 	sequence<StructType> Structs;
 	dictionary<int, ClassType> ClassMap;
 	dictionary<int, StructType> StructMap;
+	class Optionals {
+		optional(0) int optSimple;
+		optional(1) StructType optStruct;
+		optional(2) ClassType optClass;
+		optional(3) Classes optSeq;
+		optional(4) ClassMap optDict;
+	};
 	class ClassClass {
 		ClassType cls;
 		StructType str;
