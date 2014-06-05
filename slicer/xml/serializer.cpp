@@ -206,7 +206,7 @@ namespace Slicer {
 		if (name[0] == '@') {
 			mp->GetValue(new XmlAttributeValueTarget(n, name.substr(1)));
 		}
-		else {
+		else if (mp) {
 			auto element = n->add_child(name);
 			mp->GetValue(new XmlContentValueTarget(element));
 			mp->OnEachChild(boost::bind(&Xml::ModelTreeIterate, element, _1, _2));
