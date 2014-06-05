@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <boost/function.hpp>
 #include <boost/foreach.hpp>
+#include <vector>
 
 namespace Slicer {
 	class IncorrectElementName : public std::invalid_argument {
@@ -181,7 +182,9 @@ namespace Slicer {
 
 			ModelPartPtr GetChild(const std::string & name) override
 			{
-				auto childitr = hooks.find(name);
+				auto childitr = std::find_if(hooks.begin(), hooks.end(), [&name](const typename Hooks::value_type & h) {
+						return h.first == name;
+					});
 				if (childitr != hooks.end()) {
 					return childitr->second->Get(GetModel());
 				}
@@ -190,7 +193,7 @@ namespace Slicer {
 
 			virtual T * GetModel() = 0;
 
-			typedef std::map<std::string, HookPtr> Hooks;
+			typedef std::vector<std::pair<const std::string, HookPtr> > Hooks;
 
 		private:
 			static Hooks hooks;
