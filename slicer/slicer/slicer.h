@@ -14,7 +14,7 @@ namespace Slicer {
 		IceUtil::Handle<ModelPartForClassRoot<IceInternal::Handle<Object>>> root = new ModelPartForClassRoot<IceInternal::Handle<Object>>();
 		SerializerPtr serializer = new Serializer();
 		serializer->Deserialize(path, root);
-		return &root->GetModel();
+		return root->GetModel();
 	}
 
 	template <typename Serializer, typename Object>

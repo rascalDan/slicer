@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<BuiltIns>
+  <mbool>true</mbool>
+  <mbyte>4</mbyte>
+  <mdouble>3.14159265359</mdouble>
+  <mfloat>3.14</mfloat>
+  <mint>80</mint>
+  <mlong>800</mlong>
+  <mshort>40</mshort>
+  <mstring>Sample text</mstring>
+</BuiltIns>

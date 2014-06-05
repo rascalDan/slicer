@@ -61,6 +61,7 @@ namespace Slicer {
 			virtual void Complete();
 			virtual void SetValue(ValueSourcePtr);
 			virtual void GetValue(ValueTargetPtr);
+			virtual bool HasValue() const = 0;
 	};
 
 	template<typename T>
@@ -80,6 +81,7 @@ namespace Slicer {
 			virtual ModelPartPtr GetChild(const std::string &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
+			virtual bool HasValue() const override { return true; }
 
 		private:
 			T & Member;
@@ -102,7 +104,7 @@ namespace Slicer {
 					modelPart = new T(*OptionalMember);
 				}
 			}
-			virtual void OnEachChild(const ChildHandler & ch)
+			virtual void OnEachChild(const ChildHandler & ch) override
 			{
 				if (OptionalMember) {
 					modelPart->OnEachChild(ch);
@@ -144,6 +146,8 @@ namespace Slicer {
 				modelPart->GetValue(s);
 			}
 
+			virtual bool HasValue() const override { return OptionalMember; }
+
 		private:
 			IceUtil::Optional< typename T::element_type > & OptionalMember;
 			ModelPartPtr modelPart;
@@ -154,23 +158,24 @@ namespace Slicer {
 		public:
 			class HookBase : public IceUtil::Shared {
 				public:
-					virtual ModelPartPtr Get(T & t) const = 0;
+					virtual ModelPartPtr Get(T * t) const = 0;
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
 			template <typename MT, MT T::*M, typename MP>
 			class Hook : public HookBase {
 				public:
-					ModelPartPtr Get(T & t) const override
+					ModelPartPtr Get(T * t) const override
 					{
-						return new MP(t.*M);
+						return t ? new MP(t->*M) : NULL;
 					}
 			};
 
 			virtual void OnEachChild(const ChildHandler & ch)
 			{
 				for (auto h = hooks.begin(); h != hooks.end(); h++) {
-					ch(h->first, h->second->Get(GetModel()));
+					auto modelPart = h->second->Get(GetModel());
+					ch(h->first, modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr());
 				}
 			}
 
@@ -183,7 +188,7 @@ namespace Slicer {
 				return NULL;
 			}
 
-			virtual T & GetModel() = 0;
+			virtual T * GetModel() = 0;
 
 			typedef std::map<std::string, HookPtr> Hooks;
 
@@ -211,10 +216,12 @@ namespace Slicer {
 				ModelObject = new typename T::element_type();
 			}
 
-			typename T::element_type & GetModel() override
+			typename T::element_type * GetModel() override
 			{
-				return *ModelObject;
+				return ModelObject.get();
 			}
+
+			virtual bool HasValue() const override { return ModelObject; }
 
 		private:
 			T & ModelObject;
@@ -235,10 +242,12 @@ namespace Slicer {
 			{
 			}
 
-			T & GetModel() override
+			T * GetModel() override
 			{
-				return ModelObject;
+				return &ModelObject;
 			}
+
+			virtual bool HasValue() const override { return true; }
 
 		private:
 			T & ModelObject;
@@ -272,10 +281,12 @@ namespace Slicer {
 				ch(rootName, new ModelPartForClass<T>(ModelObject));
 			}
 
-			typename T::element_type & GetModel() override
+			typename T::element_type * GetModel() override
 			{
-				return *ModelObject;
+				return ModelObject.get();
 			}
+
+			virtual bool HasValue() const override { return ModelObject; }
 
 		private:
 			T ModelObject;
@@ -306,6 +317,8 @@ namespace Slicer {
 
 			ModelPartPtr GetChild(const std::string &) override;
 
+			virtual bool HasValue() const override { return true; }
+
 		private:
 			ModelPartPtr elementModelPart(typename T::value_type &) const;
 
@@ -322,10 +335,12 @@ namespace Slicer {
 			{
 			}
 
-			ModelPartForDictionaryElement<T> & GetModel() override
+			ModelPartForDictionaryElement<T> * GetModel() override
 			{
-				return *this;
+				return this;
 			}
+
+			virtual bool HasValue() const override { return true; }
 
 			typename T::key_type * key;
 			typename T::mapped_type * value;
@@ -378,6 +393,7 @@ namespace Slicer {
 				return new ModelPartForDictionaryElementInserter<T>(dictionary);
 			}
 
+			virtual bool HasValue() const override { return true; }
 
 		private:
 			T & dictionary;
