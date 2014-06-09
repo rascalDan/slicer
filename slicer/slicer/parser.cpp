@@ -55,8 +55,7 @@ namespace Slicer {
 				modulePath().c_str(), c->name().c_str());
 		BOOST_FOREACH (const auto & dm, c->allDataMembers()) {
 			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			fprintf(cpp, "\t\t{ \"%s\", ",
-					name ? name->c_str() : dm->name().c_str());
+			fprintf(cpp, "\t\t{ ");
 			auto type = dm->type();
 			fprintf(cpp, "new ModelPartForClass< %s::%sPtr >::Hook< ",
 				modulePath().c_str(), c->name().c_str());
@@ -79,7 +78,8 @@ namespace Slicer {
 			if (dm->optional()) {
 				fprintf(cpp, " > ");
 			}
-			fprintf(cpp, " > >() },\n");
+			fprintf(cpp, " > >(\"%s\") },\n",
+					name ? name->c_str() : dm->name().c_str());
 		}
 		fprintf(cpp, "\t};\n");
 		
@@ -104,16 +104,16 @@ namespace Slicer {
 				modulePath().c_str(), c->name().c_str());
 		BOOST_FOREACH (const auto & dm, c->dataMembers()) {
 			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			fprintf(cpp, "\t\t{ \"%s\", ",
-					name ? name->c_str() : dm->name().c_str());
+			fprintf(cpp, "\t\t{ ");
 			auto type = dm->type();
 			fprintf(cpp, "new ModelPartForStruct< %s::%s >::Hook< %s, &%s::%s::%s, ",
 				modulePath().c_str(), c->name().c_str(),
 				Slice::typeToString(type).c_str(),
 				modulePath().c_str(), c->name().c_str(), dm->name().c_str());
 			createNewModelPartPtrFor(type);
-			fprintf(cpp, " < %s > >() },\n",
-				Slice::typeToString(type).c_str());
+			fprintf(cpp, "< %s > >(\"%s\") },\n",
+					Slice::typeToString(type).c_str(),
+					name ? name->c_str() : dm->name().c_str());
 		}
 		fprintf(cpp, "\t};\n\n");
 		
@@ -179,25 +179,25 @@ namespace Slicer {
 				modulePath().c_str(), d->name().c_str());
 		auto kname = metaDataValue("slicer:key:", d->getMetaData());
 		auto vname = metaDataValue("slicer:value:", d->getMetaData());
-		fprintf(cpp, "\t\t{ \"%s\", ",
-				kname ? kname->c_str() : "key");
+		fprintf(cpp, "\t\t{ ");
 		auto ktype = d->keyType();
 		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, &ModelPartForDictionaryElement< %s::%s >::key, ",
 				modulePath().c_str(), d->name().c_str(),
 				Slice::typeToString(ktype).c_str(),
 				modulePath().c_str(), d->name().c_str());
 		createNewModelPartPtrFor(ktype);
-		fprintf(cpp, "< %s > >() },\n\t\t{ \"%s\", ",
+		fprintf(cpp, "< %s > >(\"%s\") },\n\t\t{ ",
 				Slice::typeToString(ktype).c_str(),
-				vname ? vname->c_str() : "value");
+				kname ? kname->c_str() : "key");
 		auto vtype = d->valueType();
 		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, &ModelPartForDictionaryElement< %s::%s >::value, ",
 				modulePath().c_str(), d->name().c_str(),
 				Slice::typeToString(vtype).c_str(),
 				modulePath().c_str(), d->name().c_str());
 		createNewModelPartPtrFor(vtype);
-		fprintf(cpp, "< %s > >() },\n",
-				Slice::typeToString(vtype).c_str());
+		fprintf(cpp, "< %s > >(\"%s\") },\n",
+				Slice::typeToString(vtype).c_str(),
+				vname ? vname->c_str() : "value");
 		fprintf(cpp, "\t};\n");
 		fprintf(cpp, "\n");
 	}
