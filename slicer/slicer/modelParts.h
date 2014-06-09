@@ -160,40 +160,55 @@ namespace Slicer {
 			class HookBase : public IceUtil::Shared {
 				public:
 					virtual ModelPartPtr Get(T * t) const = 0;
+
+					virtual std::string PartName() const = 0;
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
 			template <typename MT, MT T::*M, typename MP>
 			class Hook : public HookBase {
 				public:
+					Hook(const std::string & n) :
+						name(n)
+					{
+					}
+
 					ModelPartPtr Get(T * t) const override
 					{
 						return t ? new MP(t->*M) : NULL;
 					}
+
+					std::string PartName() const override
+					{
+						return name;
+					}
+
+				private:
+					const std::string name;
 			};
 
 			virtual void OnEachChild(const ChildHandler & ch)
 			{
-				for (auto h = hooks.begin(); h != hooks.end(); h++) {
-					auto modelPart = h->second->Get(GetModel());
-					ch(h->first, modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr());
+				BOOST_FOREACH (const auto & h, hooks) {
+					auto modelPart = h->Get(GetModel());
+					ch(h->PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr());
 				}
 			}
 
 			ModelPartPtr GetChild(const std::string & name) override
 			{
 				auto childitr = std::find_if(hooks.begin(), hooks.end(), [&name](const typename Hooks::value_type & h) {
-						return h.first == name;
+						return h->PartName() == name;
 					});
 				if (childitr != hooks.end()) {
-					return childitr->second->Get(GetModel());
+					return (*childitr)->Get(GetModel());
 				}
 				return NULL;
 			}
 
 			virtual T * GetModel() = 0;
 
-			typedef std::vector<std::pair<const std::string, HookPtr> > Hooks;
+			typedef std::vector<HookPtr> Hooks;
 
 		private:
 			static Hooks hooks;
