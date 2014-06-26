@@ -7,6 +7,8 @@
 #include <boost/function.hpp>
 #include <boost/assert.hpp>
 #include <types.h>
+#include <misc.h>
+#include "helpers.h"
 
 namespace fs = boost::filesystem;
 
@@ -26,6 +28,8 @@ verify(const fs::path & root, const fs::path & tmp, const fs::path & infile, con
 	fprintf(stderr, "%s : Check2\n", input.string().c_str());
 	if (check) check(*p);
 	fprintf(stderr, "%s : OK\n", input.string().c_str());
+
+	system(stringbf("diff -w %s %s", input, output));
 }
 
 void
@@ -85,6 +89,8 @@ main(int, char ** argv)
 	verify<TestModule::BuiltIns, Slicer::Xml>(root, tmp, "builtins.xml");
 	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-notset.xml", checkOptionals_notset);
 	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-areset.xml", checkOptionals_areset);
+	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-a.xml");
+	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-b.xml");
 
 	return 0;
 }

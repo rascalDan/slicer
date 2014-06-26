@@ -11,7 +11,8 @@ namespace fs = boost::filesystem;
 
 namespace Slicer {
 	Slicer::Slicer(FILE * c) :
-		cpp(c)
+		cpp(c),
+		classNo(0)
 	{
 	}
 
@@ -47,47 +48,43 @@ namespace Slicer {
 	{
 		if (c->hasMetaData("slicer:ignore")) { return false; }
 
+		auto decl = c->declaration();
 		fprintf(cpp, "// Class %s\n", c->name().c_str());
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartForComplex< %s::%s >::Hooks ",
 				modulePath().c_str(), c->name().c_str());
 		fprintf(cpp, "ModelPartForComplex< %s::%s >::hooks {\n",
 				modulePath().c_str(), c->name().c_str());
-		BOOST_FOREACH (const auto & dm, c->allDataMembers()) {
-			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			fprintf(cpp, "\t\t{ ");
-			auto type = dm->type();
-			fprintf(cpp, "new ModelPartForClass< %s::%sPtr >::Hook< ",
-				modulePath().c_str(), c->name().c_str());
-			if (dm->optional()) {
-				fprintf(cpp, "::IceUtil::Optional< %s >",
-						Slice::typeToString(type).c_str());
-			}
-			else {
-				fprintf(cpp, "%s",
-						Slice::typeToString(type).c_str());
-			}
-			fprintf(cpp, ", &%s::%s::%s, ",
-				modulePath().c_str(), c->name().c_str(), dm->name().c_str());
-			if (dm->optional()) {
-				fprintf(cpp, "ModelPartForOptional< ");
-			}
-			createNewModelPartPtrFor(type);
-			fprintf(cpp, "< %s",
-					Slice::typeToString(type).c_str());
-			if (dm->optional()) {
-				fprintf(cpp, " > ");
-			}
-			fprintf(cpp, " > >(\"%s\") },\n",
-					name ? name->c_str() : dm->name().c_str());
-		}
-		fprintf(cpp, "\t};\n");
+		visitComplexDataMembers(decl, c->allDataMembers());
+		fprintf(cpp, "\t};\n\n");
 		
 		fprintf(cpp, "template<>\n");
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
-		fprintf(cpp, "std::string ModelPartForClassRoot< %s::%sPtr >::rootName(\"%s\");\n\n",
-				modulePath().c_str(), c->name().c_str(),
+		fprintf(cpp, "std::string ModelPartForClassRoot< %s >::rootName(\"%s\");\n\n",
+				typeToString(decl).c_str(),
 				name ? name->c_str() : c->name().c_str());
+
+		fprintf(cpp, "static void registerClass_%u() __attribute__ ((constructor(210)));\n", classNo);
+		fprintf(cpp, "static void registerClass_%u()\n{\n", classNo);
+		fprintf(cpp, "\tSlicer::classRefMap()->insert({ \"%s::%s\", [](void * p){ return new ModelPartForClass< %s >(*static_cast< %s *>(p)); } });\n",
+				modulePath().c_str(), c->name().c_str(),
+				typeToString(decl).c_str(),
+				typeToString(decl).c_str());
+		fprintf(cpp, "}\n\n");
+		fprintf(cpp, "static void unregisterClass_%u() __attribute__ ((destructor(210)));\n", classNo);
+		fprintf(cpp, "static void unregisterClass_%u()\n{\n", classNo);
+		fprintf(cpp, "\tSlicer::classRefMap()->erase(\"%s::%s\");\n",
+				modulePath().c_str(), c->name().c_str());
+		fprintf(cpp, "}\n\n");
+
+		fprintf(cpp, "template<>\nTypeId\nModelPartForClass< %s >::GetTypeId() const\n{\n",
+				typeToString(decl).c_str());
+		fprintf(cpp, "\tauto id = ModelObject->ice_id();\n");
+		fprintf(cpp, "\treturn (id == \"%s::%s\") ? TypeId() : id;\n}\n\n",
+				modulePath().c_str(), c->name().c_str());
+
+		classNo += 1;
+
 		return true;
 	}
 
@@ -102,22 +99,43 @@ namespace Slicer {
 				modulePath().c_str(), c->name().c_str());
 		fprintf(cpp, "ModelPartForComplex< %s::%s >::hooks {\n",
 				modulePath().c_str(), c->name().c_str());
-		BOOST_FOREACH (const auto & dm, c->dataMembers()) {
-			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			fprintf(cpp, "\t\t{ ");
-			auto type = dm->type();
-			fprintf(cpp, "new ModelPartForStruct< %s::%s >::Hook< %s, &%s::%s::%s, ",
-				modulePath().c_str(), c->name().c_str(),
-				Slice::typeToString(type).c_str(),
-				modulePath().c_str(), c->name().c_str(), dm->name().c_str());
-			createNewModelPartPtrFor(type);
-			fprintf(cpp, "< %s > >(\"%s\") },\n",
-					Slice::typeToString(type).c_str(),
-					name ? name->c_str() : dm->name().c_str());
-		}
+		visitComplexDataMembers(c, c->dataMembers());
 		fprintf(cpp, "\t};\n\n");
 		
 		return true;
+	}
+
+	void
+	Slicer::visitComplexDataMembers(Slice::TypePtr it, const Slice::DataMemberList & dataMembers) const
+	{
+		BOOST_FOREACH (const auto & dm, dataMembers) {
+			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
+			auto t = Slice::TypePtr::dynamicCast(dm->container());
+			if (!t) {
+				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
+			}
+			auto name = metaDataValue("slicer:name:", dm->getMetaData());
+			fprintf(cpp, "\t\tnew ");
+			auto type = dm->type();
+			createNewModelPartPtrFor(t);
+			fprintf(cpp, "< %s >::Hook< %s",
+					typeToString(it).c_str(),
+					Slice::typeToString(type, dm->optional()).c_str());
+			fprintf(cpp, ", %s::%s, &%s::%s::%s, ",
+					modulePath().c_str(), c->name().c_str(),
+					modulePath().c_str(), c->name().c_str(), dm->name().c_str());
+			if (dm->optional()) {
+				fprintf(cpp, "ModelPartForOptional< ");
+			}
+			createNewModelPartPtrFor(type);
+			fprintf(cpp, "< %s",
+					Slice::typeToString(type).c_str());
+			if (dm->optional()) {
+				fprintf(cpp, " > ");
+			}
+			fprintf(cpp, " > >(\"%s\"),\n",
+					name ? name->c_str() : dm->name().c_str());
+		}
 	}
 
 	void
@@ -137,13 +155,11 @@ namespace Slicer {
 		else {
 			fprintf(cpp, "\t(void)name;\n");
 		}
-		fprintf(cpp, "\tsequence.push_back(%s());\n",
-					Slice::typeToString(s->type()).c_str());
+		fprintf(cpp, "\tsequence.push_back(typename element_type::value_type());\n");
 		fprintf(cpp, "\treturn new ");
 		auto etype = s->type();
 		createNewModelPartPtrFor(etype);
-		fprintf(cpp, "< %s >(sequence.back());\n}\n\n",
-				Slice::typeToString(etype).c_str());
+		fprintf(cpp, "<typename element_type::value_type>(sequence.back());\n}\n\n");
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartPtr\n");
 		fprintf(cpp, "ModelPartForSequence< %s::%s >::elementModelPart(typename %s::%s::value_type & e) const {\n",
@@ -151,8 +167,7 @@ namespace Slicer {
 				modulePath().c_str(), s->name().c_str());
 		fprintf(cpp, "\treturn new ");
 		createNewModelPartPtrFor(etype);
-		fprintf(cpp, "< %s >(e);\n}\n\n",
-				Slice::typeToString(etype).c_str());
+		fprintf(cpp, "<typename element_type::value_type>(e);\n}\n\n");
 		fprintf(cpp, "template<>\n");
 		auto ename = metaDataValue("slicer:element:", s->getMetaData());
 		fprintf(cpp, "std::string ModelPartForSequence< %s::%s >::elementName(\"%s\");\n\n",
@@ -179,23 +194,25 @@ namespace Slicer {
 				modulePath().c_str(), d->name().c_str());
 		auto kname = metaDataValue("slicer:key:", d->getMetaData());
 		auto vname = metaDataValue("slicer:value:", d->getMetaData());
-		fprintf(cpp, "\t\t{ ");
+		fprintf(cpp, "\t\t");
 		auto ktype = d->keyType();
-		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, &ModelPartForDictionaryElement< %s::%s >::key, ",
+		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, ModelPartForDictionaryElement< %s::%s >, &ModelPartForDictionaryElement< %s::%s >::key, ",
 				modulePath().c_str(), d->name().c_str(),
 				Slice::typeToString(ktype).c_str(),
+				modulePath().c_str(), d->name().c_str(),
 				modulePath().c_str(), d->name().c_str());
 		createNewModelPartPtrFor(ktype);
-		fprintf(cpp, "< %s > >(\"%s\") },\n\t\t{ ",
+		fprintf(cpp, "< %s > >(\"%s\"),\n\t\t",
 				Slice::typeToString(ktype).c_str(),
 				kname ? kname->c_str() : "key");
 		auto vtype = d->valueType();
-		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, &ModelPartForDictionaryElement< %s::%s >::value, ",
+		fprintf(cpp, "new ModelPartForDictionaryElement< %s::%s >::Hook< %s*, ModelPartForDictionaryElement< %s::%s >, &ModelPartForDictionaryElement< %s::%s >::value, ",
 				modulePath().c_str(), d->name().c_str(),
 				Slice::typeToString(vtype).c_str(),
+				modulePath().c_str(), d->name().c_str(),
 				modulePath().c_str(), d->name().c_str());
 		createNewModelPartPtrFor(vtype);
-		fprintf(cpp, "< %s > >(\"%s\") },\n",
+		fprintf(cpp, "< %s > >(\"%s\"),\n",
 				Slice::typeToString(vtype).c_str(),
 				vname ? vname->c_str() : "value");
 		fprintf(cpp, "\t};\n");
@@ -213,24 +230,24 @@ namespace Slicer {
 	Slicer::createNewModelPartPtrFor(const Slice::TypePtr & type) const
 	{
 		if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForSimple ");
+			fprintf(cpp, "ModelPartForSimple");
 		}
 		else if (auto complexClass = Slice::ClassDeclPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForClass ");
+			fprintf(cpp, "ModelPartForClass");
 		}
 		else if (auto complexStruct = Slice::StructPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForStruct ");
+			fprintf(cpp, "ModelPartForStruct");
 		}
 		else if (auto sequence = Slice::SequencePtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForSequence ");
+			fprintf(cpp, "ModelPartForSequence");
 		}
 		else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
-			fprintf(cpp, "ModelPartForDictionary ");
+			fprintf(cpp, "ModelPartForDictionary");
 		}
 	}
 
 	std::string
-	Slicer::modulePath()
+	Slicer::modulePath() const
 	{
 		std::string path;
 		BOOST_FOREACH (const auto & m, modules) {

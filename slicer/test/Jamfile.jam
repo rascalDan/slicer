@@ -26,6 +26,7 @@ lib common :
 	: :
 	<library>boost_filesystem
 	<library>boost_system
+	<include>../../libmisc
 	;
 
 unit-test do-slicer :

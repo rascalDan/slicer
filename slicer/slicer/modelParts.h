@@ -15,8 +15,12 @@
 namespace Slicer {
 	class IncorrectElementName : public std::invalid_argument {
 		public:
-			IncorrectElementName() :
-				std::invalid_argument("") { }
+			IncorrectElementName(const std::string & n);
+	};
+
+	class UnknownType : public std::invalid_argument {
+		public:
+			UnknownType(const std::string & n);
 	};
 
 	class ValueTarget : public IceUtil::Shared {
@@ -49,15 +53,22 @@ namespace Slicer {
 
 	typedef IceUtil::Handle<ModelPart> ModelPartPtr;
 	typedef std::map<std::string, ModelPartPtr> ModelParts;
+	typedef IceUtil::Optional<std::string> TypeId;
 
 	typedef boost::function<void(const std::string &, ModelPartPtr)> ChildHandler;
+
+	typedef boost::function<ModelPartPtr(void *)> ClassRef;
+	typedef std::map<std::string, ClassRef> ClassRefMap;
+	ClassRefMap * & classRefMap();
 
 	class ModelPart : public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
-			virtual ModelPartPtr GetChild(const std::string &) = 0;
+			virtual ModelPartPtr GetChild(const std::string & memberName) = 0;
+			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
+			virtual TypeId GetTypeId() const;
 			virtual void Create();
 			virtual void Complete();
 			virtual void SetValue(ValueSourcePtr);
@@ -165,7 +176,7 @@ namespace Slicer {
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
-			template <typename MT, MT T::*M, typename MP>
+			template <typename MT, typename CT, MT CT::*M, typename MP>
 			class Hook : public HookBase {
 				public:
 					Hook(const std::string & n) :
@@ -239,7 +250,18 @@ namespace Slicer {
 				return ModelObject.get();
 			}
 
+			virtual ModelPartPtr GetSubclassModelPart(const std::string & name) override
+			{
+				auto ref = classRefMap()->find(name);
+				if (ref == classRefMap()->end()) {
+					throw UnknownType(name);
+				}
+				return ref->second(&this->ModelObject);
+			}
+
 			virtual bool HasValue() const override { return ModelObject; }
+
+			virtual TypeId GetTypeId() const override;
 
 		private:
 			T & ModelObject;
@@ -288,7 +310,7 @@ namespace Slicer {
 			virtual ModelPartPtr GetChild(const std::string & name) override
 			{
 				if (!name.empty() && name != rootName) {
-					throw IncorrectElementName();
+					throw IncorrectElementName(rootName);
 				}
 				ModelPartForClass<T>::Create();
 				return new ModelPartForClass<T>(ModelObject);
@@ -406,7 +428,7 @@ namespace Slicer {
 			ModelPartPtr GetChild(const std::string & name) override
 			{
 				if (!name.empty() && name != pairName) {
-					throw IncorrectElementName();
+					throw IncorrectElementName(pairName);
 				}
 				return new ModelPartForDictionaryElementInserter<T>(dictionary);
 			}
