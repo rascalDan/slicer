@@ -167,6 +167,10 @@ namespace Slicer {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
 				auto smp = mp->GetChild(element->get_name());
 				if (smp) {
+					auto typeAttr = element->get_attribute("slicer-typeid");
+					if (typeAttr) {
+						smp = smp->GetSubclassModelPart(typeAttr->get_value());
+					}
 					smp->Create();
 					auto attrs(element->get_attributes());
 					if (!attrs.empty()) {
@@ -208,6 +212,11 @@ namespace Slicer {
 		}
 		else if (mp) {
 			auto element = n->add_child(name);
+			auto typeId = mp->GetTypeId();
+			if (typeId) {
+				element->set_attribute("slicer-typeid", *typeId);
+				mp = mp->GetSubclassModelPart(*typeId);
+			}
 			mp->GetValue(new XmlContentValueTarget(element));
 			mp->OnEachChild(boost::bind(&Xml::ModelTreeIterate, element, _1, _2));
 		}

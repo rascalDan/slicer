@@ -38,4 +38,23 @@ module TestModule {
 		StructType str;
 		int simp;
 	};
+	class Base {
+		int a;
+	};
+	class D1 extends Base {
+		int b;
+	};
+	class D2 extends Base {
+		int c;
+	};
+	class D3 extends D2 {
+		int d;
+	};
+	sequence<Base> BaseSeq;
+	dictionary<int, Base> BaseMap;
+	class InheritanceCont {
+		Base b;
+		BaseSeq bs;
+		BaseMap bm;
+	};
 };

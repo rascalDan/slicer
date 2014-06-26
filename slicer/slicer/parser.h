@@ -34,12 +34,15 @@ namespace Slicer {
 		private:
 			void createNewModelPartPtrFor(const Slice::TypePtr & type) const;
 
-			std::string modulePath();
+			void visitComplexDataMembers(Slice::TypePtr t, const Slice::DataMemberList &) const;
+
+			std::string modulePath() const;
 
 			static boost::optional<std::string> metaDataValue(const std::string & prefix, const std::list<std::string> & metadata);
 
 			FILE * cpp;
 			std::vector<Slice::ModulePtr> modules;
+			unsigned int classNo;
 	};
 }
 
