@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<InheritanceCont>
+  <b>
+    <a>1</a>
+  </b>
+  <bs>
+    <element>
+      <a>1</a>
+    </element>
+    <element>
+      <a>2</a>
+    </element>
+    <element>
+      <a>3</a>
+    </element>
+  </bs>
+  <bm>
+    <element>
+      <key>10</key>
+      <value>
+        <a>11</a>
+      </value>
+    </element>
+    <element>
+      <key>12</key>
+      <value>
+        <a>13</a>
+      </value>
+    </element>
+    <element>
+      <key>14</key>
+      <value>
+        <a>15</a>
+      </value>
+    </element>
+  </bm>
+</InheritanceCont>
