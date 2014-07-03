@@ -34,7 +34,7 @@ namespace Slicer {
 
 			void set(Ice::Byte & v) const override
 			{
-				v = boost::lexical_cast<Ice::Byte>(value);
+				v = boost::numeric_cast<Ice::Byte>(boost::lexical_cast<int>(value));
 			}
 
 			void set(Ice::Short & v) const override
@@ -106,7 +106,7 @@ namespace Slicer {
 
 			virtual void get(const Ice::Byte & value) const
 			{
-				apply(boost::lexical_cast<Glib::ustring>(value));
+				apply(boost::lexical_cast<Glib::ustring>((int)value));
 			}
 
 			virtual void set(const Ice::Short & value) const
