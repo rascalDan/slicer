@@ -21,15 +21,32 @@ verify(const fs::path & root, const fs::path & tmp, const fs::path & infile, con
 
 	fprintf(stderr, "%s : Deserialize\n", input.string().c_str());
 	IceInternal::Handle<T> p = Slicer::Deserialize<Serializer, T>(input);
-	fprintf(stderr, "%s : Check1\n", input.string().c_str());
-	if (check) check(*p);
+	if (check) {
+		fprintf(stderr, "%s : Check1\n", input.string().c_str());
+		check(*p);
+	}
 	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), output.string().c_str());
 	Slicer::Serialize<Serializer>(p, output);
-	fprintf(stderr, "%s : Check2\n", input.string().c_str());
-	if (check) check(*p);
+	if (check) {
+		fprintf(stderr, "%s : Check2\n", input.string().c_str());
+		check(*p);
+	}
 	fprintf(stderr, "%s : OK\n", input.string().c_str());
 
 	system(stringbf("diff -w %s %s", input, output));
+}
+
+void
+checkBuiltIns_valuesCorrect(const TestModule::BuiltIns & bt)
+{
+	BOOST_ASSERT(bt.mbool);
+	BOOST_ASSERT(bt.mbyte == 4);
+	BOOST_ASSERT(bt.mshort == 40);
+	BOOST_ASSERT(bt.mint == 80);
+	BOOST_ASSERT(bt.mlong == 800);
+	BOOST_ASSERT(bt.mfloat == 3.125);
+	BOOST_ASSERT(bt.mdouble == 3.0625);
+	BOOST_ASSERT(bt.mstring == "Sample text");
 }
 
 void
@@ -86,7 +103,7 @@ main(int, char ** argv)
 	fs::create_directory(tmp);
 
 	// Execute
-	verify<TestModule::BuiltIns, Slicer::Xml>(root, tmp, "builtins.xml");
+	verify<TestModule::BuiltIns, Slicer::Xml>(root, tmp, "builtins.xml", checkBuiltIns_valuesCorrect);
 	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-notset.xml", checkOptionals_notset);
 	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-areset.xml", checkOptionals_areset);
 	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-a.xml");
