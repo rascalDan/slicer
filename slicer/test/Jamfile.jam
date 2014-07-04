@@ -57,4 +57,5 @@ unit-test run-slicer :
 	<library>IceUtil
 	<library>../slicer//slicer
 	<library>../xml//slicer-xml
+	<library>../json//slicer-json
 ;
