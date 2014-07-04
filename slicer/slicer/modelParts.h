@@ -60,6 +60,13 @@ namespace Slicer {
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
 	ClassRefMap * & classRefMap();
+	enum ModelPartType {
+		mpt_Null,
+		mpt_Simple,
+		mpt_Complex,
+		mpt_Sequence,
+		mpt_Dictionary,
+	};
 
 	class ModelPart : public IceUtil::Shared {
 		public:
@@ -69,6 +76,7 @@ namespace Slicer {
 			virtual ModelPartPtr GetChild(const std::string & memberName) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
+			virtual ModelPartType GetType() const = 0;
 			virtual void Create();
 			virtual void Complete();
 			virtual void SetValue(ValueSourcePtr);
@@ -94,6 +102,7 @@ namespace Slicer {
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
 			virtual bool HasValue() const override { return true; }
+			virtual ModelPartType GetType() const { return mpt_Simple; }
 
 		private:
 			T & Member;
@@ -160,6 +169,14 @@ namespace Slicer {
 
 			virtual bool HasValue() const override { return OptionalMember; }
 
+			virtual ModelPartType GetType() const
+			{
+				if (HasValue()) {
+					return modelPart->GetType();
+				}
+				return mpt_Null;
+			}
+
 		private:
 			IceUtil::Optional< typename T::element_type > & OptionalMember;
 			ModelPartPtr modelPart;
@@ -216,6 +233,8 @@ namespace Slicer {
 				}
 				return NULL;
 			}
+
+			virtual ModelPartType GetType() const { return mpt_Complex; }
 
 			virtual T * GetModel() = 0;
 
@@ -359,6 +378,8 @@ namespace Slicer {
 
 			virtual bool HasValue() const override { return true; }
 
+			virtual ModelPartType GetType() const { return mpt_Sequence; }
+
 		private:
 			ModelPartPtr elementModelPart(typename T::value_type &) const;
 
@@ -434,6 +455,8 @@ namespace Slicer {
 			}
 
 			virtual bool HasValue() const override { return true; }
+
+			virtual ModelPartType GetType() const { return mpt_Dictionary; }
 
 		private:
 			T & dictionary;

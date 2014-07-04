@@ -1,6 +1,7 @@
 #include <slicer/parser.h>
 #include <slicer/slicer.h>
 #include <xml/serializer.h>
+#include <json/serializer.h>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
@@ -12,21 +13,25 @@
 
 namespace fs = boost::filesystem;
 
-template<typename T, typename Serializer>
+template<typename T, typename SerializerIn>
 void
 verify(const fs::path & root, const fs::path & tmp, const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
 {
 	const fs::path input = root / "initial" / infile;
 	const fs::path output = tmp / infile;
+	const fs::path outputJson = tmp / fs::change_extension(infile, "json");
+	const fs::path outputXml = tmp / fs::change_extension(infile, "xml");
 
 	fprintf(stderr, "%s : Deserialize\n", input.string().c_str());
-	IceInternal::Handle<T> p = Slicer::Deserialize<Serializer, T>(input);
+	IceInternal::Handle<T> p = Slicer::Deserialize<SerializerIn, T>(input);
 	if (check) {
 		fprintf(stderr, "%s : Check1\n", input.string().c_str());
 		check(*p);
 	}
-	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), output.string().c_str());
-	Slicer::Serialize<Serializer>(p, output);
+	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), outputJson.string().c_str());
+	Slicer::Serialize<Slicer::Json>(p, outputJson);
+	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), outputXml.string().c_str());
+	Slicer::Serialize<Slicer::Xml>(p, outputXml);
 	if (check) {
 		fprintf(stderr, "%s : Check2\n", input.string().c_str());
 		check(*p);
@@ -108,6 +113,8 @@ main(int, char ** argv)
 	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-areset.xml", checkOptionals_areset);
 	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-a.xml");
 	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-b.xml");
+	verify<TestModule::BuiltIns, Slicer::Json>(root, tmp, "builtins2.json", checkBuiltIns_valuesCorrect);
+	verify<TestModule::Optionals, Slicer::Json>(root, tmp, "optionals-areset2.json", checkOptionals_areset);
 
 	return 0;
 }
