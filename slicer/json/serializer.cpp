@@ -156,6 +156,11 @@ namespace Slicer {
 			ModelPartPtr modelPart;
 	};
 
+	Json::Json(const boost::filesystem::path & p) :
+		path(p)
+	{
+	}
+
 	void
 	Json::ModelTreeIterateSeq(json::Value * n, ModelPartPtr mp)
 	{
@@ -228,7 +233,7 @@ namespace Slicer {
 	}
 
 	void
-	Json::Deserialize(const boost::filesystem::path & path, ModelPartPtr modelRoot)
+	Json::Deserialize(ModelPartPtr modelRoot)
 	{
 		std::ifstream inFile(path.string());
 		std::stringstream buffer;
@@ -240,7 +245,7 @@ namespace Slicer {
 	}
 
 	void
-	Json::Serialize(const boost::filesystem::path & path, ModelPartPtr modelRoot)
+	Json::Serialize(ModelPartPtr modelRoot)
 	{
 		json::Value doc;
 		modelRoot->OnEachChild(boost::bind(&Json::ModelTreeIterateRoot, &doc, _2));
