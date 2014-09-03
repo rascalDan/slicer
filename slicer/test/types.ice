@@ -57,4 +57,7 @@ module TestModule {
 		BaseSeq bs;
 		BaseMap bm;
 	};
+	interface IgnoreMe {
+		int someFunction();
+	};
 };

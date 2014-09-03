@@ -46,6 +46,7 @@ namespace Slicer {
 	bool
 	Slicer::visitClassDefStart(const Slice::ClassDefPtr & c)
 	{
+		if (c->isInterface()) { return false; }
 		if (c->hasMetaData("slicer:ignore")) { return false; }
 
 		auto decl = c->declaration();
