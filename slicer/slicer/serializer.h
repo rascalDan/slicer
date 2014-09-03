@@ -9,8 +9,8 @@
 namespace Slicer {
 	class Serializer : public IceUtil::Shared {
 		public:
-			virtual void Deserialize(const boost::filesystem::path &, ModelPartPtr) = 0;
-			virtual void Serialize(const boost::filesystem::path &, ModelPartPtr) = 0;
+			virtual void Deserialize(ModelPartPtr) = 0;
+			virtual void Serialize(ModelPartPtr) = 0;
 	};
 	typedef IceUtil::Handle<Serializer> SerializerPtr;
 }
