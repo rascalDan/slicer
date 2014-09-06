@@ -27,7 +27,7 @@ namespace Slicer {
 		public:
 			virtual void get(const bool &) const = 0;
 			virtual void get(const Ice::Byte &) const = 0;
-			virtual void set(const Ice::Short &) const = 0;
+			virtual void get(const Ice::Short &) const = 0;
 			virtual void get(const Ice::Int &) const = 0;
 			virtual void get(const Ice::Long &) const = 0;
 			virtual void get(const Ice::Float &) const = 0;

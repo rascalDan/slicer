@@ -109,7 +109,7 @@ namespace Slicer {
 				apply(boost::lexical_cast<Glib::ustring>((int)value));
 			}
 
-			virtual void set(const Ice::Short & value) const
+			virtual void get(const Ice::Short & value) const
 			{
 				apply(boost::lexical_cast<Glib::ustring>(value));
 			}
