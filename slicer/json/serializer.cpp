@@ -76,7 +76,7 @@ namespace Slicer {
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void set(const Ice::Short & value) const
+			virtual void get(const Ice::Short & value) const
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
