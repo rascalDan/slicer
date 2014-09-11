@@ -1,6 +1,8 @@
 #include <slicer/parser.h>
 #include <slicer/slicer.h>
+#include <slicer/modelParts.h>
 #include <xml/serializer.h>
+#include <libxml2/libxml/parser.h>
 #include <json/serializer.h>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -9,13 +11,14 @@
 #include <boost/assert.hpp>
 #include <types.h>
 #include <misc.h>
+#include <fstream>
 #include "helpers.h"
 
 namespace fs = boost::filesystem;
 
 template<typename T, typename SerializerIn>
 void
-verify(const fs::path & root, const fs::path & tmp, const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
+verifyByFile(const fs::path & root, const fs::path & tmp, const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
 {
 	const fs::path input = root / "initial" / infile;
 	const fs::path output = tmp / infile;
@@ -29,13 +32,52 @@ verify(const fs::path & root, const fs::path & tmp, const fs::path & infile, con
 		check(*p);
 	}
 	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), outputJson.string().c_str());
-	Slicer::Serialize<Slicer::Json>(p, outputJson);
+	Slicer::Serialize<Slicer::JsonFile>(p, outputJson);
 	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), outputXml.string().c_str());
-	Slicer::Serialize<Slicer::Xml>(p, outputXml);
+	Slicer::Serialize<Slicer::XmlFile>(p, outputXml);
 	if (check) {
 		fprintf(stderr, "%s : Check2\n", input.string().c_str());
 		check(*p);
 	}
+	fprintf(stderr, "%s : OK\n", input.string().c_str());
+
+	system(stringbf("diff -w %s %s", input, output));
+}
+
+template<typename T, typename Serializer, typename Internal>
+void
+verifyByHelper(const fs::path & root, const fs::path & tmp, const fs::path & infile,
+		const boost::function<Internal(const fs::path &)> & in,
+		const boost::function<void(const Internal &, const fs::path &)> & out,
+		const boost::function<void(Internal &)> & ifree,
+		const boost::function<void(const T &)> & check = NULL)
+{
+	const fs::path input = root / "initial" / infile;
+	const fs::path output = tmp / infile;
+
+	fprintf(stderr, "%s : Read\n", input.string().c_str());
+	Internal docRead = in(input);
+
+	fprintf(stderr, "%s : Deserialize\n", input.string().c_str());
+	IceInternal::Handle<T> p = Slicer::Deserialize<Serializer, T>(docRead);
+	ifree(docRead);
+	if (check) {
+		fprintf(stderr, "%s : Check1\n", input.string().c_str());
+		check(*p);
+	}
+
+	fprintf(stderr, "%s : Serialize\n", input.string().c_str());
+	Internal docWrite;
+	Slicer::Serialize<Serializer>(p, docWrite);
+	if (check) {
+		fprintf(stderr, "%s : Check2\n", input.string().c_str());
+		check(*p);
+	}
+
+	fprintf(stderr, "%s : Write\n", input.string().c_str());
+	out(docWrite, output);
+	ifree(docWrite);
+
 	fprintf(stderr, "%s : OK\n", input.string().c_str());
 
 	system(stringbf("diff -w %s %s", input, output));
@@ -91,6 +133,47 @@ checkOptionals_areset(const TestModule::Optionals & opts)
 	BOOST_ASSERT(opts.optDict->find(13)->second->b == 15);
 }
 
+xmlpp::Document *
+readXml(const fs::path & path)
+{
+		return new xmlpp::Document(xmlParseFile(path.string().c_str()));
+}
+
+void
+writeXml(xmlpp::Document * const & doc, const fs::path & path)
+{
+	doc->write_to_file_formatted(path.string());
+}
+
+void
+freeXml(xmlpp::Document * & doc)
+{
+	delete doc;
+}
+
+json::Value
+readJson(const fs::path & path)
+{
+	std::ifstream inFile(path.string());
+	std::stringstream buffer;
+	buffer << inFile.rdbuf();
+	Glib::ustring doc(buffer.str());
+	Glib::ustring::const_iterator itr = doc.begin();
+	return json::parseValue(itr);
+}
+
+void
+writeJson(const json::Value & value, const fs::path & path)
+{
+	std::ofstream outFile(path.string());
+	json::serializeValue(value, outFile, "utf-8");
+}
+
+void
+freeJson(json::Value &)
+{
+}
+
 int
 main(int, char ** argv)
 {
@@ -106,15 +189,22 @@ main(int, char ** argv)
 	const fs::path tmp = root / "bin" / "slicer";
 	fprintf(stderr, "tmp --- %s\n", tmp.string().c_str());
 	fs::create_directory(tmp);
+	const fs::path tmpf = tmp / "byFile";
+	fs::create_directory(tmpf);
+	const fs::path tmph = tmp / "byHelper";
+	fs::create_directory(tmph);
 
 	// Execute
-	verify<TestModule::BuiltIns, Slicer::Xml>(root, tmp, "builtins.xml", checkBuiltIns_valuesCorrect);
-	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-notset.xml", checkOptionals_notset);
-	verify<TestModule::Optionals, Slicer::Xml>(root, tmp, "optionals-areset.xml", checkOptionals_areset);
-	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-a.xml");
-	verify<TestModule::InheritanceCont, Slicer::Xml>(root, tmp, "inherit-b.xml");
-	verify<TestModule::BuiltIns, Slicer::Json>(root, tmp, "builtins2.json", checkBuiltIns_valuesCorrect);
-	verify<TestModule::Optionals, Slicer::Json>(root, tmp, "optionals-areset2.json", checkOptionals_areset);
+	verifyByFile<TestModule::BuiltIns, Slicer::XmlFile>(root, tmpf, "builtins.xml", checkBuiltIns_valuesCorrect);
+	verifyByFile<TestModule::Optionals, Slicer::XmlFile>(root, tmpf, "optionals-notset.xml", checkOptionals_notset);
+	verifyByFile<TestModule::Optionals, Slicer::XmlFile>(root, tmpf, "optionals-areset.xml", checkOptionals_areset);
+	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-a.xml");
+	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-b.xml");
+	verifyByFile<TestModule::BuiltIns, Slicer::JsonFile>(root, tmpf, "builtins2.json", checkBuiltIns_valuesCorrect);
+	verifyByFile<TestModule::Optionals, Slicer::JsonFile>(root, tmpf, "optionals-areset2.json", checkOptionals_areset);
+
+	verifyByHelper<TestModule::Optionals, Slicer::JsonValue, json::Value>(root, tmph, "optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
+	verifyByHelper<TestModule::Optionals, Slicer::XmlDocument, xmlpp::Document *>(root, tmph, "optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 
 	return 0;
 }
