@@ -13,4 +13,6 @@ lib slicer-xml :
 	<library>boost_filesystem
 	<library>IceUtil
 	<library>libxmlpp
+	: :
+	<library>libxmlpp
 	;

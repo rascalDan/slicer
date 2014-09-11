@@ -20,4 +20,6 @@ lib slicer-json :
 	<library>IceUtil
 	<library>jsonpp
 	<library>glibmm
+	: :
+	<library>jsonpp
 	;

@@ -160,11 +160,6 @@ namespace Slicer {
 			}
 	};
 	
-	Xml::Xml(const boost::filesystem::path & p) :
-		path(p)
-	{
-	}
-
 	void
 	Xml::DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp)
 	{
@@ -234,8 +229,13 @@ namespace Slicer {
 		mp->OnEachChild(boost::bind(&Xml::ModelTreeIterate, root, _1, _2));
 	}
 
+	XmlFile::XmlFile(const boost::filesystem::path & p) :
+		path(p)
+	{
+	}
+
 	void
-	Xml::Deserialize(ModelPartPtr modelRoot)
+	XmlFile::Deserialize(ModelPartPtr modelRoot)
 	{
 		xmlpp::DomParser dom(path.string());
 		auto doc = dom.get_document();
@@ -243,11 +243,29 @@ namespace Slicer {
 	}
 
 	void
-	Xml::Serialize(ModelPartPtr modelRoot)
+	XmlFile::Serialize(ModelPartPtr modelRoot)
 	{
 		xmlpp::Document doc;
 		modelRoot->OnEachChild(boost::bind(&Xml::ModelTreeIterateRoot, &doc, _1, _2));
 		doc.write_to_file_formatted(path.string());
+	}
+
+	XmlDocument::XmlDocument(xmlpp::Document * & d) :
+		doc(d)
+	{
+	}
+
+	void
+	XmlDocument::Deserialize(ModelPartPtr modelRoot)
+	{
+		DocumentTreeIterate(doc, modelRoot);
+	}
+
+	void
+	XmlDocument::Serialize(ModelPartPtr modelRoot)
+	{
+		doc = new xmlpp::Document();
+		modelRoot->OnEachChild(boost::bind(&Xml::ModelTreeIterateRoot, doc, _1, _2));
 	}
 }
 
