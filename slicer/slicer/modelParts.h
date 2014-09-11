@@ -23,29 +23,55 @@ namespace Slicer {
 			UnknownType(const std::string & n);
 	};
 
-	class ValueTarget : public IceUtil::Shared {
+	template <typename T>
+	class TValueTarget {
 		public:
-			virtual void get(const bool &) const = 0;
-			virtual void get(const Ice::Byte &) const = 0;
-			virtual void get(const Ice::Short &) const = 0;
-			virtual void get(const Ice::Int &) const = 0;
-			virtual void get(const Ice::Long &) const = 0;
-			virtual void get(const Ice::Float &) const = 0;
-			virtual void get(const Ice::Double &) const = 0;
-			virtual void get(const std::string &) const = 0;
+			virtual void get(const T &) const = 0;
+	};
+	class ValueTarget : public IceUtil::Shared,
+			public TValueTarget<bool>,
+			public TValueTarget<Ice::Byte>,
+			public TValueTarget<Ice::Short>,
+			public TValueTarget<Ice::Int>,
+			public TValueTarget<Ice::Long>,
+			public TValueTarget<Ice::Float>,
+			public TValueTarget<Ice::Double>,
+			public TValueTarget<std::string> {
+		public:
+			using TValueTarget<bool>::get;
+			using TValueTarget<Ice::Byte>::get;
+			using TValueTarget<Ice::Short>::get;
+			using TValueTarget<Ice::Int>::get;
+			using TValueTarget<Ice::Long>::get;
+			using TValueTarget<Ice::Float>::get;
+			using TValueTarget<Ice::Double>::get;
+			using TValueTarget<std::string>::get;
 	};
 	typedef IceUtil::Handle<ValueTarget> ValueTargetPtr;
 
-	class ValueSource : public IceUtil::Shared {
+	template <typename T>
+	class TValueSource {
 		public:
-			virtual void set(bool &) const = 0;
-			virtual void set(Ice::Byte &) const = 0;
-			virtual void set(Ice::Short &) const = 0;
-			virtual void set(Ice::Int &) const = 0;
-			virtual void set(Ice::Long &) const = 0;
-			virtual void set(Ice::Float &) const = 0;
-			virtual void set(Ice::Double &) const = 0;
-			virtual void set(std::string &) const = 0;
+			virtual void set(T &) const = 0;
+	};
+	class ValueSource : public IceUtil::Shared,
+			public TValueSource<bool>,
+			public TValueSource<Ice::Byte>,
+			public TValueSource<Ice::Short>,
+			public TValueSource<Ice::Int>,
+			public TValueSource<Ice::Long>,
+			public TValueSource<Ice::Float>,
+			public TValueSource<Ice::Double>,
+			public TValueSource<std::string> {
+		public:
+			using TValueSource<bool>::set;
+			using TValueSource<Ice::Byte>::set;
+			using TValueSource<Ice::Short>::set;
+			using TValueSource<Ice::Int>::set;
+			using TValueSource<Ice::Long>::set;
+			using TValueSource<Ice::Float>::set;
+			using TValueSource<Ice::Double>::set;
+			using TValueSource<std::string>::set;
 	};
 	typedef IceUtil::Handle<ValueSource> ValueSourcePtr;
 
@@ -101,6 +127,30 @@ namespace Slicer {
 			virtual ModelPartPtr GetChild(const std::string &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
+			virtual bool HasValue() const override { return true; }
+			virtual ModelPartType GetType() const { return mpt_Simple; }
+
+		private:
+			T & Member;
+	};
+
+	template<typename T, typename M, T M::* MV>
+	class ModelPartForConverted : public ModelPart {
+		public:
+			typedef T element_type;
+
+			ModelPartForConverted(T & h) :
+				Member(h)
+			{
+			}
+			ModelPartForConverted(T * h) :
+				Member(*h)
+			{
+			}
+			virtual void OnEachChild(const ChildHandler &) { }
+			virtual ModelPartPtr GetChild(const std::string &) override { return NULL; }
+			virtual void SetValue(ValueSourcePtr s) override;
+			virtual void GetValue(ValueTargetPtr s) override;
 			virtual bool HasValue() const override { return true; }
 			virtual ModelPartType GetType() const { return mpt_Simple; }
 

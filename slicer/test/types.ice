@@ -1,4 +1,19 @@
+[["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
+
 module TestModule {
+	struct DateTime {
+		short year;
+		short month;
+		short day;
+		short hour;
+		short minute;
+		short second;
+	};
+	class DateTimeContainer {
+		[	"slicer:conversion:boost.posix_time.ptime:ptimeToDateTime:dateTimeToPTime",
+			"slicer:conversion:std.string:stringToDateTime:dateTimeToString" ]
+		DateTime dt;
+	};
 	class BuiltIns {
 		bool mbool;
 		byte mbyte;

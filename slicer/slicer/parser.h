@@ -10,6 +10,13 @@ namespace Slicer {
 
 	class Slicer : public Slice::ParserVisitor {
 		public:
+			class ConversionSpec {
+				public:
+					std::string ExchangeType;
+					std::string ConvertToModelFunc;
+					std::string ConvertToExchangeFunc;
+			};
+
 			Slicer(FILE * c);
 
 			static void Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
@@ -38,7 +45,12 @@ namespace Slicer {
 
 			std::string modulePath() const;
 
+			void defineConversions(Slice::DataMemberPtr dm) const;
+
 			static boost::optional<std::string> metaDataValue(const std::string & prefix, const std::list<std::string> & metadata);
+			static std::list<std::string> metaDataValues(const std::string & prefix, const std::list<std::string> & metadata);
+			static std::vector<std::string> metaDataSplit(const std::string & metadata);
+			static std::vector<ConversionSpec> getConversions(Slice::DataMemberPtr);
 
 			FILE * cpp;
 			std::vector<Slice::ModulePtr> modules;
