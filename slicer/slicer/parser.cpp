@@ -3,6 +3,9 @@
 #include <Slice/Preprocessor.h>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <Slice/CPlusPlusUtil.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -14,6 +17,62 @@ namespace Slicer {
 		cpp(c),
 		classNo(0)
 	{
+	}
+
+	void
+	Slicer::defineConversions(Slice::DataMemberPtr dm) const
+	{
+		auto type = dm->type();
+		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
+		auto conversions = getConversions(dm);
+		BOOST_FOREACH(const auto & conversion, conversions) {
+			fprintf(cpp, "%s %s(const %s &);\n",
+					conversion.ExchangeType.c_str(),
+					conversion.ConvertToExchangeFunc.c_str(),
+					Slice::typeToString(type).c_str());
+			fprintf(cpp, "%s %s(const %s &);\n\n",
+					Slice::typeToString(type).c_str(),
+					conversion.ConvertToModelFunc.c_str(),
+					conversion.ExchangeType.c_str());
+		}
+		if (!conversions.empty()) {
+			fprintf(cpp, "template<>\nvoid\n");
+			fprintf(cpp, "ModelPartForConverted< %s, %s::%s, &%s::%s::%s >::SetValue(ValueSourcePtr vsp)\n",
+					Slice::typeToString(type).c_str(),
+					modulePath().c_str(), c->name().c_str(),
+					modulePath().c_str(), c->name().c_str(), dm->name().c_str());
+			fprintf(cpp, "{\n");
+
+			BOOST_FOREACH(const auto & conversion, conversions) {
+				fprintf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
+						conversion.ExchangeType.c_str());
+				fprintf(cpp, "\t\t%s tmp;\n",
+						conversion.ExchangeType.c_str());
+				fprintf(cpp, "\t\tvspt->set(tmp);\n");
+				fprintf(cpp, "\t\tMember = %s(tmp);\n",
+						conversion.ConvertToModelFunc.c_str());
+				fprintf(cpp, "\t\treturn;\n");
+				fprintf(cpp, "\t}\n");
+			}
+			fprintf(cpp, "}\n\n");
+
+			fprintf(cpp, "template<>\nvoid\n");
+			fprintf(cpp, "ModelPartForConverted< %s, %s::%s, &%s::%s::%s >::GetValue(ValueTargetPtr vtp)\n",
+					Slice::typeToString(type).c_str(),
+					modulePath().c_str(), c->name().c_str(),
+					modulePath().c_str(), c->name().c_str(), dm->name().c_str());
+			fprintf(cpp, "{\n");
+
+			BOOST_FOREACH(const auto & conversion, conversions) {
+				fprintf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
+						conversion.ExchangeType.c_str());
+				fprintf(cpp, "\t\tvtpt->get(%s(Member));\n",
+						conversion.ConvertToExchangeFunc.c_str());
+				fprintf(cpp, "\t\treturn;\n");
+				fprintf(cpp, "\t}\n");
+			}
+			fprintf(cpp, "}\n\n");
+		}
 	}
 
 	bool
@@ -40,6 +99,16 @@ namespace Slicer {
 	{
 		fprintf(cpp, "// Begin module %s\n\n", m->name().c_str());
 		modules.push_back(m);
+		BOOST_FOREACH(const auto & c, m->structs()) {
+			BOOST_FOREACH(const auto & dm, c->dataMembers()) {
+				defineConversions(dm);
+			}
+		}
+		BOOST_FOREACH(const auto & c, m->classes()) {
+			BOOST_FOREACH(const auto & dm, c->dataMembers()) {
+				defineConversions(dm);
+			}
+		}
 		return true;
 	}
 
@@ -116,6 +185,7 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto name = metaDataValue("slicer:name:", dm->getMetaData());
+			auto conversions = metaDataValues("slicer:conversion:", dm->getMetaData());
 			fprintf(cpp, "\t\tnew ");
 			auto type = dm->type();
 			createNewModelPartPtrFor(t);
@@ -128,13 +198,21 @@ namespace Slicer {
 			if (dm->optional()) {
 				fprintf(cpp, "ModelPartForOptional< ");
 			}
-			createNewModelPartPtrFor(type);
-			fprintf(cpp, "< %s",
-					Slice::typeToString(type).c_str());
+			if (!conversions.empty()) {
+				fprintf(cpp, "ModelPartForConverted< %s, %s::%s, &%s::%s::%s >",
+						Slice::typeToString(type).c_str(),
+						modulePath().c_str(), c->name().c_str(),
+						modulePath().c_str(), c->name().c_str(), dm->name().c_str());
+			}
+			else {
+				createNewModelPartPtrFor(type);
+				fprintf(cpp, "< %s >",
+						Slice::typeToString(type).c_str());
+			}
 			if (dm->optional()) {
 				fprintf(cpp, " > ");
 			}
-			fprintf(cpp, " > >(\"%s\"),\n",
+			fprintf(cpp, " >(\"%s\"),\n",
 					name ? name->c_str() : dm->name().c_str());
 		}
 	}
@@ -267,6 +345,44 @@ namespace Slicer {
 			}
 		}
 		return boost::optional<std::string>();
+	}
+
+	std::list<std::string>
+	Slicer::metaDataValues(const std::string & prefix, const std::list<std::string> & metadata)
+	{
+		std::list<std::string> mds;
+		BOOST_FOREACH (const auto & md, metadata) {
+			if (boost::algorithm::starts_with(md, prefix)) {
+				mds.push_back(md.substr(prefix.length()));
+			}
+		}
+		return mds;
+	}
+
+	std::vector<std::string>
+	Slicer::metaDataSplit(const std::string & metadata)
+	{
+		std::vector<std::string> parts;
+		boost::algorithm::split(parts, metadata, boost::algorithm::is_any_of(":"), boost::algorithm::token_compress_off); 
+		return parts;	
+	}
+
+	std::vector<Slicer::ConversionSpec>
+	Slicer::getConversions(Slice::DataMemberPtr dm)
+	{
+		std::vector<ConversionSpec> rtn;
+		auto conversions = metaDataValues("slicer:conversion:", dm->getMetaData());
+		BOOST_FOREACH(const auto & conversion, conversions) {
+			auto split = metaDataSplit(conversion);
+			if (split.size() != 3) {
+				throw std::runtime_error("conversion needs 3 parts type:toModelFunc:toExchangeFunc");
+			}
+			BOOST_FOREACH(auto & p, split) {
+				boost::algorithm::replace_all(p, ".", "::");
+			}
+			rtn.push_back(ConversionSpec({split[0], split[1], split[2]}));
+		}
+		return rtn;
 	}
 
 	void

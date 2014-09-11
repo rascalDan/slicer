@@ -9,6 +9,34 @@
 
 namespace fs = boost::filesystem;
 
+namespace Slicer {
+	// These are the conversion helpers defined used in types.ice, they're not called in this test, but
+	// need to exist for the dynamic load to complete
+	boost::posix_time::ptime
+	dateTimeToPTime(const ::TestModule::DateTime &)
+	{
+		throw std::runtime_error("Not implemented");
+	}
+
+	::TestModule::DateTime
+	ptimeToDateTime(const boost::posix_time::ptime &)
+	{
+		throw std::runtime_error("Not implemented");
+	}
+
+	std::string
+	dateTimeToString(const ::TestModule::DateTime &)
+	{
+		throw std::runtime_error("Not implemented");
+	}
+
+	::TestModule::DateTime
+	stringToDateTime(const std::string &)
+	{
+		throw std::runtime_error("Not implemented");
+	}
+}
+
 int
 main(int, char ** argv)
 {
