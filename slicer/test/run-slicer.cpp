@@ -141,6 +141,36 @@ checkBuiltIns_valuesCorrect(const TestModule::BuiltIns & bt)
 }
 
 void
+checkInherits_types(const TestModule::InheritanceCont & i)
+{
+	BOOST_ASSERT(i.b);
+	BOOST_ASSERT(TestModule::D1Ptr::dynamicCast(i.b));
+	BOOST_ASSERT(TestModule::D1Ptr::dynamicCast(i.b)->a == 1);
+	BOOST_ASSERT(TestModule::D1Ptr::dynamicCast(i.b)->b == 2);
+	BOOST_ASSERT(i.bs.size() == 3);
+	BOOST_ASSERT(i.bs[0]);
+	BOOST_ASSERT(TestModule::D2Ptr::dynamicCast(i.bs[0]));
+	BOOST_ASSERT(TestModule::D2Ptr::dynamicCast(i.bs[0])->a == 1);
+	BOOST_ASSERT(TestModule::D2Ptr::dynamicCast(i.bs[0])->c == 100);
+	BOOST_ASSERT(i.bs[1]);
+	BOOST_ASSERT(TestModule::D3Ptr::dynamicCast(i.bs[1]));
+	BOOST_ASSERT(TestModule::D3Ptr::dynamicCast(i.bs[1])->a == 2);
+	BOOST_ASSERT(TestModule::D3Ptr::dynamicCast(i.bs[1])->c == 100);
+	BOOST_ASSERT(TestModule::D3Ptr::dynamicCast(i.bs[1])->d == 200);
+	BOOST_ASSERT(i.bs[2]);
+	BOOST_ASSERT(i.bs[2]->a == 3);
+	BOOST_ASSERT(!TestModule::D1Ptr::dynamicCast(i.bs[2]));
+	BOOST_ASSERT(!TestModule::D2Ptr::dynamicCast(i.bs[2]));
+	BOOST_ASSERT(!TestModule::D3Ptr::dynamicCast(i.bs[2]));
+	BOOST_ASSERT(i.bm.size() == 3);
+	BOOST_ASSERT(TestModule::D1Ptr::dynamicCast(i.bm.find(10)->second));
+	BOOST_ASSERT(TestModule::D3Ptr::dynamicCast(i.bm.find(12)->second));
+	BOOST_ASSERT(!TestModule::D1Ptr::dynamicCast(i.bm.find(14)->second));
+	BOOST_ASSERT(!TestModule::D2Ptr::dynamicCast(i.bm.find(14)->second));
+	BOOST_ASSERT(!TestModule::D3Ptr::dynamicCast(i.bm.find(14)->second));
+}
+
+void
 checkOptionals_notset(const TestModule::Optionals & opts)
 {
 	BOOST_ASSERT(!opts.optSimple);
@@ -243,10 +273,11 @@ main(int, char ** argv)
 	verifyByFile<TestModule::Optionals, Slicer::XmlFile>(root, tmpf, "optionals-notset.xml", checkOptionals_notset);
 	verifyByFile<TestModule::Optionals, Slicer::XmlFile>(root, tmpf, "optionals-areset.xml", checkOptionals_areset);
 	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-a.xml");
-	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-b.xml");
+	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-b.xml", checkInherits_types);
 	verifyByFile<TestModule::DateTimeContainer, Slicer::XmlFile>(root, tmpf, "conv-datetime.xml");
 	verifyByFile<TestModule::BuiltIns, Slicer::JsonFile>(root, tmpf, "builtins2.json", checkBuiltIns_valuesCorrect);
 	verifyByFile<TestModule::Optionals, Slicer::JsonFile>(root, tmpf, "optionals-areset2.json", checkOptionals_areset);
+	verifyByFile<TestModule::InheritanceCont, Slicer::JsonFile>(root, tmpf, "inherit-c.json", checkInherits_types);
 
 	verifyByHelper<TestModule::Optionals, Slicer::JsonValue, json::Value>(root, tmph, "optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
 	verifyByHelper<TestModule::Optionals, Slicer::XmlDocument, xmlpp::Document *>(root, tmph, "optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);

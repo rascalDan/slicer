@@ -112,7 +112,7 @@ namespace Slicer {
 
 	class DocumentTreeIterate : public boost::static_visitor<> {
 		public:
-			DocumentTreeIterate(ModelPartPtr mp) : modelPart(mp)
+			DocumentTreeIterate(ModelPartPtr & mp) : modelPart(mp)
 			{
 			}
 			template<typename SimpleT>
@@ -128,13 +128,17 @@ namespace Slicer {
 			}
 			void operator()(const json::Object & o) const
 			{
+				auto typeAttrItr = o.find("slicer-typeid");
+				if (typeAttrItr != o.end() && boost::get<json::String>(typeAttrItr->second.get())) {
+					modelPart = modelPart->GetSubclassModelPart(boost::get<json::String>(*typeAttrItr->second));
+				}
 				modelPart->Create();
 				BOOST_FOREACH(const auto & element, o) {
 					auto emp = modelPart->GetChild(element.first);
 					if (emp) {
 						emp->Create();
 						boost::apply_visitor(DocumentTreeIterate(emp), *element.second);
-				emp->Complete();
+						emp->Complete();
 					}
 				}
 				modelPart->Complete();
@@ -147,13 +151,13 @@ namespace Slicer {
 					if (emp) {
 						emp->Create();
 						boost::apply_visitor(DocumentTreeIterate(emp), *element);
-				emp->Complete();
+						emp->Complete();
 					}
 				}
 				modelPart->Complete();
 			}
 		private:
-			ModelPartPtr modelPart;
+			ModelPartPtr & modelPart;
 	};
 
 	void
@@ -241,7 +245,8 @@ namespace Slicer {
 		Glib::ustring doc(buffer.str());
 		Glib::ustring::const_iterator itr = doc.begin();
 		json::Value obj = json::parseValue(itr);
-		boost::apply_visitor(DocumentTreeIterate(modelRoot->GetChild(std::string())), obj);
+		auto mp = modelRoot->GetChild(std::string());
+		boost::apply_visitor(DocumentTreeIterate(mp), obj);
 	}
 
 	void
@@ -261,7 +266,8 @@ namespace Slicer {
 	void
 	JsonValue::Deserialize(ModelPartPtr modelRoot)
 	{
-		boost::apply_visitor(DocumentTreeIterate(modelRoot->GetChild(std::string())), value);
+		auto mp = modelRoot->GetChild(std::string());
+		boost::apply_visitor(DocumentTreeIterate(mp), value);
 	}
 
 	void
