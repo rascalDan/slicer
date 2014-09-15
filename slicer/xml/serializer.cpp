@@ -167,9 +167,10 @@ namespace Slicer {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
 				auto smp = mp->GetChild(element->get_name());
 				if (smp) {
-					auto typeAttr = element->get_attribute("slicer-typeid");
-					if (typeAttr) {
-						smp = smp->GetSubclassModelPart(typeAttr->get_value());
+					if (auto typeIdPropName = smp->GetTypeIdProperty()) {
+						if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
+							smp = smp->GetSubclassModelPart(typeAttr->get_value());
+						}
 					}
 					smp->Create();
 					auto attrs(element->get_attributes());
@@ -212,9 +213,10 @@ namespace Slicer {
 		}
 		else if (mp) {
 			auto element = n->add_child(name);
+			auto typeIdPropName = mp->GetTypeIdProperty();
 			auto typeId = mp->GetTypeId();
-			if (typeId) {
-				element->set_attribute("slicer-typeid", *typeId);
+			if (typeId && typeIdPropName) {
+				element->set_attribute(*typeIdPropName, *typeId);
 				mp = mp->GetSubclassModelPart(*typeId);
 			}
 			mp->GetValue(new XmlContentValueTarget(element));

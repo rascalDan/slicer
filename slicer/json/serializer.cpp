@@ -128,9 +128,11 @@ namespace Slicer {
 			}
 			void operator()(const json::Object & o) const
 			{
-				auto typeAttrItr = o.find("slicer-typeid");
-				if (typeAttrItr != o.end() && boost::get<json::String>(typeAttrItr->second.get())) {
-					modelPart = modelPart->GetSubclassModelPart(boost::get<json::String>(*typeAttrItr->second));
+				if (auto typeIdName = modelPart->GetTypeIdProperty()) {
+					auto typeAttrItr = o.find(*typeIdName);
+					if (typeAttrItr != o.end() && boost::get<json::String>(typeAttrItr->second.get())) {
+						modelPart = modelPart->GetSubclassModelPart(boost::get<json::String>(*typeAttrItr->second));
+					}
 				}
 				modelPart->Create();
 				BOOST_FOREACH(const auto & element, o) {
@@ -185,9 +187,11 @@ namespace Slicer {
 				case mpt_Complex:
 					{
 						auto nn = json::ValuePtr(new json::Value(json::Object()));
-						if (auto typeId = mp->GetTypeId()) {
-							boost::get<json::Object>(*nn).insert({"slicer-typeid", json::ValuePtr(new json::Value(*typeId))});
-							mp = mp->GetSubclassModelPart(*typeId);
+						if (auto typeIdName = mp->GetTypeIdProperty()) {
+							if (auto typeId = mp->GetTypeId()) {
+								boost::get<json::Object>(*nn).insert({*typeIdName, json::ValuePtr(new json::Value(*typeId))});
+								mp = mp->GetSubclassModelPart(*typeId);
+							}
 						}
 						mp->OnEachChild(boost::bind(&Json::ModelTreeIterate, boost::get<json::Object>(*n).insert({name, nn}).first->second.get(), _1, _2));
 						break;
@@ -213,9 +217,11 @@ namespace Slicer {
 					break;
 				case mpt_Complex:
 					*n = json::Object();
-					if (auto typeId = mp->GetTypeId()) {
-						boost::get<json::Object>(*n).insert({"slicer-typeid", json::ValuePtr(new json::Value(*typeId))});
-						mp = mp->GetSubclassModelPart(*typeId);
+					if (auto typeIdName = mp->GetTypeIdProperty()) {
+						if (auto typeId = mp->GetTypeId()) {
+							boost::get<json::Object>(*n).insert({*typeIdName, json::ValuePtr(new json::Value(*typeId))});
+							mp = mp->GetSubclassModelPart(*typeId);
+						}
 					}
 					mp->OnEachChild(boost::bind(&Json::ModelTreeIterate, n, _1, _2));
 					break;
