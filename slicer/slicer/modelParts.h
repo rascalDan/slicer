@@ -102,6 +102,7 @@ namespace Slicer {
 			virtual ModelPartPtr GetChild(const std::string & memberName) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
+			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const;
 			virtual ModelPartType GetType() const = 0;
 			virtual void Create();
 			virtual void Complete();
@@ -332,8 +333,11 @@ namespace Slicer {
 
 			virtual TypeId GetTypeId() const override;
 
+			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override { return typeIdProperty; }
+
 		private:
 			T & ModelObject;
+			static std::string typeIdProperty;
 	};
 
 	template<typename T>

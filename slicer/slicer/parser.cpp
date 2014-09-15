@@ -129,6 +129,12 @@ namespace Slicer {
 		fprintf(cpp, "\t};\n\n");
 		
 		fprintf(cpp, "template<>\n");
+		auto typeId = metaDataValue("slicer:typeid:", c->getMetaData());
+		fprintf(cpp, "std::string ModelPartForClass< %s >::typeIdProperty(\"%s\");\n\n",
+				typeToString(decl).c_str(),
+				typeId ? typeId->c_str() : "slicer-typeid");
+
+		fprintf(cpp, "template<>\n");
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
 		fprintf(cpp, "std::string ModelPartForClassRoot< %s >::rootName(\"%s\");\n\n",
 				typeToString(decl).c_str(),

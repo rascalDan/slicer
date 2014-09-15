@@ -40,6 +40,12 @@ namespace Slicer {
 		return TypeId();
 	}
 
+	IceUtil::Optional<std::string>
+	ModelPart::GetTypeIdProperty() const
+	{
+		return IceUtil::Optional<std::string>();
+	}
+
 	void
 	ModelPart::SetValue(ValueSourcePtr)
 	{

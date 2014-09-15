@@ -75,4 +75,14 @@ module TestModule {
 	interface IgnoreMe {
 		int someFunction();
 	};
+	["slicer:typeid:mytype"]
+	class Base2 {
+		int a;
+	};
+	class D12 extends Base2 {
+		int b;
+	};
+	class InheritanceCont2 {
+		Base2 b;
+	};
 };
