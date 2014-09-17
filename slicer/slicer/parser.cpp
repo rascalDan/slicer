@@ -120,13 +120,7 @@ namespace Slicer {
 
 		auto decl = c->declaration();
 		fprintf(cpp, "// Class %s\n", c->name().c_str());
-		fprintf(cpp, "template<>\n");
-		fprintf(cpp, "ModelPartForComplex< %s::%s >::Hooks ",
-				modulePath().c_str(), c->name().c_str());
-		fprintf(cpp, "ModelPartForComplex< %s::%s >::hooks {\n",
-				modulePath().c_str(), c->name().c_str());
 		visitComplexDataMembers(decl, c->allDataMembers());
-		fprintf(cpp, "\t};\n\n");
 		
 		fprintf(cpp, "template<>\n");
 		auto typeId = metaDataValue("slicer:typeid:", c->getMetaData());
@@ -159,6 +153,10 @@ namespace Slicer {
 		fprintf(cpp, "\treturn (id == \"%s::%s\") ? TypeId() : id;\n}\n\n",
 				modulePath().c_str(), c->name().c_str());
 
+		fprintf(cpp, "template<>\nMetadata ModelPartForComplex< %s::%s >::metadata ",
+				modulePath().c_str(), c->name().c_str());
+		copyMetadata(c->getMetaData());
+
 		classNo += 1;
 
 		return true;
@@ -170,20 +168,23 @@ namespace Slicer {
 		if (c->hasMetaData("slicer:ignore")) { return false; }
 
 		fprintf(cpp, "// Struct %s\n", c->name().c_str());
-		fprintf(cpp, "template<>\n");
-		fprintf(cpp, "ModelPartForComplex< %s::%s >::Hooks ",
-				modulePath().c_str(), c->name().c_str());
-		fprintf(cpp, "ModelPartForComplex< %s::%s >::hooks {\n",
-				modulePath().c_str(), c->name().c_str());
 		visitComplexDataMembers(c, c->dataMembers());
-		fprintf(cpp, "\t};\n\n");
 		
+		fprintf(cpp, "template<>\nMetadata ModelPartForComplex< %s::%s >::metadata ",
+				modulePath().c_str(), c->name().c_str());
+		copyMetadata(c->getMetaData());
+
 		return true;
 	}
 
 	void
-	Slicer::visitComplexDataMembers(Slice::TypePtr it, const Slice::DataMemberList & dataMembers) const
+	Slicer::visitComplexDataMembers(Slice::ConstructedPtr it, const Slice::DataMemberList & dataMembers) const
 	{
+		fprintf(cpp, "template<>\n");
+		fprintf(cpp, "ModelPartForComplex< %s::%s >::Hooks ",
+				modulePath().c_str(), it->name().c_str());
+		fprintf(cpp, "ModelPartForComplex< %s::%s >::hooks {\n",
+				modulePath().c_str(), it->name().c_str());
 		BOOST_FOREACH (const auto & dm, dataMembers) {
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 			auto t = Slice::TypePtr::dynamicCast(dm->container());
@@ -220,6 +221,25 @@ namespace Slicer {
 			}
 			fprintf(cpp, " >(\"%s\"),\n",
 					name ? name->c_str() : dm->name().c_str());
+		}
+		fprintf(cpp, "\t};\n\n");
+
+		BOOST_FOREACH (const auto & dm, dataMembers) {
+			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
+			auto t = Slice::TypePtr::dynamicCast(dm->container());
+			if (!t) {
+				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
+			}
+			auto type = dm->type();
+			fprintf(cpp, "template<>\ntemplate<>\nMetadata\n");
+			createNewModelPartPtrFor(t);
+			fprintf(cpp, "< %s >::HookMetadata< %s",
+					typeToString(it).c_str(),
+					Slice::typeToString(type, dm->optional()).c_str());
+			fprintf(cpp, ", %s::%s, &%s::%s::%s >::metadata ",
+					modulePath().c_str(), c->name().c_str(),
+					modulePath().c_str(), c->name().c_str(), dm->name().c_str());
+			copyMetadata(dm->getMetaData());
 		}
 	}
 
@@ -258,6 +278,10 @@ namespace Slicer {
 		fprintf(cpp, "std::string ModelPartForSequence< %s::%s >::elementName(\"%s\");\n\n",
 				modulePath().c_str(), s->name().c_str(),
 				ename ? ename->c_str() : "element");
+
+		fprintf(cpp, "template<>\nMetadata ModelPartForSequence< %s::%s >::metadata ",
+				modulePath().c_str(), s->name().c_str());
+		copyMetadata(s->getMetaData());
 	}
 
 	void
@@ -302,6 +326,25 @@ namespace Slicer {
 				vname ? vname->c_str() : "value");
 		fprintf(cpp, "\t};\n");
 		fprintf(cpp, "\n");
+
+		fprintf(cpp, "template<>\nMetadata ModelPartForDictionary< %s::%s >::metadata ",
+				modulePath().c_str(), d->name().c_str());
+		copyMetadata(d->getMetaData());
+
+		fprintf(cpp, "template<>\nMetadata ModelPartForComplex<ModelPartForDictionaryElement< %s::%s > >::metadata ",
+				modulePath().c_str(), d->name().c_str());
+		copyMetadata(d->getMetaData());
+
+		fprintf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForDictionaryElement< %s::%s >::HookMetadata< %s*, ModelPartForDictionaryElement< %s::%s >, &ModelPartForDictionaryElement< %s::%s >::key >::metadata { };\n\n",
+				modulePath().c_str(), d->name().c_str(),
+				Slice::typeToString(ktype).c_str(),
+				modulePath().c_str(), d->name().c_str(),
+				modulePath().c_str(), d->name().c_str());
+		fprintf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForDictionaryElement< %s::%s >::HookMetadata< %s*, ModelPartForDictionaryElement< %s::%s >, &ModelPartForDictionaryElement< %s::%s >::value >::metadata { };\n\n",
+				modulePath().c_str(), d->name().c_str(),
+				Slice::typeToString(vtype).c_str(),
+				modulePath().c_str(), d->name().c_str(),
+				modulePath().c_str(), d->name().c_str());
 	}
 
 	void
@@ -340,6 +383,18 @@ namespace Slicer {
 			path += m->name();
 		}
 		return path;
+	}
+
+	void
+	Slicer::copyMetadata(const std::list<std::string> & metadata) const
+	{
+		fprintf(cpp, "{\n");
+		BOOST_FOREACH (const auto & md, metadata) {
+			if (boost::algorithm::starts_with(md, "slicer:")) {
+				fprintf(cpp, "\t\"%.*s\",\n", (int)md.length() - 7, md.c_str() + 7);
+			}
+		}
+		fprintf(cpp, "};\n\n");
 	}
 
 	boost::optional<std::string>

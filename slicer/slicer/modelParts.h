@@ -86,6 +86,7 @@ namespace Slicer {
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
 	ClassRefMap * & classRefMap();
+	typedef std::set<std::string> Metadata;
 	enum ModelPartType {
 		mpt_Null,
 		mpt_Simple,
@@ -109,6 +110,7 @@ namespace Slicer {
 			virtual void SetValue(ValueSourcePtr);
 			virtual void GetValue(ValueTargetPtr);
 			virtual bool HasValue() const = 0;
+			virtual const Metadata & GetMetadata() const;
 	};
 
 	template<typename T>
@@ -227,6 +229,7 @@ namespace Slicer {
 				}
 				return mpt_Null;
 			}
+			virtual const Metadata & GetMetadata() const override { return modelPart->GetMetadata(); }
 
 		private:
 			IceUtil::Optional< typename T::element_type > & OptionalMember;
@@ -241,11 +244,22 @@ namespace Slicer {
 					virtual ModelPartPtr Get(T * t) const = 0;
 
 					virtual std::string PartName() const = 0;
+
+					virtual const Metadata & GetMetadata() const = 0;
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
+			template <typename MT, typename CT, MT CT::*M>
+			class HookMetadata : public HookBase {
+				public:
+					virtual const Metadata & GetMetadata() const override { return metadata; }
+
+				private:
+					static Metadata metadata;
+			};
+
 			template <typename MT, typename CT, MT CT::*M, typename MP>
-			class Hook : public HookBase {
+			class Hook : public HookMetadata<MT, CT, M> {
 				public:
 					Hook(const std::string & n) :
 						name(n)
@@ -261,6 +275,7 @@ namespace Slicer {
 					{
 						return name;
 					}
+
 
 				private:
 					const std::string name;
@@ -287,12 +302,15 @@ namespace Slicer {
 
 			virtual ModelPartType GetType() const { return mpt_Complex; }
 
+			virtual const Metadata & GetMetadata() const override { return metadata; }
+
 			virtual T * GetModel() = 0;
 
 			typedef std::vector<HookPtr> Hooks;
 
 		private:
 			static Hooks hooks;
+			static Metadata metadata;
 	};
 	
 	template<typename T>
@@ -434,11 +452,14 @@ namespace Slicer {
 
 			virtual ModelPartType GetType() const { return mpt_Sequence; }
 
+			virtual const Metadata & GetMetadata() const override { return metadata; }
+
 		private:
 			ModelPartPtr elementModelPart(typename T::value_type &) const;
 
 			T & sequence;
 			static std::string elementName;
+			static Metadata metadata;
 	};
 
 	template<typename T>
@@ -512,9 +533,12 @@ namespace Slicer {
 
 			virtual ModelPartType GetType() const { return mpt_Dictionary; }
 
+			virtual const Metadata & GetMetadata() const override { return metadata; }
+
 		private:
 			T & dictionary;
 			static std::string pairName;
+			static Metadata metadata;
 	};
 }
 
