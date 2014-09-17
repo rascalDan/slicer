@@ -41,12 +41,13 @@ namespace Slicer {
 		private:
 			void createNewModelPartPtrFor(const Slice::TypePtr & type) const;
 
-			void visitComplexDataMembers(Slice::TypePtr t, const Slice::DataMemberList &) const;
+			void visitComplexDataMembers(Slice::ConstructedPtr t, const Slice::DataMemberList &) const;
 
 			std::string modulePath() const;
 
 			void defineConversions(Slice::DataMemberPtr dm) const;
 
+			void copyMetadata(const std::list<std::string> & metadata) const;
 			static boost::optional<std::string> metaDataValue(const std::string & prefix, const std::list<std::string> & metadata);
 			static std::list<std::string> metaDataValues(const std::string & prefix, const std::list<std::string> & metadata);
 			static std::vector<std::string> metaDataSplit(const std::string & metadata);

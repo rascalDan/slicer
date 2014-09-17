@@ -1,6 +1,8 @@
 #include "modelParts.h"
 
 namespace Slicer {
+	const Metadata emptyMetadata;
+
 	IncorrectElementName::IncorrectElementName(const std::string & n) :
 		std::invalid_argument(n)
 	{
@@ -50,9 +52,16 @@ namespace Slicer {
 	ModelPart::SetValue(ValueSourcePtr)
 	{
 	}
+
 	void
 	ModelPart::GetValue(ValueTargetPtr)
 	{
+	}
+
+	const Metadata &
+	ModelPart::GetMetadata() const
+	{
+		return emptyMetadata;
 	}
 }
 
