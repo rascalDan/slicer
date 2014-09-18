@@ -279,6 +279,7 @@ main(int, char ** argv)
 	verifyByFile<TestModule::Optionals, Slicer::JsonFile>(root, tmpf, "optionals-areset2.json", checkOptionals_areset);
 	verifyByFile<TestModule::InheritanceCont, Slicer::JsonFile>(root, tmpf, "inherit-c.json", checkInherits_types);
 	verifyByFile<TestModule::InheritanceCont2, Slicer::JsonFile>(root, tmpf, "inherit-d.json");
+	verifyByFile<TestModule::InheritanceContMapped, Slicer::JsonFile>(root, tmpf, "inherit-mapped.json");
 
 	verifyByHelper<TestModule::Optionals, Slicer::JsonValue, json::Value>(root, tmph, "optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
 	verifyByHelper<TestModule::Optionals, Slicer::XmlDocument, xmlpp::Document *>(root, tmph, "optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);

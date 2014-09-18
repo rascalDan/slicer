@@ -13,6 +13,33 @@ namespace Slicer {
 	{
 	}
 
+	ClassNameMap * &
+	classNameMap()
+	{
+		static ClassNameMap * refs = new ClassNameMap();
+		return refs;
+	}
+
+	const std::string &
+	ModelPart::ToModelTypeName(const std::string & name)
+	{
+		auto mapped = classNameMap()->right.find(name);
+		if (mapped != classNameMap()->right.end()) {
+			return mapped->second;
+		}
+		return name;
+	}
+
+	const std::string &
+	ModelPart::ToExchangeTypeName(const std::string & name)
+	{
+		auto mapped = classNameMap()->left.find(name);
+		if (mapped != classNameMap()->left.end()) {
+			return mapped->second;
+		}
+		return name;
+	}
+
 	ClassRefMap * &
 	classRefMap()
 	{
