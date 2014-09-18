@@ -85,4 +85,11 @@ module TestModule {
 	class InheritanceCont2 {
 		Base2 b;
 	};
+	["slicer:typename:onetwo"]
+	class D13 extends Base2 {
+		int c;
+	};
+	class InheritanceContMapped {
+		Base2 b;
+	};
 };

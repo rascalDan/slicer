@@ -134,23 +134,33 @@ namespace Slicer {
 				typeToString(decl).c_str(),
 				name ? name->c_str() : c->name().c_str());
 
+		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
 		fprintf(cpp, "static void registerClass_%u() __attribute__ ((constructor(210)));\n", classNo);
 		fprintf(cpp, "static void registerClass_%u()\n{\n", classNo);
 		fprintf(cpp, "\tSlicer::classRefMap()->insert({ \"%s::%s\", [](void * p){ return new ModelPartForClass< %s >(*static_cast< %s *>(p)); } });\n",
 				modulePath().c_str(), c->name().c_str(),
 				typeToString(decl).c_str(),
 				typeToString(decl).c_str());
+		if (typeName) {
+			fprintf(cpp, "\tSlicer::classNameMap()->insert({ \"%s::%s\", \"%s\" });\n",
+					modulePath().c_str(), c->name().c_str(),
+					typeName->c_str());
+		}
 		fprintf(cpp, "}\n\n");
 		fprintf(cpp, "static void unregisterClass_%u() __attribute__ ((destructor(210)));\n", classNo);
 		fprintf(cpp, "static void unregisterClass_%u()\n{\n", classNo);
 		fprintf(cpp, "\tSlicer::classRefMap()->erase(\"%s::%s\");\n",
 				modulePath().c_str(), c->name().c_str());
+		if (typeName) {
+			fprintf(cpp, "\tSlicer::classNameMap()->left.erase(\"%s::%s\");\n",
+					modulePath().c_str(), c->name().c_str());
+		}
 		fprintf(cpp, "}\n\n");
 
 		fprintf(cpp, "template<>\nTypeId\nModelPartForClass< %s >::GetTypeId() const\n{\n",
 				typeToString(decl).c_str());
 		fprintf(cpp, "\tauto id = ModelObject->ice_id();\n");
-		fprintf(cpp, "\treturn (id == \"%s::%s\") ? TypeId() : id;\n}\n\n",
+		fprintf(cpp, "\treturn (id == \"%s::%s\") ? TypeId() : ModelPart::ToExchangeTypeName(id);\n}\n\n",
 				modulePath().c_str(), c->name().c_str());
 
 		fprintf(cpp, "template<>\nMetadata ModelPartForComplex< %s::%s >::metadata ",

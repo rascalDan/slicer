@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <boost/function.hpp>
 #include <boost/foreach.hpp>
+#include <boost/bimap.hpp>
 #include <vector>
 
 namespace Slicer {
@@ -86,6 +87,8 @@ namespace Slicer {
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
 	ClassRefMap * & classRefMap();
+	typedef boost::bimap<std::string, std::string> ClassNameMap;
+	ClassNameMap * & classNameMap();
 	typedef std::set<std::string> Metadata;
 	enum ModelPartType {
 		mpt_Null,
@@ -111,6 +114,9 @@ namespace Slicer {
 			virtual void GetValue(ValueTargetPtr);
 			virtual bool HasValue() const = 0;
 			virtual const Metadata & GetMetadata() const;
+
+			static const std::string & ToExchangeTypeName(const std::string &);
+			static const std::string & ToModelTypeName(const std::string &);
 	};
 
 	template<typename T>
@@ -340,7 +346,7 @@ namespace Slicer {
 
 			virtual ModelPartPtr GetSubclassModelPart(const std::string & name) override
 			{
-				auto ref = classRefMap()->find(name);
+				auto ref = classRefMap()->find(ModelPart::ToModelTypeName(name));
 				if (ref == classRefMap()->end()) {
 					throw UnknownType(name);
 				}
