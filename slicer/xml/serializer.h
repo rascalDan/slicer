@@ -5,34 +5,56 @@
 #include <libxml++/document.h>
 
 namespace Slicer {
-	class Xml : public Serializer {
+	class XmlSerializer : public Serializer {
 		protected:
-			static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp);
-			static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp);
 			static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartPtr mp);
 			static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartPtr mp);
 	};
 	
-	class XmlFile : public Xml {
+	class XmlFileSerializer : public XmlSerializer {
 		public:
-			XmlFile(const boost::filesystem::path &);
+			XmlFileSerializer(const boost::filesystem::path &);
 
-			virtual void Deserialize(ModelPartPtr) override;
 			virtual void Serialize(ModelPartPtr) override;
 
 		private:
 			const boost::filesystem::path path;
 	};
 	
-	class XmlDocument : public Xml {
+	class XmlDocumentSerializer : public XmlSerializer {
 		public:
-			XmlDocument(xmlpp::Document * &);
+			XmlDocumentSerializer(xmlpp::Document * &);
 
-			virtual void Deserialize(ModelPartPtr) override;
 			virtual void Serialize(ModelPartPtr) override;
 
 		private:
 			xmlpp::Document * & doc;
+	};
+
+	class XmlDeserializer : public Deserializer {
+		protected:
+			static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp);
+			static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp);
+	};
+	
+	class XmlFileDeserializer : public XmlDeserializer {
+		public:
+			XmlFileDeserializer(const boost::filesystem::path &);
+
+			virtual void Deserialize(ModelPartPtr) override;
+
+		private:
+			const boost::filesystem::path path;
+	};
+	
+	class XmlDocumentDeserializer : public XmlDeserializer {
+		public:
+			XmlDocumentDeserializer(const xmlpp::Document *);
+
+			virtual void Deserialize(ModelPartPtr) override;
+
+		private:
+			const xmlpp::Document * doc;
 	};
 }
 

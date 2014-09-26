@@ -6,13 +6,13 @@
 #include <slicer/serializer.h>
 
 namespace Slicer {
-	template <typename Serializer, typename Object, typename ... SerializerParams>
+	template <typename Deserializer, typename Object, typename ... SerializerParams>
 	IceInternal::Handle<Object>
 	Deserialize(SerializerParams & ... sp)
 	{
 		IceUtil::Handle<ModelPartForClassRoot<IceInternal::Handle<Object>>> root = new ModelPartForClassRoot<IceInternal::Handle<Object>>();
-		SerializerPtr serializer = new Serializer(sp ...);
-		serializer->Deserialize(root);
+		DeserializerPtr deserializer = new Deserializer(sp ...);
+		deserializer->Deserialize(root);
 		return root->GetModel();
 	}
 

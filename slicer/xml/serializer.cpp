@@ -161,7 +161,7 @@ namespace Slicer {
 	};
 	
 	void
-	Xml::DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp)
+	XmlDeserializer::DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp)
 	{
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
@@ -197,13 +197,13 @@ namespace Slicer {
 	}
 
 	void
-	Xml::DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp)
+	XmlDeserializer::DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp)
 	{
 		DocumentTreeIterate(doc->get_root_node(), mp);
 	}
 
 	void
-	Xml::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp)
+	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp)
 	{
 		if (name.empty()) {
 			return;
@@ -220,24 +220,29 @@ namespace Slicer {
 				mp = mp->GetSubclassModelPart(*typeId);
 			}
 			mp->GetValue(new XmlContentValueTarget(element));
-			mp->OnEachChild(boost::bind(&Xml::ModelTreeIterate, element, _1, _2));
+			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2));
 		}
 	}
 
 	void
-	Xml::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartPtr mp)
+	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartPtr mp)
 	{
 		auto root = doc->create_root_node(name);
-		mp->OnEachChild(boost::bind(&Xml::ModelTreeIterate, root, _1, _2));
+		mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, root, _1, _2));
 	}
 
-	XmlFile::XmlFile(const boost::filesystem::path & p) :
+	XmlFileSerializer::XmlFileSerializer(const boost::filesystem::path & p) :
+		path(p)
+	{
+	}
+
+	XmlFileDeserializer::XmlFileDeserializer(const boost::filesystem::path & p) :
 		path(p)
 	{
 	}
 
 	void
-	XmlFile::Deserialize(ModelPartPtr modelRoot)
+	XmlFileDeserializer::Deserialize(ModelPartPtr modelRoot)
 	{
 		xmlpp::DomParser dom(path.string());
 		auto doc = dom.get_document();
@@ -245,29 +250,34 @@ namespace Slicer {
 	}
 
 	void
-	XmlFile::Serialize(ModelPartPtr modelRoot)
+	XmlFileSerializer::Serialize(ModelPartPtr modelRoot)
 	{
 		xmlpp::Document doc;
-		modelRoot->OnEachChild(boost::bind(&Xml::ModelTreeIterateRoot, &doc, _1, _2));
+		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
 		doc.write_to_file_formatted(path.string());
 	}
 
-	XmlDocument::XmlDocument(xmlpp::Document * & d) :
+	XmlDocumentSerializer::XmlDocumentSerializer(xmlpp::Document * & d) :
+		doc(d)
+	{
+	}
+
+	XmlDocumentDeserializer::XmlDocumentDeserializer(const xmlpp::Document * d) :
 		doc(d)
 	{
 	}
 
 	void
-	XmlDocument::Deserialize(ModelPartPtr modelRoot)
+	XmlDocumentDeserializer::Deserialize(ModelPartPtr modelRoot)
 	{
 		DocumentTreeIterate(doc, modelRoot);
 	}
 
 	void
-	XmlDocument::Serialize(ModelPartPtr modelRoot)
+	XmlDocumentSerializer::Serialize(ModelPartPtr modelRoot)
 	{
 		doc = new xmlpp::Document();
-		modelRoot->OnEachChild(boost::bind(&Xml::ModelTreeIterateRoot, doc, _1, _2));
+		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, doc, _1, _2));
 	}
 }
 

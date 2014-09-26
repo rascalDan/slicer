@@ -60,7 +60,7 @@ namespace Slicer {
 	}
 }
 
-template<typename T, typename SerializerIn>
+template<typename T, typename DeserializerIn>
 void
 verifyByFile(const fs::path & root, const fs::path & tmp, const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
 {
@@ -70,15 +70,15 @@ verifyByFile(const fs::path & root, const fs::path & tmp, const fs::path & infil
 	const fs::path outputXml = tmp / fs::change_extension(infile, "xml");
 
 	fprintf(stderr, "%s : Deserialize\n", input.string().c_str());
-	IceInternal::Handle<T> p = Slicer::Deserialize<SerializerIn, T>(input);
+	IceInternal::Handle<T> p = Slicer::Deserialize<DeserializerIn, T>(input);
 	if (check) {
 		fprintf(stderr, "%s : Check1\n", input.string().c_str());
 		check(*p);
 	}
 	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), outputJson.string().c_str());
-	Slicer::Serialize<Slicer::JsonFile>(p, outputJson);
+	Slicer::Serialize<Slicer::JsonFileSerializer>(p, outputJson);
 	fprintf(stderr, "%s : Serialize -> %s\n", input.string().c_str(), outputXml.string().c_str());
-	Slicer::Serialize<Slicer::XmlFile>(p, outputXml);
+	Slicer::Serialize<Slicer::XmlFileSerializer>(p, outputXml);
 	if (check) {
 		fprintf(stderr, "%s : Check2\n", input.string().c_str());
 		check(*p);
@@ -88,7 +88,7 @@ verifyByFile(const fs::path & root, const fs::path & tmp, const fs::path & infil
 	system(stringbf("diff -w %s %s", input, output));
 }
 
-template<typename T, typename Serializer, typename Internal>
+template<typename T, typename Deserializer, typename Serializer, typename Internal>
 void
 verifyByHelper(const fs::path & root, const fs::path & tmp, const fs::path & infile,
 		const boost::function<Internal(const fs::path &)> & in,
@@ -103,7 +103,7 @@ verifyByHelper(const fs::path & root, const fs::path & tmp, const fs::path & inf
 	Internal docRead = in(input);
 
 	fprintf(stderr, "%s : Deserialize\n", input.string().c_str());
-	IceInternal::Handle<T> p = Slicer::Deserialize<Serializer, T>(docRead);
+	IceInternal::Handle<T> p = Slicer::Deserialize<Deserializer, T>(docRead);
 	ifree(docRead);
 	if (check) {
 		fprintf(stderr, "%s : Check1\n", input.string().c_str());
@@ -269,20 +269,20 @@ main(int, char ** argv)
 	fs::create_directory(tmph);
 
 	// Execute
-	verifyByFile<TestModule::BuiltIns, Slicer::XmlFile>(root, tmpf, "builtins.xml", checkBuiltIns_valuesCorrect);
-	verifyByFile<TestModule::Optionals, Slicer::XmlFile>(root, tmpf, "optionals-notset.xml", checkOptionals_notset);
-	verifyByFile<TestModule::Optionals, Slicer::XmlFile>(root, tmpf, "optionals-areset.xml", checkOptionals_areset);
-	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-a.xml");
-	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFile>(root, tmpf, "inherit-b.xml", checkInherits_types);
-	verifyByFile<TestModule::DateTimeContainer, Slicer::XmlFile>(root, tmpf, "conv-datetime.xml");
-	verifyByFile<TestModule::BuiltIns, Slicer::JsonFile>(root, tmpf, "builtins2.json", checkBuiltIns_valuesCorrect);
-	verifyByFile<TestModule::Optionals, Slicer::JsonFile>(root, tmpf, "optionals-areset2.json", checkOptionals_areset);
-	verifyByFile<TestModule::InheritanceCont, Slicer::JsonFile>(root, tmpf, "inherit-c.json", checkInherits_types);
-	verifyByFile<TestModule::InheritanceCont2, Slicer::JsonFile>(root, tmpf, "inherit-d.json");
-	verifyByFile<TestModule::InheritanceContMapped, Slicer::JsonFile>(root, tmpf, "inherit-mapped.json");
+	verifyByFile<TestModule::BuiltIns, Slicer::XmlFileDeserializer>(root, tmpf, "builtins.xml", checkBuiltIns_valuesCorrect);
+	verifyByFile<TestModule::Optionals, Slicer::XmlFileDeserializer>(root, tmpf, "optionals-notset.xml", checkOptionals_notset);
+	verifyByFile<TestModule::Optionals, Slicer::XmlFileDeserializer>(root, tmpf, "optionals-areset.xml", checkOptionals_areset);
+	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFileDeserializer>(root, tmpf, "inherit-a.xml");
+	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFileDeserializer>(root, tmpf, "inherit-b.xml", checkInherits_types);
+	verifyByFile<TestModule::DateTimeContainer, Slicer::XmlFileDeserializer>(root, tmpf, "conv-datetime.xml");
+	verifyByFile<TestModule::BuiltIns, Slicer::JsonFileDeserializer>(root, tmpf, "builtins2.json", checkBuiltIns_valuesCorrect);
+	verifyByFile<TestModule::Optionals, Slicer::JsonFileDeserializer>(root, tmpf, "optionals-areset2.json", checkOptionals_areset);
+	verifyByFile<TestModule::InheritanceCont, Slicer::JsonFileDeserializer>(root, tmpf, "inherit-c.json", checkInherits_types);
+	verifyByFile<TestModule::InheritanceCont2, Slicer::JsonFileDeserializer>(root, tmpf, "inherit-d.json");
+	verifyByFile<TestModule::InheritanceContMapped, Slicer::JsonFileDeserializer>(root, tmpf, "inherit-mapped.json");
 
-	verifyByHelper<TestModule::Optionals, Slicer::JsonValue, json::Value>(root, tmph, "optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
-	verifyByHelper<TestModule::Optionals, Slicer::XmlDocument, xmlpp::Document *>(root, tmph, "optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
+	verifyByHelper<TestModule::Optionals, Slicer::JsonValueDeserializer, Slicer::JsonValueSerializer, json::Value>(root, tmph, "optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
+	verifyByHelper<TestModule::Optionals, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>(root, tmph, "optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 
 	return 0;
 }
