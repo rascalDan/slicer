@@ -9,10 +9,15 @@
 namespace Slicer {
 	class Serializer : public IceUtil::Shared {
 		public:
-			virtual void Deserialize(ModelPartPtr) = 0;
 			virtual void Serialize(ModelPartPtr) = 0;
 	};
 	typedef IceUtil::Handle<Serializer> SerializerPtr;
+
+	class Deserializer : public IceUtil::Shared {
+		public:
+			virtual void Deserialize(ModelPartPtr) = 0;
+	};
+	typedef IceUtil::Handle<Deserializer> DeserializerPtr;
 }
 
 #endif
