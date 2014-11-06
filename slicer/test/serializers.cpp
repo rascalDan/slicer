@@ -28,9 +28,11 @@ class FileBased : public FileStructure {
 		verifyByFile(const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
 		{
 			const fs::path input = root / "initial" / infile;
-			const fs::path output = tmp / infile;
-			const fs::path outputJson = tmp / fs::change_extension(infile, "json");
-			const fs::path outputXml = tmp / fs::change_extension(infile, "xml");
+			const fs::path tmpf = tmp / "byFile";
+			fs::create_directory(tmpf);
+			const fs::path output = tmpf / infile;
+			const fs::path outputJson = tmpf / fs::change_extension(infile, "json");
+			const fs::path outputXml = tmpf / fs::change_extension(infile, "xml");
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
 			IceInternal::Handle<T> p = Slicer::Deserialize<DeserializerIn, T>(input);
@@ -64,7 +66,9 @@ class FileBased : public FileStructure {
 				const boost::function<void(const T &)> & check = NULL)
 		{
 			const fs::path input = root / "initial" / infile;
-			const fs::path output = tmp / infile;
+			const fs::path tmph = tmp / "byHandler";
+			fs::create_directory(tmph);
+			const fs::path output = tmph / infile;
 
 			BOOST_TEST_CHECKPOINT("Read: " << input);
 			Internal docRead = in(input);

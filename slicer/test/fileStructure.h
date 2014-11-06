@@ -17,8 +17,6 @@ class FileStructure {
 		const fs::path root;
 		const fs::path slice;
 		const fs::path tmp;
-		const fs::path tmpf;
-		const fs::path tmph;
 };
 
 #endif
