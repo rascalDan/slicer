@@ -6,6 +6,7 @@ lib Ice ;
 lib IceUtil ;
 lib boost_system ;
 lib boost_filesystem ;
+lib boost_utf : : <name>boost_unit_test_framework ;
 lib slicer-test : : <name>slicertypes <search>bin/slicer ;
 
 lib types :
@@ -14,49 +15,53 @@ lib types :
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
+	: :
+	<library>pthread
+	<library>Ice
+	<library>IceUtil
 	;
 
 lib common :
 	helpers.cpp
+	conversions.cpp
+	fileStructure.cpp
 	../../libmisc/misc.cpp
 	:
 	<library>dl
+	<library>types
 	<library>boost_system
 	<library>boost_filesystem
+	<library>boost_utf
+	<implicit-dependency>types
 	: :
+	<library>types
 	<library>boost_filesystem
 	<library>boost_system
 	<include>../../libmisc
+	<define>BOOST_TEST_DYN_LINK
+	<library>boost_utf
+	<implicit-dependency>types
 	;
 
-unit-test do-slicer :
-	types
-	common
-	do-slicer.cpp
+unit-test preprocess :
+	preprocessor.cpp
 	:
 	<linkflags>-rdynamic
 	<library>dl
+	<library>common
 	<include>..
-	<library>pthread
-	<library>Ice
-	<library>IceUtil
 	<library>../slicer//slicer
-	<implicit-dependency>types
 	;
 
-unit-test run-slicer :
-	run-slicer.cpp
-	types
-	common
+unit-test serializers :
+	serializers.cpp
 	:
-	<implicit-dependency>types
-	<dependency>do-slicer
+	<dependency>preprocess
 	<library>slicer-test
+	<library>common
 	<include>..
-	<library>pthread
-	<library>Ice
-	<library>IceUtil
 	<library>../slicer//slicer
 	<library>../xml//slicer-xml
 	<library>../json//slicer-json
-;
+	;
+
