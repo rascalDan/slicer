@@ -8,13 +8,9 @@ FileStructure::FileStructure() :
 	bjamout(me.parent_path()),
 	root(me.parent_path().parent_path().parent_path().parent_path()),
 	slice(fs::change_extension(root / base, ".ice")),
-	tmp(root / "bin" / "slicer"),
-	tmpf(tmp / "byFile"),
-	tmph(tmp / "byHelper")
+	tmp(root / "bin" / "slicer")
 {
 	fs::create_directory(tmp);
-	fs::create_directory(tmpf);
-	fs::create_directory(tmph);
 }
 
 FileStructure::~FileStructure()
