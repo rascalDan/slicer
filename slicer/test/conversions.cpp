@@ -19,13 +19,16 @@ namespace Slicer {
 	std::string
 	dateTimeToString(const ::TestModule::DateTime & in)
 	{
-		char buf[BUFSIZ];
-		struct tm tm({ in.second, in.minute, in.hour, in.day, in.month, in.year, 0, 0, 0
-#ifdef _BSD_SOURCE
-				, 0, 0
-#endif
-				});
+		struct tm tm;
+		memset(&tm, 0, sizeof(struct tm));
+		tm.tm_sec = in.second;
+		tm.tm_min = in.minute;
+		tm.tm_hour = in.hour;
+		tm.tm_mday = in.day;
+		tm.tm_mon = in.month;
+		tm.tm_year = in.year;
 		mktime(&tm);
+		char buf[BUFSIZ];
 		auto len = strftime(buf, BUFSIZ, "%Y-%b-%d %H:%M:%S", &tm);
 		return std::string(buf, len);
 	}
