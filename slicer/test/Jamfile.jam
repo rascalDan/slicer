@@ -53,6 +53,19 @@ unit-test preprocess :
 	<library>../slicer//slicer
 	;
 
+unit-test compilation :
+	compilation.cpp
+	:
+	<include>..
+	<library>../slicer//slicer
+	<library>types
+	<dependency>preprocess
+	<library>slicer-test
+	<library>common
+	<include>..
+	<library>../slicer//slicer
+	;
+
 unit-test serializers :
 	serializers.cpp
 	:

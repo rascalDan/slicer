@@ -546,6 +546,32 @@ namespace Slicer {
 			static std::string pairName;
 			static Metadata metadata;
 	};
+
+	// Templates for automatically determining a model part implementation
+#define templateMODELPARTFOR(Type, ModelPart) \
+	template <class T> ModelPartPtr ModelPartFor(Type & t) { return new ModelPart< Type >(t); } \
+	template <class T> ModelPartPtr ModelPartFor(Type * t) { return new ModelPart< Type >(t); }
+#define MODELPARTFOR(Type, ModelPart) \
+	ModelPartPtr ModelPartFor(Type & t); \
+	ModelPartPtr ModelPartFor(Type * t);
+
+	templateMODELPARTFOR(IceInternal::Handle<T>, ModelPartForClass);
+	templateMODELPARTFOR(std::vector<T>, ModelPartForSequence);
+	templateMODELPARTFOR(std::list<T>, ModelPartForSequence);
+	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> & t) { return new ModelPartForDictionary< std::map<K, V> >(t); } \
+	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> * t) { return new ModelPartForDictionary< std::map<K, V> >(t); } \
+	MODELPARTFOR(std::string, ModelPartForSimple);
+	MODELPARTFOR(bool, ModelPartForSimple);
+	MODELPARTFOR(Ice::Float, ModelPartForSimple);
+	MODELPARTFOR(Ice::Double, ModelPartForSimple);
+	MODELPARTFOR(Ice::Byte, ModelPartForSimple);
+	MODELPARTFOR(Ice::Short, ModelPartForSimple);
+	MODELPARTFOR(Ice::Int, ModelPartForSimple);
+	MODELPARTFOR(Ice::Long, ModelPartForSimple);
+	// Everything else is a struct?
+	templateMODELPARTFOR(T, ModelPartForStruct);
+#undef templateMODELPARTFOR
+#undef MODELPARTFOR
 }
 
 #endif
