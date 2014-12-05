@@ -14,6 +14,7 @@ namespace fs = boost::filesystem;
 
 namespace Slicer {
 	Slicer::Slicer(FILE * c) :
+		components(0),
 		cpp(c),
 		classNo(0)
 	{
@@ -22,6 +23,8 @@ namespace Slicer {
 	void
 	Slicer::defineConversions(Slice::DataMemberPtr dm) const
 	{
+		if (!cpp) return;
+
 		auto type = dm->type();
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 		auto conversions = getConversions(dm);
@@ -79,6 +82,7 @@ namespace Slicer {
 	Slicer::visitUnitStart(const Slice::UnitPtr & u)
 	{
 		fs::path topLevelFile(u->topLevelFile());
+		if (!cpp) return true;
 
 		fprintf(cpp, "// Begin Slicer code\n\n");
 		fprintf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string().c_str());
@@ -90,6 +94,8 @@ namespace Slicer {
 	void
 	Slicer::visitUnitEnd(const Slice::UnitPtr&)
 	{
+		if (!cpp) return;
+
 		fprintf(cpp, "}\n\n");
 		fprintf(cpp, "// End Slicer code\n\n");
 	}
@@ -97,8 +103,11 @@ namespace Slicer {
 	bool
 	Slicer::visitModuleStart(const Slice::ModulePtr & m)
 	{
-		fprintf(cpp, "// Begin module %s\n\n", m->name().c_str());
 		modules.push_back(m);
+
+		if (!cpp) return true;
+
+		fprintf(cpp, "// Begin module %s\n\n", m->name().c_str());
 		BOOST_FOREACH(const auto & c, m->structs()) {
 			BOOST_FOREACH(const auto & dm, c->dataMembers()) {
 				defineConversions(dm);
@@ -117,6 +126,10 @@ namespace Slicer {
 	{
 		if (c->isInterface()) { return false; }
 		if (c->hasMetaData("slicer:ignore")) { return false; }
+
+		components += 1;
+
+		if (!cpp) return true;
 
 		auto decl = c->declaration();
 		fprintf(cpp, "// Class %s\n", c->name().c_str());
@@ -177,6 +190,10 @@ namespace Slicer {
 	{
 		if (c->hasMetaData("slicer:ignore")) { return false; }
 
+		components += 1;
+
+		if (!cpp) return true;
+
 		fprintf(cpp, "// Struct %s\n", c->name().c_str());
 		visitComplexDataMembers(c, c->dataMembers());
 		
@@ -190,6 +207,8 @@ namespace Slicer {
 	void
 	Slicer::visitComplexDataMembers(Slice::ConstructedPtr it, const Slice::DataMemberList & dataMembers) const
 	{
+		if (!cpp) return;
+
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartForComplex< %s::%s >::Hooks ",
 				modulePath().c_str(), it->name().c_str());
@@ -258,6 +277,10 @@ namespace Slicer {
 	{
 		if (s->hasMetaData("slicer:ignore")) { return; }
 
+		components += 1;
+
+		if (!cpp) return;
+
 		fprintf(cpp, "// Sequence %s\n", s->name().c_str());
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartPtr ModelPartForSequence< %s::%s >::GetChild(const std::string & name)\n{\n",
@@ -298,6 +321,10 @@ namespace Slicer {
 	Slicer::visitDictionary(const Slice::DictionaryPtr & d)
 	{
 		if (d->hasMetaData("slicer:ignore")) { return; }
+
+		components += 1;
+
+		if (!cpp) return;
 
 		fprintf(cpp, "// Dictionary %s\n", d->name().c_str());
 		auto iname = metaDataValue("slicer:item:", d->getMetaData());
@@ -360,7 +387,9 @@ namespace Slicer {
 	void
 	Slicer::visitModuleEnd(const Slice::ModulePtr & m)
 	{
-		fprintf(cpp, "// End module %s\n\n", m->name().c_str());
+		if (cpp) {
+			fprintf(cpp, "// End module %s\n\n", m->name().c_str());
+		}
 		modules.pop_back();
 	}
 
@@ -456,8 +485,25 @@ namespace Slicer {
 		return rtn;
 	}
 
-	void
+	unsigned int
+	Slicer::Components() const
+	{
+		return components;
+	}
+
+	unsigned int
 	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp)
+	{
+		FilePtr cppfile(fopen(cpp.string().c_str(), "a"), fclose);
+		if (!cppfile) {
+			throw std::runtime_error("failed to open code file");
+		}
+
+		return Apply(ice, cppfile.get());
+	}
+
+	unsigned int
+	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp)
 	{
 		std::vector<std::string> cppArgs;
 		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", ice.string(), cppArgs);
@@ -479,15 +525,12 @@ namespace Slicer {
 			throw std::runtime_error("unit parse failed");
 		}
 
-		FilePtr cppfile(fopen(cpp.string().c_str(), "a"), fclose);
-		if (!cppfile) {
-			throw std::runtime_error("failed to open code file");
-		}
-
-		Slicer s(cppfile.get());
+		Slicer s(cpp);
 		u->visit(&s, false);
 
 		u->destroy();
+
+		return s.Components();
 	}
 };
 

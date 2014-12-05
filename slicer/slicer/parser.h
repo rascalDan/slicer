@@ -19,7 +19,8 @@ namespace Slicer {
 
 			Slicer(FILE * c);
 
-			static void Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
+			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
+			static unsigned int Apply(const boost::filesystem::path & ice, FILE *);
 
 			virtual bool visitUnitStart(const Slice::UnitPtr&) override;
 
@@ -37,6 +38,7 @@ namespace Slicer {
 
 			virtual void visitModuleEnd(const Slice::ModulePtr & m) override;
 
+			unsigned int Components() const;
 
 		private:
 			void createNewModelPartPtrFor(const Slice::TypePtr & type) const;
@@ -53,6 +55,7 @@ namespace Slicer {
 			static std::vector<std::string> metaDataSplit(const std::string & metadata);
 			static std::vector<ConversionSpec> getConversions(Slice::DataMemberPtr);
 
+			unsigned int components;
 			FILE * cpp;
 			std::vector<Slice::ModulePtr> modules;
 			unsigned int classNo;

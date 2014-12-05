@@ -13,7 +13,32 @@
 
 namespace fs = boost::filesystem;
 
+const unsigned int COMPONENTS_IN_TEST_ICE = 24;
+
 BOOST_FIXTURE_TEST_SUITE ( preprocessor, FileStructure );
+
+BOOST_AUTO_TEST_CASE( slicer_test_counts_path )
+{
+	auto count = Slicer::Slicer::Apply(slice, boost::filesystem::path("/dev/null"));
+	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
+}
+
+BOOST_AUTO_TEST_CASE( slicer_test_counts_filestar )
+{
+	FILE * file = fopen("/dev/null", "a");
+	BOOST_REQUIRE(file);
+
+	auto count = Slicer::Slicer::Apply(slice, file);
+	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
+
+	fclose(file);
+}
+
+BOOST_AUTO_TEST_CASE( slicer_test_counts_nullfilestar )
+{
+	auto count = Slicer::Slicer::Apply(slice, NULL);
+	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
+}
 
 BOOST_AUTO_TEST_CASE( slicer_test_ice )
 {
