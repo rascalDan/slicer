@@ -40,6 +40,12 @@ BOOST_AUTO_TEST_CASE( slicer_test_counts_nullfilestar )
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
 }
 
+BOOST_AUTO_TEST_CASE( slicer_test_counts_interfacesOnly )
+{
+	auto count = Slicer::Slicer::Apply(root / "interfaces.ice", NULL);
+	BOOST_REQUIRE_EQUAL(0, count);
+}
+
 BOOST_AUTO_TEST_CASE( slicer_test_ice )
 {
 	const fs::path cpp = fs::change_extension(tmp / base, ".cpp");
