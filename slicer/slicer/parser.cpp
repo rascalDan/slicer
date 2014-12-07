@@ -9,8 +9,11 @@
 #include <Slice/CPlusPlusUtil.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <mutex>
 
 namespace fs = boost::filesystem;
+
+std::mutex slicePreprocessor;
 
 namespace Slicer {
 	Slicer::Slicer(FILE * c) :
@@ -506,6 +509,7 @@ namespace Slicer {
 	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp)
 	{
 		std::vector<std::string> cppArgs;
+		std::lock_guard<std::mutex> lock(slicePreprocessor);
 		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", ice.string(), cppArgs);
 		FILE * cppHandle = icecpp->preprocess(false);
 
