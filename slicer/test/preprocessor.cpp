@@ -13,7 +13,7 @@
 
 namespace fs = boost::filesystem;
 
-const unsigned int COMPONENTS_IN_TEST_ICE = 24;
+const unsigned int COMPONENTS_IN_TEST_ICE = 25;
 
 BOOST_FIXTURE_TEST_SUITE ( preprocessor, FileStructure );
 

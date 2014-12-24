@@ -93,3 +93,14 @@ module TestModule {
 		Base2 b;
 	};
 };
+
+module TestModule2 {
+	class CrossModule extends TestModule::ClassType {
+		int anything;
+		[	"slicer:conversion:boost.posix_time.ptime:ptimeToDateTime:dateTimeToPTime",
+			"slicer:conversion:std.string:stringToDateTime:dateTimeToString" ]
+		TestModule::DateTime dt;
+		TestModule::Base base;
+	};
+};
+

@@ -45,8 +45,6 @@ namespace Slicer {
 
 			void visitComplexDataMembers(Slice::ConstructedPtr t, const Slice::DataMemberList &) const;
 
-			std::string modulePath() const;
-
 			void defineConversions(Slice::DataMemberPtr dm) const;
 
 			void copyMetadata(const std::list<std::string> & metadata) const;
