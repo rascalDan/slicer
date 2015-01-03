@@ -1,7 +1,6 @@
 #include "parser.h"
 #include <Slice/Parser.h>
 #include <Slice/Preprocessor.h>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -32,7 +31,7 @@ namespace Slicer {
 		auto type = dm->type();
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 		auto conversions = getConversions(dm);
-		BOOST_FOREACH(const auto & conversion, conversions) {
+		for (const auto & conversion : conversions) {
 			fprintf(cpp, "%s %s(const %s &);\n",
 					conversion.ExchangeType.c_str(),
 					conversion.ConvertToExchangeFunc.c_str(),
@@ -50,7 +49,7 @@ namespace Slicer {
 					dm->scoped().c_str());
 			fprintf(cpp, "{\n");
 
-			BOOST_FOREACH(const auto & conversion, conversions) {
+			for (const auto & conversion : conversions) {
 				fprintf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
 						conversion.ExchangeType.c_str());
 				fprintf(cpp, "\t\t%s tmp;\n",
@@ -70,7 +69,7 @@ namespace Slicer {
 					dm->scoped().c_str());
 			fprintf(cpp, "{\n");
 
-			BOOST_FOREACH(const auto & conversion, conversions) {
+			for (const auto & conversion : conversions) {
 				fprintf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
 						conversion.ExchangeType.c_str());
 				fprintf(cpp, "\t\tvtpt->get(%s(Member));\n",
@@ -112,13 +111,13 @@ namespace Slicer {
 		if (!cpp) return true;
 
 		fprintf(cpp, "// Begin module %s\n\n", m->name().c_str());
-		BOOST_FOREACH(const auto & c, m->structs()) {
-			BOOST_FOREACH(const auto & dm, c->dataMembers()) {
+		for (const auto & c : m->structs()) {
+			for (const auto & dm : c->dataMembers()) {
 				defineConversions(dm);
 			}
 		}
-		BOOST_FOREACH(const auto & c, m->classes()) {
-			BOOST_FOREACH(const auto & dm, c->dataMembers()) {
+		for (const auto & c : m->classes()) {
+			for (const auto & dm : c->dataMembers()) {
 				defineConversions(dm);
 			}
 		}
@@ -218,7 +217,7 @@ namespace Slicer {
 				it->scoped().c_str());
 		fprintf(cpp, "ModelPartForComplex< %s >::hooks {\n",
 				it->scoped().c_str());
-		BOOST_FOREACH (const auto & dm, dataMembers) {
+		for (const auto & dm : dataMembers) {
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 			auto t = Slice::TypePtr::dynamicCast(dm->container());
 			if (!t) {
@@ -257,7 +256,7 @@ namespace Slicer {
 		}
 		fprintf(cpp, "\t};\n\n");
 
-		BOOST_FOREACH (const auto & dm, dataMembers) {
+		for (const auto & dm : dataMembers) {
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 			auto t = Slice::TypePtr::dynamicCast(dm->container());
 			if (!t) {
@@ -421,7 +420,7 @@ namespace Slicer {
 	Slicer::copyMetadata(const std::list<std::string> & metadata) const
 	{
 		fprintf(cpp, "{\n");
-		BOOST_FOREACH (const auto & md, metadata) {
+		for (const auto & md : metadata) {
 			if (boost::algorithm::starts_with(md, "slicer:")) {
 				fprintf(cpp, "\t\"%.*s\",\n", (int)md.length() - 7, md.c_str() + 7);
 			}
@@ -432,7 +431,7 @@ namespace Slicer {
 	boost::optional<std::string>
 	Slicer::metaDataValue(const std::string & prefix, const std::list<std::string> & metadata)
 	{
-		BOOST_FOREACH (const auto & md, metadata) {
+		for (const auto & md : metadata) {
 			if (boost::algorithm::starts_with(md, prefix)) {
 				return md.substr(prefix.length());
 			}
@@ -444,7 +443,7 @@ namespace Slicer {
 	Slicer::metaDataValues(const std::string & prefix, const std::list<std::string> & metadata)
 	{
 		std::list<std::string> mds;
-		BOOST_FOREACH (const auto & md, metadata) {
+		for (const auto & md : metadata) {
 			if (boost::algorithm::starts_with(md, prefix)) {
 				mds.push_back(md.substr(prefix.length()));
 			}
@@ -465,12 +464,12 @@ namespace Slicer {
 	{
 		std::vector<ConversionSpec> rtn;
 		auto conversions = metaDataValues("slicer:conversion:", dm->getMetaData());
-		BOOST_FOREACH(const auto & conversion, conversions) {
+		for (const auto & conversion : conversions) {
 			auto split = metaDataSplit(conversion);
 			if (split.size() != 3) {
 				throw std::runtime_error("conversion needs 3 parts type:toModelFunc:toExchangeFunc");
 			}
-			BOOST_FOREACH(auto & p, split) {
+			for (auto & p : split) {
 				boost::algorithm::replace_all(p, ".", "::");
 			}
 			rtn.push_back(ConversionSpec({split[0], split[1], split[2]}));

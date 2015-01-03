@@ -9,7 +9,6 @@
 #include <Slice/Parser.h>
 #include <stdexcept>
 #include <boost/function.hpp>
-#include <boost/foreach.hpp>
 #include <boost/bimap.hpp>
 #include <vector>
 
@@ -289,7 +288,7 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch)
 			{
-				BOOST_FOREACH (const auto & h, hooks) {
+				for (const auto & h : hooks) {
 					auto modelPart = h->Get(GetModel());
 					ch(h->PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr());
 				}
@@ -447,7 +446,7 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
-				BOOST_FOREACH(auto & element, sequence) {
+				for(auto & element : sequence) {
 					ch(elementName, elementModelPart(element));
 				}
 			}
@@ -523,7 +522,7 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
-				BOOST_FOREACH(auto & pair, dictionary) {
+				for (auto & pair : dictionary) {
 					ch(pairName, new ModelPartForDictionaryElement<T>(const_cast<typename T::key_type *>(&pair.first), &pair.second));
 				}
 			}

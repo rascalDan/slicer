@@ -135,7 +135,7 @@ namespace Slicer {
 					}
 				}
 				modelPart->Create();
-				BOOST_FOREACH(const auto & element, o) {
+				for (const auto & element : o) {
 					auto emp = modelPart->GetChild(element.first);
 					if (emp) {
 						emp->Create();
@@ -148,7 +148,7 @@ namespace Slicer {
 			void operator()(const json::Array & a) const
 			{
 				modelPart->Create();
-				BOOST_FOREACH(const auto & element, a) {
+				for (const auto & element : a) {
 					auto emp = modelPart->GetChild(std::string());
 					if (emp) {
 						emp->Create();
