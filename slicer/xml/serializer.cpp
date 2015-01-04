@@ -1,12 +1,16 @@
 #include "serializer.h"
+#include <slicer/metadata.h>
 #include <libxml++/document.h>
 #include <libxml++/parsers/domparser.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <stdexcept>
 #include <glibmm/ustring.h>
 
 namespace Slicer {
+	const std::string md_attribute = "xml:attribute";
+
 	class BadBooleanValue : public std::invalid_argument {
 		public:
 			BadBooleanValue(const Glib::ustring &) :
@@ -151,7 +155,7 @@ namespace Slicer {
 			{
 			}
 	};
-	
+
 	class XmlContentValueTarget : public XmlValueTarget {
 		public:
 			XmlContentValueTarget(xmlpp::Element * p) :
@@ -159,13 +163,14 @@ namespace Slicer {
 			{
 			}
 	};
-	
+
 	void
 	XmlDeserializer::DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp)
 	{
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
-				auto smp = mp->GetChild(element->get_name());
+				auto smp = mp->GetChild(element->get_name(),
+						boost::bind(metaDataFlagNotSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
 				if (smp) {
 					if (auto typeIdPropName = smp->GetTypeIdProperty()) {
 						if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
@@ -182,7 +187,8 @@ namespace Slicer {
 				}
 			}
 			else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
-				auto smp = mp->GetChild("@" + attribute->get_name());
+				auto smp = mp->GetChild(attribute->get_name(),
+						boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
 				if (smp) {
 					smp->Create();
 					smp->SetValue(new XmlAttributeValueSource(attribute));
@@ -203,13 +209,13 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp)
+	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp, HookCommonPtr hp)
 	{
 		if (name.empty()) {
 			return;
 		}
-		if (name[0] == '@') {
-			mp->GetValue(new XmlAttributeValueTarget(n, name.substr(1)));
+		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
+			mp->GetValue(new XmlAttributeValueTarget(n, name));
 		}
 		else if (mp) {
 			auto element = n->add_child(name);
@@ -220,7 +226,7 @@ namespace Slicer {
 				mp = mp->GetSubclassModelPart(*typeId);
 			}
 			mp->GetValue(new XmlContentValueTarget(element));
-			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2));
+			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3));
 		}
 	}
 
@@ -228,7 +234,7 @@ namespace Slicer {
 	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartPtr mp)
 	{
 		auto root = doc->create_root_node(name);
-		mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, root, _1, _2));
+		mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, root, _1, _2, _3));
 	}
 
 	XmlFileSerializer::XmlFileSerializer(const boost::filesystem::path & p) :

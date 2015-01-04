@@ -46,6 +46,7 @@ module TestModule {
 	class ClassClass {
 		ClassType cls;
 		StructType str;
+		["slicer:xml:attribute"]
 		int simp;
 	};
 	struct StructStruct {

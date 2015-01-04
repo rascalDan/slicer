@@ -36,7 +36,7 @@ class FileBased : public FileStructure {
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
 			IceInternal::Handle<T> p = Slicer::Deserialize<DeserializerIn, T>(input);
-			
+
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check1: " << input);
 				check(*p);
@@ -291,6 +291,11 @@ BOOST_AUTO_TEST_CASE( optionals_areset2_json )
 BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 {
 	verifyByHelper<TestModule::Optionals, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
+}
+
+BOOST_AUTO_TEST_CASE( xml_attribute_xml )
+{
+	verifyByFile<TestModule::ClassClass, Slicer::XmlFileDeserializer>("xmlattr.xml");
 }
 
 BOOST_AUTO_TEST_SUITE_END();

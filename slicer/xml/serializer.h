@@ -7,10 +7,10 @@
 namespace Slicer {
 	class XmlSerializer : public Serializer {
 		protected:
-			static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartPtr mp);
+			static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartPtr mp, HookCommonPtr hp);
 			static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartPtr mp);
 	};
-	
+
 	class XmlFileSerializer : public XmlSerializer {
 		public:
 			XmlFileSerializer(const boost::filesystem::path &);
@@ -20,7 +20,7 @@ namespace Slicer {
 		private:
 			const boost::filesystem::path path;
 	};
-	
+
 	class XmlDocumentSerializer : public XmlSerializer {
 		public:
 			XmlDocumentSerializer(xmlpp::Document * &);
@@ -36,7 +36,7 @@ namespace Slicer {
 			static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp);
 			static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp);
 	};
-	
+
 	class XmlFileDeserializer : public XmlDeserializer {
 		public:
 			XmlFileDeserializer(const boost::filesystem::path &);
@@ -46,7 +46,7 @@ namespace Slicer {
 		private:
 			const boost::filesystem::path path;
 	};
-	
+
 	class XmlDocumentDeserializer : public XmlDeserializer {
 		public:
 			XmlDocumentDeserializer(const xmlpp::Document *);
