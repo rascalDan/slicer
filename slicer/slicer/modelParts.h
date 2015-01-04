@@ -13,6 +13,14 @@
 #include <vector>
 
 namespace Slicer {
+	// This allows IceUtil::Handle to play nicely with boost::things
+	template <class T>
+	T *
+	get_pointer(const IceUtil::Handle<T> & p)
+	{
+		return p.get();
+	}
+
 	class IncorrectElementName : public std::invalid_argument {
 		public:
 			IncorrectElementName(const std::string & n);
@@ -76,19 +84,22 @@ namespace Slicer {
 	typedef IceUtil::Handle<ValueSource> ValueSourcePtr;
 
 	class ModelPart;
+	class HookCommon;
 
 	typedef IceUtil::Handle<ModelPart> ModelPartPtr;
+	typedef IceUtil::Handle<HookCommon> HookCommonPtr;
 	typedef std::map<std::string, ModelPartPtr> ModelParts;
 	typedef IceUtil::Optional<std::string> TypeId;
 
-	typedef boost::function<void(const std::string &, ModelPartPtr)> ChildHandler;
+	typedef boost::function<void(const std::string &, ModelPartPtr, HookCommonPtr)> ChildHandler;
 
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
+	typedef boost::function<bool(HookCommonPtr)> HookFilter;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
 	ClassRefMap * & classRefMap();
 	typedef boost::bimap<std::string, std::string> ClassNameMap;
 	ClassNameMap * & classNameMap();
-	typedef std::set<std::string> Metadata;
+	typedef std::list<std::string> Metadata;
 	enum ModelPartType {
 		mpt_Null,
 		mpt_Simple,
@@ -97,12 +108,19 @@ namespace Slicer {
 		mpt_Dictionary,
 	};
 
+	class HookCommon : public IceUtil::Shared {
+		public:
+			virtual std::string PartName() const = 0;
+
+			virtual const Metadata & GetMetadata() const = 0;
+	};
+
 	class ModelPart : public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
-			virtual ModelPartPtr GetChild(const std::string & memberName) = 0;
+			virtual ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const;
@@ -132,7 +150,7 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ModelPartPtr GetChild(const std::string &) override { return NULL; }
+			virtual ModelPartPtr GetChild(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
 			virtual bool HasValue() const override { return true; }
@@ -156,7 +174,7 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ModelPartPtr GetChild(const std::string &) override { return NULL; }
+			virtual ModelPartPtr GetChild(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 			virtual bool HasValue() const override { return true; }
@@ -203,10 +221,10 @@ namespace Slicer {
 					modelPart->Create();
 				}
 			}
-			virtual ModelPartPtr GetChild(const std::string & name) override
+			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter & flt) override
 			{
 				if (OptionalMember) {
-					return modelPart->GetChild(name);
+					return modelPart->GetChild(name, flt);
 				}
 				return NULL;
 			}
@@ -244,13 +262,9 @@ namespace Slicer {
 	template<typename T>
 	class ModelPartForComplex : public ModelPart {
 		public:
-			class HookBase : public IceUtil::Shared {
+			class HookBase : public HookCommon {
 				public:
 					virtual ModelPartPtr Get(T * t) const = 0;
-
-					virtual std::string PartName() const = 0;
-
-					virtual const Metadata & GetMetadata() const = 0;
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
@@ -290,17 +304,16 @@ namespace Slicer {
 			{
 				for (const auto & h : hooks) {
 					auto modelPart = h->Get(GetModel());
-					ch(h->PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr());
+					ch(h->PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr(), h);
 				}
 			}
 
-			ModelPartPtr GetChild(const std::string & name) override
+			ModelPartPtr GetChild(const std::string & name, const HookFilter & flt) override
 			{
-				auto childitr = std::find_if(hooks.begin(), hooks.end(), [&name](const typename Hooks::value_type & h) {
-						return h->PartName() == name;
-					});
-				if (childitr != hooks.end()) {
-					return (*childitr)->Get(GetModel());
+				for (const auto & h : hooks) {
+					if (h->PartName() == name && (!flt || flt(h))) {
+						return h->Get(GetModel());
+					}
 				}
 				return NULL;
 			}
@@ -403,7 +416,7 @@ namespace Slicer {
 				ModelObject = o;
 			}
 
-			virtual ModelPartPtr GetChild(const std::string & name) override
+			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
 			{
 				if (!name.empty() && name != rootName) {
 					throw IncorrectElementName(rootName);
@@ -414,7 +427,7 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
-				ch(rootName, new ModelPartForClass<T>(ModelObject));
+				ch(rootName, new ModelPartForClass<T>(ModelObject), NULL);
 			}
 
 			typename T::element_type * GetModel() override
@@ -447,11 +460,11 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
 				for(auto & element : sequence) {
-					ch(elementName, elementModelPart(element));
+					ch(elementName, elementModelPart(element), NULL);
 				}
 			}
 
-			ModelPartPtr GetChild(const std::string &) override;
+			ModelPartPtr GetChild(const std::string &, const HookFilter &) override;
 
 			virtual bool HasValue() const override { return true; }
 
@@ -523,10 +536,10 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
 				for (auto & pair : dictionary) {
-					ch(pairName, new ModelPartForDictionaryElement<T>(const_cast<typename T::key_type *>(&pair.first), &pair.second));
+					ch(pairName, new ModelPartForDictionaryElement<T>(const_cast<typename T::key_type *>(&pair.first), &pair.second), NULL);
 				}
 			}
-			ModelPartPtr GetChild(const std::string & name) override
+			ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
 			{
 				if (!name.empty() && name != pairName) {
 					throw IncorrectElementName(pairName);
