@@ -9,10 +9,17 @@ module TestModule {
 		short minute;
 		short second;
 	};
+	[ "slicer:conversion:std.string:stringToIsoDate:isoDateToString" ]
+	struct IsoDate {
+		short year;
+		short month;
+		short day;
+	};
 	class DateTimeContainer {
 		[	"slicer:conversion:boost.posix_time.ptime:ptimeToDateTime:dateTimeToPTime",
 			"slicer:conversion:std.string:stringToDateTime:dateTimeToString" ]
 		DateTime dt;
+		IsoDate date;
 	};
 	class BuiltIns {
 		bool mbool;

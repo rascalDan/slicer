@@ -29,7 +29,7 @@ namespace Slicer {
 
 		auto type = dm->type();
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
-		auto conversions = getConversions(dm->getMetaData());
+		auto conversions = getAllConversions(dm);
 		for (const auto & conversion : conversions) {
 			fprintf(cpp, "%s %s(const %s &);\n",
 					conversion.ExchangeType.c_str(),
@@ -223,7 +223,7 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			auto conversions = metaDataValues("slicer:conversion:", dm->getMetaData());
+			auto conversions = getAllConversions(dm);
 			fprintf(cpp, "\t\tnew ");
 			auto type = dm->type();
 			createNewModelPartPtrFor(t);
@@ -427,6 +427,17 @@ namespace Slicer {
 		fprintf(cpp, "};\n\n");
 	}
 
+	Slicer::Conversions
+	Slicer::getAllConversions(Slice::DataMemberPtr dm)
+	{
+		auto conversions = getConversions(dm->getMetaData());
+		auto typec = Slice::ContainedPtr::dynamicCast(dm->type());
+		if (typec) {
+			auto typeConversions = getConversions(typec->getMetaData());
+			std::copy(typeConversions.begin(), typeConversions.end(), std::back_inserter(conversions));
+		}
+		return conversions;
+	}
 
 	Slicer::Conversions
 	Slicer::getConversions(const std::list<std::string> & dm)
