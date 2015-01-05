@@ -1,5 +1,8 @@
+lib po : : <name>boost_program_options ;
+
 exe slicer :
 	[ glob *.cpp ]
 	:
 	<library>../slicer//slicer
+	<library>po
 	;
