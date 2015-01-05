@@ -16,6 +16,7 @@ namespace Slicer {
 					std::string ConvertToModelFunc;
 					std::string ConvertToExchangeFunc;
 			};
+			typedef std::vector<ConversionSpec> Conversions;
 
 			Slicer(FILE * c);
 
@@ -48,7 +49,7 @@ namespace Slicer {
 			void defineConversions(Slice::DataMemberPtr dm) const;
 
 			void copyMetadata(const std::list<std::string> & metadata) const;
-			static std::vector<ConversionSpec> getConversions(const std::list<std::string> & metadata);
+			static Conversions getConversions(const std::list<std::string> & metadata);
 
 			unsigned int components;
 			FILE * cpp;

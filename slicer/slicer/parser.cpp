@@ -428,10 +428,10 @@ namespace Slicer {
 	}
 
 
-	std::vector<Slicer::ConversionSpec>
+	Slicer::Conversions
 	Slicer::getConversions(const std::list<std::string> & dm)
 	{
-		std::vector<ConversionSpec> rtn;
+		Conversions rtn;
 		auto conversions = metaDataValues("slicer:conversion:", dm);
 		for (const auto & conversion : conversions) {
 			auto split = metaDataSplit(conversion);
