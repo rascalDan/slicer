@@ -48,7 +48,7 @@ namespace Slicer {
 			void defineConversions(Slice::DataMemberPtr dm) const;
 
 			void copyMetadata(const std::list<std::string> & metadata) const;
-			static std::vector<ConversionSpec> getConversions(Slice::DataMemberPtr);
+			static std::vector<ConversionSpec> getConversions(const std::list<std::string> & metadata);
 
 			unsigned int components;
 			FILE * cpp;

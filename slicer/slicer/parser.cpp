@@ -29,7 +29,7 @@ namespace Slicer {
 
 		auto type = dm->type();
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
-		auto conversions = getConversions(dm);
+		auto conversions = getConversions(dm->getMetaData());
 		for (const auto & conversion : conversions) {
 			fprintf(cpp, "%s %s(const %s &);\n",
 					conversion.ExchangeType.c_str(),
@@ -429,10 +429,10 @@ namespace Slicer {
 
 
 	std::vector<Slicer::ConversionSpec>
-	Slicer::getConversions(Slice::DataMemberPtr dm)
+	Slicer::getConversions(const std::list<std::string> & dm)
 	{
 		std::vector<ConversionSpec> rtn;
-		auto conversions = metaDataValues("slicer:conversion:", dm->getMetaData());
+		auto conversions = metaDataValues("slicer:conversion:", dm);
 		for (const auto & conversion : conversions) {
 			auto split = metaDataSplit(conversion);
 			if (split.size() != 3) {
