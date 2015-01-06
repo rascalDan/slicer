@@ -227,7 +227,7 @@ namespace Slicer {
 					break;
 				case mpt_Sequence:
 					*n = json::Array();
-					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
+					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, n, _2));
 					break;
 				case mpt_Dictionary:
 					*n = json::Array();
