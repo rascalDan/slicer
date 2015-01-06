@@ -115,6 +115,17 @@ namespace Slicer {
 			virtual const Metadata & GetMetadata() const = 0;
 	};
 
+#define templateMODELPARTFOR(Type, ModelPart) \
+	template <class T> ModelPartPtr ModelPartFor(Type & t); \
+	template <class T> ModelPartPtr ModelPartFor(Type * t);
+	templateMODELPARTFOR(IceInternal::Handle<T>, ModelPartForClass);
+	templateMODELPARTFOR(std::vector<T>, ModelPartForSequence);
+	templateMODELPARTFOR(std::list<T>, ModelPartForSequence);
+	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> & t);
+	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> * t);
+	templateMODELPARTFOR(T, ModelPartForStruct);
+#undef templateMODELPARTFOR
+
 	class ModelPart : public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
@@ -403,17 +414,27 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForClassRoot : public ModelPartForClass<T> {
+	class ModelPartForRoot : public ModelPart {
 		public:
-			ModelPartForClassRoot() :
-				ModelPartForClass<T>(ModelObject)
+			ModelPartForRoot() :
+				ModelObject(new T()),
+				owned(true),
+				mp(ModelPartFor(*ModelObject))
 			{
 			}
 
-			ModelPartForClassRoot(T o) :
-				ModelPartForClass<T>(ModelObject)
+			ModelPartForRoot(T & o) :
+				ModelObject(&o),
+				owned(false),
+				mp(ModelPartFor(*ModelObject))
 			{
-				ModelObject = o;
+			}
+
+			~ModelPartForRoot()
+			{
+				if (owned) {
+					delete ModelObject;
+				}
 			}
 
 			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
@@ -421,24 +442,31 @@ namespace Slicer {
 				if (!name.empty() && name != rootName) {
 					throw IncorrectElementName(rootName);
 				}
-				ModelPartForClass<T>::Create();
-				return new ModelPartForClass<T>(ModelObject);
+				mp->Create();
+				return mp;
 			}
 
 			virtual void OnEachChild(const ChildHandler & ch) override
 			{
-				ch(rootName, new ModelPartForClass<T>(ModelObject), NULL);
+				ch(rootName, mp, NULL);
 			}
 
-			typename T::element_type * GetModel() override
+			T & GetModel()
 			{
-				return ModelObject.get();
+				return *ModelObject;
 			}
 
 			virtual bool HasValue() const override { return ModelObject; }
 
+			virtual ModelPartType GetType() const override
+			{
+				return mp->GetType();
+			}
+
 		private:
-			T ModelObject;
+			T * ModelObject;
+			bool owned;
+			ModelPartPtr mp;
 			static std::string rootName;
 	};
 

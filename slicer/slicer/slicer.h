@@ -10,7 +10,7 @@ namespace Slicer {
 	IceInternal::Handle<Object>
 	Deserialize(SerializerParams & ... sp)
 	{
-		IceUtil::Handle<ModelPartForClassRoot<IceInternal::Handle<Object>>> root = new ModelPartForClassRoot<IceInternal::Handle<Object>>();
+		IceUtil::Handle<ModelPartForRoot<IceInternal::Handle<Object>>> root = new ModelPartForRoot<IceInternal::Handle<Object>>();
 		DeserializerPtr deserializer = new Deserializer(sp ...);
 		deserializer->Deserialize(root);
 		return root->GetModel();
@@ -20,7 +20,7 @@ namespace Slicer {
 	void
 	Serialize(IceInternal::Handle<Object> object, SerializerParams & ... sp)
 	{
-		IceUtil::Handle<ModelPartForClassRoot<IceInternal::Handle<Object>>> root = new ModelPartForClassRoot<IceInternal::Handle<Object>>(object);
+		IceUtil::Handle<ModelPartForRoot<IceInternal::Handle<Object>>> root = new ModelPartForRoot<IceInternal::Handle<Object>>(object);
 		SerializerPtr serializer = new Serializer(sp ...);
 		serializer->Serialize(root);
 	}

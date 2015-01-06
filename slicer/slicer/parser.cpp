@@ -145,7 +145,7 @@ namespace Slicer {
 
 		fprintf(cpp, "template<>\n");
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
-		fprintf(cpp, "std::string ModelPartForClassRoot< %s >::rootName(\"%s\");\n\n",
+		fprintf(cpp, "std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
 				typeToString(decl).c_str(),
 				name ? name->c_str() : c->name().c_str());
 
