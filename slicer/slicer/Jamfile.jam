@@ -10,6 +10,7 @@ lib slicer :
 	<library>IceUtil
 	<library>boost_system
 	<library>boost_filesystem
+	<include>..
 	: :
 	<include>..
 	<library>boost_system
