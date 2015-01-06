@@ -123,6 +123,15 @@ namespace Slicer {
 		return true;
 	}
 
+
+	void
+	Slicer::defineRootName(const std::string & type, const std::string & name) const
+	{
+		fprintf(cpp, "template<>\n");
+		fprintf(cpp, "std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
+				type.c_str(), name.c_str());
+	}
+
 	bool
 	Slicer::visitClassDefStart(const Slice::ClassDefPtr & c)
 	{
@@ -143,11 +152,8 @@ namespace Slicer {
 				typeToString(decl).c_str(),
 				typeId ? typeId->c_str() : "slicer-typeid");
 
-		fprintf(cpp, "template<>\n");
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
-		fprintf(cpp, "std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
-				typeToString(decl).c_str(),
-				name ? name->c_str() : c->name().c_str());
+		defineRootName(typeToString(decl), name ? *name : c->name());
 
 		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
 		fprintf(cpp, "static void registerClass_%u() __attribute__ ((constructor(210)));\n", classNo);
@@ -313,6 +319,9 @@ namespace Slicer {
 		fprintf(cpp, "std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n",
 				s->scoped().c_str(),
 				ename ? ename->c_str() : "element");
+
+		auto name = metaDataValue("slicer:root:", s->getMetaData());
+		defineRootName(s->scoped(), name ? *name : s->name());
 
 		fprintf(cpp, "template<>\nMetadata ModelPartForSequence< %s >::metadata ",
 				s->scoped().c_str());
