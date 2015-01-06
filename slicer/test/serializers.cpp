@@ -19,7 +19,7 @@
 
 namespace fs = boost::filesystem;
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::const_iterator )
+BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
 
 class FileBased : public FileStructure {
 	public:
@@ -35,11 +35,11 @@ class FileBased : public FileStructure {
 			const fs::path outputXml = tmpf / fs::change_extension(infile, "xml");
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-			IceInternal::Handle<T> p = Slicer::Deserialize<DeserializerIn, T>(input);
+			T p = Slicer::Deserialize<DeserializerIn, T>(input);
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check1: " << input);
-				check(*p);
+				check(p);
 			}
 
 			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputJson);
@@ -50,7 +50,7 @@ class FileBased : public FileStructure {
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check2: " << input);
-				check(*p);
+				check(p);
 			}
 
 			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
@@ -74,12 +74,12 @@ class FileBased : public FileStructure {
 			Internal docRead = in(input);
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-			IceInternal::Handle<T> p = Slicer::Deserialize<Deserializer, T>(docRead);
+			T p = Slicer::Deserialize<Deserializer, T>(docRead);
 			ifree(docRead);
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check1: " << input);
-				check(*p);
+				check(p);
 			}
 
 			BOOST_TEST_CHECKPOINT("Serialize: " << input);
@@ -88,7 +88,7 @@ class FileBased : public FileStructure {
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check2: " << input);
-				check(*p);
+				check(p);
 			}
 
 			BOOST_TEST_CHECKPOINT("Write: " << output);
@@ -101,83 +101,83 @@ class FileBased : public FileStructure {
 };
 
 void
-checkBuiltIns_valuesCorrect(const TestModule::BuiltIns & bt)
+checkBuiltIns_valuesCorrect(const TestModule::BuiltInsPtr & bt)
 {
-	BOOST_REQUIRE_EQUAL(bt.mbool, true);
-	BOOST_REQUIRE_EQUAL(bt.mbyte, 4);
-	BOOST_REQUIRE_EQUAL(bt.mshort, 40);
-	BOOST_REQUIRE_EQUAL(bt.mint, 80);
-	BOOST_REQUIRE_EQUAL(bt.mlong, 800);
-	BOOST_REQUIRE_EQUAL(bt.mfloat, 3.125);
-	BOOST_REQUIRE_EQUAL(bt.mdouble, 3.0625);
-	BOOST_REQUIRE_EQUAL(bt.mstring, "Sample text");
+	BOOST_REQUIRE_EQUAL(bt->mbool, true);
+	BOOST_REQUIRE_EQUAL(bt->mbyte, 4);
+	BOOST_REQUIRE_EQUAL(bt->mshort, 40);
+	BOOST_REQUIRE_EQUAL(bt->mint, 80);
+	BOOST_REQUIRE_EQUAL(bt->mlong, 800);
+	BOOST_REQUIRE_EQUAL(bt->mfloat, 3.125);
+	BOOST_REQUIRE_EQUAL(bt->mdouble, 3.0625);
+	BOOST_REQUIRE_EQUAL(bt->mstring, "Sample text");
 }
 
 void
-checkInherits_types(const TestModule::InheritanceCont & i)
+checkInherits_types(const TestModule::InheritanceContPtr & i)
 {
-	BOOST_REQUIRE(i.b);
-	BOOST_REQUIRE(TestModule::D1Ptr::dynamicCast(i.b));
-	BOOST_REQUIRE_EQUAL(TestModule::D1Ptr::dynamicCast(i.b)->a, 1);
-	BOOST_REQUIRE_EQUAL(TestModule::D1Ptr::dynamicCast(i.b)->b, 2);
-	BOOST_REQUIRE_EQUAL(i.bs.size(), 3);
-	BOOST_REQUIRE(i.bs[0]);
-	BOOST_REQUIRE(TestModule::D2Ptr::dynamicCast(i.bs[0]));
-	BOOST_REQUIRE_EQUAL(TestModule::D2Ptr::dynamicCast(i.bs[0])->a, 1);
-	BOOST_REQUIRE_EQUAL(TestModule::D2Ptr::dynamicCast(i.bs[0])->c, 100);
-	BOOST_REQUIRE(i.bs[1]);
-	BOOST_REQUIRE(TestModule::D3Ptr::dynamicCast(i.bs[1]));
-	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i.bs[1])->a, 2);
-	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i.bs[1])->c, 100);
-	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i.bs[1])->d, 200);
-	BOOST_REQUIRE(i.bs[2]);
-	BOOST_REQUIRE_EQUAL(i.bs[2]->a, 3);
-	BOOST_REQUIRE(!TestModule::D1Ptr::dynamicCast(i.bs[2]));
-	BOOST_REQUIRE(!TestModule::D2Ptr::dynamicCast(i.bs[2]));
-	BOOST_REQUIRE(!TestModule::D3Ptr::dynamicCast(i.bs[2]));
-	BOOST_REQUIRE_EQUAL(i.bm.size(), 3);
-	BOOST_REQUIRE(TestModule::D1Ptr::dynamicCast(i.bm.find(10)->second));
-	BOOST_REQUIRE(TestModule::D3Ptr::dynamicCast(i.bm.find(12)->second));
-	BOOST_REQUIRE(!TestModule::D1Ptr::dynamicCast(i.bm.find(14)->second));
-	BOOST_REQUIRE(!TestModule::D2Ptr::dynamicCast(i.bm.find(14)->second));
-	BOOST_REQUIRE(!TestModule::D3Ptr::dynamicCast(i.bm.find(14)->second));
+	BOOST_REQUIRE(i->b);
+	BOOST_REQUIRE(TestModule::D1Ptr::dynamicCast(i->b));
+	BOOST_REQUIRE_EQUAL(TestModule::D1Ptr::dynamicCast(i->b)->a, 1);
+	BOOST_REQUIRE_EQUAL(TestModule::D1Ptr::dynamicCast(i->b)->b, 2);
+	BOOST_REQUIRE_EQUAL(i->bs.size(), 3);
+	BOOST_REQUIRE(i->bs[0]);
+	BOOST_REQUIRE(TestModule::D2Ptr::dynamicCast(i->bs[0]));
+	BOOST_REQUIRE_EQUAL(TestModule::D2Ptr::dynamicCast(i->bs[0])->a, 1);
+	BOOST_REQUIRE_EQUAL(TestModule::D2Ptr::dynamicCast(i->bs[0])->c, 100);
+	BOOST_REQUIRE(i->bs[1]);
+	BOOST_REQUIRE(TestModule::D3Ptr::dynamicCast(i->bs[1]));
+	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i->bs[1])->a, 2);
+	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i->bs[1])->c, 100);
+	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i->bs[1])->d, 200);
+	BOOST_REQUIRE(i->bs[2]);
+	BOOST_REQUIRE_EQUAL(i->bs[2]->a, 3);
+	BOOST_REQUIRE(!TestModule::D1Ptr::dynamicCast(i->bs[2]));
+	BOOST_REQUIRE(!TestModule::D2Ptr::dynamicCast(i->bs[2]));
+	BOOST_REQUIRE(!TestModule::D3Ptr::dynamicCast(i->bs[2]));
+	BOOST_REQUIRE_EQUAL(i->bm.size(), 3);
+	BOOST_REQUIRE(TestModule::D1Ptr::dynamicCast(i->bm.find(10)->second));
+	BOOST_REQUIRE(TestModule::D3Ptr::dynamicCast(i->bm.find(12)->second));
+	BOOST_REQUIRE(!TestModule::D1Ptr::dynamicCast(i->bm.find(14)->second));
+	BOOST_REQUIRE(!TestModule::D2Ptr::dynamicCast(i->bm.find(14)->second));
+	BOOST_REQUIRE(!TestModule::D3Ptr::dynamicCast(i->bm.find(14)->second));
 }
 
 void
-checkOptionals_notset(const TestModule::Optionals & opts)
+checkOptionals_notset(const TestModule::OptionalsPtr & opts)
 {
-	BOOST_REQUIRE(!opts.optSimple);
-	BOOST_REQUIRE(!opts.optStruct);
-	BOOST_REQUIRE(!opts.optClass);
-	BOOST_REQUIRE(!opts.optSeq);
-	BOOST_REQUIRE(!opts.optDict);
+	BOOST_REQUIRE(!opts->optSimple);
+	BOOST_REQUIRE(!opts->optStruct);
+	BOOST_REQUIRE(!opts->optClass);
+	BOOST_REQUIRE(!opts->optSeq);
+	BOOST_REQUIRE(!opts->optDict);
 }
 
 void
-checkOptionals_areset(const TestModule::Optionals & opts)
+checkOptionals_areset(const TestModule::OptionalsPtr & opts)
 {
-	BOOST_REQUIRE(opts.optSimple);
-	BOOST_REQUIRE_EQUAL(opts.optSimple, 4);
-	BOOST_REQUIRE(opts.optStruct);
-	BOOST_REQUIRE_EQUAL(opts.optStruct->a, 1);
-	BOOST_REQUIRE_EQUAL(opts.optStruct->b, 2);
-	BOOST_REQUIRE(opts.optClass);
-	BOOST_REQUIRE_EQUAL((*opts.optClass)->a, 1);
-	BOOST_REQUIRE_EQUAL((*opts.optClass)->b, 2);
-	BOOST_REQUIRE_EQUAL(opts.optSeq->size(), 2);
-	BOOST_REQUIRE_EQUAL((*opts.optSeq)[0]->a, 3);
-	BOOST_REQUIRE_EQUAL((*opts.optSeq)[0]->b, 4);
-	BOOST_REQUIRE_EQUAL((*opts.optSeq)[1]->a, 5);
-	BOOST_REQUIRE_EQUAL((*opts.optSeq)[1]->b, 6);
-	BOOST_REQUIRE(opts.optDict);
-	BOOST_REQUIRE_EQUAL(opts.optDict->size(), 2);
-	BOOST_REQUIRE_EQUAL(opts.optDict->find(1), opts.optDict->end());
-	BOOST_REQUIRE(opts.optDict->find(10) != opts.optDict->end());
-	BOOST_REQUIRE_EQUAL(opts.optDict->find(10)->second->a, 11);
-	BOOST_REQUIRE_EQUAL(opts.optDict->find(10)->second->b, 12);
-	BOOST_REQUIRE(opts.optDict->find(13) != opts.optDict->end());
-	BOOST_REQUIRE_EQUAL(opts.optDict->find(13)->second->a, 14);
-	BOOST_REQUIRE_EQUAL(opts.optDict->find(13)->second->b, 15);
+	BOOST_REQUIRE(opts->optSimple);
+	BOOST_REQUIRE_EQUAL(opts->optSimple, 4);
+	BOOST_REQUIRE(opts->optStruct);
+	BOOST_REQUIRE_EQUAL(opts->optStruct->a, 1);
+	BOOST_REQUIRE_EQUAL(opts->optStruct->b, 2);
+	BOOST_REQUIRE(opts->optClass);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->a, 1);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->b, 2);
+	BOOST_REQUIRE_EQUAL(opts->optSeq->size(), 2);
+	BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->a, 3);
+	BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->b, 4);
+	BOOST_REQUIRE_EQUAL((*opts->optSeq)[1]->a, 5);
+	BOOST_REQUIRE_EQUAL((*opts->optSeq)[1]->b, 6);
+	BOOST_REQUIRE(opts->optDict);
+	BOOST_REQUIRE_EQUAL(opts->optDict->size(), 2);
+	BOOST_REQUIRE_EQUAL(opts->optDict->find(1), opts->optDict->end());
+	BOOST_REQUIRE(opts->optDict->find(10) != opts->optDict->end());
+	BOOST_REQUIRE_EQUAL(opts->optDict->find(10)->second->a, 11);
+	BOOST_REQUIRE_EQUAL(opts->optDict->find(10)->second->b, 12);
+	BOOST_REQUIRE(opts->optDict->find(13) != opts->optDict->end());
+	BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->a, 14);
+	BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->b, 15);
 }
 
 xmlpp::Document *
@@ -225,57 +225,57 @@ BOOST_FIXTURE_TEST_SUITE ( byFile, FileBased );
 
 BOOST_AUTO_TEST_CASE( builtins_xml )
 {
-	verifyByFile<TestModule::BuiltIns, Slicer::XmlFileDeserializer>("builtins.xml", checkBuiltIns_valuesCorrect);
+	verifyByFile<TestModule::BuiltInsPtr, Slicer::XmlFileDeserializer>("builtins.xml", checkBuiltIns_valuesCorrect);
 }
 
 BOOST_AUTO_TEST_CASE( optionals_notset_xml )
 {
-	verifyByFile<TestModule::Optionals, Slicer::XmlFileDeserializer>("optionals-notset.xml", checkOptionals_notset);
+	verifyByFile<TestModule::OptionalsPtr, Slicer::XmlFileDeserializer>("optionals-notset.xml", checkOptionals_notset);
 }
 
 BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 {
-	verifyByFile<TestModule::Optionals, Slicer::XmlFileDeserializer>("optionals-areset.xml", checkOptionals_areset);
+	verifyByFile<TestModule::OptionalsPtr, Slicer::XmlFileDeserializer>("optionals-areset.xml", checkOptionals_areset);
 }
 
 BOOST_AUTO_TEST_CASE( inherit_a_xml )
 {
-	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFileDeserializer>("inherit-a.xml");
+	verifyByFile<TestModule::InheritanceContPtr, Slicer::XmlFileDeserializer>("inherit-a.xml");
 }
 
 BOOST_AUTO_TEST_CASE( inherit_b_xml )
 {
-	verifyByFile<TestModule::InheritanceCont, Slicer::XmlFileDeserializer>("inherit-b.xml", checkInherits_types);
+	verifyByFile<TestModule::InheritanceContPtr, Slicer::XmlFileDeserializer>("inherit-b.xml", checkInherits_types);
 }
 
 BOOST_AUTO_TEST_CASE( conv_datetime_xml )
 {
-	verifyByFile<TestModule::DateTimeContainer, Slicer::XmlFileDeserializer>("conv-datetime.xml");
+	verifyByFile<TestModule::DateTimeContainerPtr, Slicer::XmlFileDeserializer>("conv-datetime.xml");
 }
 
 BOOST_AUTO_TEST_CASE( builtins2_json )
 {
-	verifyByFile<TestModule::BuiltIns, Slicer::JsonFileDeserializer>("builtins2.json", checkBuiltIns_valuesCorrect);
+	verifyByFile<TestModule::BuiltInsPtr, Slicer::JsonFileDeserializer>("builtins2.json", checkBuiltIns_valuesCorrect);
 }
 
 BOOST_AUTO_TEST_CASE( optionals_areset2_json )
 {
-	verifyByFile<TestModule::Optionals, Slicer::JsonFileDeserializer>("optionals-areset2.json", checkOptionals_areset);
+	verifyByFile<TestModule::OptionalsPtr, Slicer::JsonFileDeserializer>("optionals-areset2.json", checkOptionals_areset);
 }
 
 BOOST_AUTO_TEST_CASE( inherit_c_json )
 {
-	verifyByFile<TestModule::InheritanceCont, Slicer::JsonFileDeserializer>("inherit-c.json", checkInherits_types);
+	verifyByFile<TestModule::InheritanceContPtr, Slicer::JsonFileDeserializer>("inherit-c.json", checkInherits_types);
 }
 
 BOOST_AUTO_TEST_CASE( inherit_d_json )
 {
-	verifyByFile<TestModule::InheritanceCont2, Slicer::JsonFileDeserializer>("inherit-d.json");
+	verifyByFile<TestModule::InheritanceCont2Ptr, Slicer::JsonFileDeserializer>("inherit-d.json");
 }
 
 BOOST_AUTO_TEST_CASE( inherit_mapped_json )
 {
-	verifyByFile<TestModule::InheritanceContMapped, Slicer::JsonFileDeserializer>("inherit-mapped.json");
+	verifyByFile<TestModule::InheritanceContMappedPtr, Slicer::JsonFileDeserializer>("inherit-mapped.json");
 }
 
 BOOST_AUTO_TEST_SUITE_END();
@@ -285,17 +285,17 @@ BOOST_FIXTURE_TEST_SUITE ( byHandler, FileBased );
 
 BOOST_AUTO_TEST_CASE( optionals_areset2_json )
 {
-	verifyByHelper<TestModule::Optionals, Slicer::JsonValueDeserializer, Slicer::JsonValueSerializer, json::Value>("optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
+	verifyByHelper<TestModule::OptionalsPtr, Slicer::JsonValueDeserializer, Slicer::JsonValueSerializer, json::Value>("optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
 }
 
 BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 {
-	verifyByHelper<TestModule::Optionals, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
+	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 }
 
 BOOST_AUTO_TEST_CASE( xml_attribute_xml )
 {
-	verifyByFile<TestModule::ClassClass, Slicer::XmlFileDeserializer>("xmlattr.xml");
+	verifyByFile<TestModule::ClassClassPtr, Slicer::XmlFileDeserializer>("xmlattr.xml");
 }
 
 BOOST_AUTO_TEST_SUITE_END();
