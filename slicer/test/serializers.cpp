@@ -180,6 +180,16 @@ checkOptionals_areset(const TestModule::OptionalsPtr & opts)
 	BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->b, 15);
 }
 
+void
+checkSeqOfClass(const TestModule::Classes & seqOfClass)
+{
+	BOOST_REQUIRE_EQUAL(seqOfClass.size(), 2);
+	BOOST_REQUIRE_EQUAL(seqOfClass[0]->a, 1);
+	BOOST_REQUIRE_EQUAL(seqOfClass[0]->b, 2);
+	BOOST_REQUIRE_EQUAL(seqOfClass[1]->a, 4);
+	BOOST_REQUIRE_EQUAL(seqOfClass[1]->b, 5);
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -226,6 +236,16 @@ BOOST_FIXTURE_TEST_SUITE ( byFile, FileBased );
 BOOST_AUTO_TEST_CASE( builtins_xml )
 {
 	verifyByFile<TestModule::BuiltInsPtr, Slicer::XmlFileDeserializer>("builtins.xml", checkBuiltIns_valuesCorrect);
+}
+
+BOOST_AUTO_TEST_CASE( sequenceOfClass_xml )
+{
+	verifyByFile<TestModule::Classes, Slicer::XmlFileDeserializer>("seqOfClass.xml", checkSeqOfClass);
+}
+
+BOOST_AUTO_TEST_CASE( sequenceOfClass_json )
+{
+	verifyByFile<TestModule::Classes, Slicer::JsonFileDeserializer>("seqOfClass2.json", checkSeqOfClass);
 }
 
 BOOST_AUTO_TEST_CASE( optionals_notset_xml )
