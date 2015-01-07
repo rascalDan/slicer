@@ -10,6 +10,7 @@
 
 namespace Slicer {
 	const std::string md_attribute = "xml:attribute";
+	const std::string md_text = "xml:text";
 
 	class BadBooleanValue : public std::invalid_argument {
 		public:
@@ -196,7 +197,16 @@ namespace Slicer {
 				}
 			}
 			else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
-				mp->SetValue(new XmlContentValueSource(content));
+				ModelPartPtr smp;
+				if (!content->is_white_space()) {
+					smp = mp->GetChild(boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
+				} 
+				if (smp) {
+					smp->SetValue(new XmlContentValueSource(content));
+				}
+				else {
+					mp->SetValue(new XmlContentValueSource(content));
+				}
 			}
 			node = node->get_next_sibling();
 		}
@@ -216,6 +226,9 @@ namespace Slicer {
 		}
 		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
 			mp->GetValue(new XmlAttributeValueTarget(n, name));
+		}
+		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_text)) {
+			mp->GetValue(new XmlContentValueTarget(n));
 		}
 		else {
 			ModelTreeProcessElement(n->add_child(name), mp);

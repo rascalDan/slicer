@@ -110,5 +110,11 @@ module TestModule2 {
 		TestModule::DateTime dt;
 		TestModule::Base base;
 	};
+	struct EntityRef {
+		[ "slicer:xml:attribute" ]
+		int Id;
+		[ "slicer:xml:text" ]
+		string Name;
+	};
 };
 

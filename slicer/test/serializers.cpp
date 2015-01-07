@@ -204,6 +204,13 @@ checkAssertEq(const T & expected, const T & actual)
 	BOOST_REQUIRE_EQUAL(expected, actual);
 }
 
+void
+checkEntityRef(const TestModule2::EntityRef & er)
+{
+	BOOST_REQUIRE_EQUAL(er.Id, 26);
+	BOOST_REQUIRE_EQUAL(er.Name, "Hull City");
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -280,6 +287,11 @@ BOOST_AUTO_TEST_CASE( simplestring_json )
 BOOST_AUTO_TEST_CASE( simpleint_json )
 {
 	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", boost::bind(checkAssertEq<Ice::Int>, 27, _1));
+}
+
+BOOST_AUTO_TEST_CASE( complexClass_xmlattrAndText )
+{
+	verifyByFile<TestModule2::EntityRef, Slicer::XmlFileDeserializer>("entityref.xml", checkEntityRef);
 }
 
 BOOST_AUTO_TEST_CASE( sequenceOfClass_xml )
