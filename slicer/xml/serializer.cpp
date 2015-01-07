@@ -211,13 +211,13 @@ namespace Slicer {
 	void
 	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp, HookCommonPtr hp)
 	{
-		if (name.empty()) {
+		if (!mp || name.empty()) {
 			return;
 		}
 		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
 			mp->GetValue(new XmlAttributeValueTarget(n, name));
 		}
-		else if (mp) {
+		else {
 			ModelTreeProcessElement(n->add_child(name), mp);
 		}
 	}
