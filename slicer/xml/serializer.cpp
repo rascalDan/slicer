@@ -218,23 +218,27 @@ namespace Slicer {
 			mp->GetValue(new XmlAttributeValueTarget(n, name));
 		}
 		else if (mp) {
-			auto element = n->add_child(name);
-			auto typeIdPropName = mp->GetTypeIdProperty();
-			auto typeId = mp->GetTypeId();
-			if (typeId && typeIdPropName) {
-				element->set_attribute(*typeIdPropName, *typeId);
-				mp = mp->GetSubclassModelPart(*typeId);
-			}
-			mp->GetValue(new XmlContentValueTarget(element));
-			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3));
+			ModelTreeProcessElement(n->add_child(name), mp);
 		}
+	}
+
+	void
+	XmlSerializer::ModelTreeProcessElement(xmlpp::Element * element, ModelPartPtr mp)
+	{
+		auto typeIdPropName = mp->GetTypeIdProperty();
+		auto typeId = mp->GetTypeId();
+		if (typeId && typeIdPropName) {
+			element->set_attribute(*typeIdPropName, *typeId);
+			mp = mp->GetSubclassModelPart(*typeId);
+		}
+		mp->GetValue(new XmlContentValueTarget(element));
+		mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3));
 	}
 
 	void
 	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartPtr mp)
 	{
-		auto root = doc->create_root_node(name);
-		mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, root, _1, _2, _3));
+		ModelTreeProcessElement(doc->create_root_node(name), mp);
 	}
 
 	XmlFileSerializer::XmlFileSerializer(const boost::filesystem::path & p) :

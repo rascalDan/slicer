@@ -9,6 +9,9 @@ namespace Slicer {
 		protected:
 			static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartPtr mp, HookCommonPtr hp);
 			static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartPtr mp);
+
+		private:
+			static void ModelTreeProcessElement(xmlpp::Element * n, ModelPartPtr mp);
 	};
 
 	class XmlFileSerializer : public XmlSerializer {
