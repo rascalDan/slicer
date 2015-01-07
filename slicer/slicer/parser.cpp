@@ -294,7 +294,7 @@ namespace Slicer {
 
 		fprintf(cpp, "// Sequence %s\n", s->name().c_str());
 		fprintf(cpp, "template<>\n");
-		fprintf(cpp, "ModelPartPtr ModelPartForSequence< %s >::GetChild(const std::string & name, const HookFilter &)\n{\n",
+		fprintf(cpp, "ModelPartPtr ModelPartForSequence< %s >::GetChild(const std::string & name, const HookFilter & flt)\n{\n",
 				s->scoped().c_str());
 		auto iname = metaDataValue("slicer:item:", s->getMetaData());
 		if (iname) {
@@ -304,19 +304,15 @@ namespace Slicer {
 		else {
 			fprintf(cpp, "\t(void)name;\n");
 		}
-		fprintf(cpp, "\tsequence.push_back(typename element_type::value_type());\n");
-		fprintf(cpp, "\treturn new ");
-		auto etype = s->type();
-		createNewModelPartPtrFor(etype);
-		fprintf(cpp, "<typename element_type::value_type>(sequence.back());\n}\n\n");
+		fprintf(cpp, "\treturn GetChild(flt);\n}\n\n");
+
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartPtr\n");
 		fprintf(cpp, "ModelPartForSequence< %s >::elementModelPart(typename %s::value_type & e) const {\n",
 				s->scoped().c_str(),
 				s->scoped().c_str());
-		fprintf(cpp, "\treturn new ");
-		createNewModelPartPtrFor(etype);
-		fprintf(cpp, "<typename element_type::value_type>(e);\n}\n\n");
+		fprintf(cpp, "\treturn ModelPartFor(e);\n}\n\n");
+		
 		fprintf(cpp, "template<>\n");
 		auto ename = metaDataValue("slicer:element:", s->getMetaData());
 		fprintf(cpp, "std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n",

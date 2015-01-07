@@ -142,6 +142,7 @@ namespace Slicer {
 			virtual ~ModelPart() = default;
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
+			virtual ModelPartPtr GetChild(const HookFilter & = HookFilter()) = 0;
 			virtual ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
@@ -172,6 +173,7 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
+			virtual ModelPartPtr GetChild(const HookFilter &) override { return NULL; }
 			virtual ModelPartPtr GetChild(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
@@ -196,6 +198,7 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
+			virtual ModelPartPtr GetChild(const HookFilter &) override { return NULL; }
 			virtual ModelPartPtr GetChild(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
@@ -242,6 +245,13 @@ namespace Slicer {
 					modelPart = new T(*OptionalMember);
 					modelPart->Create();
 				}
+			}
+			virtual ModelPartPtr GetChild(const HookFilter & flt) override
+			{
+				if (OptionalMember) {
+					return modelPart->GetChild(flt);
+				}
+				return NULL;
 			}
 			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter & flt) override
 			{
@@ -330,6 +340,15 @@ namespace Slicer {
 				}
 			}
 
+			virtual ModelPartPtr GetChild(const HookFilter & flt) override
+			{
+				for (const auto & h : hooks) {
+					if (!flt || flt(h)) {
+						return h->Get(GetModel());
+					}
+				}
+				return NULL;
+			}
 			ModelPartPtr GetChild(const std::string & name, const HookFilter & flt) override
 			{
 				for (const auto & h : hooks) {
@@ -448,10 +467,16 @@ namespace Slicer {
 				}
 			}
 
+			virtual ModelPartPtr GetChild(const HookFilter &) override
+			{
+				mp->Create();
+				return mp;
+			}
+
 			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
 			{
-				if (!name.empty() && name != rootName) {
-					throw IncorrectElementName(rootName);
+				if (name != rootName) {
+					throw IncorrectElementName(name);
 				}
 				mp->Create();
 				return mp;
@@ -501,6 +526,12 @@ namespace Slicer {
 				for(auto & element : sequence) {
 					ch(elementName, elementModelPart(element), NULL);
 				}
+			}
+
+			ModelPartPtr GetChild(const HookFilter &) override
+			{
+				sequence.push_back(typename element_type::value_type());
+				return ModelPartFor(sequence.back());
 			}
 
 			ModelPartPtr GetChild(const std::string &, const HookFilter &) override;
@@ -578,10 +609,16 @@ namespace Slicer {
 					ch(pairName, new ModelPartForDictionaryElement<T>(const_cast<typename T::key_type *>(&pair.first), &pair.second), NULL);
 				}
 			}
+
+			ModelPartPtr GetChild(const HookFilter &) override
+			{
+				return new ModelPartForDictionaryElementInserter<T>(dictionary);
+			}
+
 			ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
 			{
-				if (!name.empty() && name != pairName) {
-					throw IncorrectElementName(pairName);
+				if (name != pairName) {
+					throw IncorrectElementName(name);
 				}
 				return new ModelPartForDictionaryElementInserter<T>(dictionary);
 			}

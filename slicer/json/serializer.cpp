@@ -149,7 +149,7 @@ namespace Slicer {
 			{
 				modelPart->Create();
 				for (const auto & element : a) {
-					auto emp = modelPart->GetChild(std::string());
+					auto emp = modelPart->GetChild();
 					if (emp) {
 						emp->Create();
 						boost::apply_visitor(DocumentTreeIterate(emp), *element);
@@ -256,7 +256,7 @@ namespace Slicer {
 		Glib::ustring doc(buffer.str());
 		Glib::ustring::const_iterator itr = doc.begin();
 		json::Value obj = json::parseValue(itr);
-		auto mp = modelRoot->GetChild(std::string());
+		auto mp = modelRoot->GetChild();
 		boost::apply_visitor(DocumentTreeIterate(mp), obj);
 	}
 
@@ -282,7 +282,7 @@ namespace Slicer {
 	void
 	JsonValueDeserializer::Deserialize(ModelPartPtr modelRoot)
 	{
-		auto mp = modelRoot->GetChild(std::string());
+		auto mp = modelRoot->GetChild();
 		boost::apply_visitor(DocumentTreeIterate(mp), value);
 	}
 
