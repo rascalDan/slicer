@@ -90,5 +90,14 @@ namespace Slicer {
 	{
 		return emptyMetadata;
 	}
+
+	template<> std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
+	template<> std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Double>::rootName = "Double";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Byte>::rootName = "Byte";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Short>::rootName = "Short";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Int>::rootName = "Int";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Long>::rootName = "Long";
 }
 

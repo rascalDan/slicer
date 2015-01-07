@@ -115,16 +115,28 @@ namespace Slicer {
 			virtual const Metadata & GetMetadata() const = 0;
 	};
 
-#define templateMODELPARTFOR(Type, ModelPart) \
+#define templateMODELPARTFOR(Type) \
 	template <class T> ModelPartPtr ModelPartFor(Type & t); \
 	template <class T> ModelPartPtr ModelPartFor(Type * t);
-	templateMODELPARTFOR(IceInternal::Handle<T>, ModelPartForClass);
-	templateMODELPARTFOR(std::vector<T>, ModelPartForSequence);
-	templateMODELPARTFOR(std::list<T>, ModelPartForSequence);
+#define MODELPARTFOR(Type) \
+	ModelPartPtr ModelPartFor(Type & t); \
+	ModelPartPtr ModelPartFor(Type * t);
+	templateMODELPARTFOR(IceInternal::Handle<T>);
+	templateMODELPARTFOR(std::vector<T>);
+	templateMODELPARTFOR(std::list<T>);
 	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> & t);
 	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> * t);
-	templateMODELPARTFOR(T, ModelPartForStruct);
+	MODELPARTFOR(std::string);
+	MODELPARTFOR(bool);
+	MODELPARTFOR(Ice::Float);
+	MODELPARTFOR(Ice::Double);
+	MODELPARTFOR(Ice::Byte);
+	MODELPARTFOR(Ice::Short);
+	MODELPARTFOR(Ice::Int);
+	MODELPARTFOR(Ice::Long);
+	templateMODELPARTFOR(T);
 #undef templateMODELPARTFOR
+#undef MODELPARTFOR
 
 	class ModelPart : public IceUtil::Shared {
 		public:
@@ -591,27 +603,14 @@ namespace Slicer {
 #define templateMODELPARTFOR(Type, ModelPart) \
 	template <class T> ModelPartPtr ModelPartFor(Type & t) { return new ModelPart< Type >(t); } \
 	template <class T> ModelPartPtr ModelPartFor(Type * t) { return new ModelPart< Type >(t); }
-#define MODELPARTFOR(Type, ModelPart) \
-	ModelPartPtr ModelPartFor(Type & t); \
-	ModelPartPtr ModelPartFor(Type * t);
-
 	templateMODELPARTFOR(IceInternal::Handle<T>, ModelPartForClass);
 	templateMODELPARTFOR(std::vector<T>, ModelPartForSequence);
 	templateMODELPARTFOR(std::list<T>, ModelPartForSequence);
 	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> & t) { return new ModelPartForDictionary< std::map<K, V> >(t); } \
 	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> * t) { return new ModelPartForDictionary< std::map<K, V> >(t); } \
-	MODELPARTFOR(std::string, ModelPartForSimple);
-	MODELPARTFOR(bool, ModelPartForSimple);
-	MODELPARTFOR(Ice::Float, ModelPartForSimple);
-	MODELPARTFOR(Ice::Double, ModelPartForSimple);
-	MODELPARTFOR(Ice::Byte, ModelPartForSimple);
-	MODELPARTFOR(Ice::Short, ModelPartForSimple);
-	MODELPARTFOR(Ice::Int, ModelPartForSimple);
-	MODELPARTFOR(Ice::Long, ModelPartForSimple);
 	// Everything else is a struct?
 	templateMODELPARTFOR(T, ModelPartForStruct);
 #undef templateMODELPARTFOR
-#undef MODELPARTFOR
 }
 
 #endif

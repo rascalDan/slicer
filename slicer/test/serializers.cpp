@@ -197,6 +197,13 @@ checkStruct(const TestModule::StructType & st)
 	BOOST_REQUIRE_EQUAL(st.b, 13);
 }
 
+template<class T>
+void
+checkAssertEq(const T & expected, const T & actual)
+{
+	BOOST_REQUIRE_EQUAL(expected, actual);
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -253,6 +260,26 @@ BOOST_AUTO_TEST_CASE( structtype_xml )
 BOOST_AUTO_TEST_CASE( structtype_json )
 {
 	verifyByFile<TestModule::StructType, Slicer::JsonFileDeserializer>("struct2.json", checkStruct);
+}
+
+BOOST_AUTO_TEST_CASE( simplestring_xml )
+{
+	verifyByFile<std::string, Slicer::XmlFileDeserializer>("string.xml", boost::bind(checkAssertEq<std::string>, "test string", _1));
+}
+
+BOOST_AUTO_TEST_CASE( simpleint_xml )
+{
+	verifyByFile<Ice::Int, Slicer::XmlFileDeserializer>("int.xml", boost::bind(checkAssertEq<Ice::Int>, 27, _1));
+}
+
+BOOST_AUTO_TEST_CASE( simplestring_json )
+{
+	verifyByFile<std::string, Slicer::JsonFileDeserializer>("string2.json", boost::bind(checkAssertEq<std::string>, "test string", _1));
+}
+
+BOOST_AUTO_TEST_CASE( simpleint_json )
+{
+	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", boost::bind(checkAssertEq<Ice::Int>, 27, _1));
 }
 
 BOOST_AUTO_TEST_CASE( sequenceOfClass_xml )
