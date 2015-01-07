@@ -88,7 +88,6 @@ namespace Slicer {
 
 	typedef IceUtil::Handle<ModelPart> ModelPartPtr;
 	typedef IceUtil::Handle<HookCommon> HookCommonPtr;
-	typedef std::map<std::string, ModelPartPtr> ModelParts;
 	typedef IceUtil::Optional<std::string> TypeId;
 
 	typedef boost::function<void(const std::string &, ModelPartPtr, HookCommonPtr)> ChildHandler;
