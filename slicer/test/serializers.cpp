@@ -190,6 +190,13 @@ checkSeqOfClass(const TestModule::Classes & seqOfClass)
 	BOOST_REQUIRE_EQUAL(seqOfClass[1]->b, 5);
 }
 
+void
+checkStruct(const TestModule::StructType & st)
+{
+	BOOST_REQUIRE_EQUAL(st.a, 10);
+	BOOST_REQUIRE_EQUAL(st.b, 13);
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -236,6 +243,16 @@ BOOST_FIXTURE_TEST_SUITE ( byFile, FileBased );
 BOOST_AUTO_TEST_CASE( builtins_xml )
 {
 	verifyByFile<TestModule::BuiltInsPtr, Slicer::XmlFileDeserializer>("builtins.xml", checkBuiltIns_valuesCorrect);
+}
+
+BOOST_AUTO_TEST_CASE( structtype_xml )
+{
+	verifyByFile<TestModule::StructType, Slicer::XmlFileDeserializer>("struct.xml", checkStruct);
+}
+
+BOOST_AUTO_TEST_CASE( structtype_json )
+{
+	verifyByFile<TestModule::StructType, Slicer::JsonFileDeserializer>("struct2.json", checkStruct);
 }
 
 BOOST_AUTO_TEST_CASE( sequenceOfClass_xml )

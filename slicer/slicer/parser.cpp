@@ -204,7 +204,10 @@ namespace Slicer {
 
 		fprintf(cpp, "// Struct %s\n", c->name().c_str());
 		visitComplexDataMembers(c, c->dataMembers());
-		
+
+		auto name = metaDataValue("slicer:root:", c->getMetaData());
+		defineRootName(c->scoped(), name ? *name : c->name());
+
 		fprintf(cpp, "template<>\nMetadata ModelPartForComplex< %s >::metadata ",
 				c->scoped().c_str());
 		copyMetadata(c->getMetaData());
