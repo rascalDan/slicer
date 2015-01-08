@@ -354,6 +354,11 @@ BOOST_AUTO_TEST_CASE( inherit_mapped_json )
 	verifyByFile<TestModule::InheritanceContMappedPtr, Slicer::JsonFileDeserializer>("inherit-mapped.json");
 }
 
+BOOST_AUTO_TEST_CASE( xml_attribute_xml )
+{
+	verifyByFile<TestModule::ClassClassPtr, Slicer::XmlFileDeserializer>("xmlattr.xml");
+}
+
 BOOST_AUTO_TEST_SUITE_END();
 
 
@@ -367,11 +372,6 @@ BOOST_AUTO_TEST_CASE( optionals_areset2_json )
 BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 {
 	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
-}
-
-BOOST_AUTO_TEST_CASE( xml_attribute_xml )
-{
-	verifyByFile<TestModule::ClassClassPtr, Slicer::XmlFileDeserializer>("xmlattr.xml");
 }
 
 BOOST_AUTO_TEST_SUITE_END();
