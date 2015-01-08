@@ -211,6 +211,17 @@ checkEntityRef(const TestModule2::EntityRef & er)
 	BOOST_REQUIRE_EQUAL(er.Name, "Hull City");
 }
 
+void
+checkBare(const TestModule::BareContainers & bc)
+{
+	BOOST_REQUIRE_EQUAL(bc.bareSeq.size(), 2);
+	BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->a, 1);
+	BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->b, 2);
+	BOOST_REQUIRE_EQUAL(bc.bareSeq[1]->a, 3);
+	BOOST_REQUIRE_EQUAL(bc.bareSeq[1]->b, 4);
+	BOOST_REQUIRE_EQUAL(bc.bareMap.size(), 2);
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -357,6 +368,11 @@ BOOST_AUTO_TEST_CASE( inherit_mapped_json )
 BOOST_AUTO_TEST_CASE( xml_attribute_xml )
 {
 	verifyByFile<TestModule::ClassClassPtr, Slicer::XmlFileDeserializer>("xmlattr.xml");
+}
+
+BOOST_AUTO_TEST_CASE( xml_barecontainers_xml )
+{
+	verifyByFile<TestModule::BareContainers, Slicer::XmlFileDeserializer>("bare.xml", checkBare);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

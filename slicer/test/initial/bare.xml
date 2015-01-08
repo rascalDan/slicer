@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BareContainers>
+  <bareSeq>
+    <a>1</a>
+    <b>2</b>
+  </bareSeq>
+  <bareSeq>
+    <a>3</a>
+    <b>4</b>
+  </bareSeq>
+	<bareMap>
+		<key>5</key>
+		<value>
+			<a>6</a>
+			<b>7</b>
+		</value>
+	</bareMap>
+	<bareMap>
+		<key>8</key>
+		<value>
+			<a>9</a>
+			<b>10</b>
+		</value>
+	</bareMap>
+</BareContainers>

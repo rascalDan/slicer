@@ -100,6 +100,12 @@ module TestModule {
 	class InheritanceContMapped {
 		Base2 b;
 	};
+	struct BareContainers {
+		[ "slicer:xml:bare" ]
+		Classes bareSeq;
+		[ "slicer:xml:bare" ]
+		ClassMap bareMap;
+	};
 };
 
 module TestModule2 {
