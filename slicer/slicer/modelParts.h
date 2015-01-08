@@ -137,13 +137,46 @@ namespace Slicer {
 #undef templateMODELPARTFOR
 #undef MODELPARTFOR
 
+	class ChildRef : public IceUtil::Shared {
+		public:
+			virtual ModelPartPtr Child() const = 0;
+			virtual const Metadata & ChildMetaData() const = 0;
+	};
+	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
+	class DirectChildRef : public ChildRef {
+		public:
+			DirectChildRef(ModelPartPtr);
+
+			ModelPartPtr Child() const;
+			const Metadata & ChildMetaData() const;
+
+		private:
+			ModelPartPtr mpp;
+	};
+	class FunctionChildRef : public ChildRef {
+		public:
+			typedef boost::function<ModelPartPtr()> ModelPartFunc;
+			typedef boost::function<const Metadata &()> MetadataFunc;
+
+			FunctionChildRef(const ModelPartFunc &, const MetadataFunc &);
+
+			ModelPartPtr Child() const;
+			const Metadata & ChildMetaData() const;
+
+		private:
+			ModelPartFunc mpf;
+			MetadataFunc mdf;
+	};
+
 	class ModelPart : public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
-			virtual ModelPartPtr GetChild(const HookFilter & = HookFilter()) = 0;
-			virtual ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
+			ModelPartPtr GetChild(const HookFilter & = HookFilter());
+			ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter());
+			virtual ChildRefPtr GetChildRef(const HookFilter & = HookFilter()) = 0;
+			virtual ChildRefPtr GetChildRef(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const;
@@ -173,8 +206,8 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ModelPartPtr GetChild(const HookFilter &) override { return NULL; }
-			virtual ModelPartPtr GetChild(const std::string &, const HookFilter &) override { return NULL; }
+			virtual ChildRefPtr GetChildRef(const HookFilter &) override { return NULL; }
+			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
 			virtual bool HasValue() const override { return true; }
@@ -198,8 +231,8 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ModelPartPtr GetChild(const HookFilter &) override { return NULL; }
-			virtual ModelPartPtr GetChild(const std::string &, const HookFilter &) override { return NULL; }
+			virtual ChildRefPtr GetChildRef(const HookFilter &) override { return NULL; }
+			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 			virtual bool HasValue() const override { return true; }
@@ -246,17 +279,17 @@ namespace Slicer {
 					modelPart->Create();
 				}
 			}
-			virtual ModelPartPtr GetChild(const HookFilter & flt) override
+			virtual ChildRefPtr GetChildRef(const HookFilter & flt) override
 			{
 				if (OptionalMember) {
-					return modelPart->GetChild(flt);
+					return modelPart->GetChildRef(flt);
 				}
 				return NULL;
 			}
-			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter & flt) override
+			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override
 			{
 				if (OptionalMember) {
-					return modelPart->GetChild(name, flt);
+					return modelPart->GetChildRef(name, flt);
 				}
 				return NULL;
 			}
@@ -340,20 +373,24 @@ namespace Slicer {
 				}
 			}
 
-			virtual ModelPartPtr GetChild(const HookFilter & flt) override
+			virtual ChildRefPtr GetChildRef(const HookFilter & flt) override
 			{
 				for (const auto & h : hooks) {
 					if (!flt || flt(h)) {
-						return h->Get(GetModel());
+						return new FunctionChildRef(
+								boost::bind(&HookBase::Get, h, GetModel()),
+								boost::bind(&HookBase::GetMetadata, h));
 					}
 				}
 				return NULL;
 			}
-			ModelPartPtr GetChild(const std::string & name, const HookFilter & flt) override
+			ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override
 			{
 				for (const auto & h : hooks) {
 					if (h->PartName() == name && (!flt || flt(h))) {
-						return h->Get(GetModel());
+						return new FunctionChildRef(
+								boost::bind(&HookBase::Get, h, GetModel()),
+								boost::bind(&HookBase::GetMetadata, h));
 					}
 				}
 				return NULL;
@@ -467,19 +504,19 @@ namespace Slicer {
 				}
 			}
 
-			virtual ModelPartPtr GetChild(const HookFilter &) override
+			virtual ChildRefPtr GetChildRef(const HookFilter &) override
 			{
 				mp->Create();
-				return mp;
+				return new DirectChildRef(mp);
 			}
 
-			virtual ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
+			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override
 			{
 				if (name != rootName) {
 					throw IncorrectElementName(name);
 				}
 				mp->Create();
-				return mp;
+				return new DirectChildRef(mp);
 			}
 
 			virtual void OnEachChild(const ChildHandler & ch) override
@@ -528,13 +565,13 @@ namespace Slicer {
 				}
 			}
 
-			ModelPartPtr GetChild(const HookFilter &) override
+			ChildRefPtr GetChildRef(const HookFilter &) override
 			{
 				sequence.push_back(typename element_type::value_type());
-				return ModelPartFor(sequence.back());
+				return new DirectChildRef(ModelPartFor(sequence.back()));
 			}
 
-			ModelPartPtr GetChild(const std::string &, const HookFilter &) override;
+			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
 
 			virtual bool HasValue() const override { return true; }
 
@@ -610,17 +647,17 @@ namespace Slicer {
 				}
 			}
 
-			ModelPartPtr GetChild(const HookFilter &) override
+			ChildRefPtr GetChildRef(const HookFilter &) override
 			{
-				return new ModelPartForDictionaryElementInserter<T>(dictionary);
+				return new DirectChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
 			}
 
-			ModelPartPtr GetChild(const std::string & name, const HookFilter &) override
+			ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override
 			{
 				if (name != pairName) {
 					throw IncorrectElementName(name);
 				}
-				return new ModelPartForDictionaryElementInserter<T>(dictionary);
+				return new DirectChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
 			}
 
 			virtual bool HasValue() const override { return true; }

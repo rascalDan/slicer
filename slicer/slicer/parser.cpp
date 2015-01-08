@@ -294,7 +294,7 @@ namespace Slicer {
 
 		fprintf(cpp, "// Sequence %s\n", s->name().c_str());
 		fprintf(cpp, "template<>\n");
-		fprintf(cpp, "ModelPartPtr ModelPartForSequence< %s >::GetChild(const std::string & name, const HookFilter & flt)\n{\n",
+		fprintf(cpp, "ChildRefPtr ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt)\n{\n",
 				s->scoped().c_str());
 		auto iname = metaDataValue("slicer:item:", s->getMetaData());
 		if (iname) {
@@ -304,7 +304,7 @@ namespace Slicer {
 		else {
 			fprintf(cpp, "\t(void)name;\n");
 		}
-		fprintf(cpp, "\treturn GetChild(flt);\n}\n\n");
+		fprintf(cpp, "\treturn GetChildRef(flt);\n}\n\n");
 
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartPtr\n");

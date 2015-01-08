@@ -91,6 +91,20 @@ namespace Slicer {
 		return emptyMetadata;
 	}
 
+	ModelPartPtr
+	ModelPart::GetChild(const HookFilter & flt)
+	{
+		auto ref = GetChildRef(flt);
+		return ref ? ref->Child() : ModelPartPtr(NULL);
+	}
+
+	ModelPartPtr
+	ModelPart::GetChild(const std::string & memberName, const HookFilter & flt)
+	{
+		auto ref = GetChildRef(memberName, flt);
+		return ref ? ref->Child() : ModelPartPtr(NULL);
+	}
+
 	template<> std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
 	template<> std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
 	template<> std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
