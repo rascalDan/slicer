@@ -35,7 +35,7 @@ class FileBased : public FileStructure {
 			const fs::path outputXml = tmpf / fs::change_extension(infile, "xml");
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-			T p = Slicer::Deserialize<DeserializerIn, T>(input);
+			T p = Slicer::DeserializeAny<DeserializerIn, T>(input);
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check1: " << input);
@@ -43,10 +43,10 @@ class FileBased : public FileStructure {
 			}
 
 			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputJson);
-			Slicer::Serialize<Slicer::JsonFileSerializer>(p, outputJson);
+			Slicer::SerializeAny<Slicer::JsonFileSerializer>(p, outputJson);
 
 			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputXml);
-			Slicer::Serialize<Slicer::XmlFileSerializer>(p, outputXml);
+			Slicer::SerializeAny<Slicer::XmlFileSerializer>(p, outputXml);
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check2: " << input);
@@ -74,7 +74,7 @@ class FileBased : public FileStructure {
 			Internal docRead = in(input);
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-			T p = Slicer::Deserialize<Deserializer, T>(docRead);
+			T p = Slicer::DeserializeAny<Deserializer, T>(docRead);
 			ifree(docRead);
 
 			if (check) {
@@ -84,7 +84,7 @@ class FileBased : public FileStructure {
 
 			BOOST_TEST_CHECKPOINT("Serialize: " << input);
 			Internal docWrite;
-			Slicer::Serialize<Serializer>(p, docWrite);
+			Slicer::SerializeAny<Serializer>(p, docWrite);
 
 			if (check) {
 				BOOST_TEST_CHECKPOINT("Check2: " << input);

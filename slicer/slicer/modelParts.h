@@ -173,9 +173,9 @@ namespace Slicer {
 			virtual ~ModelPart() = default;
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
-			ModelPartPtr GetChild(const HookFilter & = HookFilter());
+			ModelPartPtr GetAnonChild(const HookFilter & = HookFilter());
 			ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter());
-			virtual ChildRefPtr GetChildRef(const HookFilter & = HookFilter()) = 0;
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter & = HookFilter()) = 0;
 			virtual ChildRefPtr GetChildRef(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
@@ -206,7 +206,7 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ChildRefPtr GetChildRef(const HookFilter &) override { return NULL; }
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
 			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
@@ -231,7 +231,7 @@ namespace Slicer {
 			{
 			}
 			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ChildRefPtr GetChildRef(const HookFilter &) override { return NULL; }
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
 			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
@@ -279,10 +279,10 @@ namespace Slicer {
 					modelPart->Create();
 				}
 			}
-			virtual ChildRefPtr GetChildRef(const HookFilter & flt) override
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override
 			{
 				if (OptionalMember) {
-					return modelPart->GetChildRef(flt);
+					return modelPart->GetAnonChildRef(flt);
 				}
 				return NULL;
 			}
@@ -373,7 +373,7 @@ namespace Slicer {
 				}
 			}
 
-			virtual ChildRefPtr GetChildRef(const HookFilter & flt) override
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override
 			{
 				for (const auto & h : hooks) {
 					if (!flt || flt(h)) {
@@ -504,7 +504,7 @@ namespace Slicer {
 				}
 			}
 
-			virtual ChildRefPtr GetChildRef(const HookFilter &) override
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override
 			{
 				mp->Create();
 				return new DirectChildRef(mp);
@@ -565,7 +565,7 @@ namespace Slicer {
 				}
 			}
 
-			ChildRefPtr GetChildRef(const HookFilter &) override
+			ChildRefPtr GetAnonChildRef(const HookFilter &) override
 			{
 				sequence.push_back(typename element_type::value_type());
 				return new DirectChildRef(ModelPartFor(sequence.back()));
@@ -647,7 +647,7 @@ namespace Slicer {
 				}
 			}
 
-			ChildRefPtr GetChildRef(const HookFilter &) override
+			ChildRefPtr GetAnonChildRef(const HookFilter &) override
 			{
 				return new DirectChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
 			}

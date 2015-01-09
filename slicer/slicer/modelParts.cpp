@@ -92,9 +92,9 @@ namespace Slicer {
 	}
 
 	ModelPartPtr
-	ModelPart::GetChild(const HookFilter & flt)
+	ModelPart::GetAnonChild(const HookFilter & flt)
 	{
-		auto ref = GetChildRef(flt);
+		auto ref = GetAnonChildRef(flt);
 		return ref ? ref->Child() : ModelPartPtr(NULL);
 	}
 

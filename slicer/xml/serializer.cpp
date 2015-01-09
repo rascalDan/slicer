@@ -177,7 +177,7 @@ namespace Slicer {
 				if (smpr) {
 					auto smp = smpr->Child();
 					if (metaDataFlagSet(smpr->ChildMetaData(), md_bare)) {
-						smp = smp->GetChild();
+						smp = smp->GetAnonChild();
 					}
 					if (smp) {
 						if (auto typeIdPropName = smp->GetTypeIdProperty()) {
@@ -207,8 +207,8 @@ namespace Slicer {
 			else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
 				ModelPartPtr smp;
 				if (!content->is_white_space()) {
-					smp = mp->GetChild(boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
-				} 
+					smp = mp->GetAnonChild(boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
+				}
 				if (smp) {
 					smp->SetValue(new XmlContentValueSource(content));
 				}

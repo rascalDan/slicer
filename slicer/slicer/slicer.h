@@ -8,7 +8,7 @@
 namespace Slicer {
 	template <typename Deserializer, typename Object, typename ... SerializerParams>
 	Object
-	Deserialize(SerializerParams & ... sp)
+	DeserializeAny(SerializerParams & ... sp)
 	{
 		IceUtil::Handle<ModelPartForRoot<Object>> root = new ModelPartForRoot<Object>();
 		DeserializerPtr deserializer = new Deserializer(sp ...);
@@ -16,13 +16,27 @@ namespace Slicer {
 		return root->GetModel();
 	}
 
+	template <typename Deserializer, typename Object, typename ... SerializerParams>
+	Object
+	Deserialize(SerializerParams & ... sp)
+	{
+		return *DeserializeAny<Deserializer, IceInternal::Handle<Object>, SerializerParams...>(sp ...);
+	}
+
 	template <typename Serializer, typename Object, typename ... SerializerParams>
 	void
-	Serialize(Object object, SerializerParams & ... sp)
+	SerializeAny(Object object, SerializerParams & ... sp)
 	{
 		IceUtil::Handle<ModelPartForRoot<Object>> root = new ModelPartForRoot<Object>(object);
 		SerializerPtr serializer = new Serializer(sp ...);
 		serializer->Serialize(root);
+	}
+
+	template <typename Serializer, typename Object, typename ... SerializerParams>
+	void
+	Serialize(IceInternal::Handle<Object> object, SerializerParams & ... sp)
+	{
+		SerializeAny(*object, sp ...);
 	}
 }
 

@@ -304,7 +304,7 @@ namespace Slicer {
 		else {
 			fprintf(cpp, "\t(void)name;\n");
 		}
-		fprintf(cpp, "\treturn GetChildRef(flt);\n}\n\n");
+		fprintf(cpp, "\treturn GetAnonChildRef(flt);\n}\n\n");
 
 		fprintf(cpp, "template<>\n");
 		fprintf(cpp, "ModelPartPtr\n");
