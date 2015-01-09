@@ -17,10 +17,10 @@ namespace Slicer {
 	}
 
 	template <typename Deserializer, typename Object, typename ... SerializerParams>
-	Object
+	IceInternal::Handle<Object>
 	Deserialize(SerializerParams & ... sp)
 	{
-		return *DeserializeAny<Deserializer, IceInternal::Handle<Object>, SerializerParams...>(sp ...);
+		return DeserializeAny<Deserializer, IceInternal::Handle<Object>, SerializerParams...>(sp ...);
 	}
 
 	template <typename Serializer, typename Object, typename ... SerializerParams>
@@ -36,7 +36,7 @@ namespace Slicer {
 	void
 	Serialize(IceInternal::Handle<Object> object, SerializerParams & ... sp)
 	{
-		SerializeAny(*object, sp ...);
+		SerializeAny<Serializer>(object, sp ...);
 	}
 }
 

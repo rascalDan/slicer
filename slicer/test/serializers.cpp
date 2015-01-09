@@ -390,5 +390,32 @@ BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 }
 
+BOOST_FIXTURE_TEST_SUITE ( compatWrapper, FileBased );
+
+BOOST_AUTO_TEST_CASE( any )
+{
+	BOOST_TEST_CHECKPOINT("Create folders");
+	const fs::path tmpf = tmp / "compatWrapper";
+	fs::create_directory(tmpf);
+
+	BOOST_TEST_CHECKPOINT("Figure out paths");
+	const boost::filesystem::path input = root / "initial" / "builtins.xml";
+	const boost::filesystem::path output = tmpf / "builtins.xml";
+
+	BOOST_TEST_CHECKPOINT("Deserialize with wrapper");
+	TestModule::BuiltInsPtr object = Slicer::Deserialize<Slicer::XmlFileDeserializer, TestModule::BuiltIns>(input);
+
+	BOOST_TEST_CHECKPOINT("Test object");
+	checkBuiltIns_valuesCorrect(object);
+
+	BOOST_TEST_CHECKPOINT("Serialize with wrapper");
+	Slicer::Serialize<Slicer::XmlFileSerializer>(object, output);
+
+	BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
+	system(stringbf("diff -w %s %s", input, output));
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+
 BOOST_AUTO_TEST_SUITE_END();
 
