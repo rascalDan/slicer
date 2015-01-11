@@ -15,37 +15,37 @@ namespace Slicer {
 	MODELPARTFOR(Ice::Long, ModelPartForSimple);
 #undef MODELPARTFOR
 
-	Slicer::FunctionChildRef::FunctionChildRef(const Slicer::FunctionChildRef::ModelPartFunc & mp, const Slicer::FunctionChildRef::MetadataFunc & md) :
-		mpf(mp),
-		mdf(md)
+	Slicer::MemberChildRef::MemberChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
+		mpp(mp),
+		mdr(md)
 	{
 	}
 
 	ModelPartPtr
-	Slicer::FunctionChildRef::Child() const
-	{
-		return mpf();
-	}
-
-	const Metadata &
-	Slicer::FunctionChildRef::ChildMetaData() const
-	{
-		return mdf();
-	}
-
-	Slicer::DirectChildRef::DirectChildRef(ModelPartPtr m) :
-		mpp(m)
-	{
-	}
-
-	ModelPartPtr
-	Slicer::DirectChildRef::Child() const
+	Slicer::MemberChildRef::Child() const
 	{
 		return mpp;
 	}
 
 	const Metadata &
-	Slicer::DirectChildRef::ChildMetaData() const
+	Slicer::MemberChildRef::ChildMetaData() const
+	{
+		return mdr;
+	}
+
+	Slicer::ImplicitChildRef::ImplicitChildRef(ModelPartPtr m) :
+		mpp(m)
+	{
+	}
+
+	ModelPartPtr
+	Slicer::ImplicitChildRef::Child() const
+	{
+		return mpp;
+	}
+
+	const Metadata &
+	Slicer::ImplicitChildRef::ChildMetaData() const
 	{
 		return emptyMetadata;
 	}

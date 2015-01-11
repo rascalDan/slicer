@@ -143,9 +143,9 @@ namespace Slicer {
 			virtual const Metadata & ChildMetaData() const = 0;
 	};
 	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
-	class DirectChildRef : public ChildRef {
+	class ImplicitChildRef : public ChildRef {
 		public:
-			DirectChildRef(ModelPartPtr);
+			ImplicitChildRef(ModelPartPtr);
 
 			ModelPartPtr Child() const;
 			const Metadata & ChildMetaData() const;
@@ -153,19 +153,16 @@ namespace Slicer {
 		private:
 			ModelPartPtr mpp;
 	};
-	class FunctionChildRef : public ChildRef {
+	class MemberChildRef : public ChildRef {
 		public:
-			typedef boost::function<ModelPartPtr()> ModelPartFunc;
-			typedef boost::function<const Metadata &()> MetadataFunc;
-
-			FunctionChildRef(const ModelPartFunc &, const MetadataFunc &);
+			MemberChildRef(ModelPartPtr, const Metadata &);
 
 			ModelPartPtr Child() const;
 			const Metadata & ChildMetaData() const;
 
 		private:
-			ModelPartFunc mpf;
-			MetadataFunc mdf;
+			ModelPartPtr mpp;
+			const Metadata & mdr;
 	};
 
 	class ModelPart : public IceUtil::Shared {
@@ -377,9 +374,7 @@ namespace Slicer {
 			{
 				for (const auto & h : hooks) {
 					if (!flt || flt(h)) {
-						return new FunctionChildRef(
-								boost::bind(&HookBase::Get, h, GetModel()),
-								boost::bind(&HookBase::GetMetadata, h));
+						return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
 					}
 				}
 				return NULL;
@@ -388,9 +383,7 @@ namespace Slicer {
 			{
 				for (const auto & h : hooks) {
 					if (h->PartName() == name && (!flt || flt(h))) {
-						return new FunctionChildRef(
-								boost::bind(&HookBase::Get, h, GetModel()),
-								boost::bind(&HookBase::GetMetadata, h));
+						return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
 					}
 				}
 				return NULL;
@@ -507,7 +500,7 @@ namespace Slicer {
 			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override
 			{
 				mp->Create();
-				return new DirectChildRef(mp);
+				return new ImplicitChildRef(mp);
 			}
 
 			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override
@@ -516,7 +509,7 @@ namespace Slicer {
 					throw IncorrectElementName(name);
 				}
 				mp->Create();
-				return new DirectChildRef(mp);
+				return new ImplicitChildRef(mp);
 			}
 
 			virtual void OnEachChild(const ChildHandler & ch) override
@@ -568,7 +561,7 @@ namespace Slicer {
 			ChildRefPtr GetAnonChildRef(const HookFilter &) override
 			{
 				sequence.push_back(typename element_type::value_type());
-				return new DirectChildRef(ModelPartFor(sequence.back()));
+				return new ImplicitChildRef(ModelPartFor(sequence.back()));
 			}
 
 			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
@@ -649,7 +642,7 @@ namespace Slicer {
 
 			ChildRefPtr GetAnonChildRef(const HookFilter &) override
 			{
-				return new DirectChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
+				return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
 			}
 
 			ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override
@@ -657,7 +650,7 @@ namespace Slicer {
 				if (name != pairName) {
 					throw IncorrectElementName(name);
 				}
-				return new DirectChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
+				return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
 			}
 
 			virtual bool HasValue() const override { return true; }
