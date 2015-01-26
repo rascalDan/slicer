@@ -33,9 +33,11 @@ namespace Slicer {
 
 			virtual bool visitStructStart(const Slice::StructPtr&) override;
 
-			void visitSequence(const Slice::SequencePtr & s) override;
+			virtual void visitEnum(const Slice::EnumPtr &) override;
 
-			void visitDictionary(const Slice::DictionaryPtr & d) override;
+			virtual void visitSequence(const Slice::SequencePtr & s) override;
+
+			virtual void visitDictionary(const Slice::DictionaryPtr & d) override;
 
 			virtual void visitModuleEnd(const Slice::ModulePtr & m) override;
 

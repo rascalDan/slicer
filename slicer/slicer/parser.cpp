@@ -293,6 +293,56 @@ namespace Slicer {
 	}
 
 	void
+	Slicer::visitEnum(const Slice::EnumPtr & e)
+	{
+		if (e->hasMetaData("slicer:ignore")) { return; }
+
+		components += 1;
+
+		if (!cpp) return;
+
+		fprintf(cpp, "// Enumeration %s\n", e->name().c_str());
+		fprintf(cpp, "template<>\nMetadata ModelPartForEnum< %s >::metadata ",
+				e->scoped().c_str());
+		copyMetadata(e->getMetaData());
+
+		fprintf(cpp, "template<>\nModelPartForEnum< %s >::Enumerations\nModelPartForEnum< %s >::enumerations([]() -> ModelPartForEnum< %s >::Enumerations\n",
+				e->scoped().c_str(),
+				e->scoped().c_str(),
+				e->scoped().c_str());
+		fprintf(cpp, "{\n\tModelPartForEnum< %s >::Enumerations e;\n",
+				e->scoped().c_str());
+		for (const auto & ee : e->getEnumerators()) {
+			fprintf(cpp, "\te.insert( { %s, \"%s\" } );\n", ee->scoped().c_str(), ee->name().c_str());
+			
+		}
+		fprintf(cpp, "\treturn e;\n}());\n\n");
+
+		fprintf(cpp, "template<>\nvoid ModelPartForEnum< %s >::SetValue(ValueSourcePtr s) {\n\
+	std::string val;\n\
+	s->set(val);\n\
+	auto i = enumerations.right.find(val);\n\
+	if (i == enumerations.right.end()) throw InvalidEnumerationValue(val, \"%s\");\n\
+	modelPart = i->second;\n\
+}\n\n",
+				e->scoped().c_str(),
+				e->scoped().c_str());
+		fprintf(cpp, "template<>\nvoid ModelPartForEnum< %s >::GetValue(ValueTargetPtr s) {\n\
+	auto i = enumerations.left.find(modelPart);\n\
+	if (i == enumerations.left.end()) throw InvalidEnumerationValue((::Ice::Int)modelPart, \"%s\");\n\
+	s->get(i->second);\n\
+}\n\n",
+				e->scoped().c_str(),
+				e->scoped().c_str());
+
+		auto name = metaDataValue("slicer:root:", e->getMetaData());
+		defineRootName(e->scoped(), name ? *name : e->name());
+
+		fprintf(cpp, "templateMODELPARTFOR(%s, ModelPartForEnum);\n\n",
+				e->scoped().c_str());
+	}
+
+	void
 	Slicer::visitSequence(const Slice::SequencePtr & s)
 	{
 		if (s->hasMetaData("slicer:ignore")) { return; }
@@ -435,6 +485,9 @@ namespace Slicer {
 		}
 		else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
 			fprintf(cpp, "ModelPartForDictionary");
+		}
+		else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
+			fprintf(cpp, "ModelPartForEnum");
 		}
 	}
 

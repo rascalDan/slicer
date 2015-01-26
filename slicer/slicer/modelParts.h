@@ -31,6 +31,12 @@ namespace Slicer {
 			UnknownType(const std::string & n);
 	};
 
+	class InvalidEnumerationValue : public std::invalid_argument {
+		public:
+			InvalidEnumerationValue(const std::string & n, const std::string & e);
+			InvalidEnumerationValue(::Ice::Int n, const std::string & e);
+	};
+
 	template <typename T>
 	class TValueTarget {
 		public:
@@ -534,6 +540,44 @@ namespace Slicer {
 			bool owned;
 			ModelPartPtr mp;
 			static std::string rootName;
+	};
+
+	template<typename T>
+	class ModelPartForEnum : public ModelPart {
+		public:
+			typedef T element_type;
+			typedef boost::bimap<T, std::string> Enumerations;
+
+			ModelPartForEnum(T & s) :
+				modelPart(s)
+			{
+			}
+
+			ModelPartForEnum(T * s) :
+				modelPart(*s)
+			{
+			}
+
+			virtual void OnEachChild(const ChildHandler &) override { }
+
+			ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
+
+			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
+
+			virtual bool HasValue() const override { return true; }
+
+			virtual ModelPartType GetType() const { return mpt_Simple; }
+
+			virtual const Metadata & GetMetadata() const override { return metadata; }
+
+			virtual void SetValue(ValueSourcePtr s) override;
+
+			virtual void GetValue(ValueTargetPtr s) override;
+
+		private:
+			T & modelPart;
+			static Metadata metadata;
+			static Enumerations enumerations;
 	};
 
 	template<typename T>

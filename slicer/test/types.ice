@@ -1,6 +1,9 @@
 [["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
 
 module TestModule {
+	enum SomeNumbers {
+		One = 1, Ten = 10, FiftyFive = 55
+	};
 	struct DateTime {
 		short year;
 		short month;
@@ -105,6 +108,10 @@ module TestModule {
 		Classes bareSeq;
 		[ "slicer:xml:bare" ]
 		ClassMap bareMap;
+	};
+	class SomeEnums {
+		SomeNumbers one;
+		SomeNumbers two;
 	};
 };
 

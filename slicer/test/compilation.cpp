@@ -100,3 +100,8 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_struct )
 	StackTypeTest(TestModule::StructType, ModelPartForStruct, mpt_Complex);
 }
 
+BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_enum )
+{
+	StackTypeTest(TestModule::SomeNumbers, ModelPartForEnum, mpt_Simple);
+}
+

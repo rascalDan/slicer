@@ -222,6 +222,19 @@ checkBare(const TestModule::BareContainers & bc)
 	BOOST_REQUIRE_EQUAL(bc.bareMap.size(), 2);
 }
 
+void
+checkSomeEnums(const TestModule::SomeEnumsPtr & se)
+{
+	BOOST_REQUIRE_EQUAL(se->one, TestModule::Ten);
+	BOOST_REQUIRE_EQUAL(se->two, TestModule::FiftyFive);
+}
+
+void
+checkSomeNumbers(const TestModule::SomeNumbers & sn)
+{
+	BOOST_REQUIRE_EQUAL(sn, TestModule::FiftyFive);
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -373,6 +386,16 @@ BOOST_AUTO_TEST_CASE( xml_attribute_xml )
 BOOST_AUTO_TEST_CASE( xml_barecontainers_xml )
 {
 	verifyByFile<TestModule::BareContainers, Slicer::XmlFileDeserializer>("bare.xml", checkBare);
+}
+
+BOOST_AUTO_TEST_CASE( xml_classOfEnums_xml )
+{
+	verifyByFile<TestModule::SomeEnumsPtr, Slicer::XmlFileDeserializer>("someenums.xml", checkSomeEnums);
+}
+
+BOOST_AUTO_TEST_CASE( xml_rootEnums_xml )
+{
+	verifyByFile<TestModule::SomeNumbers, Slicer::XmlFileDeserializer>("enum.xml", checkSomeNumbers);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
