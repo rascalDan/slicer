@@ -89,6 +89,9 @@ namespace Slicer {
 		fprintf(cpp, "// Begin Slicer code\n\n");
 		fprintf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string().c_str());
 		fprintf(cpp, "#include <slicer/modelParts.h>\n\n");
+		fprintf(cpp, "#define templateMODELPARTFOR(Type, ModelPart) \\\n");
+		fprintf(cpp, "template <> ModelPartPtr ModelPartFor(Type & t) { return new ModelPart< Type >(t); } \\\n");
+		fprintf(cpp, "template <> ModelPartPtr ModelPartFor(Type * t) { return new ModelPart< Type >(t); }\n\n");
 		fprintf(cpp, "namespace Slicer {\n");
 		return true;
 	}
@@ -188,6 +191,9 @@ namespace Slicer {
 				c->scoped().c_str());
 		copyMetadata(c->getMetaData());
 
+		fprintf(cpp, "templateMODELPARTFOR(::IceInternal::Handle< %s >, ModelPartForClass);\n\n",
+				c->scoped().c_str());
+
 		classNo += 1;
 
 		return true;
@@ -211,6 +217,9 @@ namespace Slicer {
 		fprintf(cpp, "template<>\nMetadata ModelPartForComplex< %s >::metadata ",
 				c->scoped().c_str());
 		copyMetadata(c->getMetaData());
+
+		fprintf(cpp, "templateMODELPARTFOR(%s, ModelPartForStruct);\n\n",
+				c->scoped().c_str());
 
 		return true;
 	}
@@ -325,6 +334,9 @@ namespace Slicer {
 		fprintf(cpp, "template<>\nMetadata ModelPartForSequence< %s >::metadata ",
 				s->scoped().c_str());
 		copyMetadata(s->getMetaData());
+
+		fprintf(cpp, "templateMODELPARTFOR(%s, ModelPartForSequence);\n\n",
+				s->scoped().c_str());
 	}
 
 	void
@@ -391,6 +403,9 @@ namespace Slicer {
 				d->scoped().c_str(),
 				Slice::typeToString(vtype).c_str(),
 				d->scoped().c_str(),
+				d->scoped().c_str());
+
+		fprintf(cpp, "templateMODELPARTFOR(%s, ModelPartForDictionary);\n\n",
 				d->scoped().c_str());
 	}
 
