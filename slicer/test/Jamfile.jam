@@ -51,6 +51,7 @@ unit-test preprocess :
 	<library>common
 	<include>..
 	<library>../slicer//slicer
+	<dependency>../tool//slicer
 	;
 
 unit-test compilation :

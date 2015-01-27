@@ -51,12 +51,17 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 	const fs::path cpp = fs::change_extension(tmp / base, ".cpp");
 	BOOST_TEST_CHECKPOINT("cpp: " << cpp);
 	fs::remove(cpp);
-	Slicer::Slicer::Apply(slice, cpp);
+	const std::string doslice = stringbf(
+			"%s %s %s",
+			root.parent_path() / "tool" / bjamout / "slicer",
+			slice, cpp);
+	BOOST_TEST_CHECKPOINT("slicer: " << doslice);
+	system(doslice);
 
 	const fs::path obj = fs::change_extension(tmp / base, ".o");
 	const std::string compile = stringbf(
 					"g++ -Os -fPIC -c -std=c++0x -I tmp -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s %s -o %s",
-					bjamout,
+					root / bjamout,
 					root / "..",
 					cpp, obj);
 	BOOST_TEST_CHECKPOINT("compile: " << compile);
@@ -65,7 +70,7 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 	const fs::path so = fs::change_extension(tmp / ("libslicer" + slice.filename().string()), ".so");
 	const std::string link = stringbf(
 					"g++ -shared -lIce -lIceUtil %s/lib%s.so %s -o %s",
-					bjamout, base,
+					root / bjamout, base,
 					obj, so);
 	BOOST_TEST_CHECKPOINT("link: " << link);
 	system(link);
