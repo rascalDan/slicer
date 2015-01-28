@@ -1,5 +1,7 @@
 [["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
 
+#include <included.ice>
+
 module TestModule {
 	enum SomeNumbers {
 		One = 1, Ten = 10, FiftyFive = 55
@@ -85,6 +87,7 @@ module TestModule {
 	};
 	interface IgnoreMe {
 		int someFunction();
+		DontCountMe otherFileReference();
 	};
 	["slicer:typeid:mytype"]
 	class Base2 {

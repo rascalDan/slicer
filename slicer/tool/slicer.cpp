@@ -8,10 +8,12 @@ main(int argc, char ** argv)
 {
 	boost::filesystem::path slice;
 	boost::filesystem::path cpp;
+	std::vector<boost::filesystem::path> includes;
 
 	po::options_description opts("Slicer options");
 	opts.add_options()
 		("help,h", "Show this help message")
+		("include,I", po::value(&includes), "Add include directory to search path")
 		("slice,i", po::value(&slice), "Input ICE Slice file")
 		("cpp,o", po::value(&cpp), "Output C++ file");
 
@@ -27,8 +29,11 @@ main(int argc, char ** argv)
 		std::cout << opts << std::endl;
 		return 1;
 	}
-
-	Slicer::Slicer::Apply(slice, cpp);
+	Slicer::Slicer::Args args;
+	for(const auto & include : includes) {
+		args.push_back("-I" + include.string());
+	}
+	Slicer::Slicer::Apply(slice, cpp, args);
 
 	return 0;
 }

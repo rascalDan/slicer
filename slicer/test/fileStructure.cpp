@@ -7,6 +7,7 @@ FileStructure::FileStructure() :
 	base("types"),
 	bjamout(me.parent_path().parent_path().parent_path().leaf() / me.parent_path().parent_path().leaf() / me.parent_path().leaf()),
 	root(me.parent_path().parent_path().parent_path().parent_path()),
+	included(root / "included"),
 	slice(fs::change_extension(root / base, ".ice")),
 	tmp(root / "bin" / "slicer")
 {

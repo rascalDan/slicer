@@ -15,10 +15,13 @@ lib types :
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
+	<library>included//included
+	<implicit-dependency>included//included
 	: :
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
+	<library>included//included
 	;
 
 lib common :

@@ -1,0 +1,4 @@
+module TestModule {
+	class DontCountMe {  };
+};
+

@@ -17,11 +17,14 @@ namespace Slicer {
 					std::string ConvertToExchangeFunc;
 			};
 			typedef std::vector<ConversionSpec> Conversions;
+			typedef std::vector<std::string> Args;
 
 			Slicer(FILE * c);
 
 			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
 			static unsigned int Apply(const boost::filesystem::path & ice, FILE *);
+			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args &);
+			static unsigned int Apply(const boost::filesystem::path & ice, FILE *, const Args &);
 
 			virtual bool visitUnitStart(const Slice::UnitPtr&) override;
 

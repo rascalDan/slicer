@@ -542,20 +542,31 @@ namespace Slicer {
 	unsigned int
 	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp)
 	{
+		return Apply(ice, cpp, {});
+	}
+
+	unsigned int
+	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args & args)
+	{
 		FilePtr cppfile(fopen(cpp.string().c_str(), "a"), fclose);
 		if (!cppfile) {
 			throw std::runtime_error("failed to open code file");
 		}
 
-		return Apply(ice, cppfile.get());
+		return Apply(ice, cppfile.get(), args);
 	}
 
 	unsigned int
 	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp)
 	{
-		std::vector<std::string> cppArgs;
+		return Apply(ice, cpp, {});
+	}
+
+	unsigned int
+	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp, const Args & args)
+	{
 		std::lock_guard<std::mutex> lock(slicePreprocessor);
-		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", ice.string(), cppArgs);
+		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", ice.string(), args);
 		FILE * cppHandle = icecpp->preprocess(false);
 
 		if (cppHandle == NULL) {

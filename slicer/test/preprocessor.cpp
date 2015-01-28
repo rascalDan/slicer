@@ -19,7 +19,7 @@ BOOST_FIXTURE_TEST_SUITE ( preprocessor, FileStructure );
 
 BOOST_AUTO_TEST_CASE( slicer_test_counts_path )
 {
-	auto count = Slicer::Slicer::Apply(slice, boost::filesystem::path("/dev/null"));
+	auto count = Slicer::Slicer::Apply(slice, boost::filesystem::path("/dev/null"), {"-I" + included.string()});
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
 }
 
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE( slicer_test_counts_filestar )
 	FILE * file = fopen("/dev/null", "a");
 	BOOST_REQUIRE(file);
 
-	auto count = Slicer::Slicer::Apply(slice, file);
+	auto count = Slicer::Slicer::Apply(slice, file, {"-I" + included.string()});
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
 
 	fclose(file);
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( slicer_test_counts_filestar )
 
 BOOST_AUTO_TEST_CASE( slicer_test_counts_nullfilestar )
 {
-	auto count = Slicer::Slicer::Apply(slice, NULL);
+	auto count = Slicer::Slicer::Apply(slice, NULL, {"-I" + included.string()});
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
 }
 
@@ -52,16 +52,18 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 	BOOST_TEST_CHECKPOINT("cpp: " << cpp);
 	fs::remove(cpp);
 	const std::string doslice = stringbf(
-			"%s %s %s",
+			"%s -I%s %s %s",
 			root.parent_path() / "tool" / bjamout / "slicer",
+			included,
 			slice, cpp);
 	BOOST_TEST_CHECKPOINT("slicer: " << doslice);
 	system(doslice);
 
 	const fs::path obj = fs::change_extension(tmp / base, ".o");
 	const std::string compile = stringbf(
-					"g++ -Os -fPIC -c -std=c++0x -I tmp -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s %s -o %s",
+					"g++ -Os -fPIC -c -std=c++0x -I tmp -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s -I %s %s -o %s",
 					root / bjamout,
+					included / bjamout,
 					root / "..",
 					cpp, obj);
 	BOOST_TEST_CHECKPOINT("compile: " << compile);
@@ -69,8 +71,9 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 
 	const fs::path so = fs::change_extension(tmp / ("libslicer" + slice.filename().string()), ".so");
 	const std::string link = stringbf(
-					"g++ -shared -lIce -lIceUtil %s/lib%s.so %s -o %s",
+					"g++ -shared -lIce -lIceUtil %s/lib%s.so %s/lib%s.so %s -o %s",
 					root / bjamout, base,
+					included / bjamout, included.leaf(),
 					obj, so);
 	BOOST_TEST_CHECKPOINT("link: " << link);
 	system(link);
