@@ -60,7 +60,6 @@ namespace Slicer {
 
 			unsigned int components;
 			FILE * cpp;
-			std::vector<Slice::ModulePtr> modules;
 			unsigned int classNo;
 	};
 }

@@ -108,8 +108,6 @@ namespace Slicer {
 	bool
 	Slicer::visitModuleStart(const Slice::ModulePtr & m)
 	{
-		modules.push_back(m);
-
 		if (!cpp) return true;
 
 		fprintf(cpp, "// Begin module %s\n\n", m->name().c_str());
@@ -465,7 +463,6 @@ namespace Slicer {
 		if (cpp) {
 			fprintf(cpp, "// End module %s\n\n", m->name().c_str());
 		}
-		modules.pop_back();
 	}
 
 	void
