@@ -24,6 +24,8 @@ lib types :
 	<library>included//included
 	;
 
+path-constant me : . ;
+
 lib common :
 	helpers.cpp
 	conversions.cpp
@@ -36,6 +38,7 @@ lib common :
 	<library>boost_filesystem
 	<library>boost_utf
 	<implicit-dependency>types
+	<define>ROOT=\"$(me)\"
 	: :
 	<library>types
 	<library>boost_filesystem
@@ -46,20 +49,20 @@ lib common :
 	<implicit-dependency>types
 	;
 
-unit-test preprocess :
-	preprocessor.cpp
-	:
+run preprocessor.cpp
+	: : :
 	<linkflags>-rdynamic
 	<library>dl
 	<library>common
 	<include>..
 	<library>../slicer//slicer
 	<dependency>../tool//slicer
+	:
+	preprocess
 	;
 
-unit-test compilation :
-	compilation.cpp
-	:
+run compilation.cpp
+	: : :
 	<include>..
 	<library>../slicer//slicer
 	<library>types
@@ -68,11 +71,12 @@ unit-test compilation :
 	<library>common
 	<include>..
 	<library>../slicer//slicer
+	:
+	compilation
 	;
 
-unit-test serializers :
-	serializers.cpp
-	:
+run serializers.cpp
+	: : :
 	<dependency>preprocess
 	<library>slicer-test
 	<library>common
@@ -80,5 +84,7 @@ unit-test serializers :
 	<library>../slicer//slicer
 	<library>../xml//slicer-xml
 	<library>../json//slicer-json
+	:
+	serializers
 	;
 
