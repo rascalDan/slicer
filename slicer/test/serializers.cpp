@@ -12,7 +12,6 @@
 #include <boost/format.hpp>
 #include <boost/function.hpp>
 #include <types.h>
-#include <misc.h>
 #include <fstream>
 #include "helpers.h"
 #include "fileStructure.h"
@@ -54,7 +53,7 @@ class FileBased : public FileStructure {
 			}
 
 			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-			system(stringbf("diff -w %s %s", input, output));
+			diff(input, output);
 		}
 
 		template<typename T, typename Deserializer, typename Serializer, typename Internal>
@@ -96,7 +95,7 @@ class FileBased : public FileStructure {
 			ifree(docWrite);
 
 			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-			system(stringbf("diff -w %s %s", input, output));
+			diff(input, output);
 		}
 };
 
@@ -435,7 +434,7 @@ BOOST_AUTO_TEST_CASE( any )
 	Slicer::Serialize<Slicer::XmlFileSerializer>(object, output);
 
 	BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-	system(stringbf("diff -w %s %s", input, output));
+	diff(input, output);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

@@ -14,5 +14,8 @@ loadlib(const boost::filesystem::path &);
 void
 closelib(void *);
 
+void
+diff(const boost::filesystem::path & left, const boost::filesystem::path & right);
+
 #endif
 
