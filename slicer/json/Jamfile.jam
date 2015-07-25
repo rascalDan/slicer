@@ -21,6 +21,8 @@ lib slicer-json :
 	<library>jsonpp
 	<library>glibmm
 	<library>../slicer//slicer
+	<cflags>-fvisibility=hidden
+	<variant>release:<cflags>-flto
 	: :
 	<library>jsonpp
 	;

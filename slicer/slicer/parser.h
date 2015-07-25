@@ -4,11 +4,14 @@
 #include <Slice/Parser.h>
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
+#ifndef DLL_PUBLIC
+#define DLL_PUBLIC __attribute__ ((visibility ("default")))
+#endif
 
 namespace Slicer {
 	typedef boost::shared_ptr<FILE> FilePtr;
 
-	class Slicer : public Slice::ParserVisitor {
+	class DLL_PUBLIC Slicer : public Slice::ParserVisitor {
 		public:
 			class ConversionSpec {
 				public:
@@ -19,12 +22,14 @@ namespace Slicer {
 			typedef std::vector<ConversionSpec> Conversions;
 			typedef std::vector<std::string> Args;
 
+#pragma GCC visibility push(default)
 			Slicer(FILE * c);
 
 			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
 			static unsigned int Apply(const boost::filesystem::path & ice, FILE *);
 			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args &);
 			static unsigned int Apply(const boost::filesystem::path & ice, FILE *, const Args &);
+#pragma GCC visibility pop
 
 			virtual bool visitUnitStart(const Slice::UnitPtr&) override;
 

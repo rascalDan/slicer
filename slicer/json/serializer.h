@@ -4,6 +4,10 @@
 #include <slicer/serializer.h>
 #include <jsonpp.h>
 
+#ifndef DLL_PUBLIC
+#define DLL_PUBLIC __attribute__ ((visibility ("default")))
+#endif
+
 namespace Slicer {
 	class JsonSerializer : public Serializer {
 		protected:
@@ -14,7 +18,7 @@ namespace Slicer {
 
 	class JsonFileSerializer : public JsonSerializer {
 		public:
-			JsonFileSerializer(const boost::filesystem::path &);
+			DLL_PUBLIC JsonFileSerializer(const boost::filesystem::path &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
@@ -24,7 +28,7 @@ namespace Slicer {
 
 	class JsonValueSerializer : public JsonSerializer {
 		public:
-			JsonValueSerializer(json::Value &);
+			DLL_PUBLIC JsonValueSerializer(json::Value &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
@@ -34,7 +38,7 @@ namespace Slicer {
 
 	class JsonFileDeserializer : public Deserializer {
 		public:
-			JsonFileDeserializer(const boost::filesystem::path &);
+			DLL_PUBLIC JsonFileDeserializer(const boost::filesystem::path &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
@@ -44,7 +48,7 @@ namespace Slicer {
 
 	class JsonValueDeserializer : public Deserializer {
 		public:
-			JsonValueDeserializer(const json::Value &);
+			DLL_PUBLIC JsonValueDeserializer(const json::Value &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 

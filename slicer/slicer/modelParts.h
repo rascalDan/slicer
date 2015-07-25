@@ -11,6 +11,9 @@
 #include <boost/function.hpp>
 #include <boost/bimap.hpp>
 #include <vector>
+#ifndef DLL_PUBLIC
+#define DLL_PUBLIC __attribute__ ((visibility ("default")))
+#endif
 
 namespace Slicer {
 	// This allows IceUtil::Handle to play nicely with boost::things
@@ -21,17 +24,17 @@ namespace Slicer {
 		return p.get();
 	}
 
-	class IncorrectElementName : public std::invalid_argument {
+	class DLL_PUBLIC IncorrectElementName : public std::invalid_argument {
 		public:
 			IncorrectElementName(const std::string & n);
 	};
 
-	class UnknownType : public std::invalid_argument {
+	class DLL_PUBLIC UnknownType : public std::invalid_argument {
 		public:
 			UnknownType(const std::string & n);
 	};
 
-	class InvalidEnumerationValue : public std::invalid_argument {
+	class DLL_PUBLIC InvalidEnumerationValue : public std::invalid_argument {
 		public:
 			InvalidEnumerationValue(const std::string & n, const std::string & e);
 			InvalidEnumerationValue(::Ice::Int n, const std::string & e);
@@ -101,9 +104,9 @@ namespace Slicer {
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
 	typedef boost::function<bool(HookCommonPtr)> HookFilter;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
-	ClassRefMap * & classRefMap();
+	DLL_PUBLIC ClassRefMap * & classRefMap();
 	typedef boost::bimap<std::string, std::string> ClassNameMap;
-	ClassNameMap * & classNameMap();
+	DLL_PUBLIC ClassNameMap * & classNameMap();
 	typedef std::list<std::string> Metadata;
 	enum ModelPartType {
 		mpt_Null,
@@ -121,16 +124,16 @@ namespace Slicer {
 	};
 
 #define templateMODELPARTFOR(Type) \
-	template <class T> ModelPartPtr ModelPartFor(Type & t); \
-	template <class T> ModelPartPtr ModelPartFor(Type * t);
+	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t); \
+	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t);
 #define MODELPARTFOR(Type) \
-	ModelPartPtr ModelPartFor(Type & t); \
-	ModelPartPtr ModelPartFor(Type * t);
+	ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t); \
+	ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t);
 	templateMODELPARTFOR(IceInternal::Handle<T>);
 	templateMODELPARTFOR(std::vector<T>);
 	templateMODELPARTFOR(std::list<T>);
-	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> & t);
-	template <class K, class V> ModelPartPtr ModelPartFor(std::map<K, V> * t);
+	template <class K, class V> ModelPartPtr DLL_PUBLIC ModelPartFor(std::map<K, V> & t);
+	template <class K, class V> ModelPartPtr DLL_PUBLIC ModelPartFor(std::map<K, V> * t);
 	MODELPARTFOR(std::string);
 	MODELPARTFOR(bool);
 	MODELPARTFOR(Ice::Float);
@@ -149,7 +152,7 @@ namespace Slicer {
 			virtual const Metadata & ChildMetaData() const = 0;
 	};
 	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
-	class ImplicitChildRef : public ChildRef {
+	class DLL_PUBLIC ImplicitChildRef : public ChildRef {
 		public:
 			ImplicitChildRef(ModelPartPtr);
 
@@ -159,7 +162,7 @@ namespace Slicer {
 		private:
 			ModelPartPtr mpp;
 	};
-	class MemberChildRef : public ChildRef {
+	class DLL_PUBLIC MemberChildRef : public ChildRef {
 		public:
 			MemberChildRef(ModelPartPtr, const Metadata &);
 
@@ -171,7 +174,7 @@ namespace Slicer {
 			const Metadata & mdr;
 	};
 
-	class ModelPart : public IceUtil::Shared {
+	class DLL_PUBLIC ModelPart : public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
 
@@ -196,7 +199,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForSimple : public ModelPart {
+	class DLL_PUBLIC ModelPartForSimple : public ModelPart {
 		public:
 			typedef T element_type;
 
@@ -221,7 +224,7 @@ namespace Slicer {
 	};
 
 	template<typename T, typename M, T M::* MV>
-	class ModelPartForConverted : public ModelPart {
+	class DLL_PUBLIC ModelPartForConverted : public ModelPart {
 		public:
 			typedef T element_type;
 
@@ -246,7 +249,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForOptional : public ModelPart {
+	class DLL_PUBLIC ModelPartForOptional : public ModelPart {
 		public:
 			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h) :
 				OptionalMember(h)
@@ -328,7 +331,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForComplex : public ModelPart {
+	class DLL_PUBLIC ModelPartForComplex : public ModelPart {
 		public:
 			class HookBase : public HookCommon {
 				public:
@@ -409,7 +412,7 @@ namespace Slicer {
 	};
 	
 	template<typename T>
-	class ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
+	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
 		public:
 			typedef T element_type;
 
@@ -454,7 +457,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForStruct : public ModelPartForComplex<T> {
+	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T> {
 		public:
 			typedef T element_type;
 
@@ -480,7 +483,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForRoot : public ModelPart {
+	class DLL_PUBLIC ModelPartForRoot : public ModelPart {
 		public:
 			ModelPartForRoot() :
 				ModelObject(new T()),
@@ -539,11 +542,11 @@ namespace Slicer {
 			T * ModelObject;
 			bool owned;
 			ModelPartPtr mp;
-			static std::string rootName;
+			DLL_PUBLIC static std::string rootName;
 	};
 
 	template<typename T>
-	class ModelPartForEnum : public ModelPart {
+	class DLL_PUBLIC ModelPartForEnum : public ModelPart {
 		public:
 			typedef T element_type;
 			typedef boost::bimap<T, std::string> Enumerations;
@@ -581,7 +584,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForSequence : public ModelPart {
+	class DLL_PUBLIC ModelPartForSequence : public ModelPart {
 		public:
 			typedef T element_type;
 
@@ -625,7 +628,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForDictionaryElement : public ModelPartForComplex<ModelPartForDictionaryElement<T> > {
+	class DLL_PUBLIC ModelPartForDictionaryElement : public ModelPartForComplex<ModelPartForDictionaryElement<T> > {
 		public:
 			ModelPartForDictionaryElement(typename T::key_type * k, typename T::mapped_type * v) :
 				key(k),
@@ -645,7 +648,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForDictionaryElementInserter : public ModelPartForDictionaryElement<T> {
+	class DLL_PUBLIC ModelPartForDictionaryElementInserter : public ModelPartForDictionaryElement<T> {
 		public:
 			ModelPartForDictionaryElementInserter(T & d) :
 				ModelPartForDictionaryElement<T>(&key, &value),
@@ -663,7 +666,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForDictionary : public ModelPart {
+	class DLL_PUBLIC ModelPartForDictionary : public ModelPart {
 		public:
 			typedef T element_type;
 

@@ -11,6 +11,8 @@ lib slicer :
 	<library>boost_system
 	<library>boost_filesystem
 	<include>..
+	<cflags>-fvisibility=hidden
+	<variant>release:<cflags>-flto
 	: :
 	<include>..
 	<library>boost_system

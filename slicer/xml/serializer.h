@@ -4,6 +4,10 @@
 #include <slicer/serializer.h>
 #include <libxml++/document.h>
 
+#ifndef DLL_PUBLIC
+#define DLL_PUBLIC __attribute__ ((visibility ("default")))
+#endif
+
 namespace Slicer {
 	class XmlSerializer : public Serializer {
 		protected:
@@ -17,7 +21,7 @@ namespace Slicer {
 
 	class XmlFileSerializer : public XmlSerializer {
 		public:
-			XmlFileSerializer(const boost::filesystem::path &);
+			DLL_PUBLIC XmlFileSerializer(const boost::filesystem::path &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
@@ -27,7 +31,7 @@ namespace Slicer {
 
 	class XmlDocumentSerializer : public XmlSerializer {
 		public:
-			XmlDocumentSerializer(xmlpp::Document * &);
+			DLL_PUBLIC XmlDocumentSerializer(xmlpp::Document * &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
@@ -43,7 +47,7 @@ namespace Slicer {
 
 	class XmlFileDeserializer : public XmlDeserializer {
 		public:
-			XmlFileDeserializer(const boost::filesystem::path &);
+			DLL_PUBLIC XmlFileDeserializer(const boost::filesystem::path &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
@@ -53,7 +57,7 @@ namespace Slicer {
 
 	class XmlDocumentDeserializer : public XmlDeserializer {
 		public:
-			XmlDocumentDeserializer(const xmlpp::Document *);
+			DLL_PUBLIC XmlDocumentDeserializer(const xmlpp::Document *);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
