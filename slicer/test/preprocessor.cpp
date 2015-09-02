@@ -6,7 +6,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
 #include <boost/function.hpp>
-#include <misc.h>
+#include <buffer.h>
 #include <types.h>
 #include "helpers.h"
 #include "fileStructure.h"

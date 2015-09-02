@@ -8,6 +8,7 @@ lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
 lib slicer-test : : <name>slicertypes <search>bin/slicer ;
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib types :
 	types.ice
@@ -30,7 +31,6 @@ lib common :
 	helpers.cpp
 	conversions.cpp
 	fileStructure.cpp
-	../../libmisc/misc.cpp
 	:
 	<library>dl
 	<library>types
@@ -43,7 +43,6 @@ lib common :
 	<library>types
 	<library>boost_filesystem
 	<library>boost_system
-	<include>../../libmisc
 	<define>BOOST_TEST_DYN_LINK
 	<library>boost_utf
 	<implicit-dependency>types
@@ -54,6 +53,7 @@ run preprocessor.cpp
 	<linkflags>-rdynamic
 	<library>dl
 	<library>common
+	<library>adhocutil
 	<include>..
 	<library>../slicer//slicer
 	<dependency>../tool//slicer
