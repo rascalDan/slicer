@@ -251,11 +251,7 @@ namespace Slicer {
 	JsonFileDeserializer::Deserialize(ModelPartPtr modelRoot)
 	{
 		std::ifstream inFile(path.string());
-		std::stringstream buffer;
-		buffer << inFile.rdbuf();
-		Glib::ustring doc(buffer.str());
-		Glib::ustring::const_iterator itr = doc.begin();
-		json::Value obj = json::parseValue(itr);
+		json::Value obj = json::parseValue(inFile);
 		auto mp = modelRoot->GetAnonChild();
 		boost::apply_visitor(DocumentTreeIterate(mp), obj);
 	}
