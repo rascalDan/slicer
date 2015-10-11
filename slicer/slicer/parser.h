@@ -4,9 +4,7 @@
 #include <Slice/Parser.h>
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
-#ifndef DLL_PUBLIC
-#define DLL_PUBLIC __attribute__ ((visibility ("default")))
-#endif
+#include <visibility.h>
 
 namespace Slicer {
 	typedef boost::shared_ptr<FILE> FilePtr;

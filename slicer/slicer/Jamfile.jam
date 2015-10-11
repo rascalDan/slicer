@@ -2,6 +2,7 @@ lib Slice ;
 lib IceUtil ;
 lib boost_system ;
 lib boost_filesystem ;
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer :
 	[ glob *.cpp ]
@@ -10,6 +11,7 @@ lib slicer :
 	<library>IceUtil
 	<library>boost_system
 	<library>boost_filesystem
+	<library>adhocutil
 	<include>..
 	<cflags>-fvisibility=hidden
 	<variant>release:<cflags>-flto

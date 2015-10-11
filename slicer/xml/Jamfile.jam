@@ -4,6 +4,7 @@ alias libxmlpp : : : :
 lib boost_system ;
 lib boost_filesystem ;
 lib IceUtil ;
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-xml :
 	[ glob *.cpp ]
@@ -13,6 +14,7 @@ lib slicer-xml :
 	<library>boost_filesystem
 	<library>IceUtil
 	<library>libxmlpp
+	<library>adhocutil
 	<library>../slicer//slicer
 	<cflags>-fvisibility=hidden
 	<variant>release:<cflags>-flto

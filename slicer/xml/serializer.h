@@ -3,10 +3,7 @@
 
 #include <slicer/serializer.h>
 #include <libxml++/document.h>
-
-#ifndef DLL_PUBLIC
-#define DLL_PUBLIC __attribute__ ((visibility ("default")))
-#endif
+#include <visibility.h>
 
 namespace Slicer {
 	class XmlSerializer : public Serializer {

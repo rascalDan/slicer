@@ -11,9 +11,7 @@
 #include <boost/function.hpp>
 #include <boost/bimap.hpp>
 #include <vector>
-#ifndef DLL_PUBLIC
-#define DLL_PUBLIC __attribute__ ((visibility ("default")))
-#endif
+#include <visibility.h>
 
 namespace Slicer {
 	// This allows IceUtil::Handle to play nicely with boost::things

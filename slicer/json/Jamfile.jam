@@ -6,10 +6,11 @@ alias glibmm : : : :
 lib jsonpp : : : :
 	<cflags>"`pkg-config --cflags glibmm-2.4`"
 	;
-	
+
 lib boost_system ;
 lib boost_filesystem ;
 lib IceUtil ;
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-json :
 	[ glob *.cpp ]
@@ -20,6 +21,7 @@ lib slicer-json :
 	<library>IceUtil
 	<library>jsonpp
 	<library>glibmm
+	<library>adhocutil
 	<library>../slicer//slicer
 	<cflags>-fvisibility=hidden
 	<variant>release:<cflags>-flto

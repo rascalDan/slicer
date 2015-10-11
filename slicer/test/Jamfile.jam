@@ -16,6 +16,7 @@ lib types :
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
+	<library>adhocutil
 	<library>included//included
 	<implicit-dependency>included//included
 	: :
