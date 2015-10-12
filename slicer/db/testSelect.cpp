@@ -20,18 +20,6 @@ BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
 typedef boost::shared_ptr<DB::Connection> DBPtr;
 typedef boost::shared_ptr<DB::SelectCommand> SelectPtr;
 
-boost::posix_time::ptime
-mkDateTime(short y, short m, short d, short h, short M, short s)
-{
-	return boost::posix_time::ptime(boost::gregorian::date(y, m, d), boost::posix_time::time_duration(h, M, s));
-}
-
-boost::posix_time::time_duration
-mkTimespan(short d, short h, short M, short s)
-{
-	return boost::posix_time::time_duration((d * 24) + h, M, s);
-}
-
 BOOST_AUTO_TEST_CASE( select_simple_int )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
