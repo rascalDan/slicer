@@ -434,6 +434,9 @@ namespace Slicer {
 		fprintf(cpp, "\t};\n");
 		fprintf(cpp, "\n");
 
+		auto name = metaDataValue("slicer:root:", d->getMetaData());
+		defineRootName(d->scoped(), name ? *name : d->name());
+
 		fprintf(cpp, "template<>\nDLL_PUBLIC Metadata ModelPartForDictionary< %s >::metadata ",
 				d->scoped().c_str());
 		copyMetadata(d->getMetaData());
