@@ -7,6 +7,8 @@ namespace Slicer {
 
 	TooManyRowsReturned::TooManyRowsReturned() : std::runtime_error("Too many rows returned") { }
 
+	UnsupportedModelType::UnsupportedModelType() : std::invalid_argument("Unspported model type") { }
+
 	class SqlSource : public Slicer::ValueSource,
 			public Slicer::TValueSource<boost::posix_time::time_duration>,
 			public Slicer::TValueSource<boost::posix_time::ptime>
@@ -110,7 +112,7 @@ namespace Slicer {
 				DeserializeSimple(mp);
 				return;
 			default:
-				throw std::invalid_argument("Unspported model type");
+				throw UnsupportedModelType();
 		}
 	}
 

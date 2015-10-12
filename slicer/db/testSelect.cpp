@@ -153,6 +153,13 @@ BoostThrowWrapperHelper(P & ... p)
 	return Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, T>(p...);
 }
 
+BOOST_AUTO_TEST_CASE( select_inherit_unsupportedModel )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test"));
+	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::ClassMap>(*sel), Slicer::UnsupportedModelType);
+}
+
 BOOST_AUTO_TEST_CASE( select_inherit_tooManyRowsSimple )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
