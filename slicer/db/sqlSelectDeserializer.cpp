@@ -1,6 +1,6 @@
 #include "sqlSelectDeserializer.h"
+#include "sqlSource.h"
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace Slicer {
 	NoRowsReturned::NoRowsReturned() : std::runtime_error("No rows returned") { }
@@ -8,84 +8,6 @@ namespace Slicer {
 	TooManyRowsReturned::TooManyRowsReturned() : std::runtime_error("Too many rows returned") { }
 
 	UnsupportedModelType::UnsupportedModelType() : std::invalid_argument("Unspported model type") { }
-
-	class SqlSource : public Slicer::ValueSource,
-			public Slicer::TValueSource<boost::posix_time::time_duration>,
-			public Slicer::TValueSource<boost::posix_time::ptime>
-	{
-		public:
-			SqlSource(const DB::Column & c) :
-				column(c)
-			{
-			}
-
-			bool isNull() const
-			{
-				return column.isNull();
-			}
-
-			void set(boost::posix_time::ptime & b) const override
-			{
-				column >> b;
-			}
-
-			void set(boost::posix_time::time_duration & b) const override
-			{
-				column >> b;
-			}
-
-			void set(bool & b) const override
-			{
-				column >> b;
-			}
-
-			void set(Ice::Byte & b) const override
-			{
-				int64_t cb;
-				column >> cb;
-				b = boost::numeric_cast<Ice::Byte>(cb);
-			}
-
-			void set(Ice::Short & b) const override
-			{
-				int64_t cb;
-				column >> cb;
-				b = boost::numeric_cast<Ice::Byte>(cb);
-			}
-
-			void set(Ice::Int & b) const override
-			{
-				int64_t cb;
-				column >> cb;
-				b = boost::numeric_cast<Ice::Int>(cb);
-			}
-
-			void set(Ice::Long & b) const override
-			{
-				column >> b;
-			}
-
-			void set(Ice::Float & b) const override
-			{
-				double cb;
-				column >> cb;
-				b = boost::numeric_cast<Ice::Float>(cb);
-			}
-
-			void set(Ice::Double & b) const override
-			{
-				column >> b;
-			}
-
-			void set(std::string & b) const override
-			{
-				column >> b;
-			}
-
-		private:
-			const DB::Column & column;
-	};
-	typedef IceUtil::Handle<SqlSource> SqlSourcePtr;
 
 	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand & c, IceUtil::Optional<std::string> tc) :
 		cmd(c),
