@@ -134,3 +134,16 @@ module TestModule2 {
 	};
 };
 
+module DB {
+	[	"slicer:conversion:boost.posix_time.time_duration:timedurationToTimespan:timespanToTimeduration" ]
+	struct Timespan {
+		int days;
+		short hours;
+		short minutes;
+		short seconds;
+	};
+	class SpecificTypes extends TestModule::DateTimeContainer {
+		Timespan ts;
+	};
+};
+

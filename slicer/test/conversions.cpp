@@ -77,5 +77,17 @@ namespace Slicer {
 				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday),
 				SHORT(tm.tm_hour), SHORT(tm.tm_min), SHORT(tm.tm_sec)});
 	}
+
+	::DB::Timespan
+	timedurationToTimespan(const boost::posix_time::time_duration & td)
+	{
+		return ::DB::Timespan({ SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()) });
+	}
+
+	boost::posix_time::time_duration
+	timespanToTimeduration(const ::DB::Timespan & ts)
+	{
+		return boost::posix_time::time_duration((ts.days * 24) + ts.hours, ts.minutes, ts.seconds);
+	}
 }
 
