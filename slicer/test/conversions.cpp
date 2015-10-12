@@ -1,19 +1,23 @@
 #include "types.h"
 #include <boost/numeric/conversion/cast.hpp>
 
-#define SHORT(x) boost::numeric_cast< ::Ice::Short >(x)
+#define SHORT(x) boost::numeric_cast< ::Ice::Short , int64_t >(x)
 
 namespace Slicer {
 	boost::posix_time::ptime
-	dateTimeToPTime(const ::TestModule::DateTime &)
+	dateTimeToPTime(const ::TestModule::DateTime & dt)
 	{
-		throw std::runtime_error("Not implemented");
+		return boost::posix_time::ptime(boost::gregorian::date(dt.year, dt.month, dt.day),
+				boost::posix_time::time_duration(dt.hour, dt.minute, dt.second));
 	}
 
 	::TestModule::DateTime
-	ptimeToDateTime(const boost::posix_time::ptime &)
+	ptimeToDateTime(const boost::posix_time::ptime & pt)
 	{
-		throw std::runtime_error("Not implemented");
+		return ::TestModule::DateTime({
+				SHORT(pt.date().year()), SHORT(pt.date().month()), SHORT(pt.date().day()),
+				SHORT(pt.time_of_day().hours()), SHORT(pt.time_of_day().minutes()), SHORT(pt.time_of_day().seconds())
+			});
 	}
 
 	std::string
@@ -22,8 +26,8 @@ namespace Slicer {
 		struct tm tm;
 		memset(&tm, 0, sizeof(struct tm));
 		tm.tm_mday = in.day;
-		tm.tm_mon = in.month;
-		tm.tm_year = in.year;
+		tm.tm_mon = in.month - 1;
+		tm.tm_year = in.year - 1900;
 		mktime(&tm);
 		char buf[BUFSIZ];
 		auto len = strftime(buf, BUFSIZ, "%Y-%m-%d", &tm);
@@ -40,7 +44,7 @@ namespace Slicer {
 			throw std::runtime_error("Invalid iso-date string: " + in);
 		}
 		return ::TestModule::IsoDate({
-				SHORT(tm.tm_year), SHORT(tm.tm_mon), SHORT(tm.tm_mday)});
+				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday)});
 	}
 
 	std::string
@@ -52,8 +56,8 @@ namespace Slicer {
 		tm.tm_min = in.minute;
 		tm.tm_hour = in.hour;
 		tm.tm_mday = in.day;
-		tm.tm_mon = in.month;
-		tm.tm_year = in.year;
+		tm.tm_mon = in.month- 1;
+		tm.tm_year = in.year - 1900;
 		mktime(&tm);
 		char buf[BUFSIZ];
 		auto len = strftime(buf, BUFSIZ, "%Y-%b-%d %H:%M:%S", &tm);
@@ -70,7 +74,7 @@ namespace Slicer {
 			throw std::runtime_error("Invalid date string: " + in);
 		}
 		return ::TestModule::DateTime({
-				SHORT(tm.tm_year), SHORT(tm.tm_mon), SHORT(tm.tm_mday),
+				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday),
 				SHORT(tm.tm_hour), SHORT(tm.tm_min), SHORT(tm.tm_sec)});
 	}
 }
