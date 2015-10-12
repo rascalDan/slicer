@@ -4,8 +4,10 @@ build-project tool ;
 build-project slicer ;
 build-project xml ;
 build-project json ;
+build-project db ;
 build-project test ;
 
 package.install install : <install-source-root>. : tool//slicer : slicer//slicer : [ glob slicer/*.h ] ;
 package.install install-xml : <install-source-root>. : : xml//slicer-xml : [ glob xml/*.h ] ;
 package.install install-json : <install-source-root>. : : json//slicer-json : [ glob json/*.h ] ;
+package.install install-db : <install-source-root>. : : db//slicer-db : [ glob db/*.h ] ;

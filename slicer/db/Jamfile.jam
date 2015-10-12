@@ -1,0 +1,49 @@
+import testing ;
+
+alias glibmm : : : :
+	<cflags>"`pkg-config --cflags glibmm-2.4`"
+	<linkflags>"`pkg-config --libs glibmm-2.4`"
+	;
+
+lib dbppcore : : : : <include>/usr/include/dbpp ;
+lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
+lib boost_system ;
+lib boost_filesystem ;
+lib boost_utf : : <name>boost_unit_test_framework ;
+lib IceUtil ;
+
+lib slicer-db :
+	[ glob *.cpp : test*.cpp ]
+	:
+	<include>..
+	<library>IceUtil
+	<library>dbppcore
+	<library>glibmm
+	<library>../slicer//slicer
+	<cflags>-fvisibility=hidden
+	<variant>release:<cflags>-flto
+	: :
+	<library>dbppcore
+	;
+
+path-constant me : . ;
+
+run testSelect.cpp
+	: : :
+	<define>ROOT=\"$(me)\"
+	<define>BOOST_TEST_DYN_LINK
+	<library>slicer-db
+	<library>dbpp-postgresql
+	<library>boost_system
+	<library>boost_filesystem
+	<library>boost_utf
+	<library>../test//slicer-test
+	<library>../test//common
+	<library>../slicer//slicer
+	<include>..
+	<dependency>slicer.sql
+	<dependency>../test//compilation
+	:
+	testSelect
+	;
+
