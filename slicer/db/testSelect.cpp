@@ -6,6 +6,7 @@
 #include <definedDirs.h>
 #include "sqlSelectDeserializer.h"
 #include <types.h>
+#include "exceptions.h"
 
 class StandardMockDatabase : public PQ::Mock {
 	public:

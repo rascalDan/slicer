@@ -16,11 +16,6 @@ namespace Slicer {
 			TooManyRowsReturned();
 	};
 
-	class UnsupportedModelType : public std::invalid_argument {
-		public:
-			UnsupportedModelType();
-	};
-
 	class DLL_PUBLIC SqlSelectDeserializer : public Slicer::Deserializer {
 		public:
 			SqlSelectDeserializer(DB::SelectCommand &, IceUtil::Optional<std::string> typeIdCol = IceUtil::Optional<std::string>());
