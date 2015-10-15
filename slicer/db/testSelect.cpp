@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE( select_inherit_datetime )
 
 template <typename T, typename ... P>
 T
-BoostThrowWrapperHelper(P & ... p)
+BoostThrowWrapperHelper(P && ... p)
 {
 	return Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, T>(p...);
 }
