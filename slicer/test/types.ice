@@ -44,6 +44,7 @@ module TestModule {
 		int a;
 		int b;
 	};
+	sequence<BuiltIns> BuiltInSeq;
 	sequence<ClassType> Classes;
 	sequence<StructType> Structs;
 	dictionary<int, ClassType> ClassMap;

@@ -7,6 +7,7 @@ alias glibmm : : : :
 
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
@@ -19,6 +20,7 @@ lib slicer-db :
 	<library>IceUtil
 	<library>dbppcore
 	<library>glibmm
+	<library>adhocutil
 	<library>../slicer//slicer
 	<cflags>-fvisibility=hidden
 	<variant>release:<cflags>-flto
@@ -45,5 +47,24 @@ run testSelect.cpp
 	<dependency>../test//compilation
 	:
 	testSelect
+	;
+
+run testInsert.cpp
+	: : :
+	<define>ROOT=\"$(me)\"
+	<define>BOOST_TEST_DYN_LINK
+	<library>slicer-db
+	<library>dbpp-postgresql
+	<library>boost_system
+	<library>boost_filesystem
+	<library>boost_utf
+	<library>../test//slicer-test
+	<library>../test//common
+	<library>../slicer//slicer
+	<include>..
+	<dependency>slicer.sql
+	<dependency>../test//compilation
+	:
+	testInsert
 	;
 
