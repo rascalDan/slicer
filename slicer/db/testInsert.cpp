@@ -8,6 +8,10 @@
 #include "sqlSelectDeserializer.h"
 #include <types.h>
 
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::Timespan);
+
 class StandardMockDatabase : public PQ::Mock {
 	public:
 		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
@@ -57,5 +61,21 @@ BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mfloat, bis2.back()->mfloat);
 	BOOST_REQUIRE_EQUAL(bis.back()->mdouble, bis2.back()->mdouble);
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
+}
+
+BOOST_AUTO_TEST_CASE( insert_converted )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	DB::SpecificTypesPtr st = new DB::SpecificTypes {
+		{2015, 10, 16, 19, 12, 34},
+		{2015, 10, 16},
+		{1, 2, 3, 4}
+	};
+	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(st, db.get(), "converted");
+	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM converted"));
+	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::SpecificTypesPtr>(*sel);
+	BOOST_REQUIRE_EQUAL(st->date, st2->date);
+	BOOST_REQUIRE_EQUAL(st->dt, st2->dt);
+	BOOST_REQUIRE_EQUAL(st->ts, st2->ts);
 }
 

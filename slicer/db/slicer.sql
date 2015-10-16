@@ -21,3 +21,7 @@ CREATE TABLE builtins(
 		mdouble numeric(8, 5),
 		mstring text);
 
+CREATE TABLE Converted(
+		dt timestamp without time zone,
+		date varchar(10),
+		ts interval);
