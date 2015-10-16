@@ -197,3 +197,18 @@ BOOST_AUTO_TEST_CASE( select_inherit_emptySequence )
 	BOOST_REQUIRE_EQUAL(0, bi.size());
 }
 
+BOOST_AUTO_TEST_CASE( select_null )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	db->execute("INSERT INTO test(id) VALUES(NULL)");
+
+	auto sel = SelectPtr(db->newSelectCommand("SELECT id optSimple FROM test WHERE id IS NULL"));
+	auto oi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::OptionalsPtr>(*sel);
+	BOOST_REQUIRE(!oi->optSimple);
+
+	sel = SelectPtr(db->newSelectCommand("SELECT MAX(id) optSimple FROM test WHERE id IS NOT NULL"));
+	oi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::OptionalsPtr>(*sel);
+	BOOST_REQUIRE(oi->optSimple);
+	BOOST_REQUIRE_EQUAL(oi->optSimple.get(), 4);
+}
+
