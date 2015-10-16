@@ -7,6 +7,7 @@
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include <types.h>
+#include "exceptions.h"
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
@@ -77,5 +78,12 @@ BOOST_AUTO_TEST_CASE( insert_converted )
 	BOOST_REQUIRE_EQUAL(st->date, st2->date);
 	BOOST_REQUIRE_EQUAL(st->dt, st2->dt);
 	BOOST_REQUIRE_EQUAL(st->ts, st2->ts);
+}
+
+BOOST_AUTO_TEST_CASE( insert_unsupportedModel )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	TestModule::ClassMap cm;
+	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlInsertSerializer>(cm, db.get(), "converted"), Slicer::UnsupportedModelType);
 }
 
