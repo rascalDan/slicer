@@ -9,8 +9,10 @@ void
 system(const std::string & cmd)
 {
 	if (system(cmd.c_str())) {
+		// LCOV_EXCL_START
 		fprintf(stderr, "Failed to execute:\n\t%s\n", cmd.c_str());
 		throw std::runtime_error(cmd);
+		// LCOV_EXCL_STOP
 	}
 }
 
@@ -32,7 +34,9 @@ loadlib(const boost::filesystem::path & so)
 {
 	auto handle = dlopen(so.string().c_str(), RTLD_NOW | RTLD_GLOBAL);
 	if (!handle) {
+		// LCOV_EXCL_START
 		throw std::runtime_error(dlerror());
+		// LCOV_EXCL_STOP
 	}
 	return handle;
 }
@@ -41,7 +45,9 @@ void
 closelib(void * handle)
 {
 	if (dlclose(handle)) {
+		// LCOV_EXCL_START
 		throw std::runtime_error(dlerror());
+		// LCOV_EXCL_STOP
 	}
 }
 

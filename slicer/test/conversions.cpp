@@ -41,7 +41,9 @@ namespace Slicer {
 		memset(&tm, 0, sizeof(struct tm));
 		auto end = strptime(in.c_str(), "%Y-%m-%d", &tm);
 		if (!end || *end) {
+			// LCOV_EXCL_START
 			throw std::runtime_error("Invalid iso-date string: " + in);
+			// LCOV_EXCL_STOP
 		}
 		return ::TestModule::IsoDate({
 				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday)});
@@ -71,7 +73,9 @@ namespace Slicer {
 		memset(&tm, 0, sizeof(struct tm));
 		auto end = strptime(in.c_str(), "%Y-%b-%d %H:%M:%S", &tm);
 		if (!end || *end) {
+			// LCOV_EXCL_START
 			throw std::runtime_error("Invalid date string: " + in);
+			// LCOV_EXCL_STOP
 		}
 		return ::TestModule::DateTime({
 				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday),
