@@ -4,13 +4,9 @@
 #include <types.h>
 #include <slicer/modelParts.h>
 
-namespace std {
-	ostream & operator<<(ostream & strm, const type_info & ti)
-	{
-		strm << ti.name();
-		return strm;
-	}
-}
+// LCOV_EXCL_START
+BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
+// LCOV_EXCL_STOP
 
 #define TypeTest(Var, Expr, Explicit, Expected) \
 	Var obj = Expr; \
@@ -23,9 +19,12 @@ namespace std {
 	Slicer::ModelPartPtr autoPtrMpp = Slicer::ModelPartFor(&obj); \
 	BOOST_REQUIRE_EQUAL(Slicer::Expected, autoPtrMpp->GetType()); \
 \
-	BOOST_TEST_MESSAGE(typeid(*mpp.get())); \
-	BOOST_REQUIRE_EQUAL(typeid(*mpp.get()), typeid(*autoMpp.get())); \
-	BOOST_REQUIRE_EQUAL(typeid(*mpp.get()), typeid(*autoPtrMpp.get()));
+	auto mppvalue = mpp.get(); \
+	auto amppvalue = mpp.get(); \
+	auto apmppvalue = mpp.get(); \
+	BOOST_TEST_CHECKPOINT(typeid(*mppvalue).name()); \
+	BOOST_REQUIRE_EQUAL(typeid(*mppvalue), typeid(*amppvalue)); \
+	BOOST_REQUIRE_EQUAL(typeid(*mppvalue), typeid(*apmppvalue));
 
 #define StackTypeTest(Var, Explicit, Expected) \
 	TypeTest(Var, Var(), Explicit, Expected)

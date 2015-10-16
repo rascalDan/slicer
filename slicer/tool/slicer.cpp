@@ -26,8 +26,10 @@ main(int argc, char ** argv)
 	po::notify(vm);
 
 	if (vm.count("help") || slice.empty() || cpp.empty()) {
+		// LCOV_EXCL_START
 		std::cout << opts << std::endl;
 		return 1;
+		// LCOV_EXCL_STOP
 	}
 	Slicer::Slicer::Args args;
 	for(const auto & include : includes) {
