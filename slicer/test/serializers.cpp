@@ -18,7 +18,9 @@
 
 namespace fs = boost::filesystem;
 
+// LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
+// LCOV_EXCL_STOP
 
 class FileBased : public FileStructure {
 	public:

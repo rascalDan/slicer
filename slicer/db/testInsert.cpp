@@ -9,9 +9,11 @@
 #include <types.h>
 #include "exceptions.h"
 
+// LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::Timespan);
+// LCOV_EXCL_STOP
 
 class StandardMockDatabase : public PQ::Mock {
 	public:
