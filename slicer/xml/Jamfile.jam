@@ -1,13 +1,16 @@
+import testing ;
+
 alias libxmlpp : : : :
 	<cflags>"`pkg-config --cflags libxml++-2.6`"
 	<linkflags>"`pkg-config --libs libxml++-2.6`" ;
 lib boost_system ;
 lib boost_filesystem ;
+lib boost_utf : : <name>boost_unit_test_framework ;
 lib IceUtil ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-xml :
-	[ glob *.cpp ]
+	[ glob *.cpp : test*.cpp ]
 	:
 	<include>..
 	<library>boost_system
@@ -21,3 +24,18 @@ lib slicer-xml :
 	: :
 	<library>libxmlpp
 	;
+
+run testSpecifics.cpp
+	: : :
+	<define>BOOST_TEST_DYN_LINK
+	<library>slicer-xml
+	<library>boost_utf
+	<library>../test//slicer-test
+	<library>../test//common
+	<library>../slicer//slicer
+	<include>..
+	<dependency>../test//compilation
+	:
+	testSpecifics
+	;
+

@@ -115,6 +115,19 @@ checkBuiltIns_valuesCorrect(const TestModule::BuiltInsPtr & bt)
 }
 
 void
+checkBuiltIns3_valuesCorrect(const TestModule::BuiltInsPtr & bt)
+{
+	BOOST_REQUIRE_EQUAL(bt->mbool, false);
+	BOOST_REQUIRE_EQUAL(bt->mbyte, 255);
+	BOOST_REQUIRE_EQUAL(bt->mshort, -40);
+	BOOST_REQUIRE_EQUAL(bt->mint, -80);
+	BOOST_REQUIRE_EQUAL(bt->mlong, -800);
+	BOOST_REQUIRE_EQUAL(bt->mfloat, -3.125);
+	BOOST_REQUIRE_EQUAL(bt->mdouble, -3.0625);
+	BOOST_REQUIRE_EQUAL(bt->mstring, "-Sample text-");
+}
+
+void
 checkInherits_types(const TestModule::InheritanceContPtr & i)
 {
 	BOOST_REQUIRE(i->b);
@@ -357,6 +370,11 @@ BOOST_AUTO_TEST_CASE( conv_datetime_xml )
 BOOST_AUTO_TEST_CASE( builtins2_json )
 {
 	verifyByFile<TestModule::BuiltInsPtr, Slicer::JsonFileDeserializer>("builtins2.json", checkBuiltIns_valuesCorrect);
+}
+
+BOOST_AUTO_TEST_CASE( builtins3_json )
+{
+	verifyByFile<TestModule::BuiltInsPtr, Slicer::JsonFileDeserializer>("builtins3.json", checkBuiltIns3_valuesCorrect);
 }
 
 BOOST_AUTO_TEST_CASE( optionals_areset2_json )

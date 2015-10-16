@@ -6,6 +6,11 @@
 #include <visibility.h>
 
 namespace Slicer {
+	class BadBooleanValue : public std::invalid_argument {
+		public:
+			BadBooleanValue(const Glib::ustring &);
+	};
+
 	class XmlSerializer : public Serializer {
 		protected:
 			typedef boost::function<xmlpp::Element *(xmlpp::Element *, const Glib::ustring &)> ElementCreator;

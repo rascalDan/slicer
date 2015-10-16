@@ -14,13 +14,10 @@ namespace Slicer {
 	const std::string md_bare = "xml:bare";
 	const auto defaultElementCreator = boost::bind(&xmlpp::Element::add_child, _1, _2, Glib::ustring());
 
-	class BadBooleanValue : public std::invalid_argument {
-		public:
-			BadBooleanValue(const Glib::ustring &) :
-				std::invalid_argument("Bad boolean value")
-			{
-			}
-	};
+	BadBooleanValue::BadBooleanValue(const Glib::ustring &) :
+		std::invalid_argument("Bad boolean value")
+	{
+	}
 
 	static const Glib::ustring TrueText("true");
 	static const Glib::ustring FalseText("false");
@@ -80,6 +77,10 @@ namespace Slicer {
 
 	class XmlContentValueSource : public XmlValueSource {
 		public:
+			XmlContentValueSource() :
+				XmlValueSource(Glib::ustring())
+			{
+			}
 			XmlContentValueSource(const xmlpp::ContentNode * c) :
 				XmlValueSource(c->get_content())
 			{
@@ -190,7 +191,13 @@ namespace Slicer {
 						if (!attrs.empty()) {
 							DocumentTreeIterate(attrs.front(), smp);
 						}
-						DocumentTreeIterate(element->get_first_child(), smp);
+						auto firstChild = element->get_first_child();
+						if (firstChild) {
+							DocumentTreeIterate(firstChild, smp);
+						}
+						else {
+							smp->SetValue(new XmlContentValueSource());
+						}
 						smp->Complete();
 					}
 				}
