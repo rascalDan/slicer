@@ -30,7 +30,9 @@ module TestModule {
 		bool mbool;
 		byte mbyte;
 		short mshort;
+		["slicer:db:pkey"]
 		int mint;
+		["slicer:db:pkey"]
 		long mlong;
 		float mfloat;
 		double mdouble;

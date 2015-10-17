@@ -68,3 +68,22 @@ run testInsert.cpp
 	testInsert
 	;
 
+run testUpdate.cpp
+	: : :
+	<define>ROOT=\"$(me)\"
+	<define>BOOST_TEST_DYN_LINK
+	<library>slicer-db
+	<library>dbpp-postgresql
+	<library>boost_system
+	<library>boost_filesystem
+	<library>boost_utf
+	<library>../test//slicer-test
+	<library>../test//common
+	<library>../slicer//slicer
+	<include>..
+	<dependency>slicer.sql
+	<dependency>../test//compilation
+	:
+	testUpdate
+	;
+
