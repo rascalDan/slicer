@@ -30,11 +30,7 @@ namespace Slicer {
 	SqlInsertSerializer::SerializeObject(Slicer::ModelPartPtr mp) const
 	{
 		auto ins = createInsert(mp);
-		int paramNo = 0;
-		mp->OnEachChild([&ins, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr) {
-				cmp->GetValue(new SqlBinder(*ins, paramNo++));
-			});
-		ins->execute();
+		bindObjectAndExecute(mp, ins.get());
 	}
 
 	void
@@ -45,12 +41,18 @@ namespace Slicer {
 				if (!ins) {
 					ins = createInsert(cmp);
 				}
-				int paramNo = 0;
-				cmp->OnEachChild([&ins, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr) {
-						cmp->GetValue(new SqlBinder(*ins, paramNo++));
-					});
-				ins->execute();
+				bindObjectAndExecute(cmp, ins.get());
 			});
+	}
+
+	void
+	SqlInsertSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * ins)
+	{
+		int paramNo = 0;
+		cmp->OnEachChild([&ins, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr) {
+				cmp->GetValue(new SqlBinder(*ins, paramNo++));
+			});
+		ins->execute();
 	}
 
 	SqlInsertSerializer::ModifyPtr

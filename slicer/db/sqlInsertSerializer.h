@@ -18,6 +18,7 @@ namespace Slicer {
 			void SerializeObject(Slicer::ModelPartPtr) const;
 			void SerializeSequence(Slicer::ModelPartPtr) const;
 			ModifyPtr createInsert(Slicer::ModelPartPtr) const;
+			static void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *);
 
 			DB::Connection * connection;
 			const std::string tableName;
