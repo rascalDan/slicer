@@ -15,7 +15,7 @@ CREATE TABLE builtins(
 		mbool boolean,
 		mbyte smallint,
 		mshort smallint,
-		mint int,
+		mint serial,
 		mlong bigint,
 		mfloat numeric(5, 2),
 		mdouble numeric(8, 5),

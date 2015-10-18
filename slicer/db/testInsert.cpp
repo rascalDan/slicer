@@ -66,6 +66,54 @@ BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
 }
 
+BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	TestModule::BuiltInSeq bis = {
+		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
+		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
+	};
+	Slicer::SerializeAny<Slicer::SqlAutoIdInsertSerializer>(bis, db.get(), "builtins");
+	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (1, 2) ORDER BY mint"));
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(*sel);
+	BOOST_REQUIRE_EQUAL(2, bis2.size());
+	BOOST_REQUIRE_EQUAL(bis.front()->mint, 0);
+	BOOST_REQUIRE_EQUAL(bis.back()->mint, 0);
+	BOOST_REQUIRE_EQUAL(bis2.front()->mint, 1);
+	BOOST_REQUIRE_EQUAL(bis2.back()->mint, 2);
+	BOOST_REQUIRE_EQUAL(bis.back()->mbool, bis2.back()->mbool);
+	BOOST_REQUIRE_EQUAL(bis.back()->mbyte, bis2.back()->mbyte);
+	BOOST_REQUIRE_EQUAL(bis.back()->mshort, bis2.back()->mshort);
+	BOOST_REQUIRE_EQUAL(bis.back()->mlong, bis2.back()->mlong);
+	BOOST_REQUIRE_EQUAL(bis.back()->mfloat, bis2.back()->mfloat);
+	BOOST_REQUIRE_EQUAL(bis.back()->mdouble, bis2.back()->mdouble);
+	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
+}
+
+BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	TestModule::BuiltInSeq bis = {
+		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
+		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
+	};
+	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db.get(), "builtins");
+	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (3, 4) ORDER BY mint"));
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(*sel);
+	BOOST_REQUIRE_EQUAL(2, bis2.size());
+	BOOST_REQUIRE_EQUAL(bis.front()->mint, 3);
+	BOOST_REQUIRE_EQUAL(bis.back()->mint, 4);
+	BOOST_REQUIRE_EQUAL(bis2.front()->mint, 3);
+	BOOST_REQUIRE_EQUAL(bis2.back()->mint, 4);
+	BOOST_REQUIRE_EQUAL(bis.back()->mbool, bis2.back()->mbool);
+	BOOST_REQUIRE_EQUAL(bis.back()->mbyte, bis2.back()->mbyte);
+	BOOST_REQUIRE_EQUAL(bis.back()->mshort, bis2.back()->mshort);
+	BOOST_REQUIRE_EQUAL(bis.back()->mlong, bis2.back()->mlong);
+	BOOST_REQUIRE_EQUAL(bis.back()->mfloat, bis2.back()->mfloat);
+	BOOST_REQUIRE_EQUAL(bis.back()->mdouble, bis2.back()->mdouble);
+	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
+}
+
 BOOST_AUTO_TEST_CASE( insert_converted )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
