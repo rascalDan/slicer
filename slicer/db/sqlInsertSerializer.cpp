@@ -9,7 +9,7 @@
 namespace Slicer {
 	const std::string md_auto = "db:auto";
 
-	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * c, const std::string & t) :
+	SqlInsertSerializer::SqlInsertSerializer(const DB::Connection * c, const std::string & t) :
 		connection(c),
 		tableName(t)
 	{
@@ -59,7 +59,7 @@ namespace Slicer {
 
 	class IdSave : public Slicer::ValueSource {
 		public:
-			IdSave(DB::Connection * c) :
+			IdSave(const DB::Connection * c) :
 				connection(c)
 			{
 			}
@@ -81,7 +81,7 @@ namespace Slicer {
 			NumType(Ice::Double);
 
 		private:
-			DB::Connection * connection;
+			const DB::Connection * connection;
 	};
 
 	void
