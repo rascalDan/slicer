@@ -1,10 +1,5 @@
 import testing ;
 
-alias glibmm : : : :
-	<cflags>"`pkg-config --cflags glibmm-2.4`"
-	<linkflags>"`pkg-config --libs glibmm-2.4`"
-	;
-
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
@@ -19,7 +14,7 @@ lib slicer-db :
 	<include>..
 	<library>IceUtil
 	<library>dbppcore
-	<library>glibmm
+	<library>../..//glibmm
 	<library>adhocutil
 	<library>../slicer//slicer
 	<cflags>-fvisibility=hidden
