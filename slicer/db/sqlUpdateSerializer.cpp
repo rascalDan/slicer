@@ -10,7 +10,7 @@ namespace Slicer {
 
 	const std::string md_pkey = "db:pkey";
 
-	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * c, const std::string & t) :
+	SqlUpdateSerializer::SqlUpdateSerializer(const DB::Connection * c, const std::string & t) :
 		connection(c),
 		tableName(t)
 	{
