@@ -44,7 +44,7 @@ namespace Slicer {
 	{
 		int64_t cb;
 		column >> cb;
-		b = boost::numeric_cast<Ice::Byte>(cb);
+		b = boost::numeric_cast<Ice::Short>(cb);
 	}
 
 	void
