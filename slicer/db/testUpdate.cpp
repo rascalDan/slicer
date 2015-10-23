@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE db_insert
+#define BOOST_TEST_MODULE db_update
 #include <boost/test/unit_test.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <mock.h>
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 	BOOST_REQUIRE_EQUAL(ubis.back()->mstring, ubis2.front()->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( insert_unsupportedModel )
+BOOST_AUTO_TEST_CASE( update_unsupportedModel )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	TestModule::ClassMap cm;
