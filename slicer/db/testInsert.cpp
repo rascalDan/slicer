@@ -114,6 +114,30 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
 }
 
+BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	DB::BuiltInSeq bis = {
+		DB::BuiltInsPtr(new DB::BuiltIns(true, IceUtil::Optional<Ice::Byte>(), 17, 0, 129, 2.3, 4.5, "more text")),
+		DB::BuiltInsPtr(new DB::BuiltIns(true, 6, 18, 0, 130, 3.4, IceUtil::Optional<Ice::Double>(), "even more text"))
+	};
+	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db.get(), "builtins");
+	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (5, 6) ORDER BY mint"));
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
+	BOOST_REQUIRE_EQUAL(2, bis2.size());
+	BOOST_REQUIRE_EQUAL(bis.front()->mint, 5);
+	BOOST_REQUIRE_EQUAL(bis.back()->mint, 6);
+	BOOST_REQUIRE_EQUAL(bis2.front()->mint, 5);
+	BOOST_REQUIRE_EQUAL(bis2.back()->mint, 6);
+	BOOST_REQUIRE_EQUAL(bis.back()->mbool, bis2.back()->mbool);
+	BOOST_REQUIRE_EQUAL(bis.back()->mbyte, bis2.back()->mbyte);
+	BOOST_REQUIRE_EQUAL(bis.back()->mshort, bis2.back()->mshort);
+	BOOST_REQUIRE_EQUAL(bis.back()->mlong, bis2.back()->mlong);
+	BOOST_REQUIRE_EQUAL(bis.back()->mfloat, bis2.back()->mfloat);
+	BOOST_REQUIRE_EQUAL(bis.back()->mdouble, bis2.back()->mdouble);
+	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
+}
+
 BOOST_AUTO_TEST_CASE( insert_converted )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
