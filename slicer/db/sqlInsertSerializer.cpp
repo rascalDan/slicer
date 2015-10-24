@@ -98,14 +98,19 @@ namespace Slicer {
 	void
 	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr) const
 	{
-		cmp->GetValue(new SqlBinder(*ins, paramNo++));
+		if (cmp) {
+			cmp->GetValue(new SqlBinder(*ins, paramNo++));
+		}
+		else {
+			ins->bindNull(paramNo++);
+		}
 	}
 
 	void
 	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
 	{
 		if (metaDataFlagNotSet(h->GetMetadata(), md_auto)) {
-			cmp->GetValue(new SqlBinder(*ins, paramNo++));
+			SqlInsertSerializer::bindObjectAndExecuteField(paramNo, ins, cmp, h);
 		}
 	}
 

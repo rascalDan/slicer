@@ -65,12 +65,6 @@ BOOST_AUTO_TEST_CASE( update_builtins )
 BOOST_AUTO_TEST_CASE( update_builtins_seq )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	TestModule::BuiltInSeq bis {
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 4, 16, 64, 128, 1.2, 3.4, "text1")),
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 3, 15, 63, 127, 5.2, 5.4, "text2")),
-	};
-	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bis, db.get(), "builtins");
-
 	TestModule::BuiltInSeq ubis {
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(false, 5, 17, 64, 128, -1.2, -1.4, "string")),
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(false, 5, 21, 63, 127, -4.2, -5.4, "string updated"))
@@ -79,7 +73,7 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins ORDER BY mint"));
 	auto ubis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(*sel);
-	BOOST_REQUIRE_EQUAL(2, bis.size());
+	BOOST_REQUIRE_EQUAL(2, ubis2.size());
 	BOOST_REQUIRE_EQUAL(ubis.front()->mbool, ubis2.back()->mbool);
 	BOOST_REQUIRE_EQUAL(ubis.front()->mbyte, ubis2.back()->mbyte);
 	BOOST_REQUIRE_EQUAL(ubis.front()->mshort, ubis2.back()->mshort);
@@ -96,6 +90,31 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 	BOOST_REQUIRE_EQUAL(ubis.back()->mfloat, ubis2.front()->mfloat);
 	BOOST_REQUIRE_EQUAL(ubis.back()->mdouble, ubis2.front()->mdouble);
 	BOOST_REQUIRE_EQUAL(ubis.back()->mstring, ubis2.front()->mstring);
+}
+
+BOOST_AUTO_TEST_CASE( update_withNulls )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins ORDER BY mint"));
+	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
+	BOOST_REQUIRE_EQUAL(2, bis.size());
+	BOOST_REQUIRE_EQUAL("string updated", *bis[0]->mstring);
+	BOOST_REQUIRE_EQUAL("string", *bis[1]->mstring);
+	bis[0]->mstring = "not null";
+	bis[1]->mstring = IceUtil::Optional<std::string>();
+	bis[0]->mfloat = IceUtil::Optional<Ice::Float>();
+	bis[1]->mbyte = IceUtil::Optional<Ice::Byte>();
+	bis[0]->mshort = IceUtil::Optional<Ice::Short>();
+	bis[1]->mdouble = IceUtil::Optional<Ice::Double>();
+	BOOST_CHECKPOINT("Do update");
+	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db.get(), "builtins");
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
+	BOOST_REQUIRE(bis2[0]->mstring);
+	BOOST_REQUIRE(!bis2[1]->mstring);
+	BOOST_REQUIRE(bis2[0]->mbyte);
+	BOOST_REQUIRE(!bis2[1]->mbyte);
+	BOOST_REQUIRE(!bis2[0]->mfloat);
+	BOOST_REQUIRE(bis2[1]->mfloat);
 }
 
 BOOST_AUTO_TEST_CASE( update_unsupportedModel )
