@@ -119,5 +119,14 @@ namespace Slicer {
 	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Short>::rootName = "Short";
 	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Int>::rootName = "Int";
 	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Long>::rootName = "Long";
+
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<std::string>>::rootName = "OptionalString";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<bool>>::rootName = "OptionalBoolean";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Float>>::rootName = "OptionalFloat";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Double>>::rootName = "OptionalDouble";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Byte>>::rootName = "OptionalByte";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>::rootName = "OptionalShort";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
+	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
 }
 

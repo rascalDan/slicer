@@ -3,6 +3,8 @@
 namespace Slicer {
 	const Metadata emptyMetadata;
 #define MODELPARTFOR(Type, ModelPart) \
+	ModelPartPtr ModelPartFor(IceUtil::Optional<Type> & t) { return new ModelPartForOptional< ModelPart<Type> >(t); } \
+	ModelPartPtr ModelPartFor(IceUtil::Optional<Type> * t) { return new ModelPartForOptional< ModelPart<Type> >(t); } \
 	ModelPartPtr ModelPartFor(Type & t) { return new ModelPart< Type >(t); } \
 	ModelPartPtr ModelPartFor(Type * t) { return new ModelPart< Type >(t); }
 	MODELPARTFOR(std::string, ModelPartForSimple);

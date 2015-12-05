@@ -122,9 +122,13 @@ namespace Slicer {
 	};
 
 #define templateMODELPARTFOR(Type) \
+	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> & t); \
+	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> * t); \
 	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t); \
 	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t);
 #define MODELPARTFOR(Type) \
+	ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> & t); \
+	ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> * t); \
 	ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t); \
 	ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t);
 	templateMODELPARTFOR(IceInternal::Handle<T>);
