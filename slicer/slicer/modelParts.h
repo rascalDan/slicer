@@ -209,13 +209,13 @@ namespace Slicer {
 				Member(*h)
 			{
 			}
-			virtual void OnEachChild(const ChildHandler &) { }
+			virtual void OnEachChild(const ChildHandler &) override { }
 			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
 			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
 			virtual bool HasValue() const override { return true; }
-			virtual ModelPartType GetType() const { return mpt_Simple; }
+			virtual ModelPartType GetType() const override { return mpt_Simple; }
 
 		private:
 			T & Member;
