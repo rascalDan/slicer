@@ -91,6 +91,8 @@ namespace Slicer {
 		fprintbf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string());
 		fprintbf(cpp, "#include <slicer/modelParts.h>\n\n");
 		fprintbf(cpp, "#define templateMODELPARTFOR(Type, ModelPart) \\\n");
+		fprintbf(cpp, "template <> ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> & t) { return new ModelPartForOptional< ModelPart< Type > >(t); } \\\n");
+		fprintbf(cpp, "template <> ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> * t) { return new ModelPartForOptional< ModelPart< Type > >(t); } \\\n");
 		fprintbf(cpp, "template <> ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t) { return new ModelPart< Type >(t); } \\\n");
 		fprintbf(cpp, "template <> ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t) { return new ModelPart< Type >(t); }\n\n");
 		fprintbf(cpp, "namespace Slicer {\n");
@@ -131,6 +133,9 @@ namespace Slicer {
 	{
 		fprintbf(cpp, "template<>\n");
 		fprintbf(cpp, "DLL_PUBLIC std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
+				type, name);
+		fprintbf(cpp, "template<>\n");
+		fprintbf(cpp, "DLL_PUBLIC std::string ModelPartForRoot< IceUtil::Optional< %s > >::rootName(\"Optional%s\");\n\n",
 				type, name);
 	}
 
