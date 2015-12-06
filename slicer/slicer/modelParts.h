@@ -195,6 +195,7 @@ namespace Slicer {
 			virtual void GetValue(ValueTargetPtr);
 			virtual bool HasValue() const = 0;
 			virtual const Metadata & GetMetadata() const;
+			virtual bool IsOptional() const;
 
 			static const std::string & ToExchangeTypeName(const std::string &);
 			static const std::string & ToModelTypeName(const std::string &);
@@ -326,12 +327,15 @@ namespace Slicer {
 				modelPart->GetValue(s);
 			}
 
-			virtual bool HasValue() const override { return OptionalMember; }
+			virtual bool HasValue() const override { return OptionalMember && modelPart->HasValue(); }
 
 			virtual ModelPartType GetType() const
 			{
 				return T::type;
 			}
+
+			virtual bool IsOptional() const override { return true; };
+
 			virtual const Metadata & GetMetadata() const override { return modelPart->GetMetadata(); }
 
 		private:
@@ -544,12 +548,14 @@ namespace Slicer {
 				return *ModelObject;
 			}
 
-			virtual bool HasValue() const override { return ModelObject; }
+			virtual bool HasValue() const override { return ModelObject && mp->HasValue(); }
 
 			virtual ModelPartType GetType() const override
 			{
 				return mp->GetType();
 			}
+
+			virtual bool IsOptional() const override { return mp->IsOptional(); }
 
 		private:
 			T * ModelObject;

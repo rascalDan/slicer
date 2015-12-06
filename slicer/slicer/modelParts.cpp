@@ -111,6 +111,12 @@ namespace Slicer {
 		return ref ? ref->Child() : ModelPartPtr(NULL);
 	}
 
+	bool
+	ModelPart::IsOptional() const
+	{
+		return false;
+	}
+
 	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
 	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
 	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
