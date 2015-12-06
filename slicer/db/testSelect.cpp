@@ -161,35 +161,35 @@ BOOST_AUTO_TEST_CASE( select_unsupportedModel )
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::ClassMap>(*sel), Slicer::UnsupportedModelType);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_tooManyRowsSimple )
+BOOST_AUTO_TEST_CASE( select_tooManyRowsSimple )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test"));
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(*sel), Slicer::TooManyRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_noRowsSimple )
+BOOST_AUTO_TEST_CASE( select_noRowsSimple )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test WHERE false"));
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(*sel), Slicer::NoRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_tooManyRowsComplex )
+BOOST_AUTO_TEST_CASE( select_tooManyRowsComplex )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test"));
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::BuiltInsPtr>(*sel), Slicer::TooManyRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_noRowsComplex )
+BOOST_AUTO_TEST_CASE( select_noRowsComplex )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test WHERE false"));
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::BuiltInsPtr>(*sel), Slicer::NoRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_emptySequence )
+BOOST_AUTO_TEST_CASE( select_emptySequence )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test WHERE false"));
