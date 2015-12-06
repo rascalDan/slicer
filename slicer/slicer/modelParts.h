@@ -200,8 +200,18 @@ namespace Slicer {
 			static const std::string & ToModelTypeName(const std::string &);
 	};
 
+	class DLL_PUBLIC ModelPartForSimpleBase : public ModelPart {
+		public:
+			virtual void OnEachChild(const ChildHandler &) override;
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			virtual bool HasValue() const override;
+			virtual ModelPartType GetType() const override;
+			static ModelPartType type;
+	};
+
 	template<typename T>
-	class DLL_PUBLIC ModelPartForSimple : public ModelPart {
+	class DLL_PUBLIC ModelPartForSimple : public ModelPartForSimpleBase {
 		public:
 			typedef T element_type;
 
@@ -213,20 +223,25 @@ namespace Slicer {
 				Member(*h)
 			{
 			}
-			virtual void OnEachChild(const ChildHandler &) override { }
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
-			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
 			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
-			virtual bool HasValue() const override { return true; }
-			virtual ModelPartType GetType() const override { return mpt_Simple; }
 
 		private:
 			T & Member;
 	};
 
+	class DLL_PUBLIC ModelPartForConvertedBase : public ModelPart {
+		public:
+			virtual void OnEachChild(const ChildHandler &) override;
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			virtual bool HasValue() const override;
+			virtual ModelPartType GetType() const override;
+			static ModelPartType type;
+	};
+
 	template<typename T, typename M, T M::* MV>
-	class DLL_PUBLIC ModelPartForConverted : public ModelPart {
+	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase {
 		public:
 			typedef T element_type;
 
@@ -238,13 +253,8 @@ namespace Slicer {
 				Member(*h)
 			{
 			}
-			virtual void OnEachChild(const ChildHandler &) { }
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
-			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
-			virtual bool HasValue() const override { return true; }
-			virtual ModelPartType GetType() const { return mpt_Simple; }
 
 		private:
 			T & Member;
@@ -320,10 +330,7 @@ namespace Slicer {
 
 			virtual ModelPartType GetType() const
 			{
-				if (HasValue()) {
-					return modelPart->GetType();
-				}
-				return mpt_Null;
+				return T::type;
 			}
 			virtual const Metadata & GetMetadata() const override { return modelPart->GetMetadata(); }
 
@@ -332,8 +339,14 @@ namespace Slicer {
 			ModelPartPtr modelPart;
 	};
 
+	class DLL_PUBLIC ModelPartForComplexBase : public ModelPart {
+		public:
+			virtual ModelPartType GetType() const override;
+			static ModelPartType type;
+	};
+
 	template<typename T>
-	class DLL_PUBLIC ModelPartForComplex : public ModelPart {
+	class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
 		public:
 			class HookBase : public HookCommon {
 				public:
@@ -400,8 +413,6 @@ namespace Slicer {
 				return NULL;
 			}
 
-			virtual ModelPartType GetType() const { return mpt_Complex; }
-
 			virtual const Metadata & GetMetadata() const override { return metadata; }
 
 			virtual T * GetModel() = 0;
@@ -412,7 +423,7 @@ namespace Slicer {
 			static Hooks hooks;
 			static Metadata metadata;
 	};
-	
+
 	template<typename T>
 	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
 		public:
@@ -547,8 +558,18 @@ namespace Slicer {
 			DLL_PUBLIC static std::string rootName;
 	};
 
+	class DLL_PUBLIC ModelPartForEnumBase : public ModelPart {
+		public:
+			virtual void OnEachChild(const ChildHandler &) override;
+			ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			virtual bool HasValue() const override;
+			virtual ModelPartType GetType() const override;
+			static ModelPartType type;
+	};
+
 	template<typename T>
-	class DLL_PUBLIC ModelPartForEnum : public ModelPart {
+	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase {
 		public:
 			typedef T element_type;
 			typedef boost::bimap<T, std::string> Enumerations;
@@ -563,16 +584,6 @@ namespace Slicer {
 			{
 			}
 
-			virtual void OnEachChild(const ChildHandler &) override { }
-
-			ChildRefPtr GetAnonChildRef(const HookFilter &) override { return NULL; }
-
-			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override { return NULL; }
-
-			virtual bool HasValue() const override { return true; }
-
-			virtual ModelPartType GetType() const { return mpt_Simple; }
-
 			virtual const Metadata & GetMetadata() const override { return metadata; }
 
 			virtual void SetValue(ValueSourcePtr s) override;
@@ -585,8 +596,15 @@ namespace Slicer {
 			static Enumerations enumerations;
 	};
 
+	class DLL_PUBLIC ModelPartForSequenceBase : public ModelPart {
+		public:
+			virtual bool HasValue() const override;
+			virtual ModelPartType GetType() const override;
+			static ModelPartType type;
+	};
+
 	template<typename T>
-	class DLL_PUBLIC ModelPartForSequence : public ModelPart {
+	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase {
 		public:
 			typedef T element_type;
 
@@ -614,10 +632,6 @@ namespace Slicer {
 			}
 
 			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
-
-			virtual bool HasValue() const override { return true; }
-
-			virtual ModelPartType GetType() const { return mpt_Sequence; }
 
 			virtual const Metadata & GetMetadata() const override { return metadata; }
 
@@ -667,8 +681,15 @@ namespace Slicer {
 			T & dictionary;
 	};
 
+	class DLL_PUBLIC ModelPartForDictionaryBase : public ModelPart {
+		public:
+			virtual bool HasValue() const override;
+			virtual ModelPartType GetType() const override;
+			static ModelPartType type;
+	};
+
 	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionary : public ModelPart {
+	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase {
 		public:
 			typedef T element_type;
 
@@ -701,10 +722,6 @@ namespace Slicer {
 				}
 				return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
 			}
-
-			virtual bool HasValue() const override { return true; }
-
-			virtual ModelPartType GetType() const { return mpt_Dictionary; }
 
 			virtual const Metadata & GetMetadata() const override { return metadata; }
 
