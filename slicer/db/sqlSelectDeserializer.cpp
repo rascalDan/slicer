@@ -40,12 +40,15 @@ namespace Slicer {
 	void
 	SqlSelectDeserializer::DeserializeSimple(Slicer::ModelPartPtr mp)
 	{
-		auto fmp = mp->GetAnonChild();
 		if (!cmd.fetch()) {
-			throw NoRowsReturned();
+			if (!mp->IsOptional()) {
+				throw NoRowsReturned();
+			}
+			return;
 		}
 		SqlSourcePtr h = new SqlSource(cmd[0]);
 		if (!h->isNull()) {
+			auto fmp = mp->GetAnonChild();
 			fmp->Create();
 			fmp->SetValue(h);
 			fmp->Complete();
@@ -68,7 +71,10 @@ namespace Slicer {
 	SqlSelectDeserializer::DeserializeObject(Slicer::ModelPartPtr mp)
 	{
 		if (!cmd.fetch()) {
-			throw NoRowsReturned();
+			if (!mp->IsOptional()) {
+				throw NoRowsReturned();
+			}
+			return;
 		}
 		DeserializeRow(mp);
 		if (cmd.fetch()) {

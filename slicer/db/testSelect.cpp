@@ -175,6 +175,44 @@ BOOST_AUTO_TEST_CASE( select_noRowsSimple )
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(*sel), Slicer::NoRowsReturned);
 }
 
+BOOST_AUTO_TEST_CASE( select_noRowsSimpleOptional )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test WHERE false"));
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(*sel);
+	BOOST_REQUIRE(!v);
+}
+
+BOOST_AUTO_TEST_CASE( select_tooManyRowsSimpleOptional )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand("SELECT id FROM test"));
+	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<IceUtil::Optional<Ice::Int>>(*sel), Slicer::TooManyRowsReturned);
+}
+
+BOOST_AUTO_TEST_CASE( select_simpleOptional )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand("SELECT MAX(id) FROM test"));
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(*sel);
+	BOOST_REQUIRE(v);
+	BOOST_REQUIRE_EQUAL(4, *v);
+}
+
+BOOST_AUTO_TEST_CASE( select_noRowsComplexOptional )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand(
+				"SELECT boolean mbool, \
+				id mbyte, id mshort, id mint, id mlong, \
+				fl mdouble, fl mfloat, \
+				string mstring \
+				FROM test \
+				WHERE false"));
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<TestModule::BuiltInsPtr>>(*sel);
+	BOOST_REQUIRE(!v);
+}
+
 BOOST_AUTO_TEST_CASE( select_tooManyRowsComplex )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
@@ -210,5 +248,9 @@ BOOST_AUTO_TEST_CASE( select_null )
 	oi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::OptionalsPtr>(*sel);
 	BOOST_REQUIRE(oi->optSimple);
 	BOOST_REQUIRE_EQUAL(oi->optSimple.get(), 4);
+
+	sel = SelectPtr(db->newSelectCommand("SELECT MAX(id) FROM test WHERE false"));
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(*sel);
+	BOOST_REQUIRE(!v);
 }
 
