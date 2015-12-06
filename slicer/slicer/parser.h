@@ -20,15 +20,16 @@ namespace Slicer {
 			typedef std::vector<ConversionSpec> Conversions;
 			typedef std::vector<std::string> Args;
 
-#pragma GCC visibility push(default)
 			Slicer(FILE * c);
 
 			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
 			static unsigned int Apply(const boost::filesystem::path & ice, FILE *);
 			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args &);
 			static unsigned int Apply(const boost::filesystem::path & ice, FILE *, const Args &);
-#pragma GCC visibility pop
 
+			unsigned int Components() const;
+
+#pragma GCC visibility push(hidden)
 			virtual bool visitUnitStart(const Slice::UnitPtr&) override;
 
 			virtual void visitUnitEnd(const Slice::UnitPtr&) override;
@@ -47,8 +48,6 @@ namespace Slicer {
 
 			virtual void visitModuleEnd(const Slice::ModulePtr & m) override;
 
-			unsigned int Components() const;
-
 		private:
 			void createNewModelPartPtrFor(const Slice::TypePtr & type) const;
 
@@ -60,6 +59,7 @@ namespace Slicer {
 			void copyMetadata(const std::list<std::string> & metadata) const;
 			static Conversions getAllConversions(Slice::DataMemberPtr dm);
 			static Conversions getConversions(const std::list<std::string> & metadata);
+#pragma GCC visibility pop
 
 			unsigned int components;
 			FILE * cpp;
