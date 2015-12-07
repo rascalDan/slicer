@@ -96,12 +96,12 @@ namespace Slicer {
 			rmp->Create();
 			for (auto col = 0u; col < columnCount; col += 1) {
 				const DB::Column & c = cmd[col];
-				SqlSourcePtr h = new SqlSource(c);
-				if (!h->isNull()) {
+				if (!c.isNull()) {
 					auto fmpr = rmp->GetAnonChildRef([&c](Slicer::HookCommonPtr h) {
 							return boost::iequals(c.name.raw(), h->PartName());
 						});
 					if (fmpr) {
+						SqlSourcePtr h = new SqlSource(c);
 						auto fmp = fmpr->Child();
 						fmp->Create();
 						fmp->SetValue(h);
