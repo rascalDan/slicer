@@ -1,4 +1,5 @@
 [["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
+[["cpp:include:conversions.h"]]
 
 #include <included.ice>
 
@@ -22,7 +23,7 @@ module TestModule {
 	};
 	class DateTimeContainer {
 		[	"slicer:conversion:boost.posix_time.ptime:ptimeToDateTime:dateTimeToPTime",
-			"slicer:conversion:std.string:stringToDateTime:dateTimeToString" ]
+			"slicer:conversion:std.string:stringToDateTime:dateTimeToString:nodeclare" ]
 		DateTime dt;
 		IsoDate date;
 	};
@@ -126,7 +127,7 @@ module TestModule2 {
 	class CrossModule extends TestModule::ClassType {
 		int anything;
 		[	"slicer:conversion:boost.posix_time.ptime:ptimeToDateTime:dateTimeToPTime",
-			"slicer:conversion:std.string:stringToDateTime:dateTimeToString" ]
+			"slicer:conversion:std.string:stringToDateTime:dateTimeToString:nodeclare" ]
 		TestModule::DateTime dt;
 		TestModule::Base base;
 	};

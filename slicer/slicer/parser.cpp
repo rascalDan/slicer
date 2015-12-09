@@ -34,14 +34,20 @@ namespace Slicer {
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 		auto conversions = getAllConversions(dm);
 		for (const auto & conversion : conversions) {
-			fprintbf(cpp, "%s %s(const %s &);\n",
-					conversion.ExchangeType,
-					conversion.ConvertToExchangeFunc,
-					Slice::typeToString(type));
-			fprintbf(cpp, "%s %s(const %s &);\n\n",
-					Slice::typeToString(type),
-					conversion.ConvertToModelFunc,
-					conversion.ExchangeType);
+			if (!AdHoc::containerContains(conversion.Options, "nodeclare")) {
+				if (!AdHoc::containerContains(conversion.Options, "nodeclareto")) {
+					fprintbf(cpp, "%s %s(const %s &);\n",
+							conversion.ExchangeType,
+							conversion.ConvertToExchangeFunc,
+							Slice::typeToString(type));
+				}
+				if (!AdHoc::containerContains(conversion.Options, "nodeclarefrom")) {
+					fprintbf(cpp, "%s %s(const %s &);\n\n",
+							Slice::typeToString(type),
+							conversion.ConvertToModelFunc,
+							conversion.ExchangeType);
+				}
+			}
 		}
 		if (!conversions.empty()) {
 			fprintbf(cpp, "template<>\nvoid\n");

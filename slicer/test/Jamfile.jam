@@ -13,6 +13,7 @@ lib adhocutil : : : : <include>/usr/include/adhocutil ;
 lib types :
 	types.ice
 	:
+	<include>.
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
@@ -20,6 +21,7 @@ lib types :
 	<library>included//included
 	<implicit-dependency>included//included
 	: :
+	<include>.
 	<library>pthread
 	<library>Ice
 	<library>IceUtil

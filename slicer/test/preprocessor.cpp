@@ -61,8 +61,9 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 
 	const fs::path obj = fs::change_extension(tmp / base, ".o");
 	const std::string compile = stringbf(
-					"g++ -Os -fPIC -c -std=c++0x -fvisibility=hidden -I tmp -I /usr/include/adhocutil -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s -I %s %s -o %s",
+					"g++ -Os -fPIC -c -std=c++0x -fvisibility=hidden -I tmp -I /usr/include/adhocutil -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s -I %s -I %s %s -o %s",
 					root / bjamout,
+					root,
 					included / bjamout,
 					root / "..",
 					cpp, obj);
