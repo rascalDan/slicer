@@ -5,11 +5,13 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <Slice/CPlusPlusUtil.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <mutex>
 #include <fprintbf.h>
+#include <safeMapFind.h>
 
 namespace fs = boost::filesystem;
 
@@ -527,13 +529,13 @@ namespace Slicer {
 		auto conversions = metaDataValues("slicer:conversion:", dm);
 		for (const auto & conversion : conversions) {
 			auto split = metaDataSplit(conversion);
-			if (split.size() != 3) {
-				throw std::runtime_error("conversion needs 3 parts type:toModelFunc:toExchangeFunc");
+			if (split.size() < 3) {
+				throw std::runtime_error("conversion needs at least 3 parts type:toModelFunc:toExchangeFunc[:options]");
 			}
-			for (auto & p : split) {
-				boost::algorithm::replace_all(p, ".", "::");
+			for (auto & pi : {0, 1, 2}) {
+				boost::algorithm::replace_all(split[pi], ".", "::");
 			}
-			rtn.push_back(ConversionSpec({split[0], split[1], split[2]}));
+			rtn.push_back(split);
 		}
 		return rtn;
 	}
@@ -596,6 +598,16 @@ namespace Slicer {
 		u->destroy();
 
 		return s.Components();
+	}
+
+	Slicer::ConversionSpec::ConversionSpec(const Slicer::Args & s) :
+		ExchangeType(s[0]),
+		ConvertToModelFunc(s[1]),
+		ConvertToExchangeFunc(s[2])
+	{
+		if (s.size() >= 4) {
+			boost::algorithm::split(Options, s[3], boost::algorithm::is_any_of(","), boost::algorithm::token_compress_off);
+		}
 	}
 };
 

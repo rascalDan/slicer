@@ -11,14 +11,17 @@ namespace Slicer {
 
 	class DLL_PUBLIC Slicer : public Slice::ParserVisitor {
 		public:
+			typedef std::vector<std::string> Args;
 			class ConversionSpec {
 				public:
+					ConversionSpec(const Args &);
+
 					std::string ExchangeType;
 					std::string ConvertToModelFunc;
 					std::string ConvertToExchangeFunc;
+					Args Options;
 			};
 			typedef std::vector<ConversionSpec> Conversions;
-			typedef std::vector<std::string> Args;
 
 			Slicer(FILE * c);
 
