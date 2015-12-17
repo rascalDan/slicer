@@ -1,16 +1,13 @@
 #include "fileStructure.h"
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem/convenience.hpp>
-
-#define XSTR(s) STR(s)
-#define STR(s) #s
-const boost::filesystem::path root(XSTR(ROOT));
+#include <definedDirs.h>
 
 FileStructure::FileStructure() :
-	me(boost::filesystem::canonical("/proc/self/exe")),
+	me(selfExe),
 	base("types"),
-	bjamout("bin" / me.parent_path().parent_path().leaf() / me.parent_path().leaf()),
-	root(::root),
+	bjamout("bin" / buildVariant),
+	root(rootDir),
 	included(root / "included"),
 	slice(fs::change_extension(root / base, ".ice")),
 	tmp(root / "bin" / "slicer")

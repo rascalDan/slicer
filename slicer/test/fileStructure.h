@@ -11,10 +11,10 @@ class FileStructure {
 		~FileStructure();
 
 	protected:
-		const fs::path me;
+		const fs::path & me;
 		const fs::path base;
 		const fs::path bjamout;
-		const fs::path root;
+		const fs::path & root;
 		const fs::path included;
 		const fs::path slice;
 		const fs::path tmp;
