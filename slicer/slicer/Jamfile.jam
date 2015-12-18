@@ -14,7 +14,6 @@ lib slicer :
 	<library>adhocutil
 	<include>..
 	<cflags>-fvisibility=hidden
-	<variant>release:<cflags>-flto
 	: :
 	<include>..
 	<library>boost_system

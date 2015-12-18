@@ -16,7 +16,6 @@ lib slicer-xml :
 	<library>adhocutil
 	<library>../slicer//slicer
 	<cflags>-fvisibility=hidden
-	<variant>release:<cflags>-flto
 	: :
 	<library>../..//libxmlpp
 	;
