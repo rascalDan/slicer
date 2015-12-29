@@ -15,7 +15,7 @@ namespace Slicer {
 		public:
 			typedef boost::shared_ptr<DB::ModifyCommand> ModifyPtr;
 
-			SqlUpdateSerializer(const DB::Connection *, const std::string & tableName);
+			SqlUpdateSerializer(DB::Connection * const, const std::string & tableName);
 
 			virtual void Serialize(Slicer::ModelPartPtr) override;
 
@@ -25,7 +25,7 @@ namespace Slicer {
 			ModifyPtr createUpdate(Slicer::ModelPartPtr) const;
 			static void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *);
 
-			const DB::Connection * connection;
+			DB::Connection * const connection;
 			const std::string tableName;
 	};
 }

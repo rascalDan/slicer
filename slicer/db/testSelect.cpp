@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE db_select
 #include <boost/test/unit_test.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <mock.h>
+#include <pq-mock.h>
 #include <slicer/slicer.h>
 #include <definedDirs.h>
 #include "sqlSelectDeserializer.h"
