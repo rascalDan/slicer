@@ -3,6 +3,7 @@
 
 #include <types.h>
 #include <slicer/modelParts.h>
+#include <slicer/modelPartsTypes.h>
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
