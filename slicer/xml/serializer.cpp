@@ -8,6 +8,11 @@
 #include <stdexcept>
 #include <glibmm/ustring.h>
 
+NAMEDFACTORY(".xml", Slicer::XmlFileSerializer, Slicer::FileSerializerFactory);
+NAMEDFACTORY(".xml", Slicer::XmlFileDeserializer, Slicer::FileDeserializerFactory);
+NAMEDFACTORY("application/xml", Slicer::XmlStreamSerializer, Slicer::StreamSerializerFactory);
+NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDeserializerFactory);
+
 namespace Slicer {
 	const std::string md_attribute = "xml:attribute";
 	const std::string md_text = "xml:text";
@@ -272,6 +277,33 @@ namespace Slicer {
 	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartPtr mp)
 	{
 		ModelTreeProcessElement(doc->create_root_node(name), mp, defaultElementCreator);
+	}
+
+	XmlStreamSerializer::XmlStreamSerializer(std::ostream & s) :
+		strm(s)
+	{
+	}
+
+	XmlStreamDeserializer::XmlStreamDeserializer(std::istream & s) :
+		strm(s)
+	{
+	}
+
+	void
+	XmlStreamDeserializer::Deserialize(ModelPartPtr modelRoot)
+	{
+		xmlpp::DomParser dom;
+		dom.parse_stream(strm);
+		auto doc = dom.get_document();
+		DocumentTreeIterate(doc, modelRoot);
+	}
+
+	void
+	XmlStreamSerializer::Serialize(ModelPartPtr modelRoot)
+	{
+		xmlpp::Document doc;
+		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
+		doc.write_to_stream(strm);
 	}
 
 	XmlFileSerializer::XmlFileSerializer(const boost::filesystem::path & p) :

@@ -21,6 +21,16 @@ namespace Slicer {
 			static void ModelTreeProcessElement(xmlpp::Element * n, ModelPartPtr mp, const ElementCreator &);
 	};
 
+	class XmlStreamSerializer : public XmlSerializer {
+		public:
+			DLL_PUBLIC XmlStreamSerializer(std::ostream &);
+
+			virtual void Serialize(ModelPartPtr) override;
+
+		private:
+			std::ostream & strm;
+	};
+
 	class XmlFileSerializer : public XmlSerializer {
 		public:
 			DLL_PUBLIC XmlFileSerializer(const boost::filesystem::path &);
@@ -45,6 +55,16 @@ namespace Slicer {
 		protected:
 			static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp);
 			static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp);
+	};
+
+	class XmlStreamDeserializer : public XmlDeserializer {
+		public:
+			DLL_PUBLIC XmlStreamDeserializer(std::istream &);
+
+			virtual void Deserialize(ModelPartPtr) override;
+
+		private:
+			std::istream & strm;
 	};
 
 	class XmlFileDeserializer : public XmlDeserializer {

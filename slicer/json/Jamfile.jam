@@ -1,14 +1,17 @@
+import testing ;
+
 lib jsonpp : : : :
 	<library>../..//glibmm
 	;
 
 lib boost_system ;
 lib boost_filesystem ;
+lib boost_utf : : <name>boost_unit_test_framework ;
 lib IceUtil ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-json :
-	[ glob *.cpp ]
+	[ glob *.cpp : test*.cpp ]
 	:
 	<include>..
 	<library>boost_system
@@ -22,3 +25,18 @@ lib slicer-json :
 	: :
 	<library>jsonpp
 	;
+
+run testSpecifics.cpp
+	: : :
+	<define>BOOST_TEST_DYN_LINK
+	<library>slicer-json
+	<library>boost_utf
+	<library>../test//slicer-test
+	<library>../test//common
+	<library>../slicer//slicer
+	<include>..
+	<dependency>../test//compilation
+	:
+	testSpecifics
+	;
+

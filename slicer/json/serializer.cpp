@@ -6,6 +6,15 @@
 #include <fstream>
 #include <glibmm/ustring.h>
 
+NAMEDFACTORY(".js", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory);
+NAMEDFACTORY(".js", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory);
+NAMEDFACTORY(".json", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory);
+NAMEDFACTORY(".json", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory);
+NAMEDFACTORY("application/javascript", Slicer::JsonStreamSerializer, Slicer::StreamSerializerFactory);
+NAMEDFACTORY("application/javascript", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory);
+NAMEDFACTORY("application/json", Slicer::JsonStreamSerializer, Slicer::StreamSerializerFactory);
+NAMEDFACTORY("application/json", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory);
+
 namespace Slicer {
 	class JsonValueSource : public ValueSource {
 		public:
@@ -235,6 +244,32 @@ namespace Slicer {
 					break;
 			}
 		}
+	}
+
+	JsonStreamSerializer::JsonStreamSerializer(std::ostream & s) :
+		strm(s)
+	{
+	}
+
+	JsonStreamDeserializer::JsonStreamDeserializer(std::istream & s) :
+		strm(s)
+	{
+	}
+
+	void
+	JsonStreamDeserializer::Deserialize(ModelPartPtr modelRoot)
+	{
+		json::Value obj = json::parseValue(strm);
+		auto mp = modelRoot->GetAnonChild();
+		boost::apply_visitor(DocumentTreeIterate(mp), obj);
+	}
+
+	void
+	JsonStreamSerializer::Serialize(ModelPartPtr modelRoot)
+	{
+		json::Value doc;
+		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
+		json::serializeValue(doc, strm, "utf-8");
 	}
 
 	JsonFileSerializer::JsonFileSerializer(const boost::filesystem::path & p) :

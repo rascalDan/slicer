@@ -422,6 +422,38 @@ BOOST_AUTO_TEST_CASE( json_rootEnums_json )
 	verifyByFile<TestModule::SomeNumbers, Slicer::JsonFileDeserializer>("enum2.json", checkSomeNumbers);
 }
 
+BOOST_AUTO_TEST_CASE( json_streams )
+{
+	const auto tmpf = tmp / "byStream";
+	const auto inFile = root / "initial" / "inherit-c.json";
+	const auto outFile = tmpf / "streamout.json";
+	boost::filesystem::create_directories(tmpf);
+	{
+		std::ifstream in(inFile.string());
+		auto d = Slicer::DeserializeAny<Slicer::JsonStreamDeserializer, TestModule::InheritanceContPtr>(in);
+		checkInherits_types(d);
+		std::ofstream out(outFile.string());
+		Slicer::SerializeAny<Slicer::JsonStreamSerializer>(d, out);
+	}
+	diff(inFile, outFile);
+}
+
+BOOST_AUTO_TEST_CASE( xml_streams )
+{
+	const auto tmpf = tmp / "byStream";
+	const auto inFile = root / "initial" / "inherit-b.xml";
+	const auto outFile = tmpf / "streamout.xml";
+	boost::filesystem::create_directories(tmpf);
+	{
+		std::ifstream in(inFile.string());
+		auto d = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::InheritanceContPtr>(in);
+		checkInherits_types(d);
+		std::ofstream out(outFile.string());
+		Slicer::SerializeAny<Slicer::XmlStreamSerializer>(d, out);
+	}
+	diff(inFile, outFile);
+}
+
 BOOST_AUTO_TEST_CASE( invalid_enum )
 {
 	IceUtil::Handle<Slicer::ModelPartForRoot<TestModule::SomeNumbers>> rootmp = new Slicer::ModelPartForRoot<TestModule::SomeNumbers>();
@@ -461,13 +493,19 @@ BOOST_AUTO_TEST_CASE( any )
 	const boost::filesystem::path output = tmpf / "builtins.xml";
 
 	BOOST_TEST_CHECKPOINT("Deserialize with wrapper");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	TestModule::BuiltInsPtr object = Slicer::Deserialize<Slicer::XmlFileDeserializer, TestModule::BuiltIns>(input);
+#pragma GCC diagnostic pop
 
 	BOOST_TEST_CHECKPOINT("Test object");
 	checkBuiltIns_valuesCorrect(object);
 
 	BOOST_TEST_CHECKPOINT("Serialize with wrapper");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	Slicer::Serialize<Slicer::XmlFileSerializer>(object, output);
+#pragma GCC diagnostic pop
 
 	BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
 	diff(input, output);

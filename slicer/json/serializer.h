@@ -13,6 +13,16 @@ namespace Slicer {
 			static void ModelTreeIterateRoot(json::Value *, ModelPartPtr mp);
 	};
 
+	class JsonStreamSerializer : public JsonSerializer {
+		public:
+			DLL_PUBLIC JsonStreamSerializer(std::ostream &);
+
+			virtual void Serialize(ModelPartPtr) override;
+
+		private:
+			std::ostream & strm;
+	};
+
 	class JsonFileSerializer : public JsonSerializer {
 		public:
 			DLL_PUBLIC JsonFileSerializer(const boost::filesystem::path &);
@@ -31,6 +41,16 @@ namespace Slicer {
 
 		private:
 			json::Value & value;
+	};
+
+	class JsonStreamDeserializer : public Deserializer {
+		public:
+			DLL_PUBLIC JsonStreamDeserializer(std::istream &);
+
+			virtual void Deserialize(ModelPartPtr) override;
+
+		private:
+			std::istream & strm;
 	};
 
 	class JsonFileDeserializer : public Deserializer {
