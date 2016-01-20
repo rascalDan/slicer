@@ -204,25 +204,10 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForRoot : public ModelPart {
 		public:
-			ModelPartForRoot() :
-				ModelObject(new T()),
-				owned(true),
-				mp(ModelPartFor(*ModelObject))
-			{
-			}
-
 			ModelPartForRoot(T & o) :
 				ModelObject(&o),
-				owned(false),
 				mp(ModelPartFor(*ModelObject))
 			{
-			}
-
-			~ModelPartForRoot()
-			{
-				if (owned) {
-					delete ModelObject;
-				}
 			}
 
 			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override
@@ -245,11 +230,6 @@ namespace Slicer {
 				ch(rootName, mp, NULL);
 			}
 
-			T & GetModel()
-			{
-				return *ModelObject;
-			}
-
 			virtual bool HasValue() const override { return ModelObject && mp->HasValue(); }
 
 			virtual ModelPartType GetType() const override
@@ -261,7 +241,6 @@ namespace Slicer {
 
 		private:
 			T * ModelObject;
-			bool owned;
 			ModelPartPtr mp;
 			DLL_PUBLIC static std::string rootName;
 	};

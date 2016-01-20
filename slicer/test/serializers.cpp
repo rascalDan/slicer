@@ -456,13 +456,11 @@ BOOST_AUTO_TEST_CASE( xml_streams )
 
 BOOST_AUTO_TEST_CASE( invalid_enum )
 {
-	IceUtil::Handle<Slicer::ModelPartForRoot<TestModule::SomeNumbers>> rootmp = new Slicer::ModelPartForRoot<TestModule::SomeNumbers>();
-
 	Slicer::DeserializerPtr jdeserializer = new Slicer::JsonFileDeserializer(root / "initial" / "invalidEnum.json");
-	BOOST_REQUIRE_THROW(jdeserializer->Deserialize(rootmp), Slicer::InvalidEnumerationValue);
+	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationValue);
 
 	Slicer::DeserializerPtr xdeserializer = new Slicer::XmlFileDeserializer(root / "initial" / "invalidEnum.xml");
-	BOOST_REQUIRE_THROW(xdeserializer->Deserialize(rootmp), Slicer::InvalidEnumerationValue);
+	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationValue);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

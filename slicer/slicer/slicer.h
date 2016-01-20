@@ -17,9 +17,9 @@ namespace Slicer {
 	Object
 	DeserializeAnyWith(DeserializerPtr deserializer)
 	{
-		IceUtil::Handle<ModelPartForRoot<Object>> root = new ModelPartForRoot<Object>();
-		deserializer->Deserialize(root);
-		return root->GetModel();
+		Object object;
+		deserializer->Deserialize(new ModelPartForRoot<Object>(object));
+		return object;
 	}
 
 	template <typename Deserializer, typename Object, typename ... SerializerParams>
@@ -40,8 +40,7 @@ namespace Slicer {
 	void
 	SerializeAnyWith(Object object, SerializerPtr serializer)
 	{
-		IceUtil::Handle<ModelPartForRoot<Object>> root = new ModelPartForRoot<Object>(object);
-		serializer->Serialize(root);
+		serializer->Serialize(new ModelPartForRoot<Object>(object));
 	}
 
 	template <typename Serializer, typename Object, typename ... SerializerParams>
