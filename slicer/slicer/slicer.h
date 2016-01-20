@@ -48,7 +48,6 @@ namespace Slicer {
 	void
 	SerializeAny(Object object, SerializerParams && ... sp)
 	{
-		IceUtil::Handle<ModelPartForRoot<Object>> root = new ModelPartForRoot<Object>(object);
 		SerializeAnyWith(object, new Serializer(sp ...));
 	}
 
