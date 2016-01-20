@@ -174,9 +174,9 @@ namespace Slicer {
 	void
 	JsonSerializer::ModelTreeIterateSeq(json::Value * n, ModelPartPtr mp)
 	{
-		auto & arr = boost::get<json::Array &>(*n);
-		arr.push_back(json::ValuePtr(new json::Value()));
-		ModelTreeIterateRoot(arr.back().get(), mp);
+		auto arr = boost::get<json::Array>(n);
+		arr->push_back(json::ValuePtr(new json::Value()));
+		ModelTreeIterateRoot(arr->back().get(), mp);
 	}
 
 	void
