@@ -36,13 +36,13 @@ namespace Slicer {
 		for (const auto & conversion : conversions) {
 			if (!AdHoc::containerContains(conversion.Options, "nodeclare")) {
 				if (!AdHoc::containerContains(conversion.Options, "nodeclareto")) {
-					fprintbf(cpp, "%s %s(const %s &);\n",
+					fprintbf(cpp, "DLL_PUBLIC %s %s(const %s &);\n",
 							conversion.ExchangeType,
 							conversion.ConvertToExchangeFunc,
 							Slice::typeToString(type));
 				}
 				if (!AdHoc::containerContains(conversion.Options, "nodeclarefrom")) {
-					fprintbf(cpp, "%s %s(const %s &);\n\n",
+					fprintbf(cpp, "DLL_PUBLIC %s %s(const %s &);\n\n",
 							Slice::typeToString(type),
 							conversion.ConvertToModelFunc,
 							conversion.ExchangeType);

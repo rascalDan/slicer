@@ -4,6 +4,7 @@
 #define SHORT(x) boost::numeric_cast< ::Ice::Short , int64_t >(x)
 
 namespace Slicer {
+	DLL_PUBLIC
 	boost::posix_time::ptime
 	dateTimeToPTime(const ::TestModule::DateTime & dt)
 	{
@@ -11,6 +12,7 @@ namespace Slicer {
 				boost::posix_time::time_duration(dt.hour, dt.minute, dt.second));
 	}
 
+	DLL_PUBLIC
 	::TestModule::DateTime
 	ptimeToDateTime(const boost::posix_time::ptime & pt)
 	{
@@ -20,6 +22,7 @@ namespace Slicer {
 			});
 	}
 
+	DLL_PUBLIC
 	std::string
 	isoDateToString(const ::TestModule::IsoDate & in)
 	{
@@ -34,6 +37,7 @@ namespace Slicer {
 		return std::string(buf, len);
 	}
 
+	DLL_PUBLIC
 	::TestModule::IsoDate
 	stringToIsoDate(const std::string & in)
 	{
@@ -49,6 +53,7 @@ namespace Slicer {
 				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday)});
 	}
 
+	DLL_PUBLIC
 	std::string
 	dateTimeToString(const ::TestModule::DateTime & in)
 	{
@@ -66,6 +71,7 @@ namespace Slicer {
 		return std::string(buf, len);
 	}
 
+	DLL_PUBLIC
 	::TestModule::DateTime
 	stringToDateTime(const std::string & in)
 	{
@@ -82,12 +88,14 @@ namespace Slicer {
 				SHORT(tm.tm_hour), SHORT(tm.tm_min), SHORT(tm.tm_sec)});
 	}
 
+	DLL_PUBLIC
 	::DB::Timespan
 	timedurationToTimespan(const boost::posix_time::time_duration & td)
 	{
 		return ::DB::Timespan({ SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()) });
 	}
 
+	DLL_PUBLIC
 	boost::posix_time::time_duration
 	timespanToTimeduration(const ::DB::Timespan & ts)
 	{

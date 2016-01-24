@@ -2,10 +2,11 @@
 #define SLICER_TEST_FILESTRUCTURE
 
 #include <boost/filesystem/path.hpp>
+#include <visibility.h>
 
 namespace fs = boost::filesystem;
 
-class FileStructure {
+class DLL_PUBLIC FileStructure {
 	public:
 		FileStructure();
 		~FileStructure();

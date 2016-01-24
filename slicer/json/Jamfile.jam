@@ -21,7 +21,6 @@ lib slicer-json :
 	<library>../..//glibmm
 	<library>adhocutil
 	<library>../slicer//slicer
-	<cflags>-fvisibility=hidden
 	: :
 	<library>jsonpp
 	;

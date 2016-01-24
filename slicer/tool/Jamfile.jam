@@ -5,5 +5,4 @@ exe slicer :
 	:
 	<library>../slicer//slicer
 	<library>po
-	<cflags>-fvisibility=hidden
 	;

@@ -13,7 +13,6 @@ lib slicer :
 	<library>boost_filesystem
 	<library>adhocutil
 	<include>..
-	<cflags>-fvisibility=hidden
 	: :
 	<include>..
 	<library>boost_system
