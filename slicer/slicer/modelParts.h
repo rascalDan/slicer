@@ -121,39 +121,13 @@ namespace Slicer {
 			virtual const Metadata & GetMetadata() const = 0;
 	};
 
-#define templateMODELPARTFOR(Type) \
-	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> & t); \
-	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> * t); \
-	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t); \
-	template <class T> ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t);
-#define MODELPARTFOR(Type) \
-	ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> & t); \
-	ModelPartPtr DLL_PUBLIC ModelPartFor(IceUtil::Optional<Type> * t); \
-	ModelPartPtr DLL_PUBLIC ModelPartFor(Type & t); \
-	ModelPartPtr DLL_PUBLIC ModelPartFor(Type * t);
-	templateMODELPARTFOR(IceInternal::Handle<T>);
-	templateMODELPARTFOR(std::vector<T>);
-	templateMODELPARTFOR(std::list<T>);
-	template <class K, class V> ModelPartPtr DLL_PUBLIC ModelPartFor(std::map<K, V> & t);
-	template <class K, class V> ModelPartPtr DLL_PUBLIC ModelPartFor(std::map<K, V> * t);
-	MODELPARTFOR(std::string);
-	MODELPARTFOR(bool);
-	MODELPARTFOR(Ice::Float);
-	MODELPARTFOR(Ice::Double);
-	MODELPARTFOR(Ice::Byte);
-	MODELPARTFOR(Ice::Short);
-	MODELPARTFOR(Ice::Int);
-	MODELPARTFOR(Ice::Long);
-	templateMODELPARTFOR(T);
-#undef templateMODELPARTFOR
-#undef MODELPARTFOR
-
 	class ChildRef : public IceUtil::Shared {
 		public:
 			virtual ModelPartPtr Child() const = 0;
 			virtual const Metadata & ChildMetaData() const = 0;
 	};
 	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
+
 	class DLL_PUBLIC ImplicitChildRef : public ChildRef {
 		public:
 			ImplicitChildRef(ModelPartPtr);
@@ -164,6 +138,7 @@ namespace Slicer {
 		private:
 			ModelPartPtr mpp;
 	};
+
 	class DLL_PUBLIC MemberChildRef : public ChildRef {
 		public:
 			MemberChildRef(ModelPartPtr, const Metadata &);
@@ -179,6 +154,11 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPart : public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
+
+			template<typename T>
+			static ModelPartPtr CreateFor(T & t);
+			template<typename T>
+			static ModelPartPtr CreateRootFor(T & t);
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
 			ModelPartPtr GetAnonChild(const HookFilter & = HookFilter());
@@ -202,47 +182,21 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForRoot : public ModelPart {
+	class ModelPartForRoot : public ModelPart {
 		public:
-			ModelPartForRoot(T & o) :
-				ModelObject(&o),
-				mp(ModelPartFor(*ModelObject))
-			{
-			}
+			ModelPartForRoot(T & o);
 
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override
-			{
-				mp->Create();
-				return new ImplicitChildRef(mp);
-			}
-
-			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override
-			{
-				if (name != rootName) {
-					throw IncorrectElementName(name);
-				}
-				mp->Create();
-				return new ImplicitChildRef(mp);
-			}
-
-			virtual void OnEachChild(const ChildHandler & ch) override
-			{
-				ch(rootName, mp, NULL);
-			}
-
-			virtual bool HasValue() const override { return ModelObject && mp->HasValue(); }
-
-			virtual ModelPartType GetType() const override
-			{
-				return mp->GetType();
-			}
-
-			virtual bool IsOptional() const override { return mp->IsOptional(); }
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override;
+			virtual void OnEachChild(const ChildHandler & ch) override;
+			virtual bool HasValue() const override;
+			virtual ModelPartType GetType() const override;
+			virtual bool IsOptional() const override;
 
 		private:
 			T * ModelObject;
 			ModelPartPtr mp;
-			DLL_PUBLIC static std::string rootName;
+			static std::string rootName;
 	};
 }
 

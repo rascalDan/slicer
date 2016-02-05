@@ -11,15 +11,9 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
 
 #define TypeTest(Var, Expr, Explicit, Expected) \
 	Var obj = Expr; \
-	Slicer::ModelPartPtr mpp = new Slicer::Explicit<Var>(obj); \
+	Slicer::ModelPartPtr mpp = Slicer::ModelPart::CreateFor(obj); \
 	BOOST_REQUIRE_EQUAL(Slicer::Expected, mpp->GetType()); \
- \
-	Slicer::ModelPartPtr autoMpp = Slicer::ModelPartFor(obj); \
-	BOOST_REQUIRE_EQUAL(Slicer::Expected, autoMpp->GetType()); \
- \
-	Slicer::ModelPartPtr autoPtrMpp = Slicer::ModelPartFor(&obj); \
-	BOOST_REQUIRE_EQUAL(Slicer::Expected, autoPtrMpp->GetType()); \
-\
+	\
 	auto mppvalue = mpp.get(); \
 	auto amppvalue = mpp.get(); \
 	auto apmppvalue = mpp.get(); \

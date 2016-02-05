@@ -15,20 +15,16 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForSimple : public ModelPartForSimpleBase {
+	class ModelPartForSimple : public ModelPartForSimpleBase {
 		public:
 			typedef T element_type;
 
-			ModelPartForSimple(T & h) :
-				Member(h)
-			{
-			}
-			ModelPartForSimple(T * h) :
-				Member(*h)
-			{
-			}
-			virtual void SetValue(ValueSourcePtr s) override { s->set(Member); }
-			virtual void GetValue(ValueTargetPtr s) override { s->get(Member); }
+			ModelPartForSimple(T & h);
+
+			ModelPartForSimple(T * h);
+
+			virtual void SetValue(ValueSourcePtr s) override;
+			virtual void GetValue(ValueTargetPtr s) override;
 
 		private:
 			T & Member;
@@ -45,18 +41,13 @@ namespace Slicer {
 	};
 
 	template<typename T, typename M, T M::* MV>
-	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase {
+	class ModelPartForConverted : public ModelPartForConvertedBase {
 		public:
 			typedef T element_type;
 
-			ModelPartForConverted(T & h) :
-				Member(h)
-			{
-			}
-			ModelPartForConverted(T * h) :
-				Member(*h)
-			{
-			}
+			ModelPartForConverted(T & h);
+
+			ModelPartForConverted(T * h);
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 
@@ -65,81 +56,25 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForOptional : public ModelPart {
+	class ModelPartForOptional : public ModelPart {
 		public:
-			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h) :
-				OptionalMember(h)
-			{
-				if (OptionalMember) {
-					modelPart = new T(*OptionalMember);
-				}
-			}
-			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
-				OptionalMember(*h)
-			{
-				if (OptionalMember) {
-					modelPart = new T(*OptionalMember);
-				}
-			}
-			virtual void OnEachChild(const ChildHandler & ch) override
-			{
-				if (OptionalMember) {
-					modelPart->OnEachChild(ch);
-				}
-			}
-			virtual void Complete() override
-			{
-				if (OptionalMember) {
-					modelPart->Complete();
-				}
-			}
-			virtual void Create() override
-			{
-				if (!OptionalMember) {
-					OptionalMember = typename T::element_type();
-					modelPart = new T(*OptionalMember);
-					modelPart->Create();
-				}
-			}
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override
-			{
-				if (OptionalMember) {
-					return modelPart->GetAnonChildRef(flt);
-				}
-				return NULL;
-			}
-			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override
-			{
-				if (OptionalMember) {
-					return modelPart->GetChildRef(name, flt);
-				}
-				return NULL;
-			}
-			virtual void SetValue(ValueSourcePtr s) override
-			{
-				if (OptionalMember) {
-					modelPart->SetValue(s);
-				}
-			}
-			virtual void GetValue(ValueTargetPtr s) override
-			{
-				if (!OptionalMember) {
-					OptionalMember = typename T::element_type();
-					modelPart = new T(*OptionalMember);
-				}
-				modelPart->GetValue(s);
-			}
+			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
+			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h);
+			virtual void OnEachChild(const ChildHandler & ch) override;
+			virtual void Complete() override;
+			virtual void Create() override;
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override;
+			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override;
+			virtual void SetValue(ValueSourcePtr s) override;
+			virtual void GetValue(ValueTargetPtr s) override;
 
-			virtual bool HasValue() const override { return OptionalMember && modelPart->HasValue(); }
+			virtual bool HasValue() const override;
 
-			virtual ModelPartType GetType() const
-			{
-				return T::type;
-			}
+			virtual ModelPartType GetType() const;
 
-			virtual bool IsOptional() const override { return true; };
+			virtual bool IsOptional() const override;
 
-			virtual const Metadata & GetMetadata() const override { return modelPart->GetMetadata(); }
+			virtual const Metadata & GetMetadata() const override;
 
 		private:
 			IceUtil::Optional< typename T::element_type > & OptionalMember;
@@ -153,7 +88,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
+	class ModelPartForComplex : public ModelPartForComplexBase {
 		public:
 			class HookBase : public HookCommon {
 				public:
@@ -193,34 +128,12 @@ namespace Slicer {
 					const std::string name;
 			};
 
-			virtual void OnEachChild(const ChildHandler & ch)
-			{
-				for (const auto & h : hooks) {
-					auto modelPart = h->Get(GetModel());
-					ch(h->PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr(), h);
-				}
-			}
+			virtual void OnEachChild(const ChildHandler & ch);
 
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override
-			{
-				for (const auto & h : hooks) {
-					if (!flt || flt(h)) {
-						return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
-					}
-				}
-				return NULL;
-			}
-			ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override
-			{
-				for (const auto & h : hooks) {
-					if (h->PartName() == name && (!flt || flt(h))) {
-						return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
-					}
-				}
-				return NULL;
-			}
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override;
+			ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override;
 
-			virtual const Metadata & GetMetadata() const override { return metadata; }
+			virtual const Metadata & GetMetadata() const override;
 
 			virtual T * GetModel() = 0;
 
@@ -232,44 +145,25 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
+	class ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
 		public:
 			typedef T element_type;
 
-			ModelPartForClass(T & h) :
-				ModelObject(h)
-			{
-			}
+			ModelPartForClass(T & h);
 
-			ModelPartForClass(T * h) :
-				ModelObject(*h)
-			{
-			}
+			ModelPartForClass(T * h);
 
-			virtual void Create() override
-			{
-				ModelObject = new typename T::element_type();
-			}
+			virtual void Create() override;
 
-			typename T::element_type * GetModel() override
-			{
-				return ModelObject.get();
-			}
+			typename T::element_type * GetModel() override;
 
-			virtual ModelPartPtr GetSubclassModelPart(const std::string & name) override
-			{
-				auto ref = classRefMap()->find(ModelPart::ToModelTypeName(name));
-				if (ref == classRefMap()->end()) {
-					throw UnknownType(name);
-				}
-				return ref->second(&this->ModelObject);
-			}
+			virtual ModelPartPtr GetSubclassModelPart(const std::string & name) override;
 
-			virtual bool HasValue() const override { return ModelObject; }
+			virtual bool HasValue() const override;
 
 			virtual TypeId GetTypeId() const override;
 
-			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override { return typeIdProperty; }
+			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
 
 		private:
 			T & ModelObject;
@@ -277,26 +171,17 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T> {
+	class ModelPartForStruct : public ModelPartForComplex<T> {
 		public:
 			typedef T element_type;
 
-			ModelPartForStruct(T & o) :
-				ModelObject(o)
-			{
-			}
+			ModelPartForStruct(T & o);
 
-			ModelPartForStruct(T * o) :
-				ModelObject(*o)
-			{
-			}
+			ModelPartForStruct(T * o);
 
-			T * GetModel() override
-			{
-				return &ModelObject;
-			}
+			T * GetModel() override;
 
-			virtual bool HasValue() const override { return true; }
+			virtual bool HasValue() const override;
 
 		private:
 			T & ModelObject;
@@ -313,22 +198,16 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase {
+	class ModelPartForEnum : public ModelPartForEnumBase {
 		public:
 			typedef T element_type;
 			typedef boost::bimap<T, std::string> Enumerations;
 
-			ModelPartForEnum(T & s) :
-				modelPart(s)
-			{
-			}
+			ModelPartForEnum(T & s);
 
-			ModelPartForEnum(T * s) :
-				modelPart(*s)
-			{
-			}
+			ModelPartForEnum(T * s);
 
-			virtual const Metadata & GetMetadata() const override { return metadata; }
+			virtual const Metadata & GetMetadata() const override;
 
 			virtual void SetValue(ValueSourcePtr s) override;
 
@@ -348,36 +227,21 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase {
+	class ModelPartForSequence : public ModelPartForSequenceBase {
 		public:
 			typedef T element_type;
 
-			ModelPartForSequence(T & s) :
-				sequence(s)
-			{
-			}
+			ModelPartForSequence(T & s);
 
-			ModelPartForSequence(T * s) :
-				sequence(*s)
-			{
-			}
+			ModelPartForSequence(T * s);
 
-			virtual void OnEachChild(const ChildHandler & ch) override
-			{
-				for(auto & element : sequence) {
-					ch(elementName, elementModelPart(element), NULL);
-				}
-			}
+			virtual void OnEachChild(const ChildHandler & ch) override;
 
-			ChildRefPtr GetAnonChildRef(const HookFilter &) override
-			{
-				sequence.push_back(typename element_type::value_type());
-				return new ImplicitChildRef(ModelPartFor(sequence.back()));
-			}
+			ChildRefPtr GetAnonChildRef(const HookFilter &) override;
 
 			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
 
-			virtual const Metadata & GetMetadata() const override { return metadata; }
+			virtual const Metadata & GetMetadata() const override;
 
 		private:
 			ModelPartPtr elementModelPart(typename T::value_type &) const;
@@ -388,35 +252,24 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionaryElement : public ModelPartForComplex<ModelPartForDictionaryElement<T> > {
+	class ModelPartForDictionaryElement : public ModelPartForComplex<ModelPartForDictionaryElement<T> > {
 		public:
-			ModelPartForDictionaryElement(typename T::key_type * k, typename T::mapped_type * v) :
-				key(k),
-				value(v)
-			{
-			}
+			ModelPartForDictionaryElement(typename T::key_type * k, typename T::mapped_type * v);
 
-			ModelPartForDictionaryElement<T> * GetModel() override
-			{
-				return this;
-			}
+			ModelPartForDictionaryElement<T> * GetModel() override;
 
-			virtual bool HasValue() const override { return true; }
+			virtual bool HasValue() const override;
 
 			typename T::key_type * key;
 			typename T::mapped_type * value;
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionaryElementInserter : public ModelPartForDictionaryElement<T> {
+	class ModelPartForDictionaryElementInserter : public ModelPartForDictionaryElement<T> {
 		public:
-			ModelPartForDictionaryElementInserter(T & d) :
-				ModelPartForDictionaryElement<T>(&key, &value),
-				dictionary(d)
-			{
-			}
+			ModelPartForDictionaryElementInserter(T & d);
 
-			virtual void Complete() override { dictionary.insert(typename T::value_type(key, value)); }
+			virtual void Complete() override;
 
 			mutable typename T::key_type key;
 			mutable typename T::mapped_type value;
@@ -433,41 +286,21 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase {
+	class ModelPartForDictionary : public ModelPartForDictionaryBase {
 		public:
 			typedef T element_type;
 
-			ModelPartForDictionary(T & d) :
-				dictionary(d)
-			{
-			}
+			ModelPartForDictionary(T & d);
 
-			ModelPartForDictionary(T * d) :
-				dictionary(*d)
-			{
-			}
+			ModelPartForDictionary(T * d);
 
-			virtual void OnEachChild(const ChildHandler & ch) override
-			{
-				for (auto & pair : dictionary) {
-					ch(pairName, new ModelPartForDictionaryElement<T>(const_cast<typename T::key_type *>(&pair.first), &pair.second), NULL);
-				}
-			}
+			virtual void OnEachChild(const ChildHandler & ch) override;
 
-			ChildRefPtr GetAnonChildRef(const HookFilter &) override
-			{
-				return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
-			}
+			ChildRefPtr GetAnonChildRef(const HookFilter &) override;
 
-			ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override
-			{
-				if (name != pairName) {
-					throw IncorrectElementName(name);
-				}
-				return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
-			}
+			ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override;
 
-			virtual const Metadata & GetMetadata() const override { return metadata; }
+			virtual const Metadata & GetMetadata() const override;
 
 		private:
 			T & dictionary;

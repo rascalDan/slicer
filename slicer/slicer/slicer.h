@@ -18,7 +18,7 @@ namespace Slicer {
 	DeserializeAnyWith(DeserializerPtr deserializer)
 	{
 		Object object;
-		deserializer->Deserialize(new ModelPartForRoot<Object>(object));
+		deserializer->Deserialize(ModelPart::CreateRootFor<Object>(object));
 		return object;
 	}
 
@@ -40,7 +40,7 @@ namespace Slicer {
 	void
 	SerializeAnyWith(Object object, SerializerPtr serializer)
 	{
-		serializer->Serialize(new ModelPartForRoot<Object>(object));
+		serializer->Serialize(ModelPart::CreateRootFor<Object>(object));
 	}
 
 	template <typename Serializer, typename Object, typename ... SerializerParams>

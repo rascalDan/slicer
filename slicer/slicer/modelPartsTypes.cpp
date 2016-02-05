@@ -1,11 +1,6 @@
-#include "modelPartsTypes.h"
+#include "modelPartsTypes.impl.h"
 
 namespace Slicer {
-#define MODELPARTFOR(Type, ModelPart) \
-	ModelPartPtr ModelPartFor(IceUtil::Optional<Type> & t) { return new ModelPartForOptional< ModelPart<Type> >(t); } \
-	ModelPartPtr ModelPartFor(IceUtil::Optional<Type> * t) { return new ModelPartForOptional< ModelPart<Type> >(t); } \
-	ModelPartPtr ModelPartFor(Type & t) { return new ModelPart< Type >(t); } \
-	ModelPartPtr ModelPartFor(Type * t) { return new ModelPart< Type >(t); }
 	MODELPARTFOR(std::string, ModelPartForSimple);
 	MODELPARTFOR(bool, ModelPartForSimple);
 	MODELPARTFOR(Ice::Float, ModelPartForSimple);
@@ -14,25 +9,42 @@ namespace Slicer {
 	MODELPARTFOR(Ice::Short, ModelPartForSimple);
 	MODELPARTFOR(Ice::Int, ModelPartForSimple);
 	MODELPARTFOR(Ice::Long, ModelPartForSimple);
-#undef MODELPARTFOR
 
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Double>::rootName = "Double";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Byte>::rootName = "Byte";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Short>::rootName = "Short";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Int>::rootName = "Int";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<Ice::Long>::rootName = "Long";
+	template<> std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
+	template<> std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Double>::rootName = "Double";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Byte>::rootName = "Byte";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Short>::rootName = "Short";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Int>::rootName = "Int";
+	template<> std::string Slicer::ModelPartForRoot<Ice::Long>::rootName = "Long";
 
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<std::string>>::rootName = "OptionalString";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<bool>>::rootName = "OptionalBoolean";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Float>>::rootName = "OptionalFloat";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Double>>::rootName = "OptionalDouble";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Byte>>::rootName = "OptionalByte";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>::rootName = "OptionalShort";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
-	template<> DLL_PUBLIC std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<std::string>>::rootName = "OptionalString";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<bool>>::rootName = "OptionalBoolean";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Float>>::rootName = "OptionalFloat";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Double>>::rootName = "OptionalDouble";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Byte>>::rootName = "OptionalByte";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>::rootName = "OptionalShort";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
+	template<> std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
+
+	template class Slicer::ModelPartForRoot<std::string>;
+	template class Slicer::ModelPartForRoot<bool>;
+	template class Slicer::ModelPartForRoot<Ice::Float>;
+	template class Slicer::ModelPartForRoot<Ice::Double>;
+	template class Slicer::ModelPartForRoot<Ice::Byte>;
+	template class Slicer::ModelPartForRoot<Ice::Short>;
+	template class Slicer::ModelPartForRoot<Ice::Int>;
+	template class Slicer::ModelPartForRoot<Ice::Long>;
+
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<std::string>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<bool>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Float>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Double>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Byte>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>;
+	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>;
 
 	void ModelPartForSimpleBase::OnEachChild(const ChildHandler &) { }
 	ChildRefPtr ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &) { return NULL; }
