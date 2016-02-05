@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 
 	const fs::path obj = fs::change_extension(tmp / base, ".o");
 	const std::string compile = stringbf(
-					"g++ -Os -fPIC -c -std=c++0x -fvisibility=hidden -I tmp -I /usr/include/adhocutil -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s -I %s -I %s %s -o %s",
+					"g++ -Os -fPIC -c -std=c++1y -fvisibility=hidden -I tmp -I /usr/include/adhocutil -I /usr/include/Ice -I /usr/include/IceUtil -I %s -I %s -I %s -I %s %s -o %s",
 					root / bjamout,
 					root,
 					included / bjamout,
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 
 	const fs::path so = fs::change_extension(tmp / ("libslicer" + slice.filename().string()), ".so");
 	const std::string link = stringbf(
-					"g++ -shared -lIce -lIceUtil %s/lib%s.so %s/lib%s.so %s -o %s",
+					"g++ -shared -Wl,--strip-all,--gc-sections -lIce -lIceUtil %s/lib%s.so %s/lib%s.so %s -o %s",
 					root / bjamout, base,
 					included / bjamout, included.leaf(),
 					obj, so);
