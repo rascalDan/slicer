@@ -415,15 +415,15 @@ namespace Slicer {
 				iname ? *iname : "element");
 
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "ModelPartForComplex< ModelPartForDictionaryElement< %s > >::Hooks ",
+		fprintbf(cpp, "ModelPartForComplex< %s::value_type >::Hooks ",
 				d->scoped());
-		fprintbf(cpp, "ModelPartForComplex< ModelPartForDictionaryElement< %s > >::hooks {\n",
+		fprintbf(cpp, "ModelPartForComplex< %s::value_type >::hooks {\n",
 				d->scoped());
 		auto kname = metaDataValue("slicer:key:", d->getMetaData());
 		auto vname = metaDataValue("slicer:value:", d->getMetaData());
 		fprintbf(cpp, "\t\t");
 		auto ktype = d->keyType();
-		fprintbf(cpp, "new ModelPartForDictionaryElement< %s >::Hook< %s*, ModelPartForDictionaryElement< %s >, &ModelPartForDictionaryElement< %s >::key, ",
+		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< const %s, %s::value_type, &%s::value_type::first, ",
 				d->scoped(),
 				Slice::typeToString(ktype),
 				d->scoped(),
@@ -433,7 +433,7 @@ namespace Slicer {
 				Slice::typeToString(ktype),
 				kname ? *kname : "key");
 		auto vtype = d->valueType();
-		fprintbf(cpp, "new ModelPartForDictionaryElement< %s >::Hook< %s*, ModelPartForDictionaryElement< %s >, &ModelPartForDictionaryElement< %s >::value, ",
+		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< %s, %s::value_type, &%s::value_type::second, ",
 				d->scoped(),
 				Slice::typeToString(vtype),
 				d->scoped(),
@@ -452,16 +452,16 @@ namespace Slicer {
 				d->scoped());
 		copyMetadata(d->getMetaData());
 
-		fprintbf(cpp, "template<>\nMetadata ModelPartForComplex<ModelPartForDictionaryElement< %s > >::metadata ",
+		fprintbf(cpp, "template<>\nMetadata ModelPartForComplex<%s::value_type>::metadata ",
 				d->scoped());
 		copyMetadata(d->getMetaData());
 
-		fprintbf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForDictionaryElement< %s >::HookMetadata< %s*, ModelPartForDictionaryElement< %s >, &ModelPartForDictionaryElement< %s >::key >::metadata { };\n\n",
+		fprintbf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForComplex< %s::value_type >::HookMetadata< const %s, %s::value_type, &%s::value_type::first >::metadata { };\n\n",
 				d->scoped(),
 				Slice::typeToString(ktype),
 				d->scoped(),
 				d->scoped());
-		fprintbf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForDictionaryElement< %s >::HookMetadata< %s*, ModelPartForDictionaryElement< %s >, &ModelPartForDictionaryElement< %s >::value >::metadata { };\n\n",
+		fprintbf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForComplex< %s::value_type >::HookMetadata< %s, %s::value_type, &%s::value_type::second >::metadata { };\n\n",
 				d->scoped(),
 				Slice::typeToString(vtype),
 				d->scoped(),

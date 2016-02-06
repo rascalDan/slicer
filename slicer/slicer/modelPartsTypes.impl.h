@@ -365,30 +365,10 @@ namespace Slicer {
 		return metadata;
 	}
 
-	// ModelPartForDictionaryElement
-	template<typename T>
-	ModelPartForDictionaryElement<T>::ModelPartForDictionaryElement(typename T::key_type * k, typename T::mapped_type * v) :
-		key(k),
-		value(v)
-	{
-	}
-
-	template<typename T>
-	ModelPartForDictionaryElement<T> * ModelPartForDictionaryElement<T>::GetModel()
-	{
-		return this;
-	}
-
-	template<typename T>
-	bool ModelPartForDictionaryElement<T>::HasValue() const
-	{
-		return true;
-	}
-
 	// ModelPartForDictionaryElementInserter
 	template<typename T>
 	ModelPartForDictionaryElementInserter<T>::ModelPartForDictionaryElementInserter(T & d) :
-		ModelPartForDictionaryElement<T>(&key, &value),
+		ModelPartForStruct<typename T::value_type>(value),
 		dictionary(d)
 	{
 	}
@@ -396,7 +376,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForDictionaryElementInserter<T>::Complete()
 	{
-		dictionary.insert(typename T::value_type(key, value));
+		dictionary.insert(value);
 	}
 
 	// ModelPartForDictionary
@@ -416,7 +396,7 @@ namespace Slicer {
 	void ModelPartForDictionary<T>::OnEachChild(const ChildHandler & ch)
 	{
 		for (auto & pair : dictionary) {
-			ch(pairName, new ModelPartForDictionaryElement<T>(const_cast<typename T::key_type *>(&pair.first), &pair.second), NULL);
+			ch(pairName, new ModelPartForStruct<typename T::value_type>(pair), NULL);
 		}
 	}
 

@@ -115,7 +115,7 @@ namespace Slicer {
 
 					ModelPartPtr Get(T * t) const override
 					{
-						return t ? new MP(t->*M) : NULL;
+						return t ? new MP(const_cast<typename std::remove_const<MT>::type &>(t->*M)) : NULL;
 					}
 
 					std::string PartName() const override
@@ -252,27 +252,13 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForDictionaryElement : public ModelPartForComplex<ModelPartForDictionaryElement<T> > {
-		public:
-			ModelPartForDictionaryElement(typename T::key_type * k, typename T::mapped_type * v);
-
-			ModelPartForDictionaryElement<T> * GetModel() override;
-
-			virtual bool HasValue() const override;
-
-			typename T::key_type * key;
-			typename T::mapped_type * value;
-	};
-
-	template<typename T>
-	class ModelPartForDictionaryElementInserter : public ModelPartForDictionaryElement<T> {
+	class ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
 		public:
 			ModelPartForDictionaryElementInserter(T & d);
 
 			virtual void Complete() override;
 
-			mutable typename T::key_type key;
-			mutable typename T::mapped_type value;
+			typename T::value_type value;
 
 		private:
 			T & dictionary;
