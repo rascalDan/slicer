@@ -21,8 +21,6 @@ namespace Slicer {
 
 			ModelPartForSimple(T & h);
 
-			ModelPartForSimple(T * h);
-
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 
@@ -47,7 +45,6 @@ namespace Slicer {
 
 			ModelPartForConverted(T & h);
 
-			ModelPartForConverted(T * h);
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 
@@ -59,7 +56,6 @@ namespace Slicer {
 	class ModelPartForOptional : public ModelPart {
 		public:
 			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
-			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h);
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual void Complete() override;
 			virtual void Create() override;
@@ -151,8 +147,6 @@ namespace Slicer {
 
 			ModelPartForClass(T & h);
 
-			ModelPartForClass(T * h);
-
 			virtual void Create() override;
 
 			typename T::element_type * GetModel() override;
@@ -176,8 +170,6 @@ namespace Slicer {
 			typedef T element_type;
 
 			ModelPartForStruct(T & o);
-
-			ModelPartForStruct(T * o);
 
 			T * GetModel() override;
 
@@ -205,8 +197,6 @@ namespace Slicer {
 
 			ModelPartForEnum(T & s);
 
-			ModelPartForEnum(T * s);
-
 			virtual const Metadata & GetMetadata() const override;
 
 			virtual void SetValue(ValueSourcePtr s) override;
@@ -232,8 +222,6 @@ namespace Slicer {
 			typedef T element_type;
 
 			ModelPartForSequence(T & s);
-
-			ModelPartForSequence(T * s);
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
@@ -277,8 +265,6 @@ namespace Slicer {
 			typedef T element_type;
 
 			ModelPartForDictionary(T & d);
-
-			ModelPartForDictionary(T * d);
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 

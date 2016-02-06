@@ -67,12 +67,6 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartForSimple<T>::ModelPartForSimple(T * h) :
-		Member(*h)
-	{
-	}
-
-	template<typename T>
 	void ModelPartForSimple<T>::SetValue(ValueSourcePtr s)
 	{
 		s->set(Member);
@@ -91,25 +85,10 @@ namespace Slicer {
 	{
 	}
 
-	template<typename T, typename M, T M::* MV>
-	ModelPartForConverted<T, M, MV>::ModelPartForConverted(T * h) :
-		Member(*h)
-	{
-	}
-
 	// ModelPartForOptional
 	template<typename T>
 	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h) :
 		OptionalMember(h)
-	{
-		if (OptionalMember) {
-			modelPart = new T(*OptionalMember);
-		}
-	}
-
-	template<typename T>
-	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
-		OptionalMember(*h)
 	{
 		if (OptionalMember) {
 			modelPart = new T(*OptionalMember);
@@ -248,12 +227,6 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartForClass<T>::ModelPartForClass(T * h) :
-			ModelObject(*h)
-	{
-	}
-
-	template<typename T>
 	void ModelPartForClass<T>::Create()
 	{
 		ModelObject = new typename T::element_type();
@@ -295,12 +268,6 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartForStruct<T>::ModelPartForStruct(T * o) :
-		ModelObject(*o)
-	{
-	}
-
-	template<typename T>
 	T * ModelPartForStruct<T>::GetModel()
 	{
 		return &ModelObject;
@@ -320,12 +287,6 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartForEnum<T>::ModelPartForEnum(T * s) :
-		modelPart(s)
-	{
-	}
-
-	template<typename T>
 	const Metadata & ModelPartForEnum<T>::GetMetadata() const
 	{
 		return metadata;
@@ -335,12 +296,6 @@ namespace Slicer {
 	template<typename T>
 	ModelPartForSequence<T>::ModelPartForSequence(T & s) :
 		sequence(s)
-	{
-	}
-
-	template<typename T>
-	ModelPartForSequence<T>::ModelPartForSequence(T * s) :
-		sequence(*s)
 	{
 	}
 
@@ -383,12 +338,6 @@ namespace Slicer {
 	template<typename T>
 	ModelPartForDictionary<T>::ModelPartForDictionary(T & d) :
 		dictionary(d)
-	{
-	}
-
-	template<typename T>
-	ModelPartForDictionary<T>::ModelPartForDictionary(T * d) :
-		dictionary(*d)
 	{
 	}
 
