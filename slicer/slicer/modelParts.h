@@ -106,6 +106,8 @@ namespace Slicer {
 	typedef boost::bimap<std::string, std::string> ClassNameMap;
 	DLL_PUBLIC ClassNameMap * & classNameMap();
 	typedef std::list<std::string> Metadata;
+	DLL_PUBLIC extern const Metadata emptyMetadata;
+
 	enum ModelPartType {
 		mpt_Null,
 		mpt_Simple,

@@ -1,8 +1,6 @@
 #include "slicer.h"
 
 namespace Slicer {
-	const Metadata emptyMetadata;
-
 	Slicer::MemberChildRef::MemberChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
 		mpp(mp),
 		mdr(md)

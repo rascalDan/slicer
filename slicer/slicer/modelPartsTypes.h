@@ -89,6 +89,7 @@ namespace Slicer {
 			class HookBase : public HookCommon {
 				public:
 					virtual ModelPartPtr Get(T * t) const = 0;
+					virtual const Metadata & GetMetadata() const override { return emptyMetadata; }
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
@@ -101,8 +102,8 @@ namespace Slicer {
 					static Metadata metadata;
 			};
 
-			template <typename MT, typename CT, MT CT::*M, typename MP>
-			class Hook : public HookMetadata<MT, CT, M> {
+			template <typename MT, typename CT, MT CT::*M, typename MP, typename Base = HookMetadata<MT, CT, M>>
+			class Hook : public Base {
 				public:
 					Hook(const std::string & n) :
 						name(n)

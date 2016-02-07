@@ -278,12 +278,18 @@ namespace Slicer {
 			if (dm->optional()) {
 				fprintbf(cpp, " > ");
 			}
+			if (!hasMetadata(dm->getMetaData())) {
+				fprintbf(cpp, ", HookBase");
+			}
 			fprintbf(cpp, " >(\"%s\"),\n",
 					name ? *name : dm->name());
 		}
 		fprintbf(cpp, "\t};\n\n");
 
 		for (const auto & dm : dataMembers) {
+			if (!hasMetadata(dm->getMetaData())) {
+				continue;
+			}
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 			auto t = Slice::TypePtr::dynamicCast(dm->container());
 			if (!t) {
@@ -429,7 +435,7 @@ namespace Slicer {
 				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(ktype);
-		fprintbf(cpp, "< %s > >(\"%s\"),\n\t\t",
+		fprintbf(cpp, "< %s >, HookBase >(\"%s\"),\n\t\t",
 				Slice::typeToString(ktype),
 				kname ? *kname : "key");
 		auto vtype = d->valueType();
@@ -439,7 +445,7 @@ namespace Slicer {
 				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(vtype);
-		fprintbf(cpp, "< %s > >(\"%s\"),\n",
+		fprintbf(cpp, "< %s >, HookBase >(\"%s\"),\n",
 				Slice::typeToString(vtype),
 				vname ? *vname : "value");
 		fprintbf(cpp, "\t};\n");
@@ -455,17 +461,6 @@ namespace Slicer {
 		fprintbf(cpp, "template<>\nMetadata ModelPartForComplex<%s::value_type>::metadata ",
 				d->scoped());
 		copyMetadata(d->getMetaData());
-
-		fprintbf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForComplex< %s::value_type >::HookMetadata< const %s, %s::value_type, &%s::value_type::first >::metadata { };\n\n",
-				d->scoped(),
-				Slice::typeToString(ktype),
-				d->scoped(),
-				d->scoped());
-		fprintbf(cpp, "template<>\ntemplate<>\nMetadata\nModelPartForComplex< %s::value_type >::HookMetadata< %s, %s::value_type, &%s::value_type::second >::metadata { };\n\n",
-				d->scoped(),
-				Slice::typeToString(vtype),
-				d->scoped(),
-				d->scoped());
 
 		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForDictionary);\n\n",
 				d->scoped());
@@ -500,6 +495,17 @@ namespace Slicer {
 		else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
 			fprintbf(cpp, "ModelPartForEnum");
 		}
+	}
+
+	bool
+	Slicer::hasMetadata(const std::list<std::string> & metadata) const
+	{
+		for (const auto & md : metadata) {
+			if (boost::algorithm::starts_with(md, "slicer:")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void
