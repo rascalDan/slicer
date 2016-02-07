@@ -27,6 +27,8 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
 #define StackTypeTest(Var, Explicit, Expected) \
 	TypeTest(Var, Var(), Explicit, Expected)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_class )
 {
 	TypeTest(TestModule::BuiltInsPtr, new TestModule::BuiltIns(), ModelPartForClass, mpt_Complex);
@@ -101,4 +103,5 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_enum )
 {
 	StackTypeTest(TestModule::SomeNumbers, ModelPartForEnum, mpt_Simple);
 }
+#pragma GCC diagnostic pop
 
