@@ -11,6 +11,9 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
 
 #define TypeTest(Var, Expr, Explicit, Expected) \
 	Var obj = Expr; \
+	Slicer::ModelPartPtr mppc = Slicer::ModelPartFor(obj); \
+	BOOST_REQUIRE_EQUAL(Slicer::Expected, mppc->GetType()); \
+	\
 	Slicer::ModelPartPtr mpp = Slicer::ModelPart::CreateFor(obj); \
 	BOOST_REQUIRE_EQUAL(Slicer::Expected, mpp->GetType()); \
 	\

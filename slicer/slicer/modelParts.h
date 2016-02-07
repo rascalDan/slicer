@@ -183,6 +183,8 @@ namespace Slicer {
 			static const std::string & ToModelTypeName(const std::string &);
 	};
 
+	template<typename T> inline ModelPartPtr ModelPartFor(T & t) { return ModelPart::CreateFor(t); }
+
 	template<typename T>
 	class ModelPartForRoot : public ModelPart {
 		public:
