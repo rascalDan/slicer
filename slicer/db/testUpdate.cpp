@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 	bis[1]->mbyte = IceUtil::Optional<Ice::Byte>();
 	bis[0]->mshort = IceUtil::Optional<Ice::Short>();
 	bis[1]->mdouble = IceUtil::Optional<Ice::Double>();
-	BOOST_CHECKPOINT("Do update");
+	BOOST_TEST_CHECKPOINT("Do update");
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db.get(), "builtins");
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
 	BOOST_REQUIRE(bis2[0]->mstring);
