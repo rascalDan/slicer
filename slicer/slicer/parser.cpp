@@ -559,28 +559,28 @@ namespace Slicer {
 	unsigned int
 	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp)
 	{
-		return Apply(ice, cpp, {});
+		return Apply(ice, cpp, {}, false);
 	}
 
 	unsigned int
-	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args & args)
+	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args & args, bool allowIcePrefix)
 	{
 		FilePtr cppfile(fopen(cpp.string(), "a"), fclose);
 		if (!cppfile) {
 			throw std::runtime_error("failed to open code file");
 		}
 
-		return Apply(ice, cppfile.get(), args);
+		return Apply(ice, cppfile.get(), args, allowIcePrefix);
 	}
 
 	unsigned int
 	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp)
 	{
-		return Apply(ice, cpp, {});
+		return Apply(ice, cpp, {}, false);
 	}
 
 	unsigned int
-	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp, const Args & args)
+	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp, const Args & args, bool allowIcePrefix)
 	{
 		std::lock_guard<std::mutex> lock(slicePreprocessor);
 		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", ice.string(), args);
@@ -590,7 +590,7 @@ namespace Slicer {
 			throw std::runtime_error("preprocess failed");
 		}
 
-		Slice::UnitPtr u = Slice::Unit::createUnit(false, false, false, false);
+		Slice::UnitPtr u = Slice::Unit::createUnit(false, false, allowIcePrefix, false);
 
 		int parseStatus = u->parse(ice.string(), cppHandle, false);
 

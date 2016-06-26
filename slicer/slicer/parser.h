@@ -27,8 +27,8 @@ namespace Slicer {
 
 			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp);
 			static unsigned int Apply(const boost::filesystem::path & ice, FILE *);
-			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args &);
-			static unsigned int Apply(const boost::filesystem::path & ice, FILE *, const Args &);
+			static unsigned int Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args &, bool);
+			static unsigned int Apply(const boost::filesystem::path & ice, FILE *, const Args &, bool);
 
 			unsigned int Components() const;
 
