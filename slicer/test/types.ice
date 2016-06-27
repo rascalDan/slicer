@@ -1,4 +1,6 @@
 [["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
+[["cpp:include:boost/date_time/posix_time/time_formatters.hpp"]]
+[["cpp:include:boost/date_time/posix_time/time_parsers.hpp"]]
 [["cpp:include:conversions.h"]]
 
 #include <included.ice>
@@ -136,6 +138,15 @@ module TestModule2 {
 		int Id;
 		[ "slicer:xml:text" ]
 		string Name;
+	};
+	class Conv {
+		[ "slicer:conversion:boost.posix_time.ptime:boost.posix_time.to_iso_extended_string:boost.posix_time.time_from_string:nodeclare" ]
+		string conv;
+	};
+	class MissingConv {
+		[ "slicer:conversion:boost.posix_time.ptime:boost.posix_time.to_iso_extended_string:boost.posix_time.time_from_string:nodeclare",
+			"slicer:nodefaultconversion" ]
+		string conv;
 	};
 };
 

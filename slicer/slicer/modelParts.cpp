@@ -19,6 +19,9 @@ namespace Slicer {
 	InvalidEnumerationValue::InvalidEnumerationValue(::Ice::Int n, const std::string & e) :
 		std::invalid_argument("Invalid value " + boost::lexical_cast<std::string>(n) + " in " + e) { }
 
+	NoConversionFound::NoConversionFound(const std::string & n) :
+		std::runtime_error("Could not convert to/from model for type " + n) { }
+
 	ClassNameMap * &
 	classNameMap()
 	{

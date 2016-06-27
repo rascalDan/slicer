@@ -68,6 +68,17 @@ namespace Slicer {
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
 			}
+			// Default conversion
+			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
+				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
+						Slice::typeToString(type));
+				fprintbf(cpp, "\t\tvspt->set(Member);\n");
+				fprintbf(cpp, "\t\treturn;\n");
+				fprintbf(cpp, "\t}\n");
+			}
+			// Failed to convert
+			fprintbf(cpp, "\tthrow NoConversionFound(\"%s\");\n",
+					Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
 
 			fprintbf(cpp, "template<>\nvoid\n");
@@ -85,6 +96,17 @@ namespace Slicer {
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
 			}
+			// Default conversion
+			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
+				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
+					Slice::typeToString(type));
+				fprintbf(cpp, "\t\tvtpt->get(Member);\n");
+				fprintbf(cpp, "\t\treturn;\n");
+				fprintbf(cpp, "\t}\n");
+			}
+			// Failed to convert
+			fprintbf(cpp, "\tthrow NoConversionFound(\"%s\");\n",
+					Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
 		}
 	}

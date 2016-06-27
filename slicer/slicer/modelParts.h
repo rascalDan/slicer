@@ -38,6 +38,11 @@ namespace Slicer {
 			InvalidEnumerationValue(::Ice::Int n, const std::string & e);
 	};
 
+	class DLL_PUBLIC NoConversionFound : public std::runtime_error {
+		public:
+			NoConversionFound(const std::string & n);
+	};
+
 	template <typename T>
 	class TValueTarget {
 		public:

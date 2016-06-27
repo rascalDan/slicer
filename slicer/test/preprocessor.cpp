@@ -13,7 +13,7 @@
 
 namespace fs = boost::filesystem;
 
-const unsigned int COMPONENTS_IN_TEST_ICE = 35;
+const unsigned int COMPONENTS_IN_TEST_ICE = 37;
 
 BOOST_FIXTURE_TEST_SUITE ( preprocessor, FileStructure );
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE( slicer_test_ice )
 
 	const fs::path so = fs::change_extension(tmp / ("libslicer" + slice.filename().string()), ".so");
 	const std::string link = stringbf(
-					"g++ -shared -Wl,--strip-all,--gc-sections -lIce -lIceUtil %s/lib%s.so %s/lib%s.so %s -o %s",
+					"g++ -shared -Wl,--strip-all,--gc-sections -lboost_date_time -lIce -lIceUtil %s/lib%s.so %s/lib%s.so %s -o %s",
 					root / bjamout, base,
 					included / bjamout, included.leaf(),
 					obj, so);

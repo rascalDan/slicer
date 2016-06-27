@@ -478,6 +478,32 @@ BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 }
 
+BOOST_AUTO_TEST_CASE( missingConversion )
+{
+	auto in = json::parseValue("{\"conv\": \"2016-06-30 12:34:56\"}");
+	BOOST_REQUIRE_THROW((
+		Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)
+	), Slicer::NoConversionFound);
+
+	TestModule2::MissingConvPtr obj = new TestModule2::MissingConv("2016-06-30 12:34:56");
+	json::Value v;
+	BOOST_REQUIRE_THROW(
+		Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v),
+		Slicer::NoConversionFound);
+}
+
+BOOST_AUTO_TEST_CASE( conversion )
+{
+	auto in = json::parseValue("{\"conv\": \"2016-06-30 12:34:56\"}");
+	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::ConvPtr>(in);
+	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", obj->conv);
+
+	json::Value v;
+	Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v);
+	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56",
+			boost::get<json::String>(*boost::get<json::Object>(v)["conv"]));
+}
+
 BOOST_FIXTURE_TEST_SUITE ( compatWrapper, FileBased );
 
 BOOST_AUTO_TEST_CASE( any )
