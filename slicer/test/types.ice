@@ -152,7 +152,7 @@ module TestModule2 {
 
 module DB {
 	[	"slicer:conversion:boost.posix_time.time_duration:timedurationToTimespan:timespanToTimeduration" ]
-	struct Timespan {
+	class Timespan {
 		int days;
 		short hours;
 		short minutes;

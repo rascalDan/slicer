@@ -144,14 +144,17 @@ BOOST_AUTO_TEST_CASE( insert_converted )
 	DB::SpecificTypesPtr st = new DB::SpecificTypes {
 		{2015, 10, 16, 19, 12, 34},
 		{2015, 10, 16},
-		{1, 2, 3, 4}
+		new DB::Timespan(1, 2, 3, 4)
 	};
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(st, db.get(), "converted");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM converted"));
 	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::SpecificTypesPtr>(*sel);
 	BOOST_REQUIRE_EQUAL(st->date, st2->date);
 	BOOST_REQUIRE_EQUAL(st->dt, st2->dt);
-	BOOST_REQUIRE_EQUAL(st->ts, st2->ts);
+	BOOST_REQUIRE_EQUAL(st->ts->days, st2->ts->days);
+	BOOST_REQUIRE_EQUAL(st->ts->hours, st2->ts->hours);
+	BOOST_REQUIRE_EQUAL(st->ts->minutes, st2->ts->minutes);
+	BOOST_REQUIRE_EQUAL(st->ts->seconds, st2->ts->seconds);
 }
 
 BOOST_AUTO_TEST_CASE( insert_unsupportedModel )

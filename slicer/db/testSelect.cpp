@@ -141,10 +141,10 @@ BOOST_AUTO_TEST_CASE( select_inherit_datetime )
 	BOOST_REQUIRE_EQUAL(2015, bi->date.year);
 	BOOST_REQUIRE_EQUAL(3, bi->date.month);
 	BOOST_REQUIRE_EQUAL(27, bi->date.day);
-	BOOST_REQUIRE_EQUAL(1, bi->ts.days);
-	BOOST_REQUIRE_EQUAL(13, bi->ts.hours);
-	BOOST_REQUIRE_EQUAL(13, bi->ts.minutes);
-	BOOST_REQUIRE_EQUAL(12, bi->ts.seconds);
+	BOOST_REQUIRE_EQUAL(1, bi->ts->days);
+	BOOST_REQUIRE_EQUAL(13, bi->ts->hours);
+	BOOST_REQUIRE_EQUAL(13, bi->ts->minutes);
+	BOOST_REQUIRE_EQUAL(12, bi->ts->seconds);
 }
 
 template <typename T, typename ... P>

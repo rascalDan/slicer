@@ -548,6 +548,9 @@ namespace Slicer {
 		auto conversions = getConversions(dm->getMetaData());
 		auto typec = Slice::ContainedPtr::dynamicCast(dm->type());
 		if (typec) {
+			if (auto cd = Slice::ClassDeclPtr::dynamicCast(typec)) {
+				typec = cd->definition();
+			}
 			auto typeConversions = getConversions(typec->getMetaData());
 			std::copy(typeConversions.begin(), typeConversions.end(), std::back_inserter(conversions));
 		}

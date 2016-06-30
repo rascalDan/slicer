@@ -89,17 +89,17 @@ namespace Slicer {
 	}
 
 	DLL_PUBLIC
-	::DB::Timespan
+	::DB::TimespanPtr
 	timedurationToTimespan(const boost::posix_time::time_duration & td)
 	{
-		return ::DB::Timespan({ SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()) });
+		return new ::DB::Timespan(SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()));
 	}
 
 	DLL_PUBLIC
 	boost::posix_time::time_duration
-	timespanToTimeduration(const ::DB::Timespan & ts)
+	timespanToTimeduration(const ::DB::TimespanPtr & ts)
 	{
-		return boost::posix_time::time_duration((ts.days * 24) + ts.hours, ts.minutes, ts.seconds);
+		return boost::posix_time::time_duration((ts->days * 24) + ts->hours, ts->minutes, ts->seconds);
 	}
 }
 
