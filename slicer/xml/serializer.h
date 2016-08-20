@@ -11,79 +11,79 @@ namespace Slicer {
 			BadBooleanValue(const Glib::ustring &);
 	};
 
-	class XmlSerializer : public Serializer {
+	class DLL_PUBLIC XmlSerializer : public Serializer {
 		protected:
 			typedef boost::function<xmlpp::Element *(xmlpp::Element *, const Glib::ustring &)> ElementCreator;
 			static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartPtr mp, HookCommonPtr hp, const ElementCreator &);
 			static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartPtr mp);
 
-		private:
+		protected:
 			static void ModelTreeProcessElement(xmlpp::Element * n, ModelPartPtr mp, const ElementCreator &);
 	};
 
-	class XmlStreamSerializer : public XmlSerializer {
+	class DLL_PUBLIC XmlStreamSerializer : public XmlSerializer {
 		public:
-			DLL_PUBLIC XmlStreamSerializer(std::ostream &);
+			XmlStreamSerializer(std::ostream &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			std::ostream & strm;
 	};
 
-	class XmlFileSerializer : public XmlSerializer {
+	class DLL_PUBLIC XmlFileSerializer : public XmlSerializer {
 		public:
-			DLL_PUBLIC XmlFileSerializer(const boost::filesystem::path &);
+			XmlFileSerializer(const boost::filesystem::path &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			const boost::filesystem::path path;
 	};
 
-	class XmlDocumentSerializer : public XmlSerializer {
+	class DLL_PUBLIC XmlDocumentSerializer : public XmlSerializer {
 		public:
-			DLL_PUBLIC XmlDocumentSerializer(xmlpp::Document * &);
+			XmlDocumentSerializer(xmlpp::Document * &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			xmlpp::Document * & doc;
 	};
 
-	class XmlDeserializer : public Deserializer {
+	class DLL_PUBLIC XmlDeserializer : public Deserializer {
 		protected:
 			static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp);
 			static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp);
 	};
 
-	class XmlStreamDeserializer : public XmlDeserializer {
+	class DLL_PUBLIC XmlStreamDeserializer : public XmlDeserializer {
 		public:
-			DLL_PUBLIC XmlStreamDeserializer(std::istream &);
+			XmlStreamDeserializer(std::istream &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			std::istream & strm;
 	};
 
-	class XmlFileDeserializer : public XmlDeserializer {
+	class DLL_PUBLIC XmlFileDeserializer : public XmlDeserializer {
 		public:
-			DLL_PUBLIC XmlFileDeserializer(const boost::filesystem::path &);
+			XmlFileDeserializer(const boost::filesystem::path &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			const boost::filesystem::path path;
 	};
 
-	class XmlDocumentDeserializer : public XmlDeserializer {
+	class DLL_PUBLIC XmlDocumentDeserializer : public XmlDeserializer {
 		public:
-			DLL_PUBLIC XmlDocumentDeserializer(const xmlpp::Document *);
+			XmlDocumentDeserializer(const xmlpp::Document *);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			const xmlpp::Document * doc;
 	};
 }

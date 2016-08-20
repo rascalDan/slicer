@@ -13,63 +13,63 @@ namespace Slicer {
 			static void ModelTreeIterateRoot(json::Value *, ModelPartPtr mp);
 	};
 
-	class JsonStreamSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonStreamSerializer : public JsonSerializer {
 		public:
-			DLL_PUBLIC JsonStreamSerializer(std::ostream &);
+			JsonStreamSerializer(std::ostream &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			std::ostream & strm;
 	};
 
-	class JsonFileSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonFileSerializer : public JsonSerializer {
 		public:
-			DLL_PUBLIC JsonFileSerializer(const boost::filesystem::path &);
+			JsonFileSerializer(const boost::filesystem::path &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			const boost::filesystem::path path;
 	};
 
-	class JsonValueSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
 		public:
-			DLL_PUBLIC JsonValueSerializer(json::Value &);
+			JsonValueSerializer(json::Value &);
 
 			virtual void Serialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			json::Value & value;
 	};
 
-	class JsonStreamDeserializer : public Deserializer {
+	class DLL_PUBLIC JsonStreamDeserializer : public Deserializer {
 		public:
-			DLL_PUBLIC JsonStreamDeserializer(std::istream &);
+			JsonStreamDeserializer(std::istream &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			std::istream & strm;
 	};
 
-	class JsonFileDeserializer : public Deserializer {
+	class DLL_PUBLIC JsonFileDeserializer : public Deserializer {
 		public:
-			DLL_PUBLIC JsonFileDeserializer(const boost::filesystem::path &);
+			JsonFileDeserializer(const boost::filesystem::path &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			const boost::filesystem::path path;
 	};
 
-	class JsonValueDeserializer : public Deserializer {
+	class DLL_PUBLIC JsonValueDeserializer : public Deserializer {
 		public:
-			DLL_PUBLIC JsonValueDeserializer(const json::Value &);
+			JsonValueDeserializer(const json::Value &);
 
 			virtual void Deserialize(ModelPartPtr) override;
 
-		private:
+		protected:
 			const json::Value & value;
 	};
 }
