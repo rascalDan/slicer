@@ -249,6 +249,22 @@ checkSomeNumbers(const TestModule::SomeNumbers & sn)
 	BOOST_REQUIRE_EQUAL(sn, TestModule::FiftyFive);
 }
 
+void
+checkObjectMap(const TestJson::Properties & p)
+{
+	BOOST_REQUIRE_EQUAL(3, p.size());
+	BOOST_REQUIRE_EQUAL(1, p.find("one")->second);
+	BOOST_REQUIRE_EQUAL(20, p.find("twenty")->second);
+	BOOST_REQUIRE_EQUAL(300, p.find("three hundred")->second);
+}
+
+void
+checkObjectMapMember(const TestJson::HasProperitiesPtr & p)
+{
+	BOOST_REQUIRE_EQUAL(p->name, "foo");
+	checkObjectMap(p->props);
+}
+
 xmlpp::Document *
 readXml(const fs::path & path)
 {
@@ -420,6 +436,16 @@ BOOST_AUTO_TEST_CASE( xml_rootEnums_xml )
 BOOST_AUTO_TEST_CASE( json_rootEnums_json )
 {
 	verifyByFile<TestModule::SomeNumbers, Slicer::JsonFileDeserializer>("enum2.json", checkSomeNumbers);
+}
+
+BOOST_AUTO_TEST_CASE( json_objectmap )
+{
+	verifyByFile<TestJson::Properties, Slicer::JsonFileDeserializer>("objectmap.json", checkObjectMap);
+}
+
+BOOST_AUTO_TEST_CASE( json_objectmapMember )
+{
+	verifyByFile<TestJson::HasProperitiesPtr, Slicer::JsonFileDeserializer>("objectmapMember.json", checkObjectMapMember);
 }
 
 BOOST_AUTO_TEST_CASE( json_streams )

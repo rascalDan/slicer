@@ -1,0 +1,8 @@
+{
+	"name": "foo",
+	"props": {
+		"one": 1,
+		"three hundred": 300,
+		"twenty": 20
+	}
+}

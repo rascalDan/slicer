@@ -125,6 +125,15 @@ module TestModule {
 	};
 };
 
+module TestJson {
+	[ "slicer:json:object" ]
+	dictionary<string, int> Properties;
+	class HasProperities {
+		string name;
+		Properties props;
+	};
+};
+
 module TestModule2 {
 	class CrossModule extends TestModule::ClassType {
 		int anything;

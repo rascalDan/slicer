@@ -9,6 +9,7 @@ namespace Slicer {
 	class JsonSerializer : public Serializer {
 		protected:
 			static void ModelTreeIterate(json::Value *, const std::string &, ModelPartPtr mp);
+			static void ModelTreeIterateDictObj(json::Value *, ModelPartPtr mp);
 			static void ModelTreeIterateSeq(json::Value *, ModelPartPtr mp);
 			static void ModelTreeIterateRoot(json::Value *, ModelPartPtr mp);
 	};
