@@ -203,10 +203,11 @@ namespace Slicer {
 			virtual ModelPartType GetType() const override;
 			virtual bool IsOptional() const override;
 
+			static const std::string rootName;
+
 		private:
 			T * ModelObject;
 			ModelPartPtr mp;
-			static std::string rootName;
 	};
 }
 

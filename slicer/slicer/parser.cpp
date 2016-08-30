@@ -157,10 +157,10 @@ namespace Slicer {
 	Slicer::defineRootName(const std::string & type, const std::string & name) const
 	{
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
+		fprintbf(cpp, "const std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
 				type, name);
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "std::string ModelPartForRoot< IceUtil::Optional< %s > >::rootName(\"Optional%s\");\n\n",
+		fprintbf(cpp, "const std::string ModelPartForRoot< IceUtil::Optional< %s > >::rootName(\"Optional%s\");\n\n",
 				type, name);
 
 		fprintbf(cpp, "template class ModelPartForRoot< %s >;\n\n", type);
@@ -183,7 +183,7 @@ namespace Slicer {
 
 		fprintbf(cpp, "template<>\n");
 		auto typeId = metaDataValue("slicer:typeid:", c->getMetaData());
-		fprintbf(cpp, "std::string ModelPartForClass< %s >::typeIdProperty(\"%s\");\n\n",
+		fprintbf(cpp, "const std::string ModelPartForClass< %s >::typeIdProperty(\"%s\");\n\n",
 				typeToString(decl),
 				typeId ? *typeId : "slicer-typeid");
 
@@ -219,7 +219,7 @@ namespace Slicer {
 		fprintbf(cpp, "\treturn (id == \"%s\") ? TypeId() : ModelPart::ToExchangeTypeName(id);\n}\n\n",
 				c->scoped());
 
-		fprintbf(cpp, "template<>\nMetadata ModelPartForComplex< %s >::metadata ",
+		fprintbf(cpp, "template<>\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());
 		copyMetadata(c->getMetaData());
 
@@ -246,7 +246,7 @@ namespace Slicer {
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
 		defineRootName(c->scoped(), name ? *name : c->name());
 
-		fprintbf(cpp, "template<>\nMetadata ModelPartForComplex< %s >::metadata ",
+		fprintbf(cpp, "template<>\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());
 		copyMetadata(c->getMetaData());
 
@@ -262,7 +262,7 @@ namespace Slicer {
 		if (!cpp) return;
 
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "ModelPartForComplex< %s >::Hooks ",
+		fprintbf(cpp, "const ModelPartForComplex< %s >::Hooks ",
 				it->scoped());
 		fprintbf(cpp, "ModelPartForComplex< %s >::hooks {\n",
 				it->scoped());
@@ -318,7 +318,7 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto type = dm->type();
-			fprintbf(cpp, "template<>\ntemplate<>\nMetadata\n");
+			fprintbf(cpp, "template<>\ntemplate<>\nconst Metadata\n");
 			createNewModelPartPtrFor(t);
 			fprintbf(cpp, "< %s >::HookMetadata< %s",
 					typeToString(it),
@@ -340,11 +340,11 @@ namespace Slicer {
 		if (!cpp) return;
 
 		fprintbf(cpp, "// Enumeration %s\n", e->name());
-		fprintbf(cpp, "template<>\nMetadata ModelPartForEnum< %s >::metadata ",
+		fprintbf(cpp, "template<>\nconst Metadata ModelPartForEnum< %s >::metadata ",
 				e->scoped());
 		copyMetadata(e->getMetaData());
 
-		fprintbf(cpp, "template<>\nModelPartForEnum< %s >::Enumerations\nModelPartForEnum< %s >::enumerations([]() -> ModelPartForEnum< %s >::Enumerations\n",
+		fprintbf(cpp, "template<>\nconst ModelPartForEnum< %s >::Enumerations\nModelPartForEnum< %s >::enumerations([]() -> ModelPartForEnum< %s >::Enumerations\n",
 				e->scoped(),
 				e->scoped(),
 				e->scoped());
@@ -411,14 +411,14 @@ namespace Slicer {
 
 		fprintbf(cpp, "template<>\n");
 		auto ename = metaDataValue("slicer:element:", s->getMetaData());
-		fprintbf(cpp, "std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n",
+		fprintbf(cpp, "const std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n",
 				s->scoped(),
 				ename ? *ename : "element");
 
 		auto name = metaDataValue("slicer:root:", s->getMetaData());
 		defineRootName(s->scoped(), name ? *name : s->name());
 
-		fprintbf(cpp, "template<>\nMetadata ModelPartForSequence< %s >::metadata ",
+		fprintbf(cpp, "template<>\nconst Metadata ModelPartForSequence< %s >::metadata ",
 				s->scoped());
 		copyMetadata(s->getMetaData());
 
@@ -438,12 +438,12 @@ namespace Slicer {
 		fprintbf(cpp, "// Dictionary %s\n", d->name());
 		auto iname = metaDataValue("slicer:item:", d->getMetaData());
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "std::string ModelPartForDictionary< %s >::pairName(\"%s\");\n\n",
+		fprintbf(cpp, "const std::string ModelPartForDictionary< %s >::pairName(\"%s\");\n\n",
 				d->scoped(),
 				iname ? *iname : "element");
 
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "ModelPartForComplex< %s::value_type >::Hooks ",
+		fprintbf(cpp, "const ModelPartForComplex< %s::value_type >::Hooks ",
 				d->scoped());
 		fprintbf(cpp, "ModelPartForComplex< %s::value_type >::hooks {\n",
 				d->scoped());
@@ -476,11 +476,11 @@ namespace Slicer {
 		auto name = metaDataValue("slicer:root:", d->getMetaData());
 		defineRootName(d->scoped(), name ? *name : d->name());
 
-		fprintbf(cpp, "template<>\nMetadata ModelPartForDictionary< %s >::metadata ",
+		fprintbf(cpp, "template<>\nconst Metadata ModelPartForDictionary< %s >::metadata ",
 				d->scoped());
 		copyMetadata(d->getMetaData());
 
-		fprintbf(cpp, "template<>\nMetadata ModelPartForComplex<%s::value_type>::metadata ",
+		fprintbf(cpp, "template<>\nconst Metadata ModelPartForComplex<%s::value_type>::metadata ",
 				d->scoped());
 		copyMetadata(d->getMetaData());
 

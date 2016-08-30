@@ -11,7 +11,7 @@ namespace Slicer {
 			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
-			static ModelPartType type;
+			static const ModelPartType type;
 	};
 
 	template<typename T>
@@ -35,7 +35,7 @@ namespace Slicer {
 			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
-			static ModelPartType type;
+			static const ModelPartType type;
 	};
 
 	template<typename T, typename M, T M::* MV>
@@ -80,7 +80,7 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPartForComplexBase : public ModelPart {
 		public:
 			virtual ModelPartType GetType() const override;
-			static ModelPartType type;
+			static const ModelPartType type;
 	};
 
 	template<typename T>
@@ -98,8 +98,7 @@ namespace Slicer {
 				public:
 					virtual const Metadata & GetMetadata() const override { return metadata; }
 
-				private:
-					static Metadata metadata;
+					static const Metadata metadata;
 			};
 
 			template <typename MT, typename CT, MT CT::*M, typename MP, typename Base = HookMetadata<MT, CT, M>>
@@ -136,9 +135,8 @@ namespace Slicer {
 
 			typedef std::vector<HookPtr> Hooks;
 
-		private:
-			static Hooks hooks;
-			static Metadata metadata;
+			static const Hooks hooks;
+			static const Metadata metadata;
 	};
 
 	template<typename T>
@@ -160,9 +158,10 @@ namespace Slicer {
 
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
 
+			static const std::string typeIdProperty;
+
 		private:
 			T & ModelObject;
-			static std::string typeIdProperty;
 	};
 
 	template<typename T>
@@ -187,7 +186,7 @@ namespace Slicer {
 			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
-			static ModelPartType type;
+			static const ModelPartType type;
 	};
 
 	template<typename T>
@@ -204,17 +203,18 @@ namespace Slicer {
 
 			virtual void GetValue(ValueTargetPtr s) override;
 
+			static const Metadata metadata;
+			static const Enumerations enumerations;
+
 		private:
 			T & modelPart;
-			static Metadata metadata;
-			static Enumerations enumerations;
 	};
 
 	class DLL_PUBLIC ModelPartForSequenceBase : public ModelPart {
 		public:
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
-			static ModelPartType type;
+			static const ModelPartType type;
 	};
 
 	template<typename T>
@@ -232,12 +232,13 @@ namespace Slicer {
 
 			virtual const Metadata & GetMetadata() const override;
 
+			static const Metadata metadata;
+			static const std::string elementName;
+
 		private:
 			ModelPartPtr elementModelPart(typename T::value_type &) const;
 
 			T & sequence;
-			static std::string elementName;
-			static Metadata metadata;
 	};
 
 	template<typename T>
@@ -257,7 +258,7 @@ namespace Slicer {
 		public:
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
-			static ModelPartType type;
+			static const ModelPartType type;
 	};
 
 	template<typename T>
@@ -275,10 +276,11 @@ namespace Slicer {
 
 			virtual const Metadata & GetMetadata() const override;
 
+			static const Metadata metadata;
+			static const std::string pairName;
+
 		private:
 			T & dictionary;
-			static std::string pairName;
-			static Metadata metadata;
 	};
 
 }
