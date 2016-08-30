@@ -66,7 +66,7 @@ namespace Slicer {
 
 			virtual bool HasValue() const override;
 
-			virtual ModelPartType GetType() const;
+			virtual ModelPartType GetType() const override;
 
 			virtual bool IsOptional() const override;
 
