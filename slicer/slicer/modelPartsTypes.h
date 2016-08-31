@@ -205,6 +205,8 @@ namespace Slicer {
 
 			static const Metadata metadata;
 			static const Enumerations enumerations;
+			DLL_PUBLIC static const std::string & lookup(T);
+			DLL_PUBLIC static T lookup(const std::string &);
 
 		private:
 			T & modelPart;

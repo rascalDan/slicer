@@ -358,18 +358,12 @@ namespace Slicer {
 		fprintbf(cpp, "template<>\nvoid ModelPartForEnum< %s >::SetValue(ValueSourcePtr s) {\n\
 	std::string val;\n\
 	s->set(val);\n\
-	auto i = enumerations.right.find(val);\n\
-	if (i == enumerations.right.end()) throw InvalidEnumerationValue(val, \"%s\");\n\
-	modelPart = i->second;\n\
+	modelPart = lookup(val);\n\
 }\n\n",
-				e->scoped(),
 				e->scoped());
 		fprintbf(cpp, "template<>\nvoid ModelPartForEnum< %s >::GetValue(ValueTargetPtr s) {\n\
-	auto i = enumerations.left.find(modelPart);\n\
-	if (i == enumerations.left.end()) throw InvalidEnumerationValue((::Ice::Int)modelPart, \"%s\");\n\
-	s->get(i->second);\n\
+	s->get(lookup(modelPart));\n\
 }\n\n",
-				e->scoped(),
 				e->scoped());
 
 		auto name = metaDataValue("slicer:root:", e->getMetaData());
@@ -377,6 +371,10 @@ namespace Slicer {
 
 		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForEnum);\n\n",
 				e->scoped());
+		fprintbf(cpp, "template %s ModelPartForEnum< %s >::lookup(const std::string &);\n\n",
+				e->scoped(), e->scoped());
+		fprintbf(cpp, "template const std::string & ModelPartForEnum< %s >::lookup(%s);\n\n",
+				e->scoped(), e->scoped());
 	}
 
 	void
