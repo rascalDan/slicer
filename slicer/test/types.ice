@@ -50,6 +50,7 @@ module TestModule {
 		int a;
 		int b;
 	};
+	sequence<string> SimpleSeq;
 	sequence<BuiltIns> BuiltInSeq;
 	sequence<ClassType> Classes;
 	sequence<StructType> Structs;

@@ -448,6 +448,16 @@ BOOST_AUTO_TEST_CASE( json_objectmapMember )
 	verifyByFile<TestJson::HasProperitiesPtr, Slicer::JsonFileDeserializer>("objectmapMember.json", checkObjectMapMember);
 }
 
+BOOST_AUTO_TEST_CASE( json_simpleArray )
+{
+	verifyByFile<TestModule::SimpleSeq, Slicer::JsonFileDeserializer>("simpleArray1.json");
+}
+
+BOOST_AUTO_TEST_CASE( xml_simpleArray )
+{
+	verifyByFile<TestModule::SimpleSeq, Slicer::XmlFileDeserializer>("simpleArray2.xml");
+}
+
 BOOST_AUTO_TEST_CASE( json_streams )
 {
 	const auto tmpf = tmp / "byStream";

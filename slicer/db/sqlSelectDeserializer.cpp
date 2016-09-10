@@ -88,28 +88,47 @@ namespace Slicer {
 	{
 		auto rmp = mp->GetAnonChild();
 		if (rmp) {
-			if (typeIdColIdx) {
-				std::string subclass;
-				cmd[*typeIdColIdx] >> subclass;
-				rmp = rmp->GetSubclassModelPart(subclass);
-			}
-			rmp->Create();
-			for (auto col = 0u; col < columnCount; col += 1) {
-				const DB::Column & c = cmd[col];
-				if (!c.isNull()) {
-					auto fmpr = rmp->GetAnonChildRef([&c](Slicer::HookCommonPtr h) {
-							return boost::iequals(c.name, h->PartName());
-						});
-					if (fmpr) {
-						SqlSourcePtr h = new SqlSource(c);
-						auto fmp = fmpr->Child();
-						fmp->Create();
-						fmp->SetValue(h);
-						fmp->Complete();
+			switch (rmp->GetType()) {
+				case Slicer::mpt_Complex:
+					{
+						if (typeIdColIdx) {
+							std::string subclass;
+							cmd[*typeIdColIdx] >> subclass;
+							rmp = rmp->GetSubclassModelPart(subclass);
+						}
+						rmp->Create();
+						for (auto col = 0u; col < columnCount; col += 1) {
+							const DB::Column & c = cmd[col];
+							if (!c.isNull()) {
+								auto fmpr = rmp->GetAnonChildRef([&c](Slicer::HookCommonPtr h) {
+									return boost::iequals(c.name, h->PartName());
+								});
+								if (fmpr) {
+									SqlSourcePtr h = new SqlSource(c);
+									auto fmp = fmpr->Child();
+									fmp->Create();
+									fmp->SetValue(h);
+									fmp->Complete();
+								}
+							}
+						}
+						rmp->Complete();
 					}
-				}
+					break;
+				case Slicer::mpt_Simple:
+					{
+						rmp->Create();
+						const DB::Column & c = cmd[0];
+						if (!c.isNull()) {
+							SqlSourcePtr h = new SqlSource(c);
+							rmp->SetValue(h);
+						}
+						rmp->Complete();
+					}
+					break;
+				default:
+					throw UnsupportedModelType();
 			}
-			rmp->Complete();
 		}
 	}
 }

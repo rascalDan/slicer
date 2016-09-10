@@ -99,6 +99,21 @@ BOOST_AUTO_TEST_CASE( select_inherit_single )
 	BOOST_REQUIRE_EQUAL(300, d2->c);
 }
 
+BOOST_AUTO_TEST_CASE( select_simple_sequence )
+{
+	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto sel = SelectPtr(db->newSelectCommand(
+				"SELECT string \
+				FROM test \
+				ORDER BY id DESC"));
+	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::SimpleSeq>(*sel);
+	BOOST_REQUIRE_EQUAL(4, bi.size());
+	BOOST_REQUIRE_EQUAL("text four", bi[0]);
+	BOOST_REQUIRE_EQUAL("text three", bi[1]);
+	BOOST_REQUIRE_EQUAL("text two", bi[2]);
+	BOOST_REQUIRE_EQUAL("text one", bi[3]);
+}
+
 BOOST_AUTO_TEST_CASE( select_inherit_sequence )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
