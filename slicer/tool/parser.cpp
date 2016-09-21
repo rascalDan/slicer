@@ -17,6 +17,7 @@ namespace fs = boost::filesystem;
 namespace Slicer {
 	Slicer::Slicer() :
 		cpp(NULL),
+		headerPrefix("slicer"),
 		allowIcePrefix(false),
 		components(0),
 		classNo(0)
@@ -117,7 +118,7 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Begin Slicer code\n\n");
 		fprintbf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string());
-		fprintbf(cpp, "#include <slicer/modelPartsTypes.impl.h>\n\n");
+		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "modelPartsTypes.impl.h").string());
 		fprintbf(cpp, "namespace Slicer {\n");
 		return true;
 	}

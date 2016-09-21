@@ -12,7 +12,8 @@ main(int argc, char ** argv)
 	opts.add_options()
 		("help,h", "Show this help message")
 		("include,I", po::value(&slicer.includes), "Add include directory to search path")
-		("ice", po::value(&slicer.allowIcePrefix)->default_value(false)->zero_tokens(), "Allow reserved Ice prefix in Slice identifiers")
+		("ice", po::value(&slicer.allowIcePrefix)->default_value(slicer.allowIcePrefix)->zero_tokens(), "Allow reserved Ice prefix in Slice identifiers")
+		("headerPrefix", po::value(&slicer.headerPrefix)->default_value(slicer.headerPrefix), "Prefix path for Slicer C++ #includes")
 		("slice,i", po::value(&slicer.slicePath), "Input ICE Slice file")
 		("cpp,o", po::value(&slicer.cppPath), "Output C++ file");
 
@@ -34,6 +35,4 @@ main(int argc, char ** argv)
 
 	return 0;
 }
-
-
 
