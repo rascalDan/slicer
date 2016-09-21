@@ -19,16 +19,26 @@ BOOST_FIXTURE_TEST_SUITE ( preprocessor, FileStructure );
 
 BOOST_AUTO_TEST_CASE( slicer_test_counts_path )
 {
-	auto count = Slicer::Slicer::Apply(slice, boost::filesystem::path("/dev/null"), {"-I" + included.string()}, false);
+	Slicer::Slicer s;
+	s.slicePath = slice;
+	s.cppPath = "/dev/null";
+	s.includes.push_back(included);
+
+	auto count = s.Execute();
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
+	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, s.Components());
 }
 
 BOOST_AUTO_TEST_CASE( slicer_test_counts_filestar )
 {
 	FILE * file = fopen("/dev/null", "a");
 	BOOST_REQUIRE(file);
+	Slicer::Slicer s;
+	s.slicePath = slice;
+	s.cpp = file;
+	s.includes.push_back(included);
 
-	auto count = Slicer::Slicer::Apply(slice, file, {"-I" + included.string()}, false);
+	auto count = s.Execute();
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
 
 	fclose(file);
@@ -36,13 +46,20 @@ BOOST_AUTO_TEST_CASE( slicer_test_counts_filestar )
 
 BOOST_AUTO_TEST_CASE( slicer_test_counts_nullfilestar )
 {
-	auto count = Slicer::Slicer::Apply(slice, NULL, {"-I" + included.string()}, false);
+	Slicer::Slicer s;
+	s.slicePath = slice;
+	s.includes.push_back(included);
+
+	auto count = s.Execute();
 	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE, count);
 }
 
 BOOST_AUTO_TEST_CASE( slicer_test_counts_interfacesOnly )
 {
-	auto count = Slicer::Slicer::Apply(root / "interfaces.ice", NULL);
+	Slicer::Slicer s;
+	s.slicePath = root / "interfaces.ice";
+
+	auto count = s.Execute();
 	BOOST_REQUIRE_EQUAL(0, count);
 }
 

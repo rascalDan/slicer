@@ -9,18 +9,16 @@
 #include <Slice/CPlusPlusUtil.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <mutex>
 #include <fprintbf.h>
 #include <safeMapFind.h>
 
 namespace fs = boost::filesystem;
 
-std::mutex slicePreprocessor;
-
 namespace Slicer {
-	Slicer::Slicer(FILE * c) :
+	Slicer::Slicer() :
+		cpp(NULL),
+		allowIcePrefix(false),
 		components(0),
-		cpp(c),
 		classNo(0)
 	{
 	}
@@ -580,33 +578,25 @@ namespace Slicer {
 	}
 
 	unsigned int
-	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp)
+	Slicer::Execute()
 	{
-		return Apply(ice, cpp, {}, false);
-	}
-
-	unsigned int
-	Slicer::Apply(const boost::filesystem::path & ice, const boost::filesystem::path & cpp, const Args & args, bool allowIcePrefix)
-	{
-		FilePtr cppfile(fopen(cpp.string(), "a"), fclose);
-		if (!cppfile) {
-			throw std::runtime_error("failed to open code file");
+		if (cpp != NULL && !cppPath.empty()) {
+			throw std::runtime_error("Both file handle and path provided.");
+		}
+		FilePtr cppfile(
+			cpp || cppPath.empty() ? cpp : fopen(cppPath.string(), "a"),
+			cppPath.empty() ? fflush : fclose);
+		if (!cppfile && !cppPath.empty()) {
+			throw std::runtime_error("Failed to open output file");
+		}
+		cpp = cppfile.get();
+		Slicer::Slicer::Args args;
+		// Copy includes to args
+		for(const auto & include : includes) {
+			args.push_back("-I" + include.string());
 		}
 
-		return Apply(ice, cppfile.get(), args, allowIcePrefix);
-	}
-
-	unsigned int
-	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp)
-	{
-		return Apply(ice, cpp, {}, false);
-	}
-
-	unsigned int
-	Slicer::Apply(const boost::filesystem::path & ice, FILE * cpp, const Args & args, bool allowIcePrefix)
-	{
-		std::lock_guard<std::mutex> lock(slicePreprocessor);
-		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", ice.string(), args);
+		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath.string(), args);
 		FILE * cppHandle = icecpp->preprocess(false);
 
 		if (cppHandle == NULL) {
@@ -615,7 +605,7 @@ namespace Slicer {
 
 		Slice::UnitPtr u = Slice::Unit::createUnit(false, false, allowIcePrefix, false);
 
-		int parseStatus = u->parse(ice.string(), cppHandle, false);
+		int parseStatus = u->parse(slicePath.string(), cppHandle, false);
 
 		if (!icecpp->close()) {
 			throw std::runtime_error("preprocess close failed");
@@ -625,12 +615,11 @@ namespace Slicer {
 			throw std::runtime_error("unit parse failed");
 		}
 
-		Slicer s(cpp);
-		u->visit(&s, false);
+		u->visit(this, false);
 
 		u->destroy();
 
-		return s.Components();
+		return Components();
 	}
 
 	Slicer::ConversionSpec::ConversionSpec(const Slicer::Args & s) :
