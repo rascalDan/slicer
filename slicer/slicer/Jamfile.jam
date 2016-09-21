@@ -1,20 +1,15 @@
-lib Slice ;
 lib IceUtil ;
 lib boost_system ;
-lib boost_filesystem ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer :
 	[ glob *.cpp ]
 	:
-	<library>Slice
 	<library>IceUtil
 	<library>boost_system
-	<library>boost_filesystem
 	<library>adhocutil
 	<include>..
 	: :
 	<include>..
 	<library>boost_system
-	<library>boost_filesystem
 	;

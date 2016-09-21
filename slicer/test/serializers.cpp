@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE execute_serializers
 #include <boost/test/unit_test.hpp>
 
-#include <slicer/parser.h>
+#include <tool/parser.h>
 #include <slicer/slicer.h>
 #include <slicer/modelParts.h>
 #include <xml/serializer.h>

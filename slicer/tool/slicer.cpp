@@ -1,4 +1,4 @@
-#include <slicer/parser.h>
+#include <tool/parser.h>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;

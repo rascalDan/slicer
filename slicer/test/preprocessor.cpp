@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE preprocess
 #include <boost/test/unit_test.hpp>
 
-#include <slicer/parser.h>
+#include <tool/parser.h>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>

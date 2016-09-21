@@ -1,8 +1,27 @@
+lib Slice ;
+lib IceUtil ;
 lib po : : <name>boost_program_options ;
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
+lib boost_system ;
+lib boost_filesystem ;
+
+lib slicer-compiler :
+	parser.cpp
+	:
+	<library>Slice
+	<library>IceUtil
+	<library>boost_system
+	<library>boost_filesystem
+	<library>adhocutil
+	<library>../slicer//slicer
+	<include>..
+	: :
+	<include>..
+	;
 
 exe slicer :
-	[ glob *.cpp ]
+	slicer.cpp
 	:
-	<library>../slicer//slicer
+	<library>slicer-compiler
 	<library>po
 	;

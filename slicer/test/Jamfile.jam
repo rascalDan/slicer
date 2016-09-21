@@ -59,6 +59,7 @@ run preprocessor.cpp
 	<library>adhocutil
 	<include>..
 	<library>../slicer//slicer
+	<library>../tool//slicer-compiler
 	<dependency>../tool//slicer
 	:
 	preprocess

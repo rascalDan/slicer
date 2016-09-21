@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "metadata.h"
+#include <slicer/metadata.h>
 #include <Slice/Parser.h>
 #include <Slice/Preprocessor.h>
 #include <boost/algorithm/string/predicate.hpp>
