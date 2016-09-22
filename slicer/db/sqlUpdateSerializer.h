@@ -6,11 +6,6 @@
 #include <visibility.h>
 
 namespace Slicer {
-	class NoRowsFound : public std::runtime_error {
-		public:
-			NoRowsFound();
-	};
-
 	class DLL_PUBLIC SqlUpdateSerializer : public Slicer::Serializer {
 		public:
 			typedef boost::shared_ptr<DB::ModifyCommand> ModifyPtr;

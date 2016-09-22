@@ -2,6 +2,7 @@
 #define SLICER_MODELPARTSTYPES_IMPL_H
 
 #include "modelPartsTypes.h"
+#include <common.h>
 
 #define MODELPARTFOR(Type, ModelPartType) \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType<Type>(s); } \
@@ -325,7 +326,7 @@ namespace Slicer {
 	{
 		auto i = enumerations.right.find(val);
 		if (i == enumerations.right.end()) {
-			throw InvalidEnumerationValue(val, typeid(T).name());
+			throw InvalidEnumerationSymbol(val, typeid(T).name());
 		}
 		return i->second;
 	}

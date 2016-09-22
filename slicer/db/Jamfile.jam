@@ -6,17 +6,23 @@ lib adhocutil : : : : <include>/usr/include/adhocutil ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
+lib pthread ;
+lib Ice ;
 lib IceUtil ;
 
 lib slicer-db :
 	[ glob *.cpp : test*.cpp ]
+	[ glob *.ice ]
 	:
 	<include>..
+	<library>pthread
+	<library>Ice
 	<library>IceUtil
 	<library>dbppcore
 	<library>../..//glibmm
 	<library>adhocutil
 	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
 	: :
 	<library>dbppcore
 	;
@@ -28,6 +34,7 @@ run testSelect.cpp
 	<define>ROOT=\"$(me)\"
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-db
+	<implicit-dependency>slicer-db
 	<library>dbpp-postgresql
 	<library>boost_system
 	<library>boost_filesystem
@@ -35,6 +42,7 @@ run testSelect.cpp
 	<library>../test//slicer-test
 	<library>../test//common
 	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
 	<include>..
 	<dependency>slicer.sql
 	<dependency>../test//compilation
@@ -54,6 +62,7 @@ run testInsert.cpp
 	<library>../test//slicer-test
 	<library>../test//common
 	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
 	<include>..
 	<dependency>slicer.sql
 	<dependency>../test//compilation
@@ -66,6 +75,7 @@ run testUpdate.cpp
 	<define>ROOT=\"$(me)\"
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-db
+	<implicit-dependency>slicer-db
 	<library>dbpp-postgresql
 	<library>boost_system
 	<library>boost_filesystem
@@ -73,6 +83,7 @@ run testUpdate.cpp
 	<library>../test//slicer-test
 	<library>../test//common
 	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
 	<include>..
 	<dependency>slicer.sql
 	<dependency>../test//compilation

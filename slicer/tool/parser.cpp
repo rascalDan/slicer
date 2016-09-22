@@ -1,5 +1,6 @@
 #include "parser.h"
-#include <slicer/metadata.h>
+#include <metadata.h>
+#include <common.h>
 #include <Slice/Parser.h>
 #include <Slice/Preprocessor.h>
 #include <boost/algorithm/string/predicate.hpp>
@@ -118,7 +119,8 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Begin Slicer code\n\n");
 		fprintbf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string());
-		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "modelPartsTypes.impl.h").string());
+		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "modelPartsTypes.impl.h").string());
+		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "common.h").string());
 		fprintbf(cpp, "namespace Slicer {\n");
 		return true;
 	}
@@ -391,7 +393,7 @@ namespace Slicer {
 				s->scoped());
 		auto iname = metaDataValue("slicer:item:", s->getMetaData());
 		if (iname) {
-			fprintbf(cpp, "\tif (!name.empty() && name != \"%s\") { throw IncorrectElementName(); }\n",
+			fprintbf(cpp, "\tif (!name.empty() && name != \"%s\") { throw IncorrectElementName(name); }\n",
 					*iname);
 		}
 		else {
@@ -562,7 +564,7 @@ namespace Slicer {
 		for (const auto & conversion : conversions) {
 			auto split = metaDataSplit(conversion);
 			if (split.size() < 3) {
-				throw std::runtime_error("conversion needs at least 3 parts type:toModelFunc:toExchangeFunc[:options]");
+				throw CompilerError("conversion needs at least 3 parts type:toModelFunc:toExchangeFunc[:options]");
 			}
 			for (auto & pi : {0, 1, 2}) {
 				boost::algorithm::replace_all(split[pi], ".", "::");
@@ -582,13 +584,13 @@ namespace Slicer {
 	Slicer::Execute()
 	{
 		if (cpp != NULL && !cppPath.empty()) {
-			throw std::runtime_error("Both file handle and path provided.");
+			throw CompilerError("Both file handle and path provided.");
 		}
 		FilePtr cppfile(
 			cpp || cppPath.empty() ? cpp : fopen(cppPath.string(), "a"),
 			cppPath.empty() ? fflush : fclose);
 		if (!cppfile && !cppPath.empty()) {
-			throw std::runtime_error("Failed to open output file");
+			throw CompilerError("Failed to open output file");
 		}
 		cpp = cppfile.get();
 		Slicer::Slicer::Args args;
@@ -601,7 +603,7 @@ namespace Slicer {
 		FILE * cppHandle = icecpp->preprocess(false);
 
 		if (cppHandle == NULL) {
-			throw std::runtime_error("preprocess failed");
+			throw CompilerError("preprocess failed");
 		}
 
 		Slice::UnitPtr u = Slice::Unit::createUnit(false, false, allowIcePrefix, false);
@@ -609,11 +611,11 @@ namespace Slicer {
 		int parseStatus = u->parse(slicePath.string(), cppHandle, false);
 
 		if (!icecpp->close()) {
-			throw std::runtime_error("preprocess close failed");
+			throw CompilerError("preprocess close failed");
 		}
 
 		if (parseStatus == EXIT_FAILURE) {
-			throw std::runtime_error("unit parse failed");
+			throw CompilerError("unit parse failed");
 		}
 
 		u->visit(this, false);

@@ -1,4 +1,6 @@
 import testing ;
+lib pthread ;
+lib Ice ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
@@ -7,14 +9,18 @@ lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-xml :
 	[ glob *.cpp : test*.cpp ]
+	[ glob *.ice ]
 	:
 	<include>..
 	<library>boost_system
 	<library>boost_filesystem
+	<library>pthread
+	<library>Ice
 	<library>IceUtil
 	<library>../..//libxmlpp
 	<library>adhocutil
 	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
 	: :
 	<library>../..//libxmlpp
 	;
@@ -23,6 +29,7 @@ run testSpecifics.cpp
 	: : :
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-xml
+	<implicit-dependency>slicer-xml
 	<library>boost_utf
 	<library>../test//slicer-test
 	<library>../test//common

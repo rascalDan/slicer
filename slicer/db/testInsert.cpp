@@ -7,7 +7,7 @@
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include <types.h>
-#include "exceptions.h"
+#include <common.h>
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);

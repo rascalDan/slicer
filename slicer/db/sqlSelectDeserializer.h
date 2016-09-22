@@ -6,16 +6,6 @@
 #include <visibility.h>
 
 namespace Slicer {
-	class NoRowsReturned : public std::runtime_error {
-		public:
-			NoRowsReturned();
-	};
-
-	class TooManyRowsReturned : public std::runtime_error {
-		public:
-			TooManyRowsReturned();
-	};
-
 	class DLL_PUBLIC SqlSelectDeserializer : public Slicer::Deserializer {
 		public:
 			SqlSelectDeserializer(DB::SelectCommand &, IceUtil::Optional<std::string> typeIdCol = IceUtil::Optional<std::string>());

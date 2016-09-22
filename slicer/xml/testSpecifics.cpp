@@ -4,6 +4,7 @@
 #include "serializer.h"
 #include <libxml++/parsers/domparser.h>
 #include <types.h>
+#include <xmlExceptions.h>
 
 template <typename T, typename ... P>
 T

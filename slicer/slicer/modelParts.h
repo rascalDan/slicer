@@ -22,27 +22,6 @@ namespace Slicer {
 		return p.get();
 	}
 
-	class DLL_PUBLIC IncorrectElementName : public std::invalid_argument {
-		public:
-			IncorrectElementName(const std::string & n);
-	};
-
-	class DLL_PUBLIC UnknownType : public std::invalid_argument {
-		public:
-			UnknownType(const std::string & n);
-	};
-
-	class DLL_PUBLIC InvalidEnumerationValue : public std::invalid_argument {
-		public:
-			InvalidEnumerationValue(const std::string & n, const std::string & e);
-			InvalidEnumerationValue(::Ice::Int n, const std::string & e);
-	};
-
-	class DLL_PUBLIC NoConversionFound : public std::runtime_error {
-		public:
-			NoConversionFound(const std::string & n);
-	};
-
 	template <typename T>
 	class TValueTarget {
 		public:

@@ -1,13 +1,10 @@
 #include "sqlSelectDeserializer.h"
 #include "sqlSource.h"
-#include "exceptions.h"
+#include <sqlExceptions.h>
+#include <common.h>
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace Slicer {
-	NoRowsReturned::NoRowsReturned() : std::runtime_error("No rows returned") { }
-
-	TooManyRowsReturned::TooManyRowsReturned() : std::runtime_error("Too many rows returned") { }
-
 	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand & c, IceUtil::Optional<std::string> tc) :
 		cmd(c),
 		typeIdColName(tc)

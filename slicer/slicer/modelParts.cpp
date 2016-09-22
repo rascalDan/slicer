@@ -4,24 +4,6 @@
 namespace Slicer {
 	const Metadata emptyMetadata;
 
-	IncorrectElementName::IncorrectElementName(const std::string & n) :
-		std::invalid_argument(n)
-	{
-	}
-
-	UnknownType::UnknownType(const std::string & n) :
-		std::invalid_argument(n)
-	{
-	}
-	InvalidEnumerationValue::InvalidEnumerationValue(const std::string & n, const std::string & e) :
-		std::invalid_argument("No such value '" + n + "' in " + e) { }
-
-	InvalidEnumerationValue::InvalidEnumerationValue(::Ice::Int n, const std::string & e) :
-		std::invalid_argument("Invalid value " + boost::lexical_cast<std::string>(n) + " in " + e) { }
-
-	NoConversionFound::NoConversionFound(const std::string & n) :
-		std::runtime_error("Could not convert to/from model for type " + n) { }
-
 	ClassNameMap * &
 	classNameMap()
 	{

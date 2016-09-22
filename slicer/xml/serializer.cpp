@@ -1,4 +1,5 @@
 #include "serializer.h"
+#include <xmlExceptions.h>
 #include <slicer/metadata.h>
 #include <libxml++/document.h>
 #include <libxml++/parsers/domparser.h>
@@ -18,11 +19,6 @@ namespace Slicer {
 	const std::string md_text = "xml:text";
 	const std::string md_bare = "xml:bare";
 	const auto defaultElementCreator = boost::bind(&xmlpp::Element::add_child, _1, _2, Glib::ustring());
-
-	BadBooleanValue::BadBooleanValue(const Glib::ustring &) :
-		std::invalid_argument("Bad boolean value")
-	{
-	}
 
 	static const Glib::ustring TrueText("true");
 	static const Glib::ustring FalseText("false");

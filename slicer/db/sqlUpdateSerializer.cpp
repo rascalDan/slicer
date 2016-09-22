@@ -1,13 +1,12 @@
 #include "sqlUpdateSerializer.h"
-#include "exceptions.h"
+#include <sqlExceptions.h>
+#include <common.h>
 #include "sqlBinder.h"
 #include <buffer.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 
 namespace Slicer {
-	NoRowsFound::NoRowsFound() : std::runtime_error("No rows found") { }
-
 	const std::string md_pkey = "db:pkey";
 
 	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :

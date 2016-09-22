@@ -84,8 +84,8 @@ run serializers.cpp
 	<dependency>preprocess
 	<library>slicer-test
 	<library>common
-	<include>..
 	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
 	<library>../xml//slicer-xml
 	<library>../json//slicer-json
 	:

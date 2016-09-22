@@ -8,7 +8,8 @@
 #include "sqlSelectDeserializer.h"
 #include "sqlUpdateSerializer.h"
 #include <types.h>
-#include "exceptions.h"
+#include <common.h>
+#include <sqlExceptions.h>
 
 class StandardMockDatabase : public PQ::Mock {
 	public:

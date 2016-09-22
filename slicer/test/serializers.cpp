@@ -2,8 +2,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <tool/parser.h>
-#include <slicer/slicer.h>
-#include <slicer/modelParts.h>
+#include <common.h>
+#include <slicer.h>
+#include <modelParts.h>
 #include <xml/serializer.h>
 #include <libxml2/libxml/parser.h>
 #include <json/serializer.h>
@@ -493,10 +494,10 @@ BOOST_AUTO_TEST_CASE( xml_streams )
 BOOST_AUTO_TEST_CASE( invalid_enum )
 {
 	Slicer::DeserializerPtr jdeserializer = new Slicer::JsonFileDeserializer(root / "initial" / "invalidEnum.json");
-	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationValue);
+	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
 
 	Slicer::DeserializerPtr xdeserializer = new Slicer::XmlFileDeserializer(root / "initial" / "invalidEnum.xml");
-	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationValue);
+	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

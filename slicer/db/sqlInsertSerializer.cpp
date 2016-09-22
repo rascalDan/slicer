@@ -1,5 +1,6 @@
 #include "sqlInsertSerializer.h"
-#include "exceptions.h"
+#include <common.h>
+#include <sqlExceptions.h>
 #include "sqlBinder.h"
 #include <buffer.h>
 #include <modifycommand.h>
@@ -65,7 +66,7 @@ namespace Slicer {
 			}
 
 #define NonNumType(T) \
-			void set(T &) const override { throw std::runtime_error("Can't store Id in " #T " type field"); }
+			void set(T &) const override { throw UnsuitableIdFieldType(#T); }
 
 #define NumType(T) \
 			void set(T & v) const override { v = boost::numeric_cast<T>(connection->insertId()); }
