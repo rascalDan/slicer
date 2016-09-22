@@ -1,3 +1,5 @@
+import package ;
+
 lib pthread ;
 lib Ice ;
 lib IceUtil ;
@@ -21,3 +23,11 @@ lib slicer :
 	<library>boost_system
 	<library>boost_filesystem
 	;
+
+alias install : install-lib install-slice ;
+explicit install ;
+explicit install-lib ;
+explicit install-slice ;
+package.install install-lib : <install-header-subdir>slicer/slicer : : slicer : [ glob-tree *.h ] ;
+package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
+

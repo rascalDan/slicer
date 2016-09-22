@@ -1,4 +1,5 @@
 import testing ;
+import package ;
 
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
@@ -90,4 +91,11 @@ run testUpdate.cpp
 	:
 	testUpdate
 	;
+
+alias install : install-lib install-slice ;
+explicit install ;
+explicit install-lib ;
+explicit install-slice ;
+package.install install-lib : <install-header-subdir>slicer/db : : slicer-db : [ glob-tree *.h ] ;
+package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
 

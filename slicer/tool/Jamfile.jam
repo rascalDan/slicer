@@ -1,3 +1,5 @@
+import package ;
+
 lib Slice ;
 lib Ice ;
 lib IceUtil ;
@@ -28,3 +30,7 @@ exe slicer :
 	<library>slicer-compiler
 	<library>po
 	;
+
+explicit install ;
+package.install install : <install-header-subdir>slicer/slicer : slicer : slicer-compiler : [ glob-tree *.h ] ;
+

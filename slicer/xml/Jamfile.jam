@@ -1,4 +1,6 @@
 import testing ;
+import package ;
+
 lib pthread ;
 lib Ice ;
 lib boost_system ;
@@ -39,4 +41,11 @@ run testSpecifics.cpp
 	:
 	testSpecifics
 	;
+
+alias install : install-lib install-slice ;
+explicit install ;
+explicit install-lib ;
+explicit install-slice ;
+package.install install-lib : <install-header-subdir>slicer/xml : : slicer-xml : [ glob-tree *.h ] ;
+package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
 

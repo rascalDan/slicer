@@ -1,4 +1,5 @@
 import testing ;
+import package ;
 
 lib jsonpp : : : :
 	<library>../..//glibmm
@@ -38,4 +39,7 @@ run testSpecifics.cpp
 	:
 	testSpecifics
 	;
+
+explicit install ;
+package.install install : <install-header-subdir>slicer/json : : slicer-json : [ glob-tree *.h ] ;
 
