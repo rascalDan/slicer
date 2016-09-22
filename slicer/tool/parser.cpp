@@ -277,9 +277,8 @@ namespace Slicer {
 			auto conversions = getAllConversions(dm);
 			fprintbf(cpp, "\t\tnew ");
 			auto type = dm->type();
-			createNewModelPartPtrFor(t);
-			fprintbf(cpp, "< %s >::Hook< %s",
-					typeToString(it),
+			createNewModelPartPtrFor(it);
+			fprintbf(cpp, "::Hook< %s",
 					Slice::typeToString(type, dm->optional()));
 			fprintbf(cpp, ", %s, &%s, ",
 					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
@@ -295,8 +294,6 @@ namespace Slicer {
 			}
 			else {
 				createNewModelPartPtrFor(type);
-				fprintbf(cpp, "< %s >",
-						Slice::typeToString(type));
 			}
 			if (dm->optional()) {
 				fprintbf(cpp, " > ");
@@ -320,9 +317,8 @@ namespace Slicer {
 			}
 			auto type = dm->type();
 			fprintbf(cpp, "template<>\ntemplate<> DLL_PUBLIC\nconst Metadata\n");
-			createNewModelPartPtrFor(t);
-			fprintbf(cpp, "< %s >::HookMetadata< %s",
-					typeToString(it),
+			createNewModelPartPtrFor(it);
+			fprintbf(cpp, "::HookMetadata< %s",
 					Slice::typeToString(type, dm->optional()));
 			fprintbf(cpp, ", %s, &%s >::metadata ",
 					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
@@ -456,8 +452,7 @@ namespace Slicer {
 				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(ktype);
-		fprintbf(cpp, "< %s >, HookBase >(\"%s\"),\n\t\t",
-				Slice::typeToString(ktype),
+		fprintbf(cpp, ", HookBase >(\"%s\"),\n\t\t",
 				kname ? *kname : "key");
 		auto vtype = d->valueType();
 		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< %s, %s::value_type, &%s::value_type::second, ",
@@ -466,8 +461,7 @@ namespace Slicer {
 				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(vtype);
-		fprintbf(cpp, "< %s >, HookBase >(\"%s\"),\n",
-				Slice::typeToString(vtype),
+		fprintbf(cpp, ", HookBase >(\"%s\"),\n",
 				vname ? *vname : "value");
 		fprintbf(cpp, "\t};\n");
 		fprintbf(cpp, "\n");
@@ -516,6 +510,8 @@ namespace Slicer {
 		else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
 			fprintbf(cpp, "ModelPartForEnum");
 		}
+		fprintbf(cpp, "< %s >",
+				Slice::typeToString(type));
 	}
 
 	bool
