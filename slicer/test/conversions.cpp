@@ -1,5 +1,6 @@
 #include "types.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include <visibility.h>
 
 #define SHORT(x) boost::numeric_cast< ::Ice::Short , int64_t >(x)
 

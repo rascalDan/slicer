@@ -1,10 +1,10 @@
 [["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
 [["cpp:include:boost/date_time/posix_time/time_formatters.hpp"]]
 [["cpp:include:boost/date_time/posix_time/time_parsers.hpp"]]
-[["cpp:include:conversions.h"]]
 
 #include <included.ice>
 
+["slicer:include:conversions.h"]
 module TestModule {
 	enum SomeNumbers {
 		One = 1, Ten = 10, FiftyFive = 55
