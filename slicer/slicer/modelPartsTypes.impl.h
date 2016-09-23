@@ -5,6 +5,7 @@
 #include <common.h>
 
 #define MODELPARTFOR(Type, ModelPartType) \
+	template class ModelPartType<Type>; \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType<Type>(s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType<Type> >(s); } \
 	template<> ModelPartPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(s); } \

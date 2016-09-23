@@ -359,10 +359,6 @@ namespace Slicer {
 
 		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForEnum);\n\n",
 				e->scoped());
-		fprintbf(cpp, "template %s ModelPartForEnum< %s >::lookup(const std::string &);\n\n",
-				e->scoped(), e->scoped());
-		fprintbf(cpp, "template const std::string & ModelPartForEnum< %s >::lookup(%s);\n\n",
-				e->scoped(), e->scoped());
 	}
 
 	void

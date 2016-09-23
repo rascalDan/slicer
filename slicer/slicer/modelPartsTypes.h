@@ -15,7 +15,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForSimple : public ModelPartForSimpleBase {
+	class DLL_PUBLIC ModelPartForSimple : public ModelPartForSimpleBase {
 		public:
 			typedef T element_type;
 
@@ -39,7 +39,7 @@ namespace Slicer {
 	};
 
 	template<typename T, typename M, T M::* MV>
-	class ModelPartForConverted : public ModelPartForConvertedBase {
+	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase {
 		public:
 			typedef T element_type;
 
@@ -53,7 +53,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForOptional : public ModelPart {
+	class DLL_PUBLIC ModelPartForOptional : public ModelPart {
 		public:
 			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
 			virtual void OnEachChild(const ChildHandler & ch) override;
@@ -84,7 +84,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForComplex : public ModelPartForComplexBase {
+	class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
 		public:
 			class HookBase : public HookCommon {
 				public:
@@ -140,7 +140,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
+	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
 		public:
 			typedef T element_type;
 
@@ -165,7 +165,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForStruct : public ModelPartForComplex<T> {
+	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T> {
 		public:
 			typedef T element_type;
 
@@ -190,7 +190,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForEnum : public ModelPartForEnumBase {
+	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase {
 		public:
 			typedef T element_type;
 			typedef boost::bimap<T, std::string> Enumerations;
@@ -220,7 +220,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForSequence : public ModelPartForSequenceBase {
+	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase {
 		public:
 			typedef T element_type;
 
@@ -244,7 +244,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
+	class DLL_PUBLIC ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
 		public:
 			ModelPartForDictionaryElementInserter(T & d);
 
@@ -264,7 +264,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class ModelPartForDictionary : public ModelPartForDictionaryBase {
+	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase {
 		public:
 			typedef T element_type;
 
