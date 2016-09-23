@@ -15,7 +15,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForSimple : public ModelPartForSimpleBase {
+	class DLL_PUBLIC ModelPartForSimple : public ModelPartForSimpleBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 
@@ -23,9 +23,6 @@ namespace Slicer {
 
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
-
-		private:
-			T & Member;
 	};
 
 	class DLL_PUBLIC ModelPartForConvertedBase : public ModelPart {
@@ -39,7 +36,7 @@ namespace Slicer {
 	};
 
 	template<typename T, typename M, T M::* MV>
-	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase {
+	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 
@@ -47,13 +44,10 @@ namespace Slicer {
 
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
-
-		private:
-			T & Member;
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForOptional : public ModelPart {
+	class DLL_PUBLIC ModelPartForOptional : public ModelPart, protected ModelPartModel<IceUtil::Optional<typename T::element_type> > {
 		public:
 			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
 			virtual void OnEachChild(const ChildHandler & ch) override;
@@ -72,8 +66,7 @@ namespace Slicer {
 
 			virtual const Metadata & GetMetadata() const override;
 
-		private:
-			IceUtil::Optional< typename T::element_type > & OptionalMember;
+		protected:
 			ModelPartPtr modelPart;
 	};
 
@@ -140,7 +133,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type> {
+	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type>, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 
@@ -159,13 +152,10 @@ namespace Slicer {
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
 
 			static const std::string typeIdProperty;
-
-		private:
-			T & ModelObject;
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T> {
+	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T>, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 
@@ -174,9 +164,6 @@ namespace Slicer {
 			T * GetModel() override;
 
 			virtual bool HasValue() const override;
-
-		private:
-			T & ModelObject;
 	};
 
 	class DLL_PUBLIC ModelPartForEnumBase : public ModelPart {
@@ -190,7 +177,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase {
+	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 			typedef boost::bimap<T, std::string> Enumerations;
@@ -207,9 +194,6 @@ namespace Slicer {
 			static const Enumerations enumerations;
 			DLL_PUBLIC static const std::string & lookup(T);
 			DLL_PUBLIC static T lookup(const std::string &);
-
-		private:
-			T & modelPart;
 	};
 
 	class DLL_PUBLIC ModelPartForSequenceBase : public ModelPart {
@@ -220,7 +204,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase {
+	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 
@@ -239,8 +223,6 @@ namespace Slicer {
 
 		private:
 			ModelPartPtr elementModelPart(typename T::value_type &) const;
-
-			T & sequence;
 	};
 
 	template<typename T>
@@ -264,7 +246,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase {
+	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
 
@@ -280,9 +262,6 @@ namespace Slicer {
 
 			static const Metadata metadata;
 			static const std::string pairName;
-
-		private:
-			T & dictionary;
 	};
 
 }

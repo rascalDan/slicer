@@ -63,7 +63,7 @@ namespace Slicer {
 				fprintbf(cpp, "\t\t%s tmp;\n",
 						conversion.ExchangeType);
 				fprintbf(cpp, "\t\tvspt->set(tmp);\n");
-				fprintbf(cpp, "\t\tMember = %s(tmp);\n",
+				fprintbf(cpp, "\t\tModel = %s(tmp);\n",
 						conversion.ConvertToModelFunc);
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
@@ -72,7 +72,7 @@ namespace Slicer {
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
 				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
 						Slice::typeToString(type));
-				fprintbf(cpp, "\t\tvspt->set(Member);\n");
+				fprintbf(cpp, "\t\tvspt->set(Model);\n");
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
 			}
@@ -91,7 +91,7 @@ namespace Slicer {
 			for (const auto & conversion : conversions) {
 				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
 						conversion.ExchangeType);
-				fprintbf(cpp, "\t\tvtpt->get(%s(Member));\n",
+				fprintbf(cpp, "\t\tvtpt->get(%s(Model));\n",
 						conversion.ConvertToExchangeFunc);
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
@@ -100,7 +100,7 @@ namespace Slicer {
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
 				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
 					Slice::typeToString(type));
-				fprintbf(cpp, "\t\tvtpt->get(Member);\n");
+				fprintbf(cpp, "\t\tvtpt->get(Model);\n");
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
 			}
@@ -222,7 +222,7 @@ namespace Slicer {
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nTypeId\nModelPartForClass< %s >::GetTypeId() const\n{\n",
 				typeToString(decl));
-		fprintbf(cpp, "\tauto id = ModelObject->ice_id();\n");
+		fprintbf(cpp, "\tauto id = this->Model->ice_id();\n");
 		fprintbf(cpp, "\treturn (id == \"%s\") ? TypeId() : ModelPart::ToExchangeTypeName(id);\n}\n\n",
 				c->scoped());
 
@@ -352,11 +352,11 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nvoid ModelPartForEnum< %s >::SetValue(ValueSourcePtr s) {\n\
 	std::string val;\n\
 	s->set(val);\n\
-	modelPart = lookup(val);\n\
+	this->Model = lookup(val);\n\
 }\n\n",
 				e->scoped());
 		fprintbf(cpp, "template<> DLL_PUBLIC\nvoid ModelPartForEnum< %s >::GetValue(ValueTargetPtr s) {\n\
-	s->get(lookup(modelPart));\n\
+	s->get(lookup(this->Model));\n\
 }\n\n",
 				e->scoped());
 

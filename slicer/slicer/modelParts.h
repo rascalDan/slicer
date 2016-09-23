@@ -167,6 +167,13 @@ namespace Slicer {
 			static const std::string & ToModelTypeName(const std::string &);
 	};
 
+	template<typename T>
+	class DLL_PUBLIC ModelPartModel {
+		protected:
+			ModelPartModel(T & m) : Model(m) { }
+			T & Model;		
+	};
+
 	template<typename T> inline ModelPartPtr ModelPartFor(T & t) __attribute__ ((deprecated));
 	template<typename T> inline ModelPartPtr ModelPartFor(T & t) { return ModelPart::CreateFor(t); }
 

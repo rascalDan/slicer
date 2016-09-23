@@ -64,43 +64,43 @@ namespace Slicer {
 	// ModelPartForSimple
 	template<typename T>
 	ModelPartForSimple<T>::ModelPartForSimple(T & h) :
-		Member(h)
+		ModelPartModel<T>(h)
 	{
 	}
 
 	template<typename T>
 	void ModelPartForSimple<T>::SetValue(ValueSourcePtr s)
 	{
-		s->set(Member);
+		s->set(this->Model);
 	}
 
 	template<typename T>
 	void ModelPartForSimple<T>::GetValue(ValueTargetPtr s)
 	{
-		s->get(Member);
+		s->get(this->Model);
 	}
 
 	// ModelPartForConverted
 	template<typename T, typename M, T M::* MV>
 	ModelPartForConverted<T, M, MV>::ModelPartForConverted(T & h) :
-		Member(h)
+		ModelPartModel<T>(h)
 	{
 	}
 
 	// ModelPartForOptional
 	template<typename T>
 	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h) :
-		OptionalMember(h)
+		ModelPartModel<IceUtil::Optional< typename T::element_type> >(h)
 	{
-		if (OptionalMember) {
-			modelPart = new T(*OptionalMember);
+		if (this->Model) {
+			modelPart = new T(*this->Model);
 		}
 	}
 
 	template<typename T>
 	void ModelPartForOptional<T>::OnEachChild(const ChildHandler & ch)
 	{
-		if (OptionalMember) {
+		if (this->Model) {
 			modelPart->OnEachChild(ch);
 		}
 	}
@@ -108,7 +108,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::Complete()
 	{
-		if (OptionalMember) {
+		if (this->Model) {
 			modelPart->Complete();
 		}
 	}
@@ -116,9 +116,9 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::Create()
 	{
-		if (!OptionalMember) {
-			OptionalMember = typename T::element_type();
-			modelPart = new T(*OptionalMember);
+		if (!this->Model) {
+			this->Model = typename T::element_type();
+			modelPart = new T(*this->Model);
 			modelPart->Create();
 		}
 	}
@@ -126,7 +126,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRefPtr ModelPartForOptional<T>::GetAnonChildRef(const HookFilter & flt)
 	{
-		if (OptionalMember) {
+		if (this->Model) {
 			return modelPart->GetAnonChildRef(flt);
 		}
 		return NULL;
@@ -135,7 +135,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRefPtr ModelPartForOptional<T>::GetChildRef(const std::string & name, const HookFilter & flt)
 	{
-		if (OptionalMember) {
+		if (this->Model) {
 			return modelPart->GetChildRef(name, flt);
 		}
 		return NULL;
@@ -144,7 +144,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::SetValue(ValueSourcePtr s)
 	{
-		if (OptionalMember) {
+		if (this->Model) {
 			modelPart->SetValue(s);
 		}
 	}
@@ -152,9 +152,9 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::GetValue(ValueTargetPtr s)
 	{
-		if (!OptionalMember) {
-			OptionalMember = typename T::element_type();
-			modelPart = new T(*OptionalMember);
+		if (!this->Model) {
+			this->Model = typename T::element_type();
+			modelPart = new T(*this->Model);
 		}
 		modelPart->GetValue(s);
 	}
@@ -162,7 +162,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForOptional<T>::HasValue() const
 	{
-		return OptionalMember && modelPart->HasValue();
+		return this->Model && modelPart->HasValue();
 	}
 
 	template<typename T>
@@ -224,20 +224,20 @@ namespace Slicer {
 	// ModelPartForClass
 	template<typename T>
 	ModelPartForClass<T>::ModelPartForClass(T & h) :
-			ModelObject(h)
+			ModelPartModel<T>(h)
 	{
 	}
 
 	template<typename T>
 	void ModelPartForClass<T>::Create()
 	{
-		ModelObject = new typename T::element_type();
+		this->Model = new typename T::element_type();
 	}
 
 	template<typename T>
 	typename T::element_type * ModelPartForClass<T>::GetModel()
 	{
-		return ModelObject.get();
+		return this->Model.get();
 	}
 
 	template<typename T>
@@ -247,13 +247,13 @@ namespace Slicer {
 		if (ref == classRefMap()->end()) {
 			throw UnknownType(name);
 		}
-		return ref->second(&this->ModelObject);
+		return ref->second(&this->Model);
 	}
 
 	template<typename T>
 	bool ModelPartForClass<T>::HasValue() const
 	{
-		return ModelObject;
+		return this->Model;
 	}
 
 	template<typename T>
@@ -265,14 +265,14 @@ namespace Slicer {
 	// ModelPartForStruct
 	template<typename T>
 	ModelPartForStruct<T>::ModelPartForStruct(T & o) :
-		ModelObject(o)
+		ModelPartModel<T>(o)
 	{
 	}
 
 	template<typename T>
 	T * ModelPartForStruct<T>::GetModel()
 	{
-		return &ModelObject;
+		return &this->Model;
 	}
 
 	template<typename T>
@@ -284,7 +284,7 @@ namespace Slicer {
 	// ModelPartForEnum
 	template<typename T>
 	ModelPartForEnum<T>::ModelPartForEnum(T & s) :
-		modelPart(s)
+		ModelPartModel<T>(s)
 	{
 	}
 
@@ -297,14 +297,14 @@ namespace Slicer {
 	// ModelPartForSequence
 	template<typename T>
 	ModelPartForSequence<T>::ModelPartForSequence(T & s) :
-		sequence(s)
+		ModelPartModel<T>(s)
 	{
 	}
 
 	template<typename T>
 	void ModelPartForSequence<T>::OnEachChild(const ChildHandler & ch)
 		{
-			for(auto & element : sequence) {
+			for(auto & element : this->Model) {
 				ch(elementName, elementModelPart(element), NULL);
 			}
 		}
@@ -312,8 +312,8 @@ namespace Slicer {
 	template<typename T>
 	ChildRefPtr ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
 	{
-		sequence.push_back(typename element_type::value_type());
-		return new ImplicitChildRef(ModelPart::CreateFor(sequence.back()));
+		this->Model.push_back(typename element_type::value_type());
+		return new ImplicitChildRef(ModelPart::CreateFor(this->Model.back()));
 	}
 
 	template<typename T>
@@ -359,14 +359,14 @@ namespace Slicer {
 	// ModelPartForDictionary
 	template<typename T>
 	ModelPartForDictionary<T>::ModelPartForDictionary(T & d) :
-		dictionary(d)
+		ModelPartModel<T>(d)
 	{
 	}
 
 	template<typename T>
 	void ModelPartForDictionary<T>::OnEachChild(const ChildHandler & ch)
 	{
-		for (auto & pair : dictionary) {
+		for (auto & pair : this->Model) {
 			ch(pairName, new ModelPartForStruct<typename T::value_type>(pair), NULL);
 		}
 	}
@@ -374,7 +374,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRefPtr ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
 	{
-		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
+		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>
@@ -383,7 +383,7 @@ namespace Slicer {
 		if (name != pairName) {
 			throw IncorrectElementName(name);
 		}
-		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(dictionary));
+		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>
