@@ -32,7 +32,7 @@ namespace Slicer {
 
 		auto type = dm->type();
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
-		auto conversions = getAllConversions(dm);
+		auto conversions = getConversions(getAllMetadata(dm));
 		for (const auto & conversion : conversions) {
 			if (!AdHoc::containerContains(conversion.Options, "nodeclare")) {
 				if (!AdHoc::containerContains(conversion.Options, "nodeclareto")) {
@@ -274,7 +274,6 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			auto conversions = getAllConversions(dm);
 			fprintbf(cpp, "\t\tnew ");
 			auto type = dm->type();
 			createNewModelPartPtrFor(it);
@@ -286,15 +285,7 @@ namespace Slicer {
 			if (dm->optional()) {
 				fprintbf(cpp, "ModelPartForOptional< ");
 			}
-			if (!conversions.empty()) {
-				fprintbf(cpp, "ModelPartForConverted< %s, %s, &%s >",
-						Slice::typeToString(type),
-						boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
-						dm->scoped());
-			}
-			else {
-				createNewModelPartPtrFor(type);
-			}
+			createNewModelPartPtrFor(type, dm, getAllMetadata(dm));
 			if (dm->optional()) {
 				fprintbf(cpp, " > ");
 			}
@@ -490,28 +481,37 @@ namespace Slicer {
 	}
 
 	void
-	Slicer::createNewModelPartPtrFor(const Slice::TypePtr & type) const
+	Slicer::createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm, const Slice::StringList & md) const
 	{
-		if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
-			fprintbf(cpp, "ModelPartForSimple");
+		auto conversions = getConversions(md);
+		if (dm && !conversions.empty()) {
+			fprintbf(cpp, "ModelPartForConverted< %s, %s, &%s >",
+					Slice::typeToString(type),
+					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
+					dm->scoped());
 		}
-		else if (auto complexClass = Slice::ClassDeclPtr::dynamicCast(type)) {
-			fprintbf(cpp, "ModelPartForClass");
+		else {
+			if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
+				fprintbf(cpp, "ModelPartForSimple");
+			}
+			else if (auto complexClass = Slice::ClassDeclPtr::dynamicCast(type)) {
+				fprintbf(cpp, "ModelPartForClass");
+			}
+			else if (auto complexStruct = Slice::StructPtr::dynamicCast(type)) {
+				fprintbf(cpp, "ModelPartForStruct");
+			}
+			else if (auto sequence = Slice::SequencePtr::dynamicCast(type)) {
+				fprintbf(cpp, "ModelPartForSequence");
+			}
+			else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
+				fprintbf(cpp, "ModelPartForDictionary");
+			}
+			else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
+				fprintbf(cpp, "ModelPartForEnum");
+			}
+			fprintbf(cpp, "< %s >",
+					Slice::typeToString(type));
 		}
-		else if (auto complexStruct = Slice::StructPtr::dynamicCast(type)) {
-			fprintbf(cpp, "ModelPartForStruct");
-		}
-		else if (auto sequence = Slice::SequencePtr::dynamicCast(type)) {
-			fprintbf(cpp, "ModelPartForSequence");
-		}
-		else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
-			fprintbf(cpp, "ModelPartForDictionary");
-		}
-		else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
-			fprintbf(cpp, "ModelPartForEnum");
-		}
-		fprintbf(cpp, "< %s >",
-				Slice::typeToString(type));
 	}
 
 	bool
@@ -537,19 +537,19 @@ namespace Slicer {
 		fprintbf(cpp, "};\n\n");
 	}
 
-	Slicer::Conversions
-	Slicer::getAllConversions(Slice::DataMemberPtr dm)
+	Slice::StringList
+	Slicer::getAllMetadata(const Slice::DataMemberPtr & dm)
 	{
-		auto conversions = getConversions(dm->getMetaData());
+		auto metadata = dm->getMetaData();
 		auto typec = Slice::ContainedPtr::dynamicCast(dm->type());
 		if (typec) {
 			if (auto cd = Slice::ClassDeclPtr::dynamicCast(typec)) {
 				typec = cd->definition();
 			}
-			auto typeConversions = getConversions(typec->getMetaData());
-			std::copy(typeConversions.begin(), typeConversions.end(), std::back_inserter(conversions));
+			auto typeMetadata = typec->getMetaData();
+			std::copy(typeMetadata.begin(), typeMetadata.end(), std::back_inserter(metadata));
 		}
-		return conversions;
+		return metadata;
 	}
 
 	Slicer::Conversions

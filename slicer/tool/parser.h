@@ -55,7 +55,7 @@ namespace Slicer {
 			virtual void visitModuleEnd(const Slice::ModulePtr & m) override;
 
 		private:
-			void createNewModelPartPtrFor(const Slice::TypePtr & type) const;
+			void createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm = Slice::DataMemberPtr(), const Slice::StringList & md = Slice::StringList()) const;
 
 			void visitComplexDataMembers(Slice::ConstructedPtr t, const Slice::DataMemberList &) const;
 
@@ -64,8 +64,8 @@ namespace Slicer {
 
 			bool hasMetadata(const std::list<std::string> & metadata) const;
 			void copyMetadata(const std::list<std::string> & metadata) const;
-			static Conversions getAllConversions(Slice::DataMemberPtr dm);
-			static Conversions getConversions(const std::list<std::string> & metadata);
+			static Slice::StringList getAllMetadata(const Slice::DataMemberPtr & dm);
+			static Conversions getConversions(const Slice::StringList & metadata);
 #pragma GCC visibility pop
 
 			unsigned int components;
