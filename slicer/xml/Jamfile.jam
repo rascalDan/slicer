@@ -33,7 +33,7 @@ run testSpecifics.cpp
 	<library>slicer-xml
 	<implicit-dependency>slicer-xml
 	<library>boost_utf
-	<library>../test//slicer-test
+	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
 	<include>..

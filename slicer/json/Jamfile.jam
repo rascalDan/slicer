@@ -31,7 +31,7 @@ run testSpecifics.cpp
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-json
 	<library>boost_utf
-	<library>../test//slicer-test
+	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
 	<include>..

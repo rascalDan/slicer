@@ -40,7 +40,7 @@ run testSelect.cpp
 	<library>boost_system
 	<library>boost_filesystem
 	<library>boost_utf
-	<library>../test//slicer-test
+	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
@@ -60,7 +60,7 @@ run testInsert.cpp
 	<library>boost_system
 	<library>boost_filesystem
 	<library>boost_utf
-	<library>../test//slicer-test
+	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
@@ -81,7 +81,7 @@ run testUpdate.cpp
 	<library>boost_system
 	<library>boost_filesystem
 	<library>boost_utf
-	<library>../test//slicer-test
+	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer

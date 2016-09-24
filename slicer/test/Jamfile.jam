@@ -1,4 +1,8 @@
 import testing ;
+import generators ;
+import type ;
+import feature ;
+import toolset ;
 
 lib dl ;
 lib pthread ;
@@ -6,44 +10,68 @@ lib Ice ;
 lib IceUtil ;
 lib boost_system ;
 lib boost_filesystem ;
+lib boost_date_time ;
 lib boost_utf : : <name>boost_unit_test_framework ;
-lib slicer-test : : <name>slicertypes <search>bin/slicer ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
+
+generators.register-standard $(__name__).slicer : SLICE : CPP : <slicer>pure ;
+generators.override $(__name__).slicer : slice.slicer.pure ;
+feature.feature slicerbin : : free dependency ;
+toolset.flags slicer SLICERBIN <slicerbin> ;
+toolset.flags slicer INCLUDES <include> ;
+toolset.flags slicer ALLOWICE <allow-ice>yes : --ice ;
+
+actions slicer bind SLICERBIN
+{
+	truncate -c -s 0 $(1[1])
+	"$(SLICERBIN)" -I"$(INCLUDES)" $(2) $(1[1]) $(ALLOWICE[1]) --headerPrefix="\"\""
+}
+
+cpp stypes :
+	types.ice
+	:
+	<slicer>pure
+	<slicerbin>../tool//slicer
+	<dependency>../tool//slicer
+	<include>included
+	;
 
 lib types :
 	types.ice
+	stypes
+	conversions.cpp
 	:
 	<include>.
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
 	<library>adhocutil
+	<library>boost_date_time
 	<library>included//included
+	<library>../slicer//slicer
 	<implicit-dependency>included//included
+	<implicit-dependency>../slicer//slicer
 	: :
 	<include>.
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
 	<library>included//included
+	<library>../slicer//slicer
 	;
 
 path-constant me : . ;
 
 lib common :
 	helpers.cpp
-	conversions.cpp
 	fileStructure.cpp
 	:
-	<library>dl
-	<library>types
+	<library>adhocutil
 	<library>boost_system
 	<library>boost_filesystem
 	<library>boost_utf
-	<implicit-dependency>types
 	<define>ROOT=\"$(me)\"
 	: :
-	<library>types
 	<library>boost_filesystem
 	<library>boost_system
 	<define>BOOST_TEST_DYN_LINK
@@ -53,14 +81,10 @@ lib common :
 
 run preprocessor.cpp
 	: : :
-	<linkflags>-rdynamic
-	<library>dl
 	<library>common
 	<library>adhocutil
 	<include>..
-	<library>../slicer//slicer
 	<library>../tool//slicer-compiler
-	<dependency>../tool//slicer
 	:
 	preprocess
 	;
@@ -70,19 +94,14 @@ run compilation.cpp
 	<include>..
 	<library>../slicer//slicer
 	<library>types
-	<dependency>preprocess
-	<library>slicer-test
 	<library>common
-	<include>..
-	<library>../slicer//slicer
 	:
 	compilation
 	;
 
 run serializers.cpp
 	: : :
-	<dependency>preprocess
-	<library>slicer-test
+	<library>types
 	<library>common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
