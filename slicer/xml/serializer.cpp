@@ -265,8 +265,12 @@ namespace Slicer {
 			element->set_attribute(*typeIdPropName, *typeId);
 			mp = mp->GetSubclassModelPart(*typeId);
 		}
-		mp->GetValue(new XmlContentValueTarget(element));
-		mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3, ec));
+		if (mp->GetType() == mpt_Simple) {
+			mp->GetValue(new XmlContentValueTarget(element));
+		}
+		else {
+			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3, ec));
+		}
 	}
 
 	void
