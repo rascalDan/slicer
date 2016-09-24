@@ -20,6 +20,7 @@ module TestModule {
 	[ "slicer:conversion:std.string:stringToIsoDate:isoDateToString" ]
 	struct IsoDate {
 		short year;
+		[ "slicer:custommodelpart:TestModule.MonthValidator" ]
 		short month;
 		short day;
 	};
@@ -42,6 +43,7 @@ module TestModule {
 		double mdouble;
 		string mstring;
 	};
+	[ "slicer:custommodelpart:TestModule.AbValidator" ]
 	class ClassType {
 		int a;
 		int b;

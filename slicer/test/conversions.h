@@ -3,9 +3,25 @@
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <visibility.h>
+#include <slicer/modelPartsTypes.h>
+#include <types.h>
 
 namespace TestModule {
-	class DateTime;
+	DLL_PUBLIC extern int completions;
+
+	class DLL_PUBLIC AbValidator : public Slicer::ModelPartForClass<ClassTypePtr> {
+		public:
+			AbValidator(ClassTypePtr &);
+
+			void Complete() override;
+	};
+
+	class DLL_PUBLIC MonthValidator : public Slicer::ModelPartForSimple<::Ice::Short> {
+		public:
+			MonthValidator(::Ice::Short &);
+
+			void Complete() override;
+	};
 }
 namespace Slicer {
 	DLL_PUBLIC

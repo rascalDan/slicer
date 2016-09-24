@@ -2,7 +2,7 @@
 #define SLICER_MODELPARTSTYPES_IMPL_H
 
 #include "modelPartsTypes.h"
-#include <common.h>
+#include "common.h"
 
 #define MODELPARTFOR(Type, ModelPartType) \
 	template class ModelPartType<Type>; \

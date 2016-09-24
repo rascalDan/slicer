@@ -16,6 +16,7 @@
 #include <fstream>
 #include "helpers.h"
 #include "fileStructure.h"
+#include "conversions.h"
 
 namespace fs = boost::filesystem;
 
@@ -515,6 +516,11 @@ BOOST_AUTO_TEST_CASE( optionals_areset_xml )
 	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 }
 
+BOOST_AUTO_TEST_CASE( simple_complete_validator )
+{
+	verifyByHelper<TestModule::IsoDate, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("isodate.xml", readXml, writeXml, freeXml);
+}
+
 BOOST_AUTO_TEST_CASE( missingConversion )
 {
 	auto in = json::parseValue("{\"conv\": \"2016-06-30 12:34:56\"}");
@@ -575,4 +581,9 @@ BOOST_AUTO_TEST_CASE( any )
 BOOST_AUTO_TEST_SUITE_END();
 
 BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_CASE( customerModelPartCounters )
+{
+	BOOST_REQUIRE_EQUAL(7, TestModule::completions);
+}
 

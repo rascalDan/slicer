@@ -492,6 +492,10 @@ namespace Slicer {
 					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
 					dm->scoped());
 		}
+		else if (auto cmp = metaDataValue("slicer:custommodelpart:", md)) {
+			fprintbf(cpp, "%s",
+				boost::algorithm::replace_all_copy(*cmp, ".", "::"));
+		}
 		else {
 			if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
 				fprintbf(cpp, "ModelPartForSimple");
