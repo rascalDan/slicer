@@ -15,50 +15,21 @@ namespace Slicer {
 	// ModelPartForRoot
 	template<typename T>
 	ModelPartForRoot<T>::ModelPartForRoot(T & o) :
-		ModelObject(&o),
-		mp(ModelPart::CreateFor(o))
+		ModelPartForRootBase(ModelPart::CreateFor(o)),
+		ModelObject(&o)
 	{
 	}
 
 	template<typename T>
-	ChildRefPtr ModelPartForRoot<T>::GetAnonChildRef(const HookFilter &)
+	const std::string & ModelPartForRoot<T>::GetRootName() const
 	{
-		mp->Create();
-		return new ImplicitChildRef(mp);
-	}
-
-	template<typename T>
-	ChildRefPtr ModelPartForRoot<T>::GetChildRef(const std::string & name, const HookFilter &)
-	{
-		if (name != rootName) {
-			throw IncorrectElementName(name);
-		}
-		mp->Create();
-		return new ImplicitChildRef(mp);
-	}
-
-	template<typename T>
-	void ModelPartForRoot<T>::OnEachChild(const ChildHandler & ch)
-	{
-		ch(rootName, mp, NULL);
+		return rootName;
 	}
 
 	template<typename T>
 	bool ModelPartForRoot<T>::HasValue() const
 	{
 		return ModelObject && mp->HasValue();
-	}
-
-	template<typename T>
-	ModelPartType ModelPartForRoot<T>::GetType() const
-	{
-		return mp->GetType();
-	}
-
-	template<typename T>
-	bool ModelPartForRoot<T>::IsOptional() const
-	{
-		return mp->IsOptional();
 	}
 
 	// ModelPartForSimple

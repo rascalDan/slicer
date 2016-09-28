@@ -4,6 +4,20 @@
 #include "modelParts.h"
 
 namespace Slicer {
+	template<typename T>
+	class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
+		public:
+			ModelPartForRoot(T & o);
+
+			const std::string & GetRootName() const override;
+			virtual bool HasValue() const override;
+
+			static const std::string rootName;
+
+		private:
+			T * ModelObject;
+	};
+
 	class DLL_PUBLIC ModelPartForSimpleBase : public ModelPart {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;

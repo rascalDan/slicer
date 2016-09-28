@@ -181,24 +181,15 @@ namespace Slicer {
 
 	class DLL_PUBLIC ModelPartForRootBase : public ModelPart {
 		public:
-	};
+			ModelPartForRootBase(ModelPartPtr mp);
 
-	template<typename T>
-	class ModelPartForRoot : public ModelPartForRootBase {
-		public:
-			ModelPartForRoot(T & o);
-
+			virtual const std::string & GetRootName() const = 0;
 			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
 			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override;
 			virtual void OnEachChild(const ChildHandler & ch) override;
-			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			virtual bool IsOptional() const override;
 
-			static const std::string rootName;
-
-		private:
-			T * ModelObject;
 			ModelPartPtr mp;
 	};
 }

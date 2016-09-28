@@ -46,6 +46,45 @@ namespace Slicer {
 	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>;
 	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>;
 
+	// ModelPartForRootBase
+	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) :
+		mp(m)
+	{
+	}
+
+	ChildRefPtr
+	ModelPartForRootBase::GetAnonChildRef(const HookFilter &)
+	{
+		mp->Create();
+		return new ImplicitChildRef(mp);
+	}
+
+	ChildRefPtr
+	ModelPartForRootBase::GetChildRef(const std::string & name, const HookFilter & hf)
+	{
+		if (name != GetRootName()) {
+			throw IncorrectElementName(name);
+		}
+		return GetAnonChildRef(hf);
+	}
+
+	void ModelPartForRootBase::OnEachChild(const ChildHandler & ch)
+	{
+		ch(GetRootName(), mp, NULL);
+	}
+
+	ModelPartType
+	ModelPartForRootBase::GetType() const
+	{
+		return mp->GetType();
+	}
+
+	bool
+	ModelPartForRootBase::IsOptional() const
+	{
+		return mp->IsOptional();
+	}
+
 	void ModelPartForSimpleBase::OnEachChild(const ChildHandler &) { }
 	ChildRefPtr ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &) { return NULL; }
 	ChildRefPtr ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &) { return NULL; }
