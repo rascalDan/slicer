@@ -75,9 +75,11 @@ namespace Slicer {
 	typedef IceUtil::Handle<ValueSource> ValueSourcePtr;
 
 	class ModelPart;
+	class ModelPartForRootBase;
 	class HookCommon;
 
 	typedef IceUtil::Handle<ModelPart> ModelPartPtr;
+	typedef IceUtil::Handle<ModelPartForRootBase> ModelPartForRootPtr;
 	typedef IceUtil::Handle<HookCommon> HookCommonPtr;
 	typedef IceUtil::Optional<std::string> TypeId;
 
@@ -144,7 +146,7 @@ namespace Slicer {
 			template<typename T>
 			static ModelPartPtr CreateFor(T & t);
 			template<typename T>
-			static ModelPartPtr CreateRootFor(T & t);
+			static ModelPartForRootPtr CreateRootFor(T & t);
 
 			virtual void OnEachChild(const ChildHandler &) = 0;
 			ModelPartPtr GetAnonChild(const HookFilter & = HookFilter());
@@ -171,14 +173,18 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPartModel {
 		protected:
 			ModelPartModel(T & m) : Model(m) { }
-			T & Model;		
+			T & Model;
 	};
 
 	template<typename T> inline ModelPartPtr ModelPartFor(T & t) __attribute__ ((deprecated));
 	template<typename T> inline ModelPartPtr ModelPartFor(T & t) { return ModelPart::CreateFor(t); }
 
+	class DLL_PUBLIC ModelPartForRootBase : public ModelPart {
+		public:
+	};
+
 	template<typename T>
-	class ModelPartForRoot : public ModelPart {
+	class ModelPartForRoot : public ModelPartForRootBase {
 		public:
 			ModelPartForRoot(T & o);
 

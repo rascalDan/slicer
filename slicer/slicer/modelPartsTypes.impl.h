@@ -8,8 +8,8 @@
 	template class ModelPartType<Type>; \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType<Type>(s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType<Type> >(s); } \
-	template<> ModelPartPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(s); } \
-	template<> ModelPartPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(s); } \
 
 namespace Slicer {
 	// ModelPartForRoot

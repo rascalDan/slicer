@@ -12,7 +12,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::Deserialize(Slicer::ModelPartPtr mp)
+	SqlSelectDeserializer::Deserialize(Slicer::ModelPartForRootPtr mp)
 	{
 		cmd.execute();
 		columnCount = cmd.columnCount();

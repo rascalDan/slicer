@@ -11,13 +11,13 @@
 namespace Slicer {
 	class DLL_PUBLIC Serializer : public IceUtil::Shared {
 		public:
-			virtual void Serialize(ModelPartPtr) = 0;
+			virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
 	typedef IceUtil::Handle<Serializer> SerializerPtr;
 
 	class DLL_PUBLIC Deserializer : public IceUtil::Shared {
 		public:
-			virtual void Deserialize(ModelPartPtr) = 0;
+			virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
 	typedef IceUtil::Handle<Deserializer> DeserializerPtr;
 

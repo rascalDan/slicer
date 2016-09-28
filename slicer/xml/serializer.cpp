@@ -290,7 +290,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlStreamDeserializer::Deserialize(ModelPartPtr modelRoot)
+	XmlStreamDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::DomParser dom;
 		dom.parse_stream(strm);
@@ -299,7 +299,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlStreamSerializer::Serialize(ModelPartPtr modelRoot)
+	XmlStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::Document doc;
 		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
@@ -317,7 +317,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlFileDeserializer::Deserialize(ModelPartPtr modelRoot)
+	XmlFileDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::DomParser dom(path.string());
 		auto doc = dom.get_document();
@@ -325,7 +325,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlFileSerializer::Serialize(ModelPartPtr modelRoot)
+	XmlFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::Document doc;
 		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
@@ -343,13 +343,13 @@ namespace Slicer {
 	}
 
 	void
-	XmlDocumentDeserializer::Deserialize(ModelPartPtr modelRoot)
+	XmlDocumentDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		DocumentTreeIterate(doc, modelRoot);
 	}
 
 	void
-	XmlDocumentSerializer::Serialize(ModelPartPtr modelRoot)
+	XmlDocumentSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		doc = new xmlpp::Document();
 		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, doc, _1, _2));

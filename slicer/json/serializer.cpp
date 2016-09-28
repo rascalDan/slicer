@@ -304,7 +304,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonStreamDeserializer::Deserialize(ModelPartPtr modelRoot)
+	JsonStreamDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value obj = json::parseValue(strm);
 		auto mp = modelRoot->GetAnonChild();
@@ -312,7 +312,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonStreamSerializer::Serialize(ModelPartPtr modelRoot)
+	JsonStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value doc;
 		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
@@ -330,7 +330,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonFileDeserializer::Deserialize(ModelPartPtr modelRoot)
+	JsonFileDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		std::ifstream inFile(path.string());
 		json::Value obj = json::parseValue(inFile);
@@ -339,7 +339,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonFileSerializer::Serialize(ModelPartPtr modelRoot)
+	JsonFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value doc;
 		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
@@ -358,14 +358,14 @@ namespace Slicer {
 	}
 
 	void
-	JsonValueDeserializer::Deserialize(ModelPartPtr modelRoot)
+	JsonValueDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		auto mp = modelRoot->GetAnonChild();
 		boost::apply_visitor(DocumentTreeIterate(mp), value);
 	}
 
 	void
-	JsonValueSerializer::Serialize(ModelPartPtr modelRoot)
+	JsonValueSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &value, _2));
 	}
