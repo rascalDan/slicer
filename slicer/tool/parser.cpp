@@ -628,6 +628,10 @@ namespace Slicer {
 
 		u->destroy();
 
+		if (!cppPath.empty()) {
+			cpp = NULL;
+		}
+
 		return Components() - initial;
 	}
 
