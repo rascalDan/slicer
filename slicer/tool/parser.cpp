@@ -622,11 +622,13 @@ namespace Slicer {
 			throw CompilerError("unit parse failed");
 		}
 
+		unsigned int initial = Components();
+
 		u->visit(this, false);
 
 		u->destroy();
 
-		return Components();
+		return Components() - initial;
 	}
 
 	Slicer::ConversionSpec::ConversionSpec(const Slicer::Args & s) :
