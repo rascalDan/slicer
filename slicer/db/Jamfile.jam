@@ -32,7 +32,6 @@ path-constant me : . ;
 
 run testSelect.cpp
 	: : :
-	<define>ROOT=\"$(me)\"
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-db
 	<implicit-dependency>slicer-db
@@ -53,7 +52,6 @@ run testSelect.cpp
 
 run testInsert.cpp
 	: : :
-	<define>ROOT=\"$(me)\"
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-db
 	<library>dbpp-postgresql
@@ -73,7 +71,6 @@ run testInsert.cpp
 
 run testUpdate.cpp
 	: : :
-	<define>ROOT=\"$(me)\"
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-db
 	<implicit-dependency>slicer-db

@@ -7,12 +7,13 @@
 #include "sqlSelectDeserializer.h"
 #include <types.h>
 #include <common.h>
+#include <db.h>
 #include <sqlExceptions.h>
 
 class StandardMockDatabase : public PQ::Mock {
 	public:
 		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
-				rootDir / "slicer.sql" })
+				rootDir.parent_path() / "db" / "slicer.sql" })
 		{
 		}
 };
@@ -147,7 +148,7 @@ BOOST_AUTO_TEST_CASE( select_inherit_datetime )
 				"SELECT dt, to_char(dt, 'YYYY-MM-DD') date, ts \
 				FROM test \
 				WHERE id = 3"));
-	DB::SpecificTypesPtr bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::SpecificTypesPtr>(*sel);
+	TestDatabase::SpecificTypesPtr bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(*sel);
 	BOOST_REQUIRE_EQUAL(2015, bi->dt.year);
 	BOOST_REQUIRE_EQUAL(3, bi->dt.month);
 	BOOST_REQUIRE_EQUAL(27, bi->dt.day);

@@ -9,12 +9,13 @@
 #include "sqlUpdateSerializer.h"
 #include <types.h>
 #include <common.h>
+#include <db.h>
 #include <sqlExceptions.h>
 
 class StandardMockDatabase : public PQ::Mock {
 	public:
 		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
-				rootDir / "slicer.sql" })
+				rootDir.parent_path() / "db" / "slicer.sql" })
 		{
 		}
 };
@@ -97,7 +98,7 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins ORDER BY mint"));
-	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
+	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(*sel);
 	BOOST_REQUIRE_EQUAL(2, bis.size());
 	BOOST_REQUIRE_EQUAL("string updated", *bis[0]->mstring);
 	BOOST_REQUIRE_EQUAL("string", *bis[1]->mstring);
@@ -109,7 +110,7 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 	bis[1]->mdouble = IceUtil::Optional<Ice::Double>();
 	BOOST_TEST_CHECKPOINT("Do update");
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db.get(), "builtins");
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(*sel);
 	BOOST_REQUIRE(bis2[0]->mstring);
 	BOOST_REQUIRE(!bis2[1]->mstring);
 	BOOST_REQUIRE(bis2[0]->mbyte);

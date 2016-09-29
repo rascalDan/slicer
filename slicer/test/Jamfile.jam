@@ -27,56 +27,55 @@ actions slicer bind SLICERBIN
 	"$(SLICERBIN)" -I"$(INCLUDES)" $(2) $(1[1]) $(ALLOWICE[1]) --headerPrefix="\"\""
 }
 
-cpp stypes :
-	types.ice
+lib typesice :
+	[ glob *.ice ]
 	:
-	<slicer>pure
-	<slicerbin>../tool//slicer
-	<dependency>../tool//slicer
-	<include>included
-	;
-
-lib types :
-	types.ice
-	stypes
-	conversions.cpp
-	:
+	<slicer>no
 	<include>.
+	<include>included
 	<library>pthread
 	<library>Ice
 	<library>IceUtil
+	<library>included//included
+	<implicit-dependency>included//included
+	: :
+	<library>pthread
+	<library>Ice
+	<library>IceUtil
+	;
+
+lib types :
+	[ glob *.ice ]
+	conversions.cpp
+	:
+	<dependency>../tool//slicer
+	<slicer>pure
+	<slicerbin>../tool//slicer
+	<include>.
 	<library>adhocutil
+	<library>typesice
 	<library>boost_date_time
 	<library>included//included
 	<library>../slicer//slicer
+	<implicit-dependency>typesice
 	<implicit-dependency>included//included
 	<implicit-dependency>../slicer//slicer
 	: :
 	<include>.
-	<library>pthread
-	<library>Ice
-	<library>IceUtil
 	<library>included//included
 	<library>../slicer//slicer
+	<library>typesice
 	;
 
 path-constant me : . ;
 
-lib common :
-	helpers.cpp
-	fileStructure.cpp
-	:
-	<library>adhocutil
-	<library>boost_system
-	<library>boost_filesystem
-	<library>boost_utf
-	<define>ROOT=\"$(me)\"
-	: :
+alias common : : : :
 	<library>boost_filesystem
 	<library>boost_system
 	<define>BOOST_TEST_DYN_LINK
 	<library>boost_utf
 	<implicit-dependency>types
+	<define>ROOT=\"$(me)\"
 	;
 
 run preprocessor.cpp
@@ -100,6 +99,7 @@ run compilation.cpp
 	;
 
 run serializers.cpp
+	helpers.cpp
 	: : :
 	<library>types
 	<library>common

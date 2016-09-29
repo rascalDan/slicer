@@ -13,9 +13,11 @@
 #include <boost/format.hpp>
 #include <boost/function.hpp>
 #include <types.h>
+#include <json.h>
+#include <xml.h>
 #include <fstream>
 #include "helpers.h"
-#include "fileStructure.h"
+#include <definedDirs.h>
 #include "conversions.h"
 
 namespace fs = boost::filesystem;
@@ -24,14 +26,14 @@ namespace fs = boost::filesystem;
 BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
 // LCOV_EXCL_STOP
 
-class FileBased : public FileStructure {
+class FileBased {
 	public:
 		template<typename T, typename DeserializerIn>
 		void
 		verifyByFile(const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
 		{
-			const fs::path input = root / "initial" / infile;
-			const fs::path tmpf = tmp / "byFile";
+			const fs::path input = rootDir / "initial" / infile;
+			const fs::path tmpf = binDir / "byFile";
 			fs::create_directory(tmpf);
 			const fs::path output = tmpf / infile;
 			const fs::path outputJson = tmpf / fs::change_extension(infile, "json");
@@ -68,8 +70,8 @@ class FileBased : public FileStructure {
 				const boost::function<void(Internal &)> & ifree,
 				const boost::function<void(const T &)> & check = NULL)
 		{
-			const fs::path input = root / "initial" / infile;
-			const fs::path tmph = tmp / "byHandler";
+			const fs::path input = rootDir / "initial" / infile;
+			const fs::path tmph = binDir / "byHandler";
 			fs::create_directory(tmph);
 			const fs::path output = tmph / infile;
 
@@ -221,14 +223,14 @@ checkAssertEq(const T & expected, const T & actual)
 }
 
 void
-checkEntityRef(const TestModule2::EntityRef & er)
+checkEntityRef(const TestXml::EntityRef & er)
 {
 	BOOST_REQUIRE_EQUAL(er.Id, 26);
 	BOOST_REQUIRE_EQUAL(er.Name, "Hull City");
 }
 
 void
-checkBare(const TestModule::BareContainers & bc)
+checkBare(const TestXml::BareContainers & bc)
 {
 	BOOST_REQUIRE_EQUAL(bc.bareSeq.size(), 2);
 	BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->a, 1);
@@ -347,7 +349,7 @@ BOOST_AUTO_TEST_CASE( simpleint_json )
 
 BOOST_AUTO_TEST_CASE( complexClass_xmlattrAndText )
 {
-	verifyByFile<TestModule2::EntityRef, Slicer::XmlFileDeserializer>("entityref.xml", checkEntityRef);
+	verifyByFile<TestXml::EntityRef, Slicer::XmlFileDeserializer>("entityref.xml", checkEntityRef);
 }
 
 BOOST_AUTO_TEST_CASE( sequenceOfClass_xml )
@@ -422,7 +424,7 @@ BOOST_AUTO_TEST_CASE( xml_attribute_xml )
 
 BOOST_AUTO_TEST_CASE( xml_barecontainers_xml )
 {
-	verifyByFile<TestModule::BareContainers, Slicer::XmlFileDeserializer>("bare.xml", checkBare);
+	verifyByFile<TestXml::BareContainers, Slicer::XmlFileDeserializer>("bare.xml", checkBare);
 }
 
 BOOST_AUTO_TEST_CASE( xml_classOfEnums_xml )
@@ -462,8 +464,8 @@ BOOST_AUTO_TEST_CASE( xml_simpleArray )
 
 BOOST_AUTO_TEST_CASE( json_streams )
 {
-	const auto tmpf = tmp / "byStream";
-	const auto inFile = root / "initial" / "inherit-c.json";
+	const auto tmpf = binDir / "byStream";
+	const auto inFile = rootDir / "initial" / "inherit-c.json";
 	const auto outFile = tmpf / "streamout.json";
 	boost::filesystem::create_directories(tmpf);
 	{
@@ -478,8 +480,8 @@ BOOST_AUTO_TEST_CASE( json_streams )
 
 BOOST_AUTO_TEST_CASE( xml_streams )
 {
-	const auto tmpf = tmp / "byStream";
-	const auto inFile = root / "initial" / "inherit-b.xml";
+	const auto tmpf = binDir / "byStream";
+	const auto inFile = rootDir / "initial" / "inherit-b.xml";
 	const auto outFile = tmpf / "streamout.xml";
 	boost::filesystem::create_directories(tmpf);
 	{
@@ -494,10 +496,10 @@ BOOST_AUTO_TEST_CASE( xml_streams )
 
 BOOST_AUTO_TEST_CASE( invalid_enum )
 {
-	Slicer::DeserializerPtr jdeserializer = new Slicer::JsonFileDeserializer(root / "initial" / "invalidEnum.json");
+	Slicer::DeserializerPtr jdeserializer = new Slicer::JsonFileDeserializer(rootDir / "initial" / "invalidEnum.json");
 	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
 
-	Slicer::DeserializerPtr xdeserializer = new Slicer::XmlFileDeserializer(root / "initial" / "invalidEnum.xml");
+	Slicer::DeserializerPtr xdeserializer = new Slicer::XmlFileDeserializer(rootDir / "initial" / "invalidEnum.xml");
 	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
 
@@ -552,11 +554,11 @@ BOOST_FIXTURE_TEST_SUITE ( compatWrapper, FileBased );
 BOOST_AUTO_TEST_CASE( any )
 {
 	BOOST_TEST_CHECKPOINT("Create folders");
-	const fs::path tmpf = tmp / "compatWrapper";
+	const fs::path tmpf = binDir / "compatWrapper";
 	fs::create_directory(tmpf);
 
 	BOOST_TEST_CHECKPOINT("Figure out paths");
-	const boost::filesystem::path input = root / "initial" / "builtins.xml";
+	const boost::filesystem::path input = rootDir / "initial" / "builtins.xml";
 	const boost::filesystem::path output = tmpf / "builtins.xml";
 
 	BOOST_TEST_CHECKPOINT("Deserialize with wrapper");

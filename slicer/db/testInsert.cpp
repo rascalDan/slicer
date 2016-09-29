@@ -8,17 +8,18 @@
 #include "sqlSelectDeserializer.h"
 #include <types.h>
 #include <common.h>
+#include <db.h>
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
-BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::Timespan);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
 // LCOV_EXCL_STOP
 
 class StandardMockDatabase : public PQ::Mock {
 	public:
 		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
-				rootDir / "slicer.sql" })
+				rootDir.parent_path() / "db" / "slicer.sql" })
 		{
 		}
 };
@@ -117,13 +118,13 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	DB::BuiltInSeq bis = {
-		DB::BuiltInsPtr(new DB::BuiltIns(true, IceUtil::Optional<Ice::Byte>(), 17, 0, 129, 2.3, 4.5, "more text")),
-		DB::BuiltInsPtr(new DB::BuiltIns(true, 6, 18, 0, 130, 3.4, IceUtil::Optional<Ice::Double>(), "even more text"))
+	TestDatabase::BuiltInSeq bis = {
+		TestDatabase::BuiltInsPtr(new TestDatabase::BuiltIns(true, IceUtil::Optional<Ice::Byte>(), 17, 0, 129, 2.3, 4.5, "more text")),
+		TestDatabase::BuiltInsPtr(new TestDatabase::BuiltIns(true, 6, 18, 0, 130, 3.4, IceUtil::Optional<Ice::Double>(), "even more text"))
 	};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db.get(), "builtins");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (5, 6) ORDER BY mint"));
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::BuiltInSeq>(*sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(*sel);
 	BOOST_REQUIRE_EQUAL(2, bis2.size());
 	BOOST_REQUIRE_EQUAL(bis.front()->mint, 5);
 	BOOST_REQUIRE_EQUAL(bis.back()->mint, 6);
@@ -141,14 +142,14 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 BOOST_AUTO_TEST_CASE( insert_converted )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	DB::SpecificTypesPtr st = new DB::SpecificTypes {
+	TestDatabase::SpecificTypesPtr st = new TestDatabase::SpecificTypes {
 		{2015, 10, 16, 19, 12, 34},
 		{2015, 10, 16},
-		new DB::Timespan(1, 2, 3, 4)
+		new TestDatabase::Timespan(1, 2, 3, 4)
 	};
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(st, db.get(), "converted");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM converted"));
-	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, DB::SpecificTypesPtr>(*sel);
+	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(*sel);
 	BOOST_REQUIRE_EQUAL(st->date, st2->date);
 	BOOST_REQUIRE_EQUAL(st->dt, st2->dt);
 	BOOST_REQUIRE_EQUAL(st->ts->days, st2->ts->days);
