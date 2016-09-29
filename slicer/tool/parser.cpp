@@ -552,8 +552,10 @@ namespace Slicer {
 			if (auto cd = Slice::ClassDeclPtr::dynamicCast(typec)) {
 				typec = cd->definition();
 			}
-			auto typeMetadata = typec->getMetaData();
-			std::copy(typeMetadata.begin(), typeMetadata.end(), std::back_inserter(metadata));
+			if (typec) {
+				auto typeMetadata = typec->getMetaData();
+				std::copy(typeMetadata.begin(), typeMetadata.end(), std::back_inserter(metadata));
+			}
 		}
 		return metadata;
 	}
