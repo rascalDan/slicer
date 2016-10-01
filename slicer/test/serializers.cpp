@@ -586,6 +586,6 @@ BOOST_AUTO_TEST_SUITE_END();
 
 BOOST_AUTO_TEST_CASE( customerModelPartCounters )
 {
-	BOOST_REQUIRE_EQUAL(7, TestModule::completions);
+	BOOST_REQUIRE_EQUAL(27, TestModule::completions);
 }
 

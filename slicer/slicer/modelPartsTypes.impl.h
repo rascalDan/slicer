@@ -4,12 +4,15 @@
 #include "modelPartsTypes.h"
 #include "common.h"
 
-#define MODELPARTFOR(Type, ModelPartType) \
-	template class ModelPartType<Type>; \
-	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType<Type>(s); } \
-	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType<Type> >(s); } \
+#define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
+	template class BaseModelPart; \
+	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(s); } \
+	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType>(s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(s); } \
+
+#define MODELPARTFOR(Type, ModelPartType) \
+	CUSTOMMODELPARTFOR(Type, ModelPartType<Type>, ModelPartType<Type>)
 
 namespace Slicer {
 	// ModelPartForRoot

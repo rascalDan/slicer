@@ -56,6 +56,8 @@ namespace Slicer {
 
 		private:
 			void createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm = Slice::DataMemberPtr(), const Slice::StringList & md = Slice::StringList()) const;
+			std::string getBasicModelPart(const Slice::TypePtr & type) const;
+			void defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const;
 
 			void visitComplexDataMembers(Slice::ConstructedPtr t, const Slice::DataMemberList &) const;
 

@@ -230,8 +230,7 @@ namespace Slicer {
 				c->scoped());
 		copyMetadata(c->getMetaData());
 
-		fprintbf(cpp, "MODELPARTFOR(::IceInternal::Handle< %s >, ModelPartForClass);\n\n",
-				c->scoped());
+		defineMODELPART(stringbf("::IceInternal::Handle< %s >", c->scoped()), decl, c->getMetaData());
 
 		classNo += 1;
 
@@ -257,8 +256,7 @@ namespace Slicer {
 				c->scoped());
 		copyMetadata(c->getMetaData());
 
-		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForStruct);\n\n",
-				c->scoped());
+		defineMODELPART(c->scoped(), c, c->getMetaData());
 
 		return true;
 	}
@@ -363,8 +361,7 @@ namespace Slicer {
 		auto name = metaDataValue("slicer:root:", e->getMetaData());
 		defineRootName(e->scoped(), name ? *name : e->name());
 
-		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForEnum);\n\n",
-				e->scoped());
+		defineMODELPART(e->scoped(), e, e->getMetaData());
 	}
 
 	void
@@ -410,8 +407,7 @@ namespace Slicer {
 				s->scoped());
 		copyMetadata(s->getMetaData());
 
-		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForSequence);\n\n",
-				s->scoped());
+		defineMODELPART(s->scoped(), s, s->getMetaData());
 	}
 
 	void
@@ -470,8 +466,7 @@ namespace Slicer {
 				d->scoped());
 		copyMetadata(d->getMetaData());
 
-		fprintbf(cpp, "MODELPARTFOR(%s, ModelPartForDictionary);\n\n",
-				d->scoped());
+		defineMODELPART(d->scoped(), d, d->getMetaData());
 	}
 
 	void
@@ -497,27 +492,33 @@ namespace Slicer {
 				boost::algorithm::replace_all_copy(*cmp, ".", "::"));
 		}
 		else {
-			if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
-				fprintbf(cpp, "ModelPartForSimple");
-			}
-			else if (auto complexClass = Slice::ClassDeclPtr::dynamicCast(type)) {
-				fprintbf(cpp, "ModelPartForClass");
-			}
-			else if (auto complexStruct = Slice::StructPtr::dynamicCast(type)) {
-				fprintbf(cpp, "ModelPartForStruct");
-			}
-			else if (auto sequence = Slice::SequencePtr::dynamicCast(type)) {
-				fprintbf(cpp, "ModelPartForSequence");
-			}
-			else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
-				fprintbf(cpp, "ModelPartForDictionary");
-			}
-			else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
-				fprintbf(cpp, "ModelPartForEnum");
-			}
-			fprintbf(cpp, "< %s >",
-					Slice::typeToString(type));
+			fprintbf(cpp, "%s< %s >",
+					getBasicModelPart(type), Slice::typeToString(type));
 		}
+	}
+
+	std::string
+	Slicer::getBasicModelPart(const Slice::TypePtr & type) const
+	{
+		if (auto builtin = Slice::BuiltinPtr::dynamicCast(type)) {
+			return "ModelPartForSimple";
+		}
+		else if (auto complexClass = Slice::ClassDeclPtr::dynamicCast(type)) {
+			return "ModelPartForClass";
+		}
+		else if (auto complexStruct = Slice::StructPtr::dynamicCast(type)) {
+			return "ModelPartForStruct";
+		}
+		else if (auto sequence = Slice::SequencePtr::dynamicCast(type)) {
+			return "ModelPartForSequence";
+		}
+		else if (auto dictionary = Slice::DictionaryPtr::dynamicCast(type)) {
+			return "ModelPartForDictionary";
+		}
+		else if (auto enumeration = Slice::EnumPtr::dynamicCast(type)) {
+			return "ModelPartForEnum";
+		}
+		throw CompilerError("Unknown basic type");
 	}
 
 	bool
@@ -576,6 +577,19 @@ namespace Slicer {
 			rtn.push_back(split);
 		}
 		return rtn;
+	}
+
+	void
+	Slicer::defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const
+	{
+		if (auto cmp = metaDataValue("slicer:custommodelpart:", metadata)) {
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, ::%s);\n\n",
+					type, getBasicModelPart(stype), type, boost::algorithm::replace_all_copy(*cmp, ".", "::"));
+		}
+		else {
+			fprintbf(cpp, "MODELPARTFOR(%s, %s);\n\n",
+					type, getBasicModelPart(stype));
+		}
 	}
 
 	unsigned int
