@@ -583,7 +583,7 @@ namespace Slicer {
 	Slicer::defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const
 	{
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", metadata)) {
-			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, ::%s);\n\n",
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n",
 					type, getBasicModelPart(stype), type, boost::algorithm::replace_all_copy(*cmp, ".", "::"));
 		}
 		else {
