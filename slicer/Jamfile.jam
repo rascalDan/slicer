@@ -5,13 +5,14 @@ build-project slicer ;
 build-project xml ;
 build-project json ;
 build-project db ;
+build-project ice ;
 build-project test ;
 
 explicit install ;
 explicit install-xml ;
 explicit install-json ;
 explicit install-db ;
-alias install : slicer//install tool//install ;
+alias install : slicer//install tool//install ice//install ;
 alias install-xml : xml//install ;
 alias install-json : json//install ;
 alias install-db : db//install ;

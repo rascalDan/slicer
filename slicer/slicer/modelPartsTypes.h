@@ -11,6 +11,8 @@ namespace Slicer {
 
 			const std::string & GetRootName() const override;
 			virtual bool HasValue() const override;
+			void Write(::Ice::OutputStreamPtr &) const override;
+			void Read(::Ice::InputStreamPtr &) override;
 
 			static const std::string rootName;
 

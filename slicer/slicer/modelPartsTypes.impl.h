@@ -3,6 +3,10 @@
 
 #include "modelPartsTypes.h"
 #include "common.h"
+#include <Ice/Stream.h>
+#include <Ice/StreamHelpers.h>
+#include <Ice/BasicStream.h>
+#include <IceUtil/Optional.h>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template class BaseModelPart; \
@@ -33,6 +37,62 @@ namespace Slicer {
 	bool ModelPartForRoot<T>::HasValue() const
 	{
 		return ModelObject && mp->HasValue();
+	}
+
+	template<typename T>
+	void
+	typeWrite(::Ice::OutputStreamPtr & s, const ::IceUtil::Optional<T> & m)
+	{
+		typedef Ice::StreamableTraits<T> traits;
+		s->startEncapsulation();
+		if (m && s->writeOptional(0,
+				Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::optionalFormat)) {
+			Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::write(s.get(), *m);
+		}
+		s->endEncapsulation();
+	}
+
+	template<typename T>
+	void
+	typeWrite(::Ice::OutputStreamPtr & s, const T & m)
+	{
+		s->write(m);
+	}
+
+	template<typename T>
+	void
+	typeRead(::Ice::InputStreamPtr & s, ::IceUtil::Optional<T> & m)
+	{
+		typedef Ice::StreamableTraits<T> traits;
+		s->startEncapsulation();
+		if (s->readOptional(0,
+				Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::optionalFormat)) {
+			m.__setIsSet();
+			Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::read(s.get(), *m);
+		}
+		else {
+			m = IceUtil::None;
+		}
+		s->endEncapsulation();
+	}
+
+	template<typename T>
+	void
+	typeRead(::Ice::InputStreamPtr & s, T & m)
+	{
+		s->read(m);
+	}
+
+	template<typename T>
+	void ModelPartForRoot<T>::Write(::Ice::OutputStreamPtr & s) const
+	{
+		typeWrite(s, *ModelObject);
+	}
+
+	template<typename T>
+	void ModelPartForRoot<T>::Read(::Ice::InputStreamPtr & s)
+	{
+		typeRead(s, *ModelObject);
 	}
 
 	// ModelPartForSimple

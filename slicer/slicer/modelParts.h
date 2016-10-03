@@ -6,6 +6,7 @@
 #include <IceUtil/Handle.h>
 #include <IceUtil/Optional.h>
 #include <Ice/Handle.h>
+#include <Ice/StreamF.h>
 #include <Slice/Parser.h>
 #include <stdexcept>
 #include <boost/function.hpp>
@@ -189,6 +190,8 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual ModelPartType GetType() const override;
 			virtual bool IsOptional() const override;
+			virtual void Write(::Ice::OutputStreamPtr &) const = 0;
+			virtual void Read(::Ice::InputStreamPtr &) = 0;
 
 			ModelPartPtr mp;
 	};
