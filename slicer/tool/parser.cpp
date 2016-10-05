@@ -195,32 +195,20 @@ namespace Slicer {
 		defineRootName(typeToString(decl), name ? *name : c->name());
 
 		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
-		fprintbf(cpp, "static void registerClass_%u() __attribute__ ((constructor(210)));\n", classNo);
-		fprintbf(cpp, "static void registerClass_%u()\n{\n", classNo);
-		fprintbf(cpp, "\tSlicer::classRefMap()->insert({ \"%s\", &ModelPartForClass< %s >::CreateModelPart });\n",
-				c->scoped(),
+		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "__attribute__ ((init_priority(209)))\nconst std::string ModelPartForClass< %s >::className(\"%s\");\n",
+				typeToString(decl), c->scoped());
+		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "__attribute__ ((init_priority(209)))\nconst IceUtil::Optional<std::string> ModelPartForClass< %s >::typeName",
 				typeToString(decl));
 		if (typeName) {
-			fprintbf(cpp, "\tSlicer::classNameMap()->insert({ \"%s\", \"%s\" });\n",
-					c->scoped(),
+			fprintbf(cpp, "(\"%s\")",
 					*typeName);
 		}
-		fprintbf(cpp, "}\n\n");
-		fprintbf(cpp, "static void unregisterClass_%u() __attribute__ ((destructor(210)));\n", classNo);
-		fprintbf(cpp, "static void unregisterClass_%u()\n{\n", classNo);
-		fprintbf(cpp, "\tSlicer::classRefMap()->erase(\"%s\");\n",
-				c->scoped());
-		if (typeName) {
-			fprintbf(cpp, "\tSlicer::classNameMap()->left.erase(\"%s\");\n",
-					c->scoped());
+		else {
+			fprintbf(cpp, "(IceUtil::None)");
 		}
-		fprintbf(cpp, "}\n\n");
-
-		fprintbf(cpp, "template<> DLL_PUBLIC\nTypeId\nModelPartForClass< %s >::GetTypeId() const\n{\n",
-				typeToString(decl));
-		fprintbf(cpp, "\tauto id = this->Model->ice_id();\n");
-		fprintbf(cpp, "\treturn (id == \"%s\") ? TypeId() : ModelPart::ToExchangeTypeName(id);\n}\n\n",
-				c->scoped());
+		fprintbf(cpp, ";\n\n");
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());

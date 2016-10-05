@@ -168,8 +168,12 @@ namespace Slicer {
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
 
 			static const std::string typeIdProperty;
+			static const std::string className;
+			static const IceUtil::Optional<std::string> typeName;
 
 			static ModelPartPtr CreateModelPart(void *);
+			static void registerClass() __attribute__ ((constructor(210)));
+			static void unregisterClass() __attribute__ ((destructor(210)));
 	};
 
 	template<typename T>

@@ -304,6 +304,32 @@ namespace Slicer {
 		return new ModelPartForClass<T>(*static_cast<T *>(p));
 	}
 
+	template<typename T>
+	void ModelPartForClass<T>::registerClass()
+	{
+		Slicer::classRefMap()->insert({ className, &ModelPartForClass<T>::CreateModelPart });
+		if (typeName) {
+			Slicer::classNameMap()->insert({ className, *typeName });
+		}
+	}
+
+	template<typename T>
+	void ModelPartForClass<T>::unregisterClass()
+	{
+		Slicer::classRefMap()->erase(className);
+		if (typeName) {
+			Slicer::classNameMap()->left.erase(className);
+		}
+	}
+
+	template<typename T>
+	TypeId
+	ModelPartForClass<T>::GetTypeId() const
+	{
+		auto id = this->Model->ice_id();
+		return (id == className) ? TypeId() : ModelPart::ToExchangeTypeName(id);
+	}
+
 	// ModelPartForStruct
 	template<typename T>
 	ModelPartForStruct<T>::ModelPartForStruct(T & o) :
