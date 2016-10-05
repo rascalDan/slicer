@@ -10,6 +10,8 @@
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template class BaseModelPart; \
+	template class ModelPartForRoot<Type>; \
+	template class ModelPartForRoot< IceUtil::Optional<Type> >; \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType>(s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(s); } \

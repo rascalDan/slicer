@@ -169,9 +169,6 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const std::string ModelPartForRoot< IceUtil::Optional< %s > >::rootName(\"Optional%s\");\n\n",
 				type, name);
-
-		fprintbf(cpp, "template class ModelPartForRoot< %s >;\n\n", type);
-		fprintbf(cpp, "template class ModelPartForRoot< IceUtil::Optional< %s > >;\n\n", type);
 	}
 
 	bool

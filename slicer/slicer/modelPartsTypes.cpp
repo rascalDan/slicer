@@ -28,24 +28,6 @@ namespace Slicer {
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
 
-	template class Slicer::ModelPartForRoot<std::string>;
-	template class Slicer::ModelPartForRoot<bool>;
-	template class Slicer::ModelPartForRoot<Ice::Float>;
-	template class Slicer::ModelPartForRoot<Ice::Double>;
-	template class Slicer::ModelPartForRoot<Ice::Byte>;
-	template class Slicer::ModelPartForRoot<Ice::Short>;
-	template class Slicer::ModelPartForRoot<Ice::Int>;
-	template class Slicer::ModelPartForRoot<Ice::Long>;
-
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<std::string>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<bool>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Float>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Double>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Byte>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>;
-	template class Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>;
-
 	// ModelPartForRootBase
 	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) :
 		mp(m)
