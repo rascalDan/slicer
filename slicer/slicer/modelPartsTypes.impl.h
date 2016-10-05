@@ -298,6 +298,12 @@ namespace Slicer {
 		return typeIdProperty;
 	}
 
+	template<typename T>
+	ModelPartPtr ModelPartForClass<T>::CreateModelPart(void * p)
+	{
+		return new ModelPartForClass<T>(*static_cast<T *>(p));
+	}
+
 	// ModelPartForStruct
 	template<typename T>
 	ModelPartForStruct<T>::ModelPartForStruct(T & o) :

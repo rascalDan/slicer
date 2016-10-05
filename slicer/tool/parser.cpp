@@ -197,9 +197,8 @@ namespace Slicer {
 		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
 		fprintbf(cpp, "static void registerClass_%u() __attribute__ ((constructor(210)));\n", classNo);
 		fprintbf(cpp, "static void registerClass_%u()\n{\n", classNo);
-		fprintbf(cpp, "\tSlicer::classRefMap()->insert({ \"%s\", [](void * p){ return new ModelPartForClass< %s >(*static_cast< %s *>(p)); } });\n",
+		fprintbf(cpp, "\tSlicer::classRefMap()->insert({ \"%s\", &ModelPartForClass< %s >::CreateModelPart });\n",
 				c->scoped(),
-				typeToString(decl),
 				typeToString(decl));
 		if (typeName) {
 			fprintbf(cpp, "\tSlicer::classNameMap()->insert({ \"%s\", \"%s\" });\n",
