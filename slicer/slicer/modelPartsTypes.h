@@ -92,6 +92,8 @@ namespace Slicer {
 			static const ModelPartType type;
 
 		protected:
+			ModelPartPtr getSubclassModelPart(const std::string & name, void * m);
+
 			static void registerClass(const std::string & className, const TypeId & typeName, const ClassRef &);
 			static void unregisterClass(const std::string & className, const TypeId & typeName);
 	};

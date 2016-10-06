@@ -97,6 +97,14 @@ namespace Slicer {
 			Slicer::classNameMap()->left.erase(className);
 		}
 	}
+	ModelPartPtr ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
+	{
+		auto ref = classRefMap()->find(ModelPart::ToModelTypeName(name));
+		if (ref == classRefMap()->end()) {
+			throw UnknownType(name);
+		}
+		return ref->second(m);
+	}
 
 	void ModelPartForEnumBase::OnEachChild(const ChildHandler &) { }
 	ChildRefPtr ModelPartForEnumBase::GetAnonChildRef(const HookFilter &) { return NULL; }

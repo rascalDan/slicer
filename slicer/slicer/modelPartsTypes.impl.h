@@ -279,11 +279,7 @@ namespace Slicer {
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::GetSubclassModelPart(const std::string & name)
 	{
-		auto ref = classRefMap()->find(ModelPart::ToModelTypeName(name));
-		if (ref == classRefMap()->end()) {
-			throw UnknownType(name);
-		}
-		return ref->second(&this->Model);
+		return ModelPartForComplexBase::getSubclassModelPart(name, &this->Model);
 	}
 
 	template<typename T>
