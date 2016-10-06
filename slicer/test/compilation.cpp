@@ -11,9 +11,6 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
 
 #define TypeTest(Var, Expr, Explicit, Expected) \
 	Var obj = Expr; \
-	Slicer::ModelPartPtr mppc = Slicer::ModelPartFor(obj); \
-	BOOST_REQUIRE_EQUAL(Slicer::Expected, mppc->GetType()); \
-	\
 	Slicer::ModelPartPtr mpp = Slicer::ModelPart::CreateFor(obj); \
 	BOOST_REQUIRE_EQUAL(Slicer::Expected, mpp->GetType()); \
 	\
@@ -27,8 +24,6 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
 #define StackTypeTest(Var, Explicit, Expected) \
 	TypeTest(Var, Var(), Explicit, Expected)
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_class )
 {
 	TypeTest(TestModule::BuiltInsPtr, new TestModule::BuiltIns(), ModelPartForClass, mpt_Complex);
@@ -103,5 +98,4 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_enum )
 {
 	StackTypeTest(TestModule::SomeNumbers, ModelPartForEnum, mpt_Simple);
 }
-#pragma GCC diagnostic pop
 

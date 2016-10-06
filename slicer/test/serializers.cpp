@@ -549,39 +549,6 @@ BOOST_AUTO_TEST_CASE( conversion )
 			boost::get<json::String>(*boost::get<json::Object>(v)["conv"]));
 }
 
-BOOST_FIXTURE_TEST_SUITE ( compatWrapper, FileBased );
-
-BOOST_AUTO_TEST_CASE( any )
-{
-	BOOST_TEST_CHECKPOINT("Create folders");
-	const fs::path tmpf = binDir / "compatWrapper";
-	fs::create_directory(tmpf);
-
-	BOOST_TEST_CHECKPOINT("Figure out paths");
-	const boost::filesystem::path input = rootDir / "initial" / "builtins.xml";
-	const boost::filesystem::path output = tmpf / "builtins.xml";
-
-	BOOST_TEST_CHECKPOINT("Deserialize with wrapper");
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-	TestModule::BuiltInsPtr object = Slicer::Deserialize<Slicer::XmlFileDeserializer, TestModule::BuiltIns>(input);
-#pragma GCC diagnostic pop
-
-	BOOST_TEST_CHECKPOINT("Test object");
-	checkBuiltIns_valuesCorrect(object);
-
-	BOOST_TEST_CHECKPOINT("Serialize with wrapper");
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-	Slicer::Serialize<Slicer::XmlFileSerializer>(object, output);
-#pragma GCC diagnostic pop
-
-	BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-	diff(input, output);
-}
-
-BOOST_AUTO_TEST_SUITE_END();
-
 BOOST_AUTO_TEST_SUITE_END();
 
 BOOST_AUTO_TEST_CASE( customerModelPartCounters )

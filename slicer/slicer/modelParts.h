@@ -177,9 +177,6 @@ namespace Slicer {
 			T & Model;
 	};
 
-	template<typename T> inline ModelPartPtr ModelPartFor(T & t) __attribute__ ((deprecated));
-	template<typename T> inline ModelPartPtr ModelPartFor(T & t) { return ModelPart::CreateFor(t); }
-
 	class DLL_PUBLIC ModelPartForRootBase : public ModelPart {
 		public:
 			ModelPartForRootBase(ModelPartPtr mp);
