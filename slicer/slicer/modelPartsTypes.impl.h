@@ -307,19 +307,13 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::registerClass()
 	{
-		Slicer::classRefMap()->insert({ className, &ModelPartForClass<T>::CreateModelPart });
-		if (typeName) {
-			Slicer::classNameMap()->insert({ className, *typeName });
-		}
+		ModelPartForComplexBase::registerClass(className, typeName, &ModelPartForClass<T>::CreateModelPart);
 	}
 
 	template<typename T>
 	void ModelPartForClass<T>::unregisterClass()
 	{
-		Slicer::classRefMap()->erase(className);
-		if (typeName) {
-			Slicer::classNameMap()->left.erase(className);
-		}
+		ModelPartForComplexBase::unregisterClass(className, typeName);
 	}
 
 	template<typename T>

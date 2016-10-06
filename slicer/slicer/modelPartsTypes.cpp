@@ -83,6 +83,20 @@ namespace Slicer {
 
 	ModelPartType ModelPartForComplexBase::GetType() const { return type; }
 	const ModelPartType ModelPartForComplexBase::type = mpt_Complex;
+	void ModelPartForComplexBase::registerClass(const std::string & className, const TypeId & typeName, const ClassRef & cr)
+	{
+		Slicer::classRefMap()->insert({ className, cr });
+		if (typeName) {
+			Slicer::classNameMap()->insert({ className, *typeName });
+		}
+	}
+	void ModelPartForComplexBase::unregisterClass(const std::string & className, const TypeId & typeName)
+	{
+		Slicer::classRefMap()->erase(className);
+		if (typeName) {
+			Slicer::classNameMap()->left.erase(className);
+		}
+	}
 
 	void ModelPartForEnumBase::OnEachChild(const ChildHandler &) { }
 	ChildRefPtr ModelPartForEnumBase::GetAnonChildRef(const HookFilter &) { return NULL; }

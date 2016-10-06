@@ -89,9 +89,9 @@ namespace Slicer {
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
 	typedef boost::function<bool(HookCommonPtr)> HookFilter;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
-	DLL_PUBLIC ClassRefMap * & classRefMap();
+	DLL_PUBLIC ClassRefMap * classRefMap();
 	typedef boost::bimap<std::string, std::string> ClassNameMap;
-	DLL_PUBLIC ClassNameMap * & classNameMap();
+	DLL_PUBLIC ClassNameMap * classNameMap();
 	typedef std::list<std::string> Metadata;
 	DLL_PUBLIC extern const Metadata emptyMetadata;
 

@@ -3,12 +3,13 @@
 
 namespace Slicer {
 	const Metadata emptyMetadata;
+	static ClassNameMap names __attribute__((init_priority(209)));
+	static ClassRefMap refs __attribute__((init_priority(209)));
 
-	ClassNameMap * &
+	ClassNameMap *
 	classNameMap()
 	{
-		static ClassNameMap * refs = new ClassNameMap();
-		return refs;
+		return &names;
 	}
 
 	const std::string &
@@ -31,11 +32,10 @@ namespace Slicer {
 		return name;
 	}
 
-	ClassRefMap * &
+	ClassRefMap *
 	classRefMap()
 	{
-		static ClassRefMap * refs = new ClassRefMap();
-		return refs;
+		return &refs;
 	}
 
 	void

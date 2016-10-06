@@ -90,6 +90,10 @@ namespace Slicer {
 		public:
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
+
+		protected:
+			static void registerClass(const std::string & className, const TypeId & typeName, const ClassRef &);
+			static void unregisterClass(const std::string & className, const TypeId & typeName);
 	};
 
 	template<typename T>
