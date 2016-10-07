@@ -45,7 +45,6 @@ run testSelect.cpp
 	<implicit-dependency>../slicer//slicer
 	<include>..
 	<dependency>slicer.sql
-	<dependency>../test//compilation
 	:
 	testSelect
 	;
@@ -64,7 +63,6 @@ run testInsert.cpp
 	<implicit-dependency>../slicer//slicer
 	<include>..
 	<dependency>slicer.sql
-	<dependency>../test//compilation
 	:
 	testInsert
 	;
@@ -84,7 +82,6 @@ run testUpdate.cpp
 	<implicit-dependency>../slicer//slicer
 	<include>..
 	<dependency>slicer.sql
-	<dependency>../test//compilation
 	:
 	testUpdate
 	;

@@ -589,48 +589,56 @@ namespace Slicer {
 			throw CompilerError("Both file handle and path provided.");
 		}
 		FilePtr cppfile(
-			cpp || cppPath.empty() ? cpp : fopen(cppPath.string(), "a"),
+			cpp || cppPath.empty() ? cpp : fopen(cppPath.string(), "w"),
 			cppPath.empty() ? fflush : fclose);
 		if (!cppfile && !cppPath.empty()) {
 			throw CompilerError("Failed to open output file");
 		}
-		cpp = cppfile.get();
-		Slicer::Slicer::Args args;
-		// Copy includes to args
-		for(const auto & include : includes) {
-			args.push_back("-I" + include.string());
+		try {
+			cpp = cppfile.get();
+			Slicer::Slicer::Args args;
+			// Copy includes to args
+			for(const auto & include : includes) {
+				args.push_back("-I" + include.string());
+			}
+
+			Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath.string(), args);
+			FILE * cppHandle = icecpp->preprocess(false);
+
+			if (cppHandle == NULL) {
+				throw CompilerError("preprocess failed");
+			}
+
+			Slice::UnitPtr u = Slice::Unit::createUnit(false, false, allowIcePrefix, false);
+
+			int parseStatus = u->parse(slicePath.string(), cppHandle, false);
+
+			if (!icecpp->close()) {
+				throw CompilerError("preprocess close failed");
+			}
+
+			if (parseStatus == EXIT_FAILURE) {
+				throw CompilerError("unit parse failed");
+			}
+
+			unsigned int initial = Components();
+
+			u->visit(this, false);
+
+			u->destroy();
+
+			if (!cppPath.empty()) {
+				cpp = NULL;
+			}
+
+			return Components() - initial;
 		}
-
-		Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath.string(), args);
-		FILE * cppHandle = icecpp->preprocess(false);
-
-		if (cppHandle == NULL) {
-			throw CompilerError("preprocess failed");
+		catch (...) {
+			if (!cppPath.empty()) {
+				unlink(cppPath.c_str());
+			}
+			throw;
 		}
-
-		Slice::UnitPtr u = Slice::Unit::createUnit(false, false, allowIcePrefix, false);
-
-		int parseStatus = u->parse(slicePath.string(), cppHandle, false);
-
-		if (!icecpp->close()) {
-			throw CompilerError("preprocess close failed");
-		}
-
-		if (parseStatus == EXIT_FAILURE) {
-			throw CompilerError("unit parse failed");
-		}
-
-		unsigned int initial = Components();
-
-		u->visit(this, false);
-
-		u->destroy();
-
-		if (!cppPath.empty()) {
-			cpp = NULL;
-		}
-
-		return Components() - initial;
 	}
 
 	Slicer::ConversionSpec::ConversionSpec(const Slicer::Args & s) :

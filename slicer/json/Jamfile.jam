@@ -35,7 +35,6 @@ run testSpecifics.cpp
 	<library>../test//common
 	<library>../slicer//slicer
 	<include>..
-	<dependency>../test//compilation
 	:
 	testSpecifics
 	;
