@@ -106,6 +106,58 @@ namespace Slicer {
 		return ref->second(m);
 	}
 
+	void ModelPartForOptionalBase::OnEachChild(const ChildHandler & ch)
+	{
+		if (this->hasModel()) {
+			modelPart->OnEachChild(ch);
+		}
+	}
+
+	void ModelPartForOptionalBase::Complete()
+	{
+		if (this->hasModel()) {
+			modelPart->Complete();
+		}
+	}
+
+	ChildRefPtr ModelPartForOptionalBase::GetAnonChildRef(const HookFilter & flt)
+	{
+		if (this->hasModel()) {
+			return modelPart->GetAnonChildRef(flt);
+		}
+		return NULL;
+	}
+
+	ChildRefPtr ModelPartForOptionalBase::GetChildRef(const std::string & name, const HookFilter & flt)
+	{
+		if (this->hasModel()) {
+			return modelPart->GetChildRef(name, flt);
+		}
+		return NULL;
+	}
+
+	void ModelPartForOptionalBase::SetValue(ValueSourcePtr s)
+	{
+		if (this->hasModel()) {
+			modelPart->SetValue(s);
+		}
+	}
+
+	bool ModelPartForOptionalBase::HasValue() const
+	{
+		return this->hasModel() && modelPart->HasValue();
+	}
+
+	bool ModelPartForOptionalBase::IsOptional() const
+	{
+		return true;
+	};
+
+	const Metadata & ModelPartForOptionalBase::GetMetadata() const
+	{
+		return modelPart->GetMetadata();
+	}
+
 	void ModelPartForEnumBase::OnEachChild(const ChildHandler &) { }
 	ChildRefPtr ModelPartForEnumBase::GetAnonChildRef(const HookFilter &) { return NULL; }
 	ChildRefPtr ModelPartForEnumBase::GetChildRef(const std::string &, const HookFilter &) { return NULL; }

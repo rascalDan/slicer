@@ -134,19 +134,9 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	void ModelPartForOptional<T>::OnEachChild(const ChildHandler & ch)
+	bool ModelPartForOptional<T>::hasModel() const
 	{
-		if (this->Model) {
-			modelPart->OnEachChild(ch);
-		}
-	}
-
-	template<typename T>
-	void ModelPartForOptional<T>::Complete()
-	{
-		if (this->Model) {
-			modelPart->Complete();
-		}
+		return this->Model;
 	}
 
 	template<typename T>
@@ -156,32 +146,6 @@ namespace Slicer {
 			this->Model = typename T::element_type();
 			modelPart = new T(*this->Model);
 			modelPart->Create();
-		}
-	}
-
-	template<typename T>
-	ChildRefPtr ModelPartForOptional<T>::GetAnonChildRef(const HookFilter & flt)
-	{
-		if (this->Model) {
-			return modelPart->GetAnonChildRef(flt);
-		}
-		return NULL;
-	}
-
-	template<typename T>
-	ChildRefPtr ModelPartForOptional<T>::GetChildRef(const std::string & name, const HookFilter & flt)
-	{
-		if (this->Model) {
-			return modelPart->GetChildRef(name, flt);
-		}
-		return NULL;
-	}
-
-	template<typename T>
-	void ModelPartForOptional<T>::SetValue(ValueSourcePtr s)
-	{
-		if (this->Model) {
-			modelPart->SetValue(s);
 		}
 	}
 
@@ -196,27 +160,9 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	bool ModelPartForOptional<T>::HasValue() const
-	{
-		return this->Model && modelPart->HasValue();
-	}
-
-	template<typename T>
 	ModelPartType ModelPartForOptional<T>::GetType() const
 	{
 		return T::type;
-	}
-
-	template<typename T>
-	bool ModelPartForOptional<T>::IsOptional() const
-	{
-		return true;
-	};
-
-	template<typename T>
-	const Metadata & ModelPartForOptional<T>::GetMetadata() const
-	{
-		return modelPart->GetMetadata();
 	}
 
 	// ModelPartForComplex

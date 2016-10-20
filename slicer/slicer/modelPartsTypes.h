@@ -61,29 +61,33 @@ namespace Slicer {
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 	};
-
-	template<typename T>
-	class DLL_PUBLIC ModelPartForOptional : public ModelPart, protected ModelPartModel<IceUtil::Optional<typename T::element_type> > {
+	
+	class DLL_PUBLIC ModelPartForOptionalBase : public ModelPart {
 		public:
-			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual void Complete() override;
-			virtual void Create() override;
 			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override;
 			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override;
 			virtual void SetValue(ValueSourcePtr s) override;
-			virtual void GetValue(ValueTargetPtr s) override;
-
 			virtual bool HasValue() const override;
-
-			virtual ModelPartType GetType() const override;
-
 			virtual bool IsOptional() const override;
-
 			virtual const Metadata & GetMetadata() const override;
 
 		protected:
+			virtual bool hasModel() const = 0;
 			ModelPartPtr modelPart;
+	};
+
+	template<typename T>
+	class DLL_PUBLIC ModelPartForOptional : public ModelPartForOptionalBase, protected ModelPartModel<IceUtil::Optional<typename T::element_type> > {
+		public:
+			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
+			virtual void Create() override;
+			virtual void GetValue(ValueTargetPtr s) override;
+			virtual ModelPartType GetType() const override;
+
+		protected:
+			virtual bool hasModel() const override;
 	};
 
 	class DLL_PUBLIC ModelPartForComplexBase : public ModelPart {
