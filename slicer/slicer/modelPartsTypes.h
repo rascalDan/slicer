@@ -101,7 +101,7 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
 		public:
-			class HookBase : public HookCommon {
+			class DLL_PRIVATE HookBase : public HookCommon {
 				public:
 					virtual ModelPartPtr Get(T * t) const = 0;
 					virtual const Metadata & GetMetadata() const override { return emptyMetadata; }
@@ -109,7 +109,7 @@ namespace Slicer {
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
 			template <typename MT, typename CT, MT CT::*M>
-			class HookMetadata : public HookBase {
+			class DLL_PRIVATE HookMetadata : public HookBase {
 				public:
 					virtual const Metadata & GetMetadata() const override { return metadata; }
 
@@ -117,7 +117,7 @@ namespace Slicer {
 			};
 
 			template <typename MT, typename CT, MT CT::*M, typename MP, typename Base = HookMetadata<MT, CT, M>>
-			class Hook : public Base {
+			class DLL_PRIVATE Hook : public Base {
 				public:
 					Hook(const std::string & n) :
 						name(n)

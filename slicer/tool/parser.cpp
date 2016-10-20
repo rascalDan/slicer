@@ -295,7 +295,7 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto type = dm->type();
-			fprintbf(cpp, "template<>\ntemplate<> DLL_PUBLIC\nconst Metadata\n");
+			fprintbf(cpp, "template<>\ntemplate<> DLL_PRIVATE\nconst Metadata\n");
 			createNewModelPartPtrFor(it);
 			fprintbf(cpp, "::HookMetadata< %s",
 					Slice::typeToString(type, dm->optional()));
