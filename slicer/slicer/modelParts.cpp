@@ -101,5 +101,23 @@ namespace Slicer {
 	{
 		return false;
 	}
+
+	bool
+	HookCommon::filter(const HookFilter & flt, const std::string & name)
+	{
+		return (PartName() == name && (!flt || flt(this)));
+	}
+
+	bool
+	HookCommon::filter(const HookFilter & flt)
+	{
+		return (!flt || flt(this));
+	}
+
+	void
+	HookCommon::apply(const ChildHandler & ch, const ModelPartPtr & modelPart)
+	{
+		ch(PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr(), this);
+	}
 }
 

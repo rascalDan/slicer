@@ -103,19 +103,23 @@ namespace Slicer {
 		mpt_Dictionary,
 	};
 
-	class HookCommon : public IceUtil::Shared {
-		public:
-			virtual std::string PartName() const = 0;
-
-			virtual const Metadata & GetMetadata() const = 0;
-	};
-
 	class ChildRef : public IceUtil::Shared {
 		public:
 			virtual ModelPartPtr Child() const = 0;
 			virtual const Metadata & ChildMetaData() const = 0;
 	};
 	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
+
+	class DLL_PUBLIC HookCommon : public IceUtil::Shared {
+		public:
+			bool filter(const HookFilter & flt);
+			bool filter(const HookFilter & flt, const std::string &);
+			void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);
+
+			virtual std::string PartName() const = 0;
+
+			virtual const Metadata & GetMetadata() const = 0;
+	};
 
 	class DLL_PUBLIC ImplicitChildRef : public ChildRef {
 		public:

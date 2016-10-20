@@ -224,8 +224,7 @@ namespace Slicer {
 	void ModelPartForComplex<T>::OnEachChild(const ChildHandler & ch)
 	{
 		for (const auto & h : hooks) {
-			auto modelPart = h->Get(GetModel());
-			ch(h->PartName(), modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr(), h);
+			h->apply(ch, h->Get(GetModel()));
 		}
 	}
 
@@ -233,7 +232,7 @@ namespace Slicer {
 	ChildRefPtr ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
 	{
 		for (const auto & h : hooks) {
-			if (!flt || flt(h)) {
+			if (h->filter(flt)) {
 				return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
 		}
@@ -244,7 +243,7 @@ namespace Slicer {
 	ChildRefPtr ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt)
 	{
 		for (const auto & h : hooks) {
-			if (h->PartName() == name && (!flt || flt(h))) {
+			if (h->filter(flt, name)) {
 				return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
 		}
