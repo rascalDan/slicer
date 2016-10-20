@@ -112,16 +112,8 @@ namespace Slicer {
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
-			template <typename MT, typename CT, MT CT::*M>
-			class DLL_PRIVATE HookMetadata : public HookBase {
-				public:
-					virtual const Metadata & GetMetadata() const override { return metadata; }
-
-					static const Metadata metadata;
-			};
-
-			template <typename MT, typename CT, MT CT::*M, typename MP, typename Base = HookMetadata<MT, CT, M>>
-			class DLL_PRIVATE Hook : public Base {
+			template <typename MT, typename CT, MT CT::*M, typename MP>
+			class DLL_PRIVATE Hook : public HookBase {
 				public:
 					Hook(const std::string & n) :
 						name(n)
@@ -138,10 +130,24 @@ namespace Slicer {
 						return name;
 					}
 
-
 				private:
 					const std::string name;
 			};
+
+			template <typename MT, typename CT, MT CT::*M, typename MP>
+			class DLL_PRIVATE HookMetadata : public Hook<MT, CT, M, MP> {
+				public:
+					HookMetadata(const std::string & n, const Metadata & md) :
+						Hook<MT, CT, M, MP>(n),
+						metadata(md)
+					{
+					}
+
+					virtual const Metadata & GetMetadata() const override { return metadata; }
+
+					const Metadata metadata;
+			};
+
 
 			virtual void OnEachChild(const ChildHandler & ch);
 

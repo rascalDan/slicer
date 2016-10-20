@@ -213,6 +213,7 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());
 		copyMetadata(c->getMetaData());
+		fprintbf(cpp, ";\n\n");
 
 		defineMODELPART(stringbf("::IceInternal::Handle< %s >", c->scoped()), decl, c->getMetaData());
 
@@ -239,6 +240,7 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());
 		copyMetadata(c->getMetaData());
+		fprintbf(cpp, ";\n\n");
 
 		defineMODELPART(c->scoped(), c, c->getMetaData());
 
@@ -265,7 +267,13 @@ namespace Slicer {
 			fprintbf(cpp, "\t\tnew ");
 			auto type = dm->type();
 			createNewModelPartPtrFor(it);
-			fprintbf(cpp, "::Hook< %s",
+			if (hasMetadata(dm->getMetaData())) {
+				fprintbf(cpp, "::HookMetadata<");
+			}
+			else {
+				fprintbf(cpp, "::Hook<");
+			}
+			fprintbf(cpp, " %s",
 					Slice::typeToString(type, dm->optional()));
 			fprintbf(cpp, ", %s, &%s, ",
 					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
@@ -277,33 +285,15 @@ namespace Slicer {
 			if (dm->optional()) {
 				fprintbf(cpp, " > ");
 			}
-			if (!hasMetadata(dm->getMetaData())) {
-				fprintbf(cpp, ", HookBase");
-			}
-			fprintbf(cpp, " >(\"%s\"),\n",
+			fprintbf(cpp, " >(\"%s\"",
 					name ? *name : dm->name());
+			if (hasMetadata(dm->getMetaData())) {
+				fprintbf(cpp, ", ");
+				copyMetadata(dm->getMetaData());
+			}
+			fprintbf(cpp, " ),\n");
 		}
 		fprintbf(cpp, "\t};\n\n");
-
-		for (const auto & dm : dataMembers) {
-			if (!hasMetadata(dm->getMetaData())) {
-				continue;
-			}
-			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
-			auto t = Slice::TypePtr::dynamicCast(dm->container());
-			if (!t) {
-				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
-			}
-			auto type = dm->type();
-			fprintbf(cpp, "template<>\ntemplate<> DLL_PRIVATE\nconst Metadata\n");
-			createNewModelPartPtrFor(it);
-			fprintbf(cpp, "::HookMetadata< %s",
-					Slice::typeToString(type, dm->optional()));
-			fprintbf(cpp, ", %s, &%s >::metadata ",
-					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
-					dm->scoped());
-			copyMetadata(dm->getMetaData());
-		}
 	}
 
 	void
@@ -319,6 +309,7 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForEnum< %s >::metadata ",
 				e->scoped());
 		copyMetadata(e->getMetaData());
+		fprintbf(cpp, ";\n\n");
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst ModelPartForEnum< %s >::Enumerations\nModelPartForEnum< %s >::enumerations([]() -> ModelPartForEnum< %s >::Enumerations\n",
 				e->scoped(),
@@ -390,6 +381,7 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForSequence< %s >::metadata ",
 				s->scoped());
 		copyMetadata(s->getMetaData());
+		fprintbf(cpp, ";\n\n");
 
 		defineMODELPART(s->scoped(), s, s->getMetaData());
 	}
@@ -425,7 +417,7 @@ namespace Slicer {
 				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(ktype);
-		fprintbf(cpp, ", HookBase >(\"%s\"),\n\t\t",
+		fprintbf(cpp, " >(\"%s\"),\n\t\t",
 				kname ? *kname : "key");
 		auto vtype = d->valueType();
 		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< %s, %s::value_type, &%s::value_type::second, ",
@@ -434,7 +426,7 @@ namespace Slicer {
 				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(vtype);
-		fprintbf(cpp, ", HookBase >(\"%s\"),\n",
+		fprintbf(cpp, " >(\"%s\"),\n",
 				vname ? *vname : "value");
 		fprintbf(cpp, "\t};\n");
 		fprintbf(cpp, "\n");
@@ -445,10 +437,12 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForDictionary< %s >::metadata ",
 				d->scoped());
 		copyMetadata(d->getMetaData());
+		fprintbf(cpp, ";\n\n");
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForComplex<%s::value_type>::metadata ",
 				d->scoped());
 		copyMetadata(d->getMetaData());
+		fprintbf(cpp, ";\n\n");
 
 		defineMODELPART(d->scoped(), d, d->getMetaData());
 	}
@@ -525,7 +519,7 @@ namespace Slicer {
 				fprintbf(cpp, "\t\"%s\",\n", md.c_str() + 7);
 			}
 		}
-		fprintbf(cpp, "};\n\n");
+		fprintbf(cpp, "}");
 	}
 
 	Slice::StringList
