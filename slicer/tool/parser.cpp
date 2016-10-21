@@ -275,9 +275,8 @@ namespace Slicer {
 			}
 			fprintbf(cpp, " %s",
 					Slice::typeToString(type, dm->optional()));
-			fprintbf(cpp, ", %s, &%s, ",
-					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
-					dm->scoped());
+			fprintbf(cpp, ", %s, ",
+					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct));
 			if (dm->optional()) {
 				fprintbf(cpp, "ModelPartForOptional< ");
 			}
@@ -285,7 +284,8 @@ namespace Slicer {
 			if (dm->optional()) {
 				fprintbf(cpp, " > ");
 			}
-			fprintbf(cpp, " >(\"%s\"",
+			fprintbf(cpp, " >(&%s, \"%s\"",
+					dm->scoped(),
 					name ? *name : dm->name());
 			if (hasMetadata(dm->getMetaData())) {
 				fprintbf(cpp, ", ");
@@ -411,22 +411,22 @@ namespace Slicer {
 		auto vname = metaDataValue("slicer:value:", d->getMetaData());
 		fprintbf(cpp, "\t\t");
 		auto ktype = d->keyType();
-		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< const %s, %s::value_type, &%s::value_type::first, ",
+		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< const %s, %s::value_type, ",
 				d->scoped(),
 				Slice::typeToString(ktype),
-				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(ktype);
-		fprintbf(cpp, " >(\"%s\"),\n\t\t",
+		fprintbf(cpp, " >(&%s::value_type::first, \"%s\"),\n\t\t",
+				d->scoped(),
 				kname ? *kname : "key");
 		auto vtype = d->valueType();
-		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< %s, %s::value_type, &%s::value_type::second, ",
+		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< %s, %s::value_type, ",
 				d->scoped(),
 				Slice::typeToString(vtype),
-				d->scoped(),
 				d->scoped());
 		createNewModelPartPtrFor(vtype);
-		fprintbf(cpp, " >(\"%s\"),\n",
+		fprintbf(cpp, " >(&%s::value_type::second, \"%s\"),\n",
+				d->scoped(),
 				vname ? *vname : "value");
 		fprintbf(cpp, "\t};\n");
 		fprintbf(cpp, "\n");

@@ -112,17 +112,18 @@ namespace Slicer {
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
-			template <typename MT, typename CT, MT CT::*M, typename MP>
+			template <typename MT, typename CT, typename MP>
 			class DLL_PRIVATE Hook : public HookBase {
 				public:
-					Hook(const std::string & n) :
+					Hook(MT CT::* m, const std::string & n) :
+						member(m),
 						name(n)
 					{
 					}
 
 					ModelPartPtr Get(T * t) const override
 					{
-						return t ? new MP(const_cast<typename std::remove_const<MT>::type &>(t->*M)) : NULL;
+						return t ? new MP(const_cast<typename std::remove_const<MT>::type &>(t->*member)) : NULL;
 					}
 
 					std::string PartName() const override
@@ -131,14 +132,15 @@ namespace Slicer {
 					}
 
 				private:
+					const MT CT::* member;
 					const std::string name;
 			};
 
-			template <typename MT, typename CT, MT CT::*M, typename MP>
-			class DLL_PRIVATE HookMetadata : public Hook<MT, CT, M, MP> {
+			template <typename MT, typename CT, typename MP>
+			class DLL_PRIVATE HookMetadata : public Hook<MT, CT, MP> {
 				public:
-					HookMetadata(const std::string & n, const Metadata & md) :
-						Hook<MT, CT, M, MP>(n),
+					HookMetadata(MT CT::* member, const std::string & n, const Metadata & md) :
+						Hook<MT, CT, MP>(member, n),
 						metadata(md)
 					{
 					}
