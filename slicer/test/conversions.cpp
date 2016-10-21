@@ -109,7 +109,7 @@ namespace TestModule {
 	int completions = 0;
 
 	AbValidator::AbValidator(ClassTypePtr & m) :
-		Slicer::ModelPartForClass<ClassTypePtr>(m)
+		Slicer::ModelPartForClass<ClassType>(m)
 	{
 	}
 
@@ -121,7 +121,7 @@ namespace TestModule {
 			throw std::runtime_error("Mock error");
 			// LCOV_EXCL_STOP
 		}
-		Slicer::ModelPartForClass<ClassTypePtr>::Complete();
+		Slicer::ModelPartForClass<ClassType>::Complete();
 		completions += 1;
 	}
 

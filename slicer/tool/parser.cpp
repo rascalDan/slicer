@@ -188,7 +188,7 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		auto typeId = metaDataValue("slicer:typeid:", c->getMetaData());
 		fprintbf(cpp, "const std::string ModelPartForClass< %s >::typeIdProperty(\"%s\");\n\n",
-				typeToString(decl),
+				decl->typeId(),
 				typeId ? *typeId : "slicer-typeid");
 
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
@@ -197,10 +197,10 @@ namespace Slicer {
 		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "__attribute__ ((init_priority(209)))\nconst std::string ModelPartForClass< %s >::className(\"%s\");\n",
-				typeToString(decl), c->scoped());
+				decl->typeId(), c->scoped());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "__attribute__ ((init_priority(209)))\nconst IceUtil::Optional<std::string> ModelPartForClass< %s >::typeName",
-				typeToString(decl));
+				decl->typeId());
 		if (typeName) {
 			fprintbf(cpp, "(\"%s\")",
 					*typeName);
@@ -215,7 +215,14 @@ namespace Slicer {
 		copyMetadata(c->getMetaData());
 		fprintbf(cpp, ";\n\n");
 
-		defineMODELPART(stringbf("::IceInternal::Handle< %s >", c->scoped()), decl, c->getMetaData());
+		if (auto cmp = metaDataValue("slicer:custommodelpart:", c->getMetaData())) {
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n",
+					Slice::typeToString(decl), getBasicModelPart(decl), c->scoped(), boost::algorithm::replace_all_copy(*cmp, ".", "::"));
+		}
+		else {
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>);\n\n",
+					Slice::typeToString(decl), c->scoped(), c->scoped());
+		}
 
 		classNo += 1;
 
@@ -471,7 +478,7 @@ namespace Slicer {
 		}
 		else {
 			fprintbf(cpp, "%s< %s >",
-					getBasicModelPart(type), Slice::typeToString(type));
+					getBasicModelPart(type), Slice::ClassDeclPtr::dynamicCast(type) ? type->typeId() : Slice::typeToString(type));
 		}
 	}
 

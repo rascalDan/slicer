@@ -167,15 +167,15 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<typename T::element_type>, protected ModelPartModel<T> {
+	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<IceInternal::Handle<T> > {
 		public:
-			typedef T element_type;
+			typedef IceInternal::Handle<T> element_type;
 
-			ModelPartForClass(T & h);
+			ModelPartForClass(element_type & h);
 
 			virtual void Create() override;
 
-			typename T::element_type * GetModel() override;
+			T * GetModel() override;
 
 			virtual ModelPartPtr GetSubclassModelPart(const std::string & name) override;
 

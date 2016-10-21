@@ -9,7 +9,7 @@
 namespace TestModule {
 	DLL_PUBLIC extern int completions;
 
-	class DLL_PUBLIC AbValidator : public Slicer::ModelPartForClass<ClassTypePtr> {
+	class DLL_PUBLIC AbValidator : public Slicer::ModelPartForClass<ClassType> {
 		public:
 			AbValidator(ClassTypePtr &);
 

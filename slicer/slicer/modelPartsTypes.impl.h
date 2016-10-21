@@ -204,19 +204,19 @@ namespace Slicer {
 
 	// ModelPartForClass
 	template<typename T>
-	ModelPartForClass<T>::ModelPartForClass(T & h) :
-			ModelPartModel<T>(h)
+	ModelPartForClass<T>::ModelPartForClass(element_type & h) :
+			ModelPartModel<element_type>(h)
 	{
 	}
 
 	template<typename T>
 	void ModelPartForClass<T>::Create()
 	{
-		this->Model = new typename T::element_type();
+		this->Model = new T();
 	}
 
 	template<typename T>
-	typename T::element_type * ModelPartForClass<T>::GetModel()
+	T * ModelPartForClass<T>::GetModel()
 	{
 		return this->Model.get();
 	}
@@ -242,7 +242,7 @@ namespace Slicer {
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::CreateModelPart(void * p)
 	{
-		return new ModelPartForClass<T>(*static_cast<T *>(p));
+		return new ModelPartForClass<T>(*static_cast<element_type *>(p));
 	}
 
 	template<typename T>
