@@ -112,10 +112,10 @@ namespace Slicer {
 			};
 			typedef IceUtil::Handle<HookBase> HookPtr;
 
-			template <typename MT, typename CT, typename MP>
+			template <typename MT, typename MP>
 			class DLL_PRIVATE Hook : public HookBase {
 				public:
-					Hook(MT CT::* m, const std::string & n) :
+					Hook(MT T::* m, const std::string & n) :
 						member(m),
 						name(n)
 					{
@@ -132,15 +132,15 @@ namespace Slicer {
 					}
 
 				private:
-					const MT CT::* member;
+					const MT T::* member;
 					const std::string name;
 			};
 
-			template <typename MT, typename CT, typename MP>
-			class DLL_PRIVATE HookMetadata : public Hook<MT, CT, MP> {
+			template <typename MT, typename MP>
+			class DLL_PRIVATE HookMetadata : public Hook<MT, MP> {
 				public:
-					HookMetadata(MT CT::* member, const std::string & n, const Metadata & md) :
-						Hook<MT, CT, MP>(member, n),
+					HookMetadata(MT T::* member, const std::string & n, const Metadata & md) :
+						Hook<MT, MP>(member, n),
 						metadata(md)
 					{
 					}
