@@ -46,10 +46,10 @@ namespace Slicer {
 	typeWrite(::Ice::OutputStreamPtr & s, const ::IceUtil::Optional<T> & m)
 	{
 		typedef Ice::StreamableTraits<T> traits;
+		typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
 		s->startEncapsulation();
-		if (m && s->writeOptional(0,
-				Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::optionalFormat)) {
-			Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::write(s.get(), *m);
+		if (m && s->writeOptional(0, SOH::optionalFormat)) {
+			SOH::write(s.get(), *m);
 		}
 		s->endEncapsulation();
 	}
@@ -66,11 +66,11 @@ namespace Slicer {
 	typeRead(::Ice::InputStreamPtr & s, ::IceUtil::Optional<T> & m)
 	{
 		typedef Ice::StreamableTraits<T> traits;
+		typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
 		s->startEncapsulation();
-		if (s->readOptional(0,
-				Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::optionalFormat)) {
+		if (s->readOptional(0, SOH::optionalFormat)) {
 			m.__setIsSet();
-			Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>::read(s.get(), *m);
+			SOH::read(s.get(), *m);
 		}
 		else {
 			m = IceUtil::None;
