@@ -112,13 +112,15 @@ namespace Slicer {
 
 	class DLL_PUBLIC HookCommon : public IceUtil::Shared {
 		public:
+			HookCommon(const std::string &);
+
 			bool filter(const HookFilter & flt);
 			bool filter(const HookFilter & flt, const std::string &);
 			void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);
 
-			virtual std::string PartName() const = 0;
-
 			virtual const Metadata & GetMetadata() const = 0;
+
+			const std::string name;
 	};
 
 	class DLL_PUBLIC ImplicitChildRef : public ChildRef {

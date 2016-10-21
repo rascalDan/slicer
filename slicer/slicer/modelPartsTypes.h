@@ -107,6 +107,7 @@ namespace Slicer {
 		public:
 			class DLL_PRIVATE HookBase : public HookCommon {
 				public:
+					HookBase(const std::string & n) : HookCommon(n) { }
 					virtual ModelPartPtr Get(T * t) const = 0;
 					virtual const Metadata & GetMetadata() const override { return emptyMetadata; }
 			};
@@ -116,8 +117,8 @@ namespace Slicer {
 			class DLL_PRIVATE Hook : public HookBase {
 				public:
 					Hook(MT T::* m, const std::string & n) :
-						member(m),
-						name(n)
+						HookBase(n),
+						member(m)
 					{
 					}
 
@@ -126,14 +127,8 @@ namespace Slicer {
 						return t ? new MP(const_cast<typename std::remove_const<MT>::type &>(t->*member)) : NULL;
 					}
 
-					std::string PartName() const override
-					{
-						return name;
-					}
-
 				private:
 					const MT T::* member;
-					const std::string name;
 			};
 
 			template <typename MT, typename MP>

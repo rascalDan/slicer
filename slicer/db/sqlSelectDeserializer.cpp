@@ -98,7 +98,7 @@ namespace Slicer {
 							const DB::Column & c = cmd[col];
 							if (!c.isNull()) {
 								auto fmpr = rmp->GetAnonChildRef([&c](Slicer::HookCommonPtr h) {
-									return boost::iequals(c.name, h->PartName());
+									return boost::iequals(c.name, h->name);
 								});
 								if (fmpr) {
 									SqlSourcePtr h = new SqlSource(c);
