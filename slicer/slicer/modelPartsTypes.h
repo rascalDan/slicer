@@ -5,6 +5,11 @@
 
 namespace Slicer {
 	template<typename T>
+	struct isLocal {
+		static constexpr bool value = false;
+	};
+
+	template<typename T>
 	class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
 		public:
 			ModelPartForRoot(T & o);

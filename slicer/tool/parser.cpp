@@ -159,10 +159,14 @@ namespace Slicer {
 		return true;
 	}
 
-
 	void
-	Slicer::defineRootName(const std::string & type, const std::string & name) const
+	Slicer::defineRoot(const std::string & type, const std::string & name, const Slice::TypePtr & stype) const
 	{
+		if (stype->isLocal()) {
+			fprintbf(cpp, "template<>\n");
+			fprintbf(cpp, "struct isLocal< %s > { static constexpr bool value = true; };\n\n",
+					type);
+		}
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
 				type, name);
@@ -192,7 +196,7 @@ namespace Slicer {
 				typeId ? *typeId : "slicer-typeid");
 
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
-		defineRootName(typeToString(decl), name ? *name : c->name());
+		defineRoot(typeToString(decl), name ? *name : c->name(), decl);
 
 		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
@@ -242,7 +246,7 @@ namespace Slicer {
 		visitComplexDataMembers(c, c->dataMembers());
 
 		auto name = metaDataValue("slicer:root:", c->getMetaData());
-		defineRootName(c->scoped(), name ? *name : c->name());
+		defineRoot(c->scoped(), name ? *name : c->name(), c);
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());
@@ -339,7 +343,7 @@ namespace Slicer {
 				e->scoped());
 
 		auto name = metaDataValue("slicer:root:", e->getMetaData());
-		defineRootName(e->scoped(), name ? *name : e->name());
+		defineRoot(e->scoped(), name ? *name : e->name(), e);
 
 		defineMODELPART(e->scoped(), e, e->getMetaData());
 	}
@@ -381,7 +385,7 @@ namespace Slicer {
 				ename ? *ename : "element");
 
 		auto name = metaDataValue("slicer:root:", s->getMetaData());
-		defineRootName(s->scoped(), name ? *name : s->name());
+		defineRoot(s->scoped(), name ? *name : s->name(), s);
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForSequence< %s >::metadata ",
 				s->scoped());
@@ -435,7 +439,7 @@ namespace Slicer {
 		fprintbf(cpp, "\n");
 
 		auto name = metaDataValue("slicer:root:", d->getMetaData());
-		defineRootName(d->scoped(), name ? *name : d->name());
+		defineRoot(d->scoped(), name ? *name : d->name(), d);
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForDictionary< %s >::metadata ",
 				d->scoped());

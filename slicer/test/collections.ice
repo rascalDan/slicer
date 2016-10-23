@@ -8,9 +8,9 @@ module TestModule {
 	sequence<string> SimpleSeq;
 	sequence<BuiltIns> BuiltInSeq;
 	sequence<ClassType> Classes;
-	sequence<StructType> Structs;
+	local sequence<StructType> Structs;
 	dictionary<int, ClassType> ClassMap;
-	dictionary<int, StructType> StructMap;
+	local dictionary<int, StructType> StructMap;
 };
 
 #endif

@@ -41,8 +41,13 @@ namespace Slicer {
 		return ModelObject && mp->HasValue();
 	}
 
+#define IfLocal(T) \
+	typename std::enable_if<Slicer::isLocal<T>::value>::type
+#define IfNotLocal(T) \
+	typename std::enable_if<!Slicer::isLocal<T>::value>::type
+
 	template<typename T>
-	void
+	IfNotLocal(T)
 	typeWrite(::Ice::OutputStreamPtr & s, const ::IceUtil::Optional<T> & m)
 	{
 		typedef Ice::StreamableTraits<T> traits;
@@ -55,14 +60,28 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	void
+	IfLocal(T)
+	typeWrite(::Ice::OutputStreamPtr &, const ::IceUtil::Optional<T> &)
+	{
+		throw LocalTypeException();
+	}
+
+	template<typename T>
+	IfNotLocal(T)
 	typeWrite(::Ice::OutputStreamPtr & s, const T & m)
 	{
 		s->write(m);
 	}
 
 	template<typename T>
-	void
+	IfLocal(T)
+	typeWrite(::Ice::OutputStreamPtr &, const T &)
+	{
+		throw LocalTypeException();
+	}
+
+	template<typename T>
+	IfNotLocal(T)
 	typeRead(::Ice::InputStreamPtr & s, ::IceUtil::Optional<T> & m)
 	{
 		typedef Ice::StreamableTraits<T> traits;
@@ -79,10 +98,24 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	void
+	IfLocal(T)
+	typeRead(::Ice::InputStreamPtr &, ::IceUtil::Optional<T> &)
+	{
+		throw LocalTypeException();
+	}
+
+	template<typename T>
+	IfNotLocal(T)
 	typeRead(::Ice::InputStreamPtr & s, T & m)
 	{
 		s->read(m);
+	}
+
+	template<typename T>
+	IfLocal(T)
+	typeRead(::Ice::InputStreamPtr &, T &)
+	{
+		throw LocalTypeException();
 	}
 
 	template<typename T>

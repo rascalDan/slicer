@@ -12,6 +12,7 @@ module Slicer {
 		string name;
 	};
 	exception UnsupportedModelType extends RuntimeError { };
+	exception LocalTypeException extends RuntimeError { };
 	exception NoConversionFound extends RuntimeError {
 		string type;
 	};

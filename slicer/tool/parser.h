@@ -62,7 +62,7 @@ namespace Slicer {
 			void visitComplexDataMembers(Slice::ConstructedPtr t, const Slice::DataMemberList &) const;
 
 			void defineConversions(Slice::DataMemberPtr dm) const;
-			void defineRootName(const std::string & type, const std::string & name) const;
+			void defineRoot(const std::string & type, const std::string & name, const Slice::TypePtr & stype) const;
 
 			bool hasMetadata(const std::list<std::string> & metadata) const;
 			void copyMetadata(const std::list<std::string> & metadata) const;
