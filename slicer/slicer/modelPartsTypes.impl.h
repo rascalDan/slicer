@@ -261,8 +261,7 @@ namespace Slicer {
 	TypeId
 	ModelPartForClass<T>::GetTypeId() const
 	{
-		auto id = this->Model->ice_id();
-		return (id == className) ? TypeId() : ModelPart::ToExchangeTypeName(id);
+		return ModelPartForComplexBase::GetTypeId(this->Model->ice_id(), className);
 	}
 
 	// ModelPartForStruct

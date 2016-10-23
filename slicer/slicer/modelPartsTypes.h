@@ -100,6 +100,7 @@ namespace Slicer {
 
 			static void registerClass(const std::string & className, const TypeId & typeName, const ClassRef &);
 			static void unregisterClass(const std::string & className, const TypeId & typeName);
+			static TypeId GetTypeId(const std::string & id, const std::string & className);
 	};
 
 	template<typename T>
