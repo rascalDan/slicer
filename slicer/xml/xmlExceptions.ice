@@ -4,6 +4,7 @@
 #include <common.ice>
 
 module Slicer {
+	["cpp:ice_print"]
 	exception BadBooleanValue extends DeserializerError {
 		string text;
 	};

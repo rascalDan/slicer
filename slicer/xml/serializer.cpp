@@ -8,6 +8,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <stdexcept>
 #include <glibmm/ustring.h>
+#include <boost/format.hpp>
 
 NAMEDFACTORY(".xml", Slicer::XmlFileSerializer, Slicer::FileSerializerFactory);
 NAMEDFACTORY(".xml", Slicer::XmlFileDeserializer, Slicer::FileDeserializerFactory);
@@ -353,6 +354,12 @@ namespace Slicer {
 	{
 		doc = new xmlpp::Document();
 		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, doc, _1, _2));
+	}
+
+	void BadBooleanValue::ice_print(std::ostream & s) const
+	{
+		static boost::format f("Bad boolean value [%s]");
+		s << f % text;
 	}
 }
 
