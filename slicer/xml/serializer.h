@@ -3,6 +3,7 @@
 
 #include <slicer/serializer.h>
 #include <libxml++/document.h>
+#include <libxml++/nodes/element.h>
 #include <visibility.h>
 
 namespace Slicer {
@@ -14,6 +15,8 @@ namespace Slicer {
 
 		protected:
 			static void ModelTreeProcessElement(xmlpp::Element * n, ModelPartPtr mp, const ElementCreator &);
+			static void ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartPtr dict);
+			static void ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartPtr dict);
 	};
 
 	class DLL_PUBLIC XmlStreamSerializer : public XmlSerializer {
@@ -49,7 +52,10 @@ namespace Slicer {
 	class DLL_PUBLIC XmlDeserializer : public Deserializer {
 		protected:
 			static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp);
+			static void DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr mp, ChildRefPtr c);
 			static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartPtr mp);
+			static void DocumentTreeIterateDictAttrs(const xmlpp::Element::AttributeList & attrs, ModelPartPtr dict);
+			static void DocumentTreeIterateDictElements(const xmlpp::Element * parent, ModelPartPtr dict);
 	};
 
 	class DLL_PUBLIC XmlStreamDeserializer : public XmlDeserializer {

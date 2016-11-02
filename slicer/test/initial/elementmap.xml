@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Maps>
+  <amap/>
+	<emap>
+		<a>one</a>
+		<b>two</b>
+		<c>three</c>
+	</emap>
+	<rmap>
+		<a Id="1">one</a>
+		<b Id="2">two</b>
+		<c Id="3">three</c>
+	</rmap>
+</Maps>

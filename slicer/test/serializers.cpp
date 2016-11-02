@@ -254,6 +254,31 @@ checkSomeNumbers(const TestModule::SomeNumbers & sn)
 }
 
 void
+attributeMap(const TestXml::Maps & s)
+{
+	BOOST_REQUIRE_EQUAL(3, s.amap.size());
+	BOOST_REQUIRE_EQUAL("one", s.amap.find("a")->second);
+	BOOST_REQUIRE_EQUAL("two", s.amap.find("b")->second);
+	BOOST_REQUIRE_EQUAL("three", s.amap.find("c")->second);
+}
+
+void
+elementMap(const TestXml::Maps & s)
+{
+	BOOST_REQUIRE_EQUAL(3, s.emap.size());
+	BOOST_REQUIRE_EQUAL("one", s.emap.find("a")->second);
+	BOOST_REQUIRE_EQUAL("two", s.emap.find("b")->second);
+	BOOST_REQUIRE_EQUAL("three", s.emap.find("c")->second);
+	BOOST_REQUIRE_EQUAL(3, s.rmap.size());
+	BOOST_REQUIRE_EQUAL(1, s.rmap.find("a")->second.Id);
+	BOOST_REQUIRE_EQUAL(2, s.rmap.find("b")->second.Id);
+	BOOST_REQUIRE_EQUAL(3, s.rmap.find("c")->second.Id);
+	BOOST_REQUIRE_EQUAL("one", s.rmap.find("a")->second.Name);
+	BOOST_REQUIRE_EQUAL("two", s.rmap.find("b")->second.Name);
+	BOOST_REQUIRE_EQUAL("three", s.rmap.find("c")->second.Name);
+}
+
+void
 checkObjectMap(const TestJson::Properties & p)
 {
 	BOOST_REQUIRE_EQUAL(3, p.size());
@@ -435,6 +460,16 @@ BOOST_AUTO_TEST_CASE( xml_classOfEnums_xml )
 BOOST_AUTO_TEST_CASE( xml_rootEnums_xml )
 {
 	verifyByFile<TestModule::SomeNumbers, Slicer::XmlFileDeserializer>("enum.xml", checkSomeNumbers);
+}
+
+BOOST_AUTO_TEST_CASE( xml_attributemap_xml )
+{
+	verifyByFile<TestXml::Maps, Slicer::XmlFileDeserializer>("attributemap.xml", attributeMap);
+}
+
+BOOST_AUTO_TEST_CASE( xml_elementmap_xml )
+{
+	verifyByFile<TestXml::Maps, Slicer::XmlFileDeserializer>("elementmap.xml", elementMap);
 }
 
 BOOST_AUTO_TEST_CASE( json_rootEnums_json )

@@ -19,6 +19,10 @@ namespace Slicer {
 	const std::string md_attribute = "xml:attribute";
 	const std::string md_text = "xml:text";
 	const std::string md_bare = "xml:bare";
+	const std::string md_attributes = "xml:attributes";
+	const std::string md_elements = "xml:elements";
+	const std::string keyName = "key";
+	const std::string valueName = "value";
 	const auto defaultElementCreator = boost::bind(&xmlpp::Element::add_child, _1, _2, Glib::ustring());
 
 	static const Glib::ustring TrueText("true");
@@ -171,6 +175,75 @@ namespace Slicer {
 	};
 
 	void
+	XmlDeserializer::DocumentTreeIterateDictAttrs(const xmlpp::Element::AttributeList & attrs, ModelPartPtr dict)
+	{
+		for (const auto & attr : attrs) {
+			auto emp = dict->GetAnonChild();
+			emp->Create();
+			auto key = emp->GetChild(keyName);
+			auto value = emp->GetChild(valueName);
+			key->SetValue(new XmlValueSource(attr->get_name()));
+			key->Complete();
+			value->SetValue(new XmlValueSource(attr->get_value()));
+			value->Complete();
+			emp->Complete();
+		}
+	}
+
+	void
+	XmlDeserializer::DocumentTreeIterateDictElements(const xmlpp::Element * element, ModelPartPtr dict)
+	{
+		auto node = element->get_first_child();
+		while (node) {
+			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
+				auto emp = dict->GetAnonChild();
+				emp->Create();
+				auto key = emp->GetChild(keyName);
+				auto value = emp->GetChildRef(valueName);
+				key->SetValue(new XmlValueSource(element->get_name()));
+				key->Complete();
+				DocumentTreeIterateElement(element, value->Child(), value);
+				emp->Complete();
+			}
+			node = node->get_next_sibling();
+		}
+	}
+
+	void
+	XmlDeserializer::DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr smp, ChildRefPtr smpr)
+	{
+		if (auto typeIdPropName = smp->GetTypeIdProperty()) {
+			if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
+				smp = smp->GetSubclassModelPart(typeAttr->get_value());
+			}
+		}
+		smp->Create();
+		if (metaDataFlagSet(smpr->ChildMetaData(), md_attributes)) {
+			auto attrs(element->get_attributes());
+			if (!attrs.empty()) {
+				DocumentTreeIterateDictAttrs(attrs, smp);
+			}
+		}
+		else if (metaDataFlagSet(smpr->ChildMetaData(), md_elements)) {
+			DocumentTreeIterateDictElements(element, smp);
+		}
+		else {
+			auto attrs(element->get_attributes());
+			if (!attrs.empty()) {
+				DocumentTreeIterate(attrs.front(), smp);
+			}
+			auto firstChild = element->get_first_child();
+			if (firstChild) {
+				DocumentTreeIterate(firstChild, smp);
+			}
+			else {
+				smp->SetValue(new XmlContentValueSource());
+			}
+		}
+		smp->Complete();
+	}
+
+	void
 	XmlDeserializer::DocumentTreeIterate(const xmlpp::Node * node, ModelPartPtr mp)
 	{
 		while (node) {
@@ -183,24 +256,7 @@ namespace Slicer {
 						smp = smp->GetAnonChild();
 					}
 					if (smp) {
-						if (auto typeIdPropName = smp->GetTypeIdProperty()) {
-							if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
-								smp = smp->GetSubclassModelPart(typeAttr->get_value());
-							}
-						}
-						smp->Create();
-						auto attrs(element->get_attributes());
-						if (!attrs.empty()) {
-							DocumentTreeIterate(attrs.front(), smp);
-						}
-						auto firstChild = element->get_first_child();
-						if (firstChild) {
-							DocumentTreeIterate(firstChild, smp);
-						}
-						else {
-							smp->SetValue(new XmlContentValueSource());
-						}
-						smp->Complete();
+						DocumentTreeIterateElement(element, smp, smpr);
 					}
 				}
 			}
@@ -247,6 +303,12 @@ namespace Slicer {
 		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_text)) {
 			mp->GetValue(new XmlContentValueTarget(n));
 		}
+		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_attributes)) {
+			ModelTreeIterateDictAttrs(n->add_child(name), mp);
+		}
+		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_elements)) {
+			ModelTreeIterateDictElements(n->add_child(name), mp);
+		}
 		else {
 			if (hp && metaDataFlagSet(hp->GetMetadata(), md_bare)) {
 				ModelTreeProcessElement(n, mp, boost::bind(&xmlpp::Element::add_child, _1, name, Glib::ustring()));
@@ -255,6 +317,26 @@ namespace Slicer {
 				ModelTreeProcessElement(ec(n, name), mp, defaultElementCreator);
 			}
 		}
+	}
+
+	void
+	XmlSerializer::ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartPtr dict)
+	{
+		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
+			mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
+				mp->GetChild(valueName)->GetValue(new XmlAttributeValueTarget(element, name));
+			}));
+		});
+	}
+
+	void
+	XmlSerializer::ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartPtr dict)
+	{
+		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
+			mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
+				ModelTreeProcessElement(element->add_child(name), mp->GetChild(valueName), defaultElementCreator);
+			}));
+		});
 	}
 
 	void

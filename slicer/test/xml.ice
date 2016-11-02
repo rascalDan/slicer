@@ -16,6 +16,16 @@ module TestXml {
 		[ "slicer:xml:text" ]
 		string Name;
 	};
+	dictionary<string, string> StringMap;
+	dictionary<string, EntityRef> RefMap;
+	struct Maps {
+		[ "slicer:xml:attributes" ]
+		StringMap amap;
+		[ "slicer:xml:elements" ]
+		StringMap emap;
+		[ "slicer:xml:elements" ]
+		RefMap rmap;
+	};
 };
 
 #endif
