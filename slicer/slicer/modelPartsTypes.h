@@ -152,7 +152,7 @@ namespace Slicer {
 			};
 
 
-			virtual void OnEachChild(const ChildHandler & ch);
+			virtual void OnEachChild(const ChildHandler & ch) override;
 
 			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override;
 			ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override;
