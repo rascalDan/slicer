@@ -55,6 +55,7 @@ namespace Slicer {
 			virtual void visitModuleEnd(const Slice::ModulePtr & m) override;
 
 		private:
+			void createModelPartForConverted(const Slice::TypePtr & type, const std::string & container, const Slice::DataMemberPtr & dm) const;
 			void createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm = Slice::DataMemberPtr(), const Slice::StringList & md = Slice::StringList()) const;
 			std::string getBasicModelPart(const Slice::TypePtr & type) const;
 			void defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const;

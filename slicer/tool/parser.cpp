@@ -51,11 +51,8 @@ namespace Slicer {
 		}
 		if (!conversions.empty()) {
 			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
-			fprintbf(cpp, "ModelPartForConverted< %s, %s, &%s >::SetValue(ValueSourcePtr vsp)\n",
-					Slice::typeToString(type),
-					c->scoped(),
-					dm->scoped());
-			fprintbf(cpp, "{\n");
+			createModelPartForConverted(type, c->scoped(), dm);
+			fprintbf(cpp, "::SetValue(ValueSourcePtr vsp)\n{\n");
 
 			for (const auto & conversion : conversions) {
 				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
@@ -82,11 +79,8 @@ namespace Slicer {
 			fprintbf(cpp, "}\n\n");
 
 			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
-			fprintbf(cpp, "ModelPartForConverted< %s, %s, &%s >::GetValue(ValueTargetPtr vtp)\n",
-					Slice::typeToString(type),
-					c->scoped(),
-					dm->scoped());
-			fprintbf(cpp, "{\n");
+			createModelPartForConverted(type, c->scoped(), dm);
+			fprintbf(cpp, "::GetValue(ValueTargetPtr vtp)\n{\n");
 
 			for (const auto & conversion : conversions) {
 				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
@@ -463,14 +457,31 @@ namespace Slicer {
 	}
 
 	void
+	Slicer::createModelPartForConverted(const Slice::TypePtr & type, const std::string & container, const Slice::DataMemberPtr & dm) const
+	{
+		fprintbf(cpp, "ModelPartForConverted< %s, ",
+				Slice::typeToString(type));
+		if (dm->optional()) {
+			fprintbf(cpp, "IceUtil::Optional< %s >",
+					Slice::typeToString(type));
+		}
+		else {
+			fprintbf(cpp, "%s",
+					Slice::typeToString(type));
+		}
+		fprintbf(cpp, ", %s, &%s >",
+				container,
+				dm->scoped());
+	}
+
+	void
 	Slicer::createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm, const Slice::StringList & md) const
 	{
 		auto conversions = getConversions(md);
 		if (dm && !conversions.empty()) {
-			fprintbf(cpp, "ModelPartForConverted< %s, %s, &%s >",
-					Slice::typeToString(type),
+			createModelPartForConverted(type,
 					boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct),
-					dm->scoped());
+					dm);
 		}
 		else if (auto cmp = metaDataValue("slicer:custommodelpart:", md)) {
 			fprintbf(cpp, "%s",

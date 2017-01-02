@@ -150,8 +150,8 @@ namespace Slicer {
 	}
 
 	// ModelPartForConverted
-	template<typename T, typename M, T M::* MV>
-	ModelPartForConverted<T, M, MV>::ModelPartForConverted(T & h) :
+	template<typename T, typename MT, typename M, MT M::* MV>
+	ModelPartForConverted<T, MT, M, MV>::ModelPartForConverted(T & h) :
 		ModelPartModel<T>(h)
 	{
 	}

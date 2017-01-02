@@ -56,7 +56,7 @@ namespace Slicer {
 			static const ModelPartType type;
 	};
 
-	template<typename T, typename M, T M::* MV>
+	template<typename T, typename MT, typename M, MT M::* MV>
 	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
@@ -66,7 +66,7 @@ namespace Slicer {
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
 	};
-	
+
 	class DLL_PUBLIC ModelPartForOptionalBase : public ModelPart {
 		public:
 			virtual void OnEachChild(const ChildHandler & ch) override;
