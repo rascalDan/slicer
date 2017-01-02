@@ -1,5 +1,5 @@
 #include <sqlExceptions.h>
-#include <boost/format.hpp>
+#include <compileTimeFormatter.h>
 
 namespace Slicer {
 	void TooManyRowsReturned::ice_print(std::ostream & s) const
@@ -17,10 +17,10 @@ namespace Slicer {
 		s << "No rows found";
 	}
 
+	AdHocFormatter(UnsuitableIdFieldTypeMsg, "Unsuitable id field type [%?]");
 	void UnsuitableIdFieldType::ice_print(std::ostream & s) const
 	{
-		static boost::format f("Unsuitable id field type [%s]");
-		s << f % type;
+		UnsuitableIdFieldTypeMsg::write(s, type);
 	}
 
 }

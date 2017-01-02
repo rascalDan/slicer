@@ -1,6 +1,6 @@
 #include "slicer.h"
 #include <common.h>
-#include <boost/format.hpp>
+#include <compileTimeFormatter.h>
 
 namespace Slicer {
 	Slicer::MemberChildRef::MemberChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
@@ -38,32 +38,32 @@ namespace Slicer {
 		return emptyMetadata;
 	}
 
+	AdHocFormatter(InvalidEnumerationSymbolMsg, "Invalid enumeration symbol [%?] for type [%?]");
 	void
 	InvalidEnumerationSymbol::ice_print(std::ostream & s) const
 	{
-		static boost::format f("Invalid enumeration symbol [%s] for type [%s]");
-		s << f % symbol % type;
+		InvalidEnumerationSymbolMsg::write(s, symbol, type);
 	}
 
+	AdHocFormatter(InvalidEnumerationValueMsg, "Invalid enumeration symbol [%?] for type [%?]");
 	void
 	InvalidEnumerationValue::ice_print(std::ostream & s) const
 	{
-		static boost::format f("Invalid enumeration symbol [%d] for type [%s]");
-		s << f % value % type;
+		InvalidEnumerationValueMsg::write(s, value, type);
 	}
 
+	AdHocFormatter(UnknownTypeMsg, "Unknown type [%?]");
 	void
 	UnknownType::ice_print(std::ostream & s) const
 	{
-		static boost::format f("Unknown type [%s]");
-		s << f % type;
+		UnknownTypeMsg::write(s, type);
 	}
 
+	AdHocFormatter(NoConversionFoundMsg, "No conversion found for type [%?]");
 	void
 	NoConversionFound::ice_print(std::ostream & s) const
 	{
-		static boost::format f("No conversion found for type [%s]");
-		s << f % type;
+		NoConversionFoundMsg::write(s, type);
 	}
 
 	void
@@ -78,11 +78,11 @@ namespace Slicer {
 		s << "Unsupported model type";
 	}
 
+	AdHocFormatter(IncorrectElementNameMsg, "Incorrect element name [%?]");
 	void
 	IncorrectElementName::ice_print(std::ostream & s) const
 	{
-		static boost::format f("Incorrect element name [%s]");
-		s << f % name;
+		IncorrectElementNameMsg::write(s, name);
 	}
 
 	void
@@ -103,11 +103,11 @@ namespace Slicer {
 		s << "General runtime error";
 	}
 
+	AdHocFormatter(CompilerErrorMsg, "Slicer compiler: %?");
 	void
 	CompilerError::ice_print(std::ostream & s) const
 	{
-		static boost::format f("Slicer compiler: %s");
-		s << f % what;
+		CompilerErrorMsg::write(s, what);
 	}
 }
 
