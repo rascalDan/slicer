@@ -114,7 +114,7 @@ checkBuiltIns_valuesCorrect(const TestModule::BuiltInsPtr & bt)
 	BOOST_REQUIRE_EQUAL(bt->mint, 80);
 	BOOST_REQUIRE_EQUAL(bt->mlong, 800);
 	BOOST_REQUIRE_EQUAL(bt->mfloat, 3.125);
-	BOOST_REQUIRE_EQUAL(bt->mdouble, 3.0625);
+	BOOST_REQUIRE_CLOSE(bt->mdouble, 3.0625, 1);
 	BOOST_REQUIRE_EQUAL(bt->mstring, "Sample text");
 }
 
@@ -127,7 +127,7 @@ checkBuiltIns3_valuesCorrect(const TestModule::BuiltInsPtr & bt)
 	BOOST_REQUIRE_EQUAL(bt->mint, -80);
 	BOOST_REQUIRE_EQUAL(bt->mlong, -800);
 	BOOST_REQUIRE_EQUAL(bt->mfloat, -3.125);
-	BOOST_REQUIRE_EQUAL(bt->mdouble, -3.0625);
+	BOOST_REQUIRE_CLOSE(bt->mdouble, -3.0625, 1);
 	BOOST_REQUIRE_EQUAL(bt->mstring, "-Sample text-");
 }
 
