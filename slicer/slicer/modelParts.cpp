@@ -3,13 +3,29 @@
 
 namespace Slicer {
 	const Metadata emptyMetadata;
-	static ClassNameMap names __attribute__((init_priority(209)));
-	static ClassRefMap refs __attribute__((init_priority(209)));
+	static void createClassMaps() __attribute__((constructor(208)));
+	static void deleteClassMaps() __attribute__((destructor(208)));
+	static ClassNameMap * names;
+	static ClassRefMap * refs;
+
+	void createClassMaps()
+	{
+		names = new ClassNameMap();
+		refs = new ClassRefMap();
+	}
+
+	static void deleteClassMaps()
+	{
+		delete names;
+		delete refs;
+		names = nullptr;
+		refs = nullptr;
+	}
 
 	ClassNameMap *
 	classNameMap()
 	{
-		return &names;
+		return names;
 	}
 
 	const std::string &
@@ -35,7 +51,7 @@ namespace Slicer {
 	ClassRefMap *
 	classRefMap()
 	{
-		return &refs;
+		return refs;
 	}
 
 	void

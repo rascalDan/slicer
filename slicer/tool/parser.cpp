@@ -194,19 +194,21 @@ namespace Slicer {
 
 		auto typeName = metaDataValue("slicer:typename:", c->getMetaData());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "__attribute__ ((init_priority(209)))\nconst std::string ModelPartForClass< %s >::className(\"%s\");\n",
-				decl->typeId(), c->scoped());
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "__attribute__ ((init_priority(209)))\nconst IceUtil::Optional<std::string> ModelPartForClass< %s >::typeName",
+		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::className = nullptr;\n",
 				decl->typeId());
+		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::typeName = nullptr;\n",
+				decl->typeId());
+		fprintbf(cpp, "template<>\nvoid ModelPartForClass< %s >::initClassName() {\n\tclassName = new std::string(\"%s\");\n",
+				decl->typeId(), c->scoped());
 		if (typeName) {
-			fprintbf(cpp, "(\"%s\")",
+			fprintbf(cpp, "\t typeName = new std::string(\"%s\");",
 					*typeName);
 		}
 		else {
-			fprintbf(cpp, "(IceUtil::None)");
+			fprintbf(cpp, "\t typeName = nullptr;");
 		}
-		fprintbf(cpp, ";\n\n");
+		fprintbf(cpp, "\n}\n");
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForComplex< %s >::metadata ",
 				c->scoped());

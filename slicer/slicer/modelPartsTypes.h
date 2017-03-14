@@ -103,8 +103,8 @@ namespace Slicer {
 		protected:
 			ModelPartPtr getSubclassModelPart(const std::string & name, void * m);
 
-			static void registerClass(const std::string & className, const TypeId & typeName, const ClassRef &);
-			static void unregisterClass(const std::string & className, const TypeId & typeName);
+			static void registerClass(const std::string & className, const std::string * typeName, const ClassRef &);
+			static void unregisterClass(const std::string & className, const std::string * typeName);
 			static TypeId GetTypeId(const std::string & id, const std::string & className);
 	};
 
@@ -187,10 +187,12 @@ namespace Slicer {
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
 
 			static const std::string typeIdProperty;
-			static const std::string className;
-			static const IceUtil::Optional<std::string> typeName;
+			static const std::string * className;
+			static const std::string * typeName;
 
 			static ModelPartPtr CreateModelPart(void *);
+			static void initClassName() __attribute__ ((constructor(209)));
+			static void deleteClassName() __attribute__ ((destructor(209)));
 			static void registerClass() __attribute__ ((constructor(210)));
 			static void unregisterClass() __attribute__ ((destructor(210)));
 	};

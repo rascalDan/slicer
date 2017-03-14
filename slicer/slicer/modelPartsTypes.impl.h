@@ -279,22 +279,29 @@ namespace Slicer {
 	}
 
 	template<typename T>
+	void ModelPartForClass<T>::deleteClassName()
+	{
+		delete className;
+		delete typeName;
+	}
+
+	template<typename T>
 	void ModelPartForClass<T>::registerClass()
 	{
-		ModelPartForComplexBase::registerClass(className, typeName, &ModelPartForClass<T>::CreateModelPart);
+		ModelPartForComplexBase::registerClass(*className, typeName, &ModelPartForClass<T>::CreateModelPart);
 	}
 
 	template<typename T>
 	void ModelPartForClass<T>::unregisterClass()
 	{
-		ModelPartForComplexBase::unregisterClass(className, typeName);
+		ModelPartForComplexBase::unregisterClass(*className, typeName);
 	}
 
 	template<typename T>
 	TypeId
 	ModelPartForClass<T>::GetTypeId() const
 	{
-		return ModelPartForComplexBase::GetTypeId(this->Model->ice_id(), className);
+		return ModelPartForComplexBase::GetTypeId(this->Model->ice_id(), *className);
 	}
 
 	// ModelPartForStruct
