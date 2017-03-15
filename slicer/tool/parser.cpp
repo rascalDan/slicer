@@ -199,14 +199,14 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::typeName = nullptr;\n",
 				decl->typeId());
-		fprintbf(cpp, "template<>\nvoid ModelPartForClass< %s >::initClassName() {\n\tclassName = new std::string(\"%s\");\n",
+		fprintbf(cpp, "template<>\nvoid ModelPartForClass< %s >::initClassName() {\n\tclassName = new std::string(\"%s\");\n\t",
 				decl->typeId(), c->scoped());
 		if (typeName) {
-			fprintbf(cpp, "\t typeName = new std::string(\"%s\");",
+			fprintbf(cpp, "typeName = new std::string(\"%s\");",
 					*typeName);
 		}
 		else {
-			fprintbf(cpp, "\t typeName = nullptr;");
+			fprintbf(cpp, "typeName = nullptr;");
 		}
 		fprintbf(cpp, "\n}\n");
 
