@@ -288,6 +288,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::registerClass()
 	{
+		initClassName();
 		ModelPartForComplexBase::registerClass(*className, typeName, &ModelPartForClass<T>::CreateModelPart);
 	}
 
@@ -295,6 +296,7 @@ namespace Slicer {
 	void ModelPartForClass<T>::unregisterClass()
 	{
 		ModelPartForComplexBase::unregisterClass(*className, typeName);
+		deleteClassName();
 	}
 
 	template<typename T>

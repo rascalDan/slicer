@@ -191,8 +191,8 @@ namespace Slicer {
 			static const std::string * typeName;
 
 			static ModelPartPtr CreateModelPart(void *);
-			static void initClassName() __attribute__ ((constructor(209)));
-			static void deleteClassName() __attribute__ ((destructor(209)));
+			static void initClassName();
+			static void deleteClassName();
 			static void registerClass() __attribute__ ((constructor(210)));
 			static void unregisterClass() __attribute__ ((destructor(210)));
 	};
