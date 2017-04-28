@@ -23,7 +23,7 @@ namespace Slicer {
 	const std::string md_elements = "xml:elements";
 	const std::string keyName = "key";
 	const std::string valueName = "value";
-	const auto defaultElementCreator = boost::bind(&xmlpp::Element::add_child, _1, _2, Glib::ustring());
+	const auto defaultElementCreator = boost::bind(&xmlpp::Element::add_child_element, _1, _2, Glib::ustring());
 
 	static const Glib::ustring TrueText("true");
 	static const Glib::ustring FalseText("false");
@@ -169,13 +169,13 @@ namespace Slicer {
 	class XmlContentValueTarget : public XmlValueTarget {
 		public:
 			XmlContentValueTarget(xmlpp::Element * p) :
-				XmlValueTarget(boost::bind(&xmlpp::Element::set_child_text, p, _1))
+				XmlValueTarget(boost::bind(&xmlpp::Element::set_first_child_text, p, _1))
 			{
 			}
 	};
 
 	void
-	XmlDeserializer::DocumentTreeIterateDictAttrs(const xmlpp::Element::AttributeList & attrs, ModelPartPtr dict)
+	XmlDeserializer::DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, ModelPartPtr dict)
 	{
 		for (const auto & attr : attrs) {
 			auto emp = dict->GetAnonChild();
@@ -304,14 +304,14 @@ namespace Slicer {
 			mp->GetValue(new XmlContentValueTarget(n));
 		}
 		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_attributes)) {
-			ModelTreeIterateDictAttrs(n->add_child(name), mp);
+			ModelTreeIterateDictAttrs(n->add_child_element(name), mp);
 		}
 		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_elements)) {
-			ModelTreeIterateDictElements(n->add_child(name), mp);
+			ModelTreeIterateDictElements(n->add_child_element(name), mp);
 		}
 		else {
 			if (hp && metaDataFlagSet(hp->GetMetadata(), md_bare)) {
-				ModelTreeProcessElement(n, mp, boost::bind(&xmlpp::Element::add_child, _1, name, Glib::ustring()));
+				ModelTreeProcessElement(n, mp, boost::bind(&xmlpp::Element::add_child_element, _1, name, Glib::ustring()));
 			}
 			else {
 				ModelTreeProcessElement(ec(n, name), mp, defaultElementCreator);
@@ -334,7 +334,7 @@ namespace Slicer {
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
-				ModelTreeProcessElement(element->add_child(name), mp->GetChild(valueName), defaultElementCreator);
+				ModelTreeProcessElement(element->add_child_element(name), mp->GetChild(valueName), defaultElementCreator);
 			}));
 		});
 	}
