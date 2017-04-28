@@ -1,4 +1,5 @@
 import package ;
+import slice ;
 
 build-project tool ;
 build-project slicer ;
