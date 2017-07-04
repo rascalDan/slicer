@@ -1,4 +1,5 @@
 import os ;
+import slice ;
 
 using gcc : : [ os.environ CXX ] ;
 
