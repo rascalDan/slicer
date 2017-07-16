@@ -41,11 +41,8 @@ namespace Slicer {
 	void
 	SqlInsertSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
 	{
-		ModifyPtr ins;
+		ModifyPtr ins = createInsert(mp->GetContainedModelPart());
 		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, HookCommonPtr) {
-				if (!ins) {
-					ins = createInsert(cmp);
-				}
 				bindObjectAndExecute(cmp, ins.get());
 			});
 	}

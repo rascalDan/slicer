@@ -164,8 +164,7 @@ namespace Slicer {
 	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
 		ModelPartModel<IceUtil::Optional< typename T::element_type> >(h)
 	{
-		BOOST_ASSERT(this->Model);
-		if (*this->Model) {
+		if (hasModel()) {
 			modelPart = new T(&**this->Model);
 		}
 	}
@@ -173,8 +172,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForOptional<T>::hasModel() const
 	{
-		BOOST_ASSERT(this->Model);
-		return *this->Model;
+		return this->Model && *this->Model;
 	}
 
 	template<typename T>
