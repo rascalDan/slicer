@@ -151,6 +151,8 @@ namespace Slicer {
 			virtual ~ModelPart() = default;
 
 			template<typename T>
+			static ModelPartPtr CreateFor();
+			template<typename T>
 			static ModelPartPtr CreateFor(T & t);
 			template<typename T>
 			static ModelPartForRootPtr CreateRootFor(T & t);
@@ -171,6 +173,7 @@ namespace Slicer {
 			virtual bool HasValue() const = 0;
 			virtual const Metadata & GetMetadata() const;
 			virtual bool IsOptional() const;
+			virtual ModelPartPtr GetContainedModelPart();
 
 			static const std::string & ToExchangeTypeName(const std::string &);
 			static const std::string & ToModelTypeName(const std::string &);

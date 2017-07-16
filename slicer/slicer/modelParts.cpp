@@ -118,6 +118,12 @@ namespace Slicer {
 		return false;
 	}
 
+	ModelPartPtr
+	ModelPart::GetContainedModelPart()
+	{
+		return this;
+	}
+
 	HookCommon::HookCommon(const std::string & n) :
 		name(n)
 	{

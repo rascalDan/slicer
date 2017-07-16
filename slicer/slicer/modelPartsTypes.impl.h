@@ -12,6 +12,7 @@
 	template class BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
 	template class ModelPartForRoot< IceUtil::Optional<Type> >; \
+	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return new ModelPartType(nullptr); } \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(&s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType>(&s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(&s); } \
@@ -258,8 +259,7 @@ namespace Slicer {
 	template<typename T>
 	T * ModelPartForClass<T>::GetModel()
 	{
-		BOOST_ASSERT(this->Model);
-		return this->Model->get();
+		return this->Model ? this->Model->get() : nullptr;
 	}
 
 	template<typename T>
@@ -327,7 +327,6 @@ namespace Slicer {
 	template<typename T>
 	T * ModelPartForStruct<T>::GetModel()
 	{
-		BOOST_ASSERT(this->Model);
 		return this->Model;
 	}
 
@@ -400,6 +399,12 @@ namespace Slicer {
 		return metadata;
 	}
 
+	template<typename T>
+	ModelPartPtr ModelPartForSequence<T>::GetContainedModelPart()
+	{
+		return ModelPart::CreateFor<typename T::value_type>();
+	}
+
 	// ModelPartForDictionaryElementInserter
 	template<typename T>
 	ModelPartForDictionaryElementInserter<T>::ModelPartForDictionaryElementInserter(T * d) :
@@ -453,6 +458,11 @@ namespace Slicer {
 		return metadata;
 	}
 
+	template<typename T>
+	ModelPartPtr ModelPartForDictionary<T>::GetContainedModelPart()
+	{
+		return new ModelPartForStruct<typename T::value_type>(nullptr);
+	}
 }
 
 #endif

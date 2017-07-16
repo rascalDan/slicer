@@ -130,7 +130,7 @@ namespace Slicer {
 
 					ModelPartPtr Get(T * t) const override
 					{
-						return t ? new MP(const_cast<typename std::remove_const<MT>::type *>(&(t->*member))) : NULL;
+						return new MP(t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : NULL);
 					}
 
 				private:
@@ -261,6 +261,8 @@ namespace Slicer {
 
 			virtual const Metadata & GetMetadata() const override;
 
+			virtual ModelPartPtr GetContainedModelPart() override;
+
 			static const Metadata metadata;
 			static const std::string elementName;
 
@@ -302,6 +304,8 @@ namespace Slicer {
 			ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override;
 
 			virtual const Metadata & GetMetadata() const override;
+
+			virtual ModelPartPtr GetContainedModelPart() override;
 
 			static const Metadata metadata;
 			static const std::string pairName;
