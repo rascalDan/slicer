@@ -12,10 +12,10 @@
 	template class BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
 	template class ModelPartForRoot< IceUtil::Optional<Type> >; \
-	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(s); } \
-	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType>(s); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(s); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(s); } \
+	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(&s); } \
+	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType>(&s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(&s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(&s); } \
 
 #define MODELPARTFOR(Type, ModelPartType) \
 	CUSTOMMODELPARTFOR(Type, ModelPartType<Type>, ModelPartType<Type>)
@@ -23,9 +23,9 @@
 namespace Slicer {
 	// ModelPartForRoot
 	template<typename T>
-	ModelPartForRoot<T>::ModelPartForRoot(T & o) :
-		ModelPartForRootBase(ModelPart::CreateFor(o)),
-		ModelObject(&o)
+	ModelPartForRoot<T>::ModelPartForRoot(T * o) :
+		ModelPartForRootBase(ModelPart::CreateFor(*o)),
+		ModelObject(o)
 	{
 	}
 
@@ -132,7 +132,7 @@ namespace Slicer {
 
 	// ModelPartForSimple
 	template<typename T>
-	ModelPartForSimple<T>::ModelPartForSimple(T & h) :
+	ModelPartForSimple<T>::ModelPartForSimple(T * h) :
 		ModelPartModel<T>(h)
 	{
 	}
@@ -140,44 +140,44 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForSimple<T>::SetValue(ValueSourcePtr s)
 	{
-		s->set(this->Model);
+		s->set(*this->Model);
 	}
 
 	template<typename T>
 	void ModelPartForSimple<T>::GetValue(ValueTargetPtr s)
 	{
-		s->get(this->Model);
+		s->get(*this->Model);
 	}
 
 	// ModelPartForConverted
 	template<typename T, typename MT, typename M, MT M::* MV>
-	ModelPartForConverted<T, MT, M, MV>::ModelPartForConverted(T & h) :
+	ModelPartForConverted<T, MT, M, MV>::ModelPartForConverted(T * h) :
 		ModelPartModel<T>(h)
 	{
 	}
 
 	// ModelPartForOptional
 	template<typename T>
-	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h) :
+	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
 		ModelPartModel<IceUtil::Optional< typename T::element_type> >(h)
 	{
-		if (this->Model) {
-			modelPart = new T(*this->Model);
+		if (*this->Model) {
+			modelPart = new T(&**this->Model);
 		}
 	}
 
 	template<typename T>
 	bool ModelPartForOptional<T>::hasModel() const
 	{
-		return this->Model;
+		return *this->Model;
 	}
 
 	template<typename T>
 	void ModelPartForOptional<T>::Create()
 	{
-		if (!this->Model) {
-			this->Model = typename T::element_type();
-			modelPart = new T(*this->Model);
+		if (!*this->Model) {
+			*this->Model = typename T::element_type();
+			modelPart = new T(&**this->Model);
 			modelPart->Create();
 		}
 	}
@@ -185,9 +185,9 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::GetValue(ValueTargetPtr s)
 	{
-		if (!this->Model) {
-			this->Model = typename T::element_type();
-			modelPart = new T(*this->Model);
+		if (!*this->Model) {
+			*this->Model = typename T::element_type();
+			modelPart = new T(&**this->Model);
 		}
 		modelPart->GetValue(s);
 	}
@@ -237,7 +237,7 @@ namespace Slicer {
 
 	// ModelPartForClass
 	template<typename T>
-	ModelPartForClass<T>::ModelPartForClass(element_type & h) :
+	ModelPartForClass<T>::ModelPartForClass(element_type * h) :
 			ModelPartModel<element_type>(h)
 	{
 	}
@@ -245,25 +245,25 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::Create()
 	{
-		this->Model = new T();
+		*this->Model = new T();
 	}
 
 	template<typename T>
 	T * ModelPartForClass<T>::GetModel()
 	{
-		return this->Model.get();
+		return this->Model->get();
 	}
 
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::GetSubclassModelPart(const std::string & name)
 	{
-		return ModelPartForComplexBase::getSubclassModelPart(name, &this->Model);
+		return ModelPartForComplexBase::getSubclassModelPart(name, this->Model);
 	}
 
 	template<typename T>
 	bool ModelPartForClass<T>::HasValue() const
 	{
-		return this->Model;
+		return *this->Model;
 	}
 
 	template<typename T>
@@ -275,7 +275,7 @@ namespace Slicer {
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::CreateModelPart(void * p)
 	{
-		return new ModelPartForClass<T>(*static_cast<element_type *>(p));
+		return new ModelPartForClass<T>(static_cast<element_type *>(p));
 	}
 
 	template<typename T>
@@ -303,12 +303,12 @@ namespace Slicer {
 	TypeId
 	ModelPartForClass<T>::GetTypeId() const
 	{
-		return ModelPartForComplexBase::GetTypeId(this->Model->ice_id(), *className);
+		return ModelPartForComplexBase::GetTypeId((*this->Model)->ice_id(), *className);
 	}
 
 	// ModelPartForStruct
 	template<typename T>
-	ModelPartForStruct<T>::ModelPartForStruct(T & o) :
+	ModelPartForStruct<T>::ModelPartForStruct(T * o) :
 		ModelPartModel<T>(o)
 	{
 	}
@@ -316,7 +316,7 @@ namespace Slicer {
 	template<typename T>
 	T * ModelPartForStruct<T>::GetModel()
 	{
-		return &this->Model;
+		return this->Model;
 	}
 
 	template<typename T>
@@ -327,7 +327,7 @@ namespace Slicer {
 
 	// ModelPartForEnum
 	template<typename T>
-	ModelPartForEnum<T>::ModelPartForEnum(T & s) :
+	ModelPartForEnum<T>::ModelPartForEnum(T * s) :
 		ModelPartModel<T>(s)
 	{
 	}
@@ -340,7 +340,7 @@ namespace Slicer {
 
 	// ModelPartForSequence
 	template<typename T>
-	ModelPartForSequence<T>::ModelPartForSequence(T & s) :
+	ModelPartForSequence<T>::ModelPartForSequence(T * s) :
 		ModelPartModel<T>(s)
 	{
 	}
@@ -348,7 +348,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForSequence<T>::OnEachChild(const ChildHandler & ch)
 		{
-			for(auto & element : this->Model) {
+			for(auto & element : *this->Model) {
 				ch(elementName, elementModelPart(element), NULL);
 			}
 		}
@@ -356,8 +356,8 @@ namespace Slicer {
 	template<typename T>
 	ChildRefPtr ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
 	{
-		this->Model.push_back(typename element_type::value_type());
-		return new ImplicitChildRef(ModelPart::CreateFor(this->Model.back()));
+		this->Model->push_back(typename element_type::value_type());
+		return new ImplicitChildRef(ModelPart::CreateFor(this->Model->back()));
 	}
 
 	template<typename T>
@@ -388,8 +388,8 @@ namespace Slicer {
 
 	// ModelPartForDictionaryElementInserter
 	template<typename T>
-	ModelPartForDictionaryElementInserter<T>::ModelPartForDictionaryElementInserter(T & d) :
-		ModelPartForStruct<typename T::value_type>(value),
+	ModelPartForDictionaryElementInserter<T>::ModelPartForDictionaryElementInserter(T * d) :
+		ModelPartForStruct<typename T::value_type>(&value),
 		dictionary(d)
 	{
 	}
@@ -397,12 +397,12 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForDictionaryElementInserter<T>::Complete()
 	{
-		dictionary.insert(value);
+		dictionary->insert(value);
 	}
 
 	// ModelPartForDictionary
 	template<typename T>
-	ModelPartForDictionary<T>::ModelPartForDictionary(T & d) :
+	ModelPartForDictionary<T>::ModelPartForDictionary(T * d) :
 		ModelPartModel<T>(d)
 	{
 	}
@@ -410,8 +410,8 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForDictionary<T>::OnEachChild(const ChildHandler & ch)
 	{
-		for (auto & pair : this->Model) {
-			ch(pairName, new ModelPartForStruct<typename T::value_type>(pair), NULL);
+		for (auto & pair : *this->Model) {
+			ch(pairName, new ModelPartForStruct<typename T::value_type>(&pair), NULL);
 		}
 	}
 

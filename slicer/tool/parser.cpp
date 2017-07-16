@@ -60,7 +60,7 @@ namespace Slicer {
 				fprintbf(cpp, "\t\t%s tmp;\n",
 						conversion.ExchangeType);
 				fprintbf(cpp, "\t\tvspt->set(tmp);\n");
-				fprintbf(cpp, "\t\tModel = %s(tmp);\n",
+				fprintbf(cpp, "\t\t*Model = %s(tmp);\n",
 						conversion.ConvertToModelFunc);
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
@@ -69,7 +69,7 @@ namespace Slicer {
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
 				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
 						Slice::typeToString(type));
-				fprintbf(cpp, "\t\tvspt->set(Model);\n");
+				fprintbf(cpp, "\t\tvspt->set(*Model);\n");
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
 			}
@@ -85,7 +85,7 @@ namespace Slicer {
 			for (const auto & conversion : conversions) {
 				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
 						conversion.ExchangeType);
-				fprintbf(cpp, "\t\tvtpt->get(%s(Model));\n",
+				fprintbf(cpp, "\t\tvtpt->get(%s(*Model));\n",
 						conversion.ConvertToExchangeFunc);
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
@@ -94,7 +94,7 @@ namespace Slicer {
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
 				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
 					Slice::typeToString(type));
-				fprintbf(cpp, "\t\tvtpt->get(Model);\n");
+				fprintbf(cpp, "\t\tvtpt->get(*Model);\n");
 				fprintbf(cpp, "\t\treturn;\n");
 				fprintbf(cpp, "\t}\n");
 			}
@@ -330,11 +330,11 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\nvoid ModelPartForEnum< %s >::SetValue(ValueSourcePtr s) {\n\
 	std::string val;\n\
 	s->set(val);\n\
-	this->Model = lookup(val);\n\
+	*this->Model = lookup(val);\n\
 }\n\n",
 				e->scoped());
 		fprintbf(cpp, "template<> DLL_PUBLIC\nvoid ModelPartForEnum< %s >::GetValue(ValueTargetPtr s) {\n\
-	s->get(lookup(this->Model));\n\
+	s->get(lookup(*this->Model));\n\
 }\n\n",
 				e->scoped());
 

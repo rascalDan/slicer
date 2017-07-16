@@ -11,14 +11,14 @@ namespace TestModule {
 
 	class DLL_PUBLIC AbValidator : public Slicer::ModelPartForClass<ClassType> {
 		public:
-			AbValidator(ClassTypePtr &);
+			AbValidator(ClassTypePtr *);
 
 			void Complete() override;
 	};
 
 	class DLL_PUBLIC MonthValidator : public Slicer::ModelPartForSimple<::Ice::Short> {
 		public:
-			MonthValidator(::Ice::Short &);
+			MonthValidator(::Ice::Short *);
 
 			void Complete() override;
 	};

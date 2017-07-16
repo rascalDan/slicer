@@ -179,8 +179,9 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartModel {
 		protected:
-			ModelPartModel(T & m) : Model(m) { }
-			T & Model;
+			ModelPartModel() : Model(nullptr) { }
+			ModelPartModel(T * m) : Model(m) { }
+			T * Model;
 	};
 
 	class DLL_PUBLIC ModelPartForRootBase : public ModelPart {

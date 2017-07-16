@@ -108,7 +108,7 @@ namespace Slicer {
 namespace TestModule {
 	int completions = 0;
 
-	AbValidator::AbValidator(ClassTypePtr & m) :
+	AbValidator::AbValidator(ClassTypePtr * m) :
 		Slicer::ModelPartForClass<ClassType>(m)
 	{
 	}
@@ -116,7 +116,8 @@ namespace TestModule {
 	void
 	AbValidator::Complete()
 	{
-		if (this->Model->a == 0 || this->Model->b == 0) {
+		const auto & M = *this->Model;
+		if (M->a == 0 || M->b == 0) {
 			// LCOV_EXCL_START
 			throw std::runtime_error("Mock error");
 			// LCOV_EXCL_STOP
@@ -125,7 +126,7 @@ namespace TestModule {
 		completions += 1;
 	}
 
-	MonthValidator::MonthValidator(::Ice::Short & m) :
+	MonthValidator::MonthValidator(::Ice::Short * m) :
 		Slicer::ModelPartForSimple<::Ice::Short>(m)
 	{
 	}
@@ -133,7 +134,8 @@ namespace TestModule {
 	void
 	MonthValidator::Complete()
 	{
-		if (this->Model < 1 || this->Model > 12) {
+		const auto & M = *this->Model;
+		if (M < 1 || M > 12) {
 			// LCOV_EXCL_START
 			throw std::runtime_error("This date smells fishy.");
 			// LCOV_EXCL_STOP

@@ -12,7 +12,7 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
 		public:
-			ModelPartForRoot(T & o);
+			ModelPartForRoot(T * o);
 
 			const std::string & GetRootName() const override;
 			virtual bool HasValue() const override;
@@ -40,7 +40,7 @@ namespace Slicer {
 		public:
 			typedef T element_type;
 
-			ModelPartForSimple(T & h);
+			ModelPartForSimple(T * h);
 
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
@@ -61,7 +61,7 @@ namespace Slicer {
 		public:
 			typedef T element_type;
 
-			ModelPartForConverted(T & h);
+			ModelPartForConverted(T * h);
 
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
@@ -86,7 +86,7 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForOptional : public ModelPartForOptionalBase, protected ModelPartModel<IceUtil::Optional<typename T::element_type> > {
 		public:
-			ModelPartForOptional(IceUtil::Optional< typename T::element_type > & h);
+			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h);
 			virtual void Create() override;
 			virtual void GetValue(ValueTargetPtr s) override;
 			virtual ModelPartType GetType() const override;
@@ -130,7 +130,7 @@ namespace Slicer {
 
 					ModelPartPtr Get(T * t) const override
 					{
-						return t ? new MP(const_cast<typename std::remove_const<MT>::type &>(t->*member)) : NULL;
+						return t ? new MP(const_cast<typename std::remove_const<MT>::type *>(&(t->*member))) : NULL;
 					}
 
 				private:
@@ -172,7 +172,7 @@ namespace Slicer {
 		public:
 			typedef IceInternal::Handle<T> element_type;
 
-			ModelPartForClass(element_type & h);
+			ModelPartForClass(element_type * h);
 
 			virtual void Create() override;
 
@@ -202,7 +202,7 @@ namespace Slicer {
 		public:
 			typedef T element_type;
 
-			ModelPartForStruct(T & o);
+			ModelPartForStruct(T * o);
 
 			T * GetModel() override;
 
@@ -225,7 +225,7 @@ namespace Slicer {
 			typedef T element_type;
 			typedef boost::bimap<T, std::string> Enumerations;
 
-			ModelPartForEnum(T & s);
+			ModelPartForEnum(T * s);
 
 			virtual const Metadata & GetMetadata() const override;
 
@@ -251,7 +251,7 @@ namespace Slicer {
 		public:
 			typedef T element_type;
 
-			ModelPartForSequence(T & s);
+			ModelPartForSequence(T * s);
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
@@ -271,14 +271,14 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
 		public:
-			ModelPartForDictionaryElementInserter(T & d);
+			ModelPartForDictionaryElementInserter(T * d);
 
 			virtual void Complete() override;
 
 			typename T::value_type value;
 
 		private:
-			T & dictionary;
+			T * dictionary;
 	};
 
 	class DLL_PUBLIC ModelPartForDictionaryBase : public ModelPart {
@@ -293,7 +293,7 @@ namespace Slicer {
 		public:
 			typedef T element_type;
 
-			ModelPartForDictionary(T & d);
+			ModelPartForDictionary(T * d);
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
