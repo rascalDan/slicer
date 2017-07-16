@@ -53,6 +53,7 @@ namespace Slicer {
 			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
 			createModelPartForConverted(type, c->scoped(), dm);
 			fprintbf(cpp, "::SetValue(ValueSourcePtr vsp)\n{\n");
+			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
 				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
@@ -81,6 +82,7 @@ namespace Slicer {
 			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
 			createModelPartForConverted(type, c->scoped(), dm);
 			fprintbf(cpp, "::GetValue(ValueTargetPtr vtp)\n{\n");
+			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
 				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",

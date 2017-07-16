@@ -140,12 +140,14 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForSimple<T>::SetValue(ValueSourcePtr s)
 	{
+		BOOST_ASSERT(this->Model);
 		s->set(*this->Model);
 	}
 
 	template<typename T>
 	void ModelPartForSimple<T>::GetValue(ValueTargetPtr s)
 	{
+		BOOST_ASSERT(this->Model);
 		s->get(*this->Model);
 	}
 
@@ -161,6 +163,7 @@ namespace Slicer {
 	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
 		ModelPartModel<IceUtil::Optional< typename T::element_type> >(h)
 	{
+		BOOST_ASSERT(this->Model);
 		if (*this->Model) {
 			modelPart = new T(&**this->Model);
 		}
@@ -169,12 +172,14 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForOptional<T>::hasModel() const
 	{
+		BOOST_ASSERT(this->Model);
 		return *this->Model;
 	}
 
 	template<typename T>
 	void ModelPartForOptional<T>::Create()
 	{
+		BOOST_ASSERT(this->Model);
 		if (!*this->Model) {
 			*this->Model = typename T::element_type();
 			modelPart = new T(&**this->Model);
@@ -185,6 +190,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::GetValue(ValueTargetPtr s)
 	{
+		BOOST_ASSERT(this->Model);
 		if (!*this->Model) {
 			*this->Model = typename T::element_type();
 			modelPart = new T(&**this->Model);
@@ -245,24 +251,28 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::Create()
 	{
+		BOOST_ASSERT(this->Model);
 		*this->Model = new T();
 	}
 
 	template<typename T>
 	T * ModelPartForClass<T>::GetModel()
 	{
+		BOOST_ASSERT(this->Model);
 		return this->Model->get();
 	}
 
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::GetSubclassModelPart(const std::string & name)
 	{
+		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::getSubclassModelPart(name, this->Model);
 	}
 
 	template<typename T>
 	bool ModelPartForClass<T>::HasValue() const
 	{
+		BOOST_ASSERT(this->Model);
 		return *this->Model;
 	}
 
@@ -303,6 +313,7 @@ namespace Slicer {
 	TypeId
 	ModelPartForClass<T>::GetTypeId() const
 	{
+		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::GetTypeId((*this->Model)->ice_id(), *className);
 	}
 
@@ -316,6 +327,7 @@ namespace Slicer {
 	template<typename T>
 	T * ModelPartForStruct<T>::GetModel()
 	{
+		BOOST_ASSERT(this->Model);
 		return this->Model;
 	}
 
@@ -347,15 +359,17 @@ namespace Slicer {
 
 	template<typename T>
 	void ModelPartForSequence<T>::OnEachChild(const ChildHandler & ch)
-		{
-			for(auto & element : *this->Model) {
-				ch(elementName, elementModelPart(element), NULL);
-			}
+	{
+		BOOST_ASSERT(this->Model);
+		for(auto & element : *this->Model) {
+			ch(elementName, elementModelPart(element), NULL);
 		}
+	}
 
 	template<typename T>
 	ChildRefPtr ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
 	{
+		BOOST_ASSERT(this->Model);
 		this->Model->push_back(typename element_type::value_type());
 		return new ImplicitChildRef(ModelPart::CreateFor(this->Model->back()));
 	}
@@ -410,6 +424,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForDictionary<T>::OnEachChild(const ChildHandler & ch)
 	{
+		BOOST_ASSERT(this->Model);
 		for (auto & pair : *this->Model) {
 			ch(pairName, new ModelPartForStruct<typename T::value_type>(&pair), NULL);
 		}
@@ -418,12 +433,14 @@ namespace Slicer {
 	template<typename T>
 	ChildRefPtr ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
 	{
+		BOOST_ASSERT(this->Model);
 		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>
 	ChildRefPtr ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &)
 	{
+		BOOST_ASSERT(this->Model);
 		if (name != pairName) {
 			throw IncorrectElementName(name);
 		}
