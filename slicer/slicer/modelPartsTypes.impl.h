@@ -350,6 +350,26 @@ namespace Slicer {
 		return metadata;
 	}
 
+	template<typename T>
+	T ModelPartForEnum<T>::lookup(const std::string & val)
+	{
+		auto i = enumerations.right.find(val);
+		if (i == enumerations.right.end()) {
+			throw InvalidEnumerationSymbol(val, typeid(T).name());
+		}
+		return i->second;
+	}
+
+	template<typename T>
+	const std::string & ModelPartForEnum<T>::lookup(T val)
+	{
+		auto i = enumerations.left.find(val);
+		if (i == enumerations.left.end()) {
+			throw InvalidEnumerationValue((::Ice::Int)val, typeid(T).name());
+		}
+		return i->second;
+	}
+
 	// ModelPartForSequence
 	template<typename T>
 	ModelPartForSequence<T>::ModelPartForSequence(T * s) :
@@ -378,26 +398,6 @@ namespace Slicer {
 	const Metadata & ModelPartForSequence<T>::GetMetadata() const
 	{
 		return metadata;
-	}
-
-	template<typename T>
-	T ModelPartForEnum<T>::lookup(const std::string & val)
-	{
-		auto i = enumerations.right.find(val);
-		if (i == enumerations.right.end()) {
-			throw InvalidEnumerationSymbol(val, typeid(T).name());
-		}
-		return i->second;
-	}
-
-	template<typename T>
-	const std::string & ModelPartForEnum<T>::lookup(T val)
-	{
-		auto i = enumerations.left.find(val);
-		if (i == enumerations.left.end()) {
-			throw InvalidEnumerationValue((::Ice::Int)val, typeid(T).name());
-		}
-		return i->second;
 	}
 
 	// ModelPartForDictionaryElementInserter
