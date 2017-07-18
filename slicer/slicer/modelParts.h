@@ -199,6 +199,7 @@ namespace Slicer {
 			virtual bool IsOptional() const override;
 			virtual void Write(::Ice::OutputStreamPtr &) const = 0;
 			virtual void Read(::Ice::InputStreamPtr &) = 0;
+			virtual ModelPartPtr GetContainedModelPart() override;
 
 			ModelPartPtr mp;
 	};

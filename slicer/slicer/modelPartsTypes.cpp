@@ -67,6 +67,12 @@ namespace Slicer {
 		return mp->IsOptional();
 	}
 
+	ModelPartPtr
+	ModelPartForRootBase::GetContainedModelPart()
+	{
+		return mp->GetContainedModelPart();
+	}
+
 	void ModelPartForSimpleBase::OnEachChild(const ChildHandler &) { }
 	ChildRefPtr ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &) { return NULL; }
 	ChildRefPtr ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &) { return NULL; }
