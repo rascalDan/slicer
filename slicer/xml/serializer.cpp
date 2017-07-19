@@ -294,7 +294,7 @@ namespace Slicer {
 	void
 	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp, HookCommonPtr hp, const ElementCreator & ec)
 	{
-		if (!mp || name.empty()) {
+		if (!mp->HasValue() || name.empty()) {
 			return;
 		}
 		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
@@ -323,9 +323,11 @@ namespace Slicer {
 	XmlSerializer::ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartPtr dict)
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
-			mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
-				mp->GetChild(valueName)->GetValue(new XmlAttributeValueTarget(element, name));
-			}));
+			if (mp->HasValue()) {
+				mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
+					mp->GetChild(valueName)->GetValue(new XmlAttributeValueTarget(element, name));
+				}));
+			}
 		});
 	}
 
@@ -333,9 +335,11 @@ namespace Slicer {
 	XmlSerializer::ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartPtr dict)
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
-			mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
-				ModelTreeProcessElement(element->add_child_element(name), mp->GetChild(valueName), defaultElementCreator);
-			}));
+			if (mp->HasValue()) {
+				mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
+					ModelTreeProcessElement(element->add_child_element(name), mp->GetChild(valueName), defaultElementCreator);
+				}));
+			}
 		});
 	}
 

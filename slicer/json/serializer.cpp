@@ -194,6 +194,7 @@ namespace Slicer {
 	void
 	JsonSerializer::ModelTreeIterateSeq(json::Value * n, ModelPartPtr mp)
 	{
+		if (!mp->HasValue()) return;
 		auto arr = boost::get<json::Array>(n);
 		arr->push_back(json::ValuePtr(new json::Value()));
 		ModelTreeIterateRoot(arr->back().get(), mp);
@@ -202,6 +203,7 @@ namespace Slicer {
 	void
 	JsonSerializer::ModelTreeIterateDictObj(json::Value * n, ModelPartPtr mp)
 	{
+		if (!mp->HasValue()) return;
 		auto obj = boost::get<json::Object>(n);
 		json::Object::key_type k;
 		auto v = json::ValuePtr(new json::Value());
@@ -219,7 +221,7 @@ namespace Slicer {
 		if (name.empty() || !n) {
 			return;
 		}
-		if (mp) {
+		if (mp && mp->HasValue()) {
 			switch (mp->GetType()) {
 				case mpt_Null:
 					boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value())});

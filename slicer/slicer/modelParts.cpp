@@ -144,7 +144,7 @@ namespace Slicer {
 	void
 	HookCommon::apply(const ChildHandler & ch, const ModelPartPtr & modelPart)
 	{
-		ch(this->name, modelPart && modelPart->HasValue() ? modelPart : ModelPartPtr(), this);
+		ch(this->name, modelPart, this);
 	}
 }
 
