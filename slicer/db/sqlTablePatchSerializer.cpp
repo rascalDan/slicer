@@ -1,13 +1,11 @@
 #include "sqlTablePatchSerializer.h"
 #include "sqlInsertSerializer.h"
+#include "sqlCommon.h"
 #include <slicer/metadata.h>
 #include <compileTimeFormatter.h>
 #include <scopeExit.h>
 
 namespace Slicer {
-	const std::string md_pkey = "db:pkey";
-	const std::string ignore = "ignore";
-
 	AdHocFormatter(ttname, "slicer_tmp_%?");
 	SqlTablePatchSerializer::SqlTablePatchSerializer(DB::Connection * db, DB::TablePatch & tp) :
 		db(db),
@@ -34,12 +32,12 @@ namespace Slicer {
 
 		auto mp = mpr->GetContainedModelPart();
 		mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
-			if (metaDataFlagSet(h->GetMetadata(), md_pkey)) {
+			if (isPKey(h)) {
 				tablePatch.pk.insert(name);
 			}
 		});
 		mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
-			if (metaDataFlagNotSet(h->GetMetadata(), ignore)) {
+			if (isBind(h)) {
 				tablePatch.cols.insert(name);
 			}
 		});

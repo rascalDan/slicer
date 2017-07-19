@@ -2,13 +2,12 @@
 #include <sqlExceptions.h>
 #include <common.h>
 #include "sqlBinder.h"
+#include "sqlCommon.h"
 #include <buffer.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 
 namespace Slicer {
-	const std::string md_pkey = "db:pkey";
-
 	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :
 		connection(c),
 		tableName(t)
@@ -51,20 +50,20 @@ namespace Slicer {
 	{
 		int paramNo = 0;
 		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
-				if (metaDataFlagNotSet(h->GetMetadata(), md_pkey)) {
-					if (cmp->HasValue()) {
-						cmp->GetValue(new SqlBinder(*upd, paramNo++));
-					}
-					else {
-						upd->bindNull(paramNo++);
-					}
-				}
-			});
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
-				if (metaDataFlagSet(h->GetMetadata(), md_pkey)) {
+			if (isValue(h)) {
+				if (cmp->HasValue()) {
 					cmp->GetValue(new SqlBinder(*upd, paramNo++));
 				}
-			});
+				else {
+					upd->bindNull(paramNo++);
+				}
+			}
+		});
+		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
+			if (isPKey(h)) {
+				cmp->GetValue(new SqlBinder(*upd, paramNo++));
+			}
+		});
 		if (upd->execute() == 0) {
 			throw NoRowsFound();
 		}
@@ -77,23 +76,23 @@ namespace Slicer {
 		update.appendbf("UPDATE %s SET ", tableName);
 		int fieldNo = 0;
 		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, HookCommonPtr h) {
-				if (metaDataFlagNotSet(h->GetMetadata(), md_pkey)) {
-					if (fieldNo++) {
-						update.append(", ");
-					}
-					update.appendbf("%s = ?", name);
+			if (isValue(h)) {
+				if (fieldNo++) {
+					update.append(", ");
 				}
-			});
+				update.appendbf("%s = ?", name);
+			}
+		});
 		update.append(" WHERE ", AdHoc::Buffer::Use);
 		fieldNo = 0;
 		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, HookCommonPtr h) {
-				if (metaDataFlagSet(h->GetMetadata(), md_pkey)) {
-					if (fieldNo++) {
-						update.append(" AND ");
-					}
-					update.appendbf("%s = ?", name);
+			if (isPKey(h)) {
+				if (fieldNo++) {
+					update.append(" AND ");
 				}
-			});
+				update.appendbf("%s = ?", name);
+			}
+		});
 		return ModifyPtr(connection->newModifyCommand(update));
 	}
 }

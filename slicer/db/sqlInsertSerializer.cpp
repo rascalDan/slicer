@@ -2,14 +2,13 @@
 #include <common.h>
 #include <sqlExceptions.h>
 #include "sqlBinder.h"
+#include "sqlCommon.h"
 #include <buffer.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace Slicer {
-	const std::string md_auto = "db:auto";
-
 	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, const std::string & t) :
 		connection(c),
 		tableName(t)
@@ -87,27 +86,29 @@ namespace Slicer {
 	{
 		SqlAutoIdInsertSerializer::bindObjectAndExecute(cmp, ins);
 		cmp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
-				if (metaDataFlagSet(h->GetMetadata(), md_auto)) {
-					cmp->SetValue(new IdSave(connection));
-				}
-			});
+			if (isAuto(h)) {
+				cmp->SetValue(new IdSave(connection));
+			}
+		});
 	}
 
 	void
-	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr) const
+	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
 	{
-		if (cmp->HasValue()) {
-			cmp->GetValue(new SqlBinder(*ins, paramNo++));
-		}
-		else {
-			ins->bindNull(paramNo++);
+		if (isBind(h)) {
+			if (cmp->HasValue()) {
+				cmp->GetValue(new SqlBinder(*ins, paramNo++));
+			}
+			else {
+				ins->bindNull(paramNo++);
+			}
 		}
 	}
 
 	void
 	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
 	{
-		if (metaDataFlagNotSet(h->GetMetadata(), md_auto)) {
+		if (isNotAuto(h)) {
 			SqlInsertSerializer::bindObjectAndExecuteField(paramNo, ins, cmp, h);
 		}
 	}
@@ -128,18 +129,20 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, HookCommonPtr) const
+	SqlInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, HookCommonPtr h) const
 	{
-		if (fieldNo++) {
-			insert.append(", ");
+		if (isBind(h)) {
+			if (fieldNo++) {
+				insert.append(", ");
+			}
+			insert.append(name);
 		}
-		insert.append(name);
 	}
 
 	void
 	SqlAutoIdInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, HookCommonPtr h) const
 	{
-		if (metaDataFlagNotSet(h->GetMetadata(), md_auto)) {
+		if (isNotAuto(h)) {
 			if (fieldNo++) {
 				insert.append(", ");
 			}

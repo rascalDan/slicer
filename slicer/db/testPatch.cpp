@@ -14,6 +14,7 @@
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::PrimaryKey);
 // LCOV_EXCL_STOP
 
 class StandardMockDatabase : public PQ::Mock {
@@ -43,5 +44,11 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 	auto cmd = db->select("SELECT COUNT(*) FROM builtins");
 	auto c = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, int>(*cmd);
 	BOOST_REQUIRE_EQUAL(2, c);
+	BOOST_REQUIRE_EQUAL(2, tp.pk.size());
+	DB::PrimaryKey pk = {"mint", "mlong"};
+	BOOST_REQUIRE_EQUAL(pk, tp.pk);
+	BOOST_REQUIRE_EQUAL(8, tp.cols.size());
+	DB::ColumnNames cols = {"mbool", "mbyte", "mdouble", "mfloat", "mint", "mlong", "mshort", "mstring"};
+	BOOST_REQUIRE_EQUAL(cols, tp.cols);
 }
 
