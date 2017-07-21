@@ -368,6 +368,22 @@ namespace Slicer {
 		return i->second;
 	}
 
+	template<typename T>
+	void ModelPartForEnum<T>::SetValue(ValueSourcePtr s)
+	{
+		BOOST_ASSERT(this->Model);
+		std::string val;
+		s->set(val);
+		*this->Model = lookup(val);
+	}
+
+	template<typename T>
+	void ModelPartForEnum<T>::GetValue(ValueTargetPtr s)
+	{
+		BOOST_ASSERT(this->Model);
+		s->get(lookup(*this->Model));
+	}
+
 	// ModelPartForSequence
 	template<typename T>
 	ModelPartForSequence<T>::ModelPartForSequence(T * s) :

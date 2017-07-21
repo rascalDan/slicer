@@ -329,17 +329,6 @@ namespace Slicer {
 		}
 		fprintbf(cpp, "\treturn e;\n}());\n\n");
 
-		fprintbf(cpp, "template<> DLL_PUBLIC\nvoid ModelPartForEnum< %s >::SetValue(ValueSourcePtr s) {\n\
-	std::string val;\n\
-	s->set(val);\n\
-	*this->Model = lookup(val);\n\
-}\n\n",
-				e->scoped());
-		fprintbf(cpp, "template<> DLL_PUBLIC\nvoid ModelPartForEnum< %s >::GetValue(ValueTargetPtr s) {\n\
-	s->get(lookup(*this->Model));\n\
-}\n\n",
-				e->scoped());
-
 		auto name = metaDataValue("slicer:root:", e->getMetaData());
 		defineRoot(e->scoped(), name ? *name : e->name(), e);
 
