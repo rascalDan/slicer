@@ -370,13 +370,6 @@ namespace Slicer {
 		fprintbf(cpp, "\treturn GetAnonChildRef(flt);\n}\n\n");
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "ModelPartPtr\n");
-		fprintbf(cpp, "ModelPartForSequence< %s >::elementModelPart(typename %s::value_type & e) const {\n",
-				s->scoped(),
-				s->scoped());
-		fprintbf(cpp, "\treturn ModelPart::CreateFor(e);\n}\n\n");
-
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		auto ename = metaDataValue("slicer:element:", s->getMetaData());
 		fprintbf(cpp, "const std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n",
 				s->scoped(),

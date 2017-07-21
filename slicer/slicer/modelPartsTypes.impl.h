@@ -399,6 +399,12 @@ namespace Slicer {
 	}
 
 	template<typename T>
+	ModelPartPtr ModelPartForSequence<T>::elementModelPart(typename T::value_type & e) const
+	{
+		return ModelPart::CreateFor(e);
+	}
+
+	template<typename T>
 	ModelPartPtr ModelPartForSequence<T>::GetContainedModelPart()
 	{
 		return ModelPart::CreateFor<typename T::value_type>();
