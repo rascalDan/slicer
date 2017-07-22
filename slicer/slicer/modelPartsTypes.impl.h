@@ -159,6 +159,52 @@ namespace Slicer {
 	{
 	}
 
+	template<typename ET, typename MT, typename Conv>
+	inline
+	bool ModelPartForConvertedBase::tryConvertFrom(const ValueSourcePtr & vsp, MT * model, const Conv & conv)
+	{
+		if (auto vspt = dynamic_cast<TValueSource<ET> *>(vsp.get())) {
+			ET tmp;
+			vspt->set(tmp);
+			*model = conv(tmp);
+			return true;
+		}
+		return false;
+	}
+
+	template<typename ET, typename MT>
+	inline
+	bool ModelPartForConvertedBase::tryConvertFrom(const ValueSourcePtr & vsp, MT * model)
+	{
+		if (auto vspt = dynamic_cast<TValueSource<ET> *>(vsp.get())) {
+			vspt->set(*model);
+			return true;
+		}
+		return false;
+	}
+
+	template<typename ET, typename MT, typename Conv>
+	inline
+	bool ModelPartForConvertedBase::tryConvertTo(const ValueTargetPtr & vsp, MT * model, const Conv & conv)
+	{
+		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(vsp.get())) {
+			vspt->get(conv(*model));
+			return true;
+		}
+		return false;
+	}
+
+	template<typename ET, typename MT>
+	inline
+	bool ModelPartForConvertedBase::tryConvertTo(const ValueTargetPtr & vsp, MT * model)
+	{
+		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(vsp.get())) {
+			vspt->get(*model);
+			return true;
+		}
+		return false;
+	}
+
 	// ModelPartForOptional
 	template<typename T>
 	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :

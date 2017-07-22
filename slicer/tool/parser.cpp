@@ -56,23 +56,14 @@ namespace Slicer {
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
-						conversion.ExchangeType);
-				fprintbf(cpp, "\t\t%s tmp;\n",
-						conversion.ExchangeType);
-				fprintbf(cpp, "\t\tvspt->set(tmp);\n");
-				fprintbf(cpp, "\t\t*Model = %s(tmp);\n",
+				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model, %s)) return;\n",
+						conversion.ExchangeType,
 						conversion.ConvertToModelFunc);
-				fprintbf(cpp, "\t\treturn;\n");
-				fprintbf(cpp, "\t}\n");
 			}
 			// Default conversion
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
-				fprintbf(cpp, "\tif (auto vspt = dynamic_cast<TValueSource< %s > *>(vsp.get())) {\n",
+				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model)) return;\n",
 						Slice::typeToString(type));
-				fprintbf(cpp, "\t\tvspt->set(*Model);\n");
-				fprintbf(cpp, "\t\treturn;\n");
-				fprintbf(cpp, "\t}\n");
 			}
 			// Failed to convert
 			fprintbf(cpp, "\tthrow NoConversionFound(\"%s\");\n",
@@ -85,20 +76,14 @@ namespace Slicer {
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
-						conversion.ExchangeType);
-				fprintbf(cpp, "\t\tvtpt->get(%s(*Model));\n",
+				fprintbf(cpp, "\tif (tryConvertTo< %s >(vtp, Model, %s)) return;\n",
+						conversion.ExchangeType,
 						conversion.ConvertToExchangeFunc);
-				fprintbf(cpp, "\t\treturn;\n");
-				fprintbf(cpp, "\t}\n");
 			}
 			// Default conversion
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
-				fprintbf(cpp, "\tif (auto vtpt = dynamic_cast<TValueTarget< %s > *>(vtp.get())) {\n",
+				fprintbf(cpp, "\tif (tryConvertTo< %s >(vtp, Model)) return;\n",
 					Slice::typeToString(type));
-				fprintbf(cpp, "\t\tvtpt->get(*Model);\n");
-				fprintbf(cpp, "\t\treturn;\n");
-				fprintbf(cpp, "\t}\n");
 			}
 			// Failed to convert
 			fprintbf(cpp, "\tthrow NoConversionFound(\"%s\");\n",

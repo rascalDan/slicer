@@ -54,6 +54,16 @@ namespace Slicer {
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
+
+		protected:
+			template<typename ET, typename MT, typename Conv>
+			inline static bool tryConvertFrom(const ValueSourcePtr & vsp, MT * model, const Conv & conv);
+			template<typename ET, typename MT>
+			inline static bool tryConvertFrom(const ValueSourcePtr & vsp, MT * model);
+			template<typename ET, typename MT, typename Conv>
+			inline static bool tryConvertTo(const ValueTargetPtr & vsp, MT * model, const Conv & conv);
+			template<typename ET, typename MT>
+			inline static bool tryConvertTo(const ValueTargetPtr & vsp, MT * model);
 	};
 
 	template<typename T, typename MT, typename M, MT M::* MV>
