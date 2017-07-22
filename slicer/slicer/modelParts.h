@@ -28,7 +28,7 @@ namespace Slicer {
 		public:
 			virtual void get(const T &) const = 0;
 	};
-	class ValueTarget : public IceUtil::Shared,
+	class ValueTarget : virtual public IceUtil::Shared,
 			public TValueTarget<bool>,
 			public TValueTarget<Ice::Byte>,
 			public TValueTarget<Ice::Short>,
@@ -54,7 +54,7 @@ namespace Slicer {
 		public:
 			virtual void set(T &) const = 0;
 	};
-	class ValueSource : public IceUtil::Shared,
+	class ValueSource : virtual public IceUtil::Shared,
 			public TValueSource<bool>,
 			public TValueSource<Ice::Byte>,
 			public TValueSource<Ice::Short>,
@@ -103,14 +103,14 @@ namespace Slicer {
 		mpt_Dictionary,
 	};
 
-	class ChildRef : public IceUtil::Shared {
+	class ChildRef : virtual public IceUtil::Shared {
 		public:
 			virtual ModelPartPtr Child() const = 0;
 			virtual const Metadata & ChildMetaData() const = 0;
 	};
 	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
 
-	class DLL_PUBLIC HookCommon : public IceUtil::Shared {
+	class DLL_PUBLIC HookCommon : virtual public IceUtil::Shared {
 		public:
 			HookCommon(const std::string &);
 
@@ -146,7 +146,7 @@ namespace Slicer {
 			const Metadata & mdr;
 	};
 
-	class DLL_PUBLIC ModelPart : public IceUtil::Shared {
+	class DLL_PUBLIC ModelPart : virtual public IceUtil::Shared {
 		public:
 			virtual ~ModelPart() = default;
 
