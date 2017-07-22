@@ -24,14 +24,14 @@ namespace Slicer {
 
 	template <typename Object>
 	void
-	SerializeAnyWith(Object object, SerializerPtr serializer)
+	SerializeAnyWith(const Object & object, SerializerPtr serializer)
 	{
-		serializer->Serialize(ModelPart::CreateRootFor<Object>(object));
+		serializer->Serialize(ModelPart::CreateRootFor<const Object>(object));
 	}
 
 	template <typename Serializer, typename Object, typename ... SerializerParams>
 	void
-	SerializeAny(Object object, SerializerParams && ... sp)
+	SerializeAny(const Object & object, SerializerParams && ... sp)
 	{
 		SerializeAnyWith(object, new Serializer(sp ...));
 	}
