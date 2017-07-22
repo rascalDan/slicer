@@ -241,6 +241,48 @@ namespace Slicer {
 		return metadata;
 	}
 
+	template<typename T>
+	ModelPartForComplex<T>::HookBase::HookBase(const std::string & n) :
+		HookCommon(n)
+	{
+	}
+
+	template<typename T>
+	const Metadata & ModelPartForComplex<T>::HookBase::GetMetadata() const
+	{
+		return emptyMetadata;
+	}
+
+	template<typename T>
+	template<typename MT, typename MP>
+	ModelPartForComplex<T>::Hook<MT, MP>::Hook(MT T::* m, const std::string & n) :
+		HookBase(n),
+		member(m)
+	{
+	}
+
+	template<typename T>
+	template<typename MT, typename MP>
+	ModelPartPtr ModelPartForComplex<T>::Hook<MT, MP>::Get(T * t) const
+	{
+		return new MP(t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : NULL);
+	}
+
+	template<typename T>
+	template<typename MT, typename MP>
+	ModelPartForComplex<T>::HookMetadata<MT, MP>::HookMetadata(MT T::* member, const std::string & n, const Metadata & md) :
+		Hook<MT, MP>(member, n),
+		metadata(md)
+	{
+	}
+
+	template<typename T>
+	template<typename MT, typename MP>
+	const Metadata & ModelPartForComplex<T>::HookMetadata<MT, MP>::GetMetadata() const
+	{
+		return metadata;
+	}
+
 	// ModelPartForClass
 	template<typename T>
 	ModelPartForClass<T>::ModelPartForClass(element_type * h) :
