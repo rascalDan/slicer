@@ -310,6 +310,56 @@ namespace Slicer {
 			static const std::string pairName;
 	};
 
+	template<typename T>
+	class DLL_PUBLIC Stream {
+		public:
+			typedef boost::function<void(const T &)> Consumer;
+			typedef T element_type;
+
+			virtual void Produce(const Consumer & c) = 0;
+	};
+
+	class DLL_PUBLIC ModelPartForStreamBase : public ModelPart {
+		public:
+			virtual ModelPartType GetType() const override;
+			virtual bool HasValue() const override;
+			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+
+			virtual ModelPartPtr GetContainedModelPart() override = 0;
+			virtual void OnEachChild(const ChildHandler & ch) override = 0;
+	};
+
+	template<typename T>
+	class DLL_PUBLIC ModelPartForStream : public ModelPartForStreamBase, ModelPartModel<Stream<T>> {
+		public:
+			ModelPartForStream(Stream<T> * s);
+
+			virtual ModelPartPtr GetContainedModelPart() override;
+			virtual void OnEachChild(const ChildHandler & ch) override;
+	};
+
+	class DLL_PUBLIC ModelPartForStreamRootBase : public ModelPartForRootBase {
+		public:
+			ModelPartForStreamRootBase(ModelPartPtr mp);
+
+			virtual void Write(Ice::OutputStreamPtr&) const override;
+			virtual void Read(Ice::InputStreamPtr&) override;
+			virtual bool HasValue() const override;
+			virtual void OnEachChild(const ChildHandler & ch) override;
+			virtual const std::string & GetRootName() const override = 0;
+	};
+
+	template<typename T>
+	class DLL_PUBLIC ModelPartForStreamRoot : public ModelPartForStreamRootBase {
+		public:
+			ModelPartForStreamRoot(Stream<T> * s);
+
+			virtual const std::string & GetRootName() const override;
+
+		private:
+			Stream<T> * stream;
+	};
 }
 
 #endif

@@ -24,6 +24,12 @@
 
 #define MODELPARTFOR(Type, ModelPartType) \
 	CUSTOMMODELPARTFOR(Type, ModelPartType<Type>, ModelPartType<Type>)
+#define MODELPARTFORSTREAM(StreamImpl) \
+	namespace Slicer { \
+		template<> ModelPartForRootPtr ModelPart::CreateRootFor(const StreamImpl & stream) { \
+			return new ModelPartForStreamRoot<typename StreamImpl::element_type>(const_cast<StreamImpl *>(&stream)); \
+		} \
+	}
 
 namespace Slicer {
 	// ModelPartForRoot
@@ -575,6 +581,43 @@ namespace Slicer {
 	ModelPartPtr ModelPartForDictionary<T>::GetContainedModelPart()
 	{
 		return new ModelPartForStruct<typename T::value_type>(nullptr);
+	}
+
+	// ModelPartForStream
+	template<typename T>
+	ModelPartForStream<T>::ModelPartForStream(Stream<T> * s) :
+		ModelPartModel<Stream<T>>(s)
+	{
+	}
+
+	template<typename T>
+	ModelPartPtr
+	ModelPartForStream<T>::GetContainedModelPart()
+	{
+		return ModelPart::CreateFor<T>();
+	}
+
+	template<typename T>
+	void
+	ModelPartForStream<T>::OnEachChild(const ChildHandler & ch)
+	{
+		BOOST_ASSERT(this->Model);
+		this->Model->Produce([&ch](const T & element) {
+			ch(ModelPartForSequence<std::vector<T>>::elementName, ModelPart::CreateFor(element), NULL);
+		});
+	}
+
+	template<typename T>
+	ModelPartForStreamRoot<T>::ModelPartForStreamRoot(Stream<T> * s) :
+		ModelPartForStreamRootBase(new ModelPartForStream<T>(s))
+	{
+	}
+
+	template<typename T>
+	const std::string &
+	ModelPartForStreamRoot<T>::GetRootName() const
+	{
+		return ModelPartForRoot<std::vector<T>>::rootName;
 	}
 }
 

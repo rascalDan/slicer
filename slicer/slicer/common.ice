@@ -38,6 +38,10 @@ module Slicer {
 		string symbol;
 		string type;
 	};
+	["cpp:ice_print"]
+	exception InvalidStreamOperation extends SerializerError {
+		string method;
+	};
 };
 
 #endif

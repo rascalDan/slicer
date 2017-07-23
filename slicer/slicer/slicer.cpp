@@ -109,5 +109,12 @@ namespace Slicer {
 	{
 		CompilerErrorMsg::write(s, what);
 	}
+
+	AdHocFormatter(InvalidStreamOperationMsg, "%? is not valid on streams");
+	void
+	InvalidStreamOperation::ice_print(std::ostream & s) const
+	{
+		InvalidStreamOperationMsg::write(s, method);
+	}
 }
 

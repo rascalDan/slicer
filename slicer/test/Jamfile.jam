@@ -92,3 +92,22 @@ run serializers.cpp
 	serializers
 	;
 
+lib streams-mp :
+	streams-mp.cpp
+	:
+	<library>common
+	<library>types
+	;
+
+run streams.cpp
+	helpers.cpp
+	: : :
+	<library>streams-mp
+	<library>types
+	<library>common
+	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
+	<library>../xml//slicer-xml
+	<library>../json//slicer-json
+	;
+
