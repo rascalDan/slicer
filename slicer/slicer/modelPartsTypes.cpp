@@ -116,6 +116,12 @@ namespace Slicer {
 		return (id == className) ? TypeId() : ModelPart::ToExchangeTypeName(id);
 	}
 
+	std::string ModelPartForComplexBase::demangle(const char * mangled)
+	{
+		auto buf = std::unique_ptr<char, decltype(free)*>(abi::__cxa_demangle(mangled, NULL, NULL, NULL), std::free);
+		return "::" + std::string(buf.get());
+	}
+
 	void ModelPartForOptionalBase::OnEachChild(const ChildHandler & ch)
 	{
 		if (this->hasModel()) {

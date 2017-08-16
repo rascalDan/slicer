@@ -2,6 +2,7 @@
 #define SLICER_MODELPARTSTYPES_H
 
 #include "modelParts.h"
+#include <Ice/ObjectF.h>
 
 namespace Slicer {
 	template<typename T>
@@ -116,6 +117,7 @@ namespace Slicer {
 			static void registerClass(const std::string & className, const std::string * typeName, const ClassRef &);
 			static void unregisterClass(const std::string & className, const std::string * typeName);
 			static TypeId GetTypeId(const std::string & id, const std::string & className);
+			static std::string demangle(const char * mangled);
 	};
 
 	template<typename T>
@@ -182,6 +184,10 @@ namespace Slicer {
 			virtual bool HasValue() const override;
 
 			virtual TypeId GetTypeId() const override;
+			template<typename dummy = T>
+			const std::string & getTypeId(typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
+			template<typename dummy = T>
+			std::string getTypeId(typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
 
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
 

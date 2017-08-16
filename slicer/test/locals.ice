@@ -10,6 +10,16 @@ module Locals {
 	local enum E {
 		a, b
 	};
+	local class LocalClass {
+		int a;
+		string b;
+	};
+	local class LocalSubClass extends LocalClass {
+		double c;
+	};
+	local class LocalSub2Class extends LocalSubClass {
+		int d;
+	};
 };
 
 #endif

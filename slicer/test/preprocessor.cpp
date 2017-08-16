@@ -19,6 +19,7 @@ ComponentsCount COMPONENTS_IN_TEST_ICE = {
 	{ "inheritance.ice", 12 },
 	{ "interfaces.ice", 0 },
 	{ "json.ice", 2 },
+	{ "locals.ice", 7 },
 	{ "optionals.ice", 1 },
 	{ "structs.ice", 4 },
 	{ "types.ice", 3 },

@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <types.h>
+#include <locals.h>
 #include <slicer/modelParts.h>
 #include <slicer/modelPartsTypes.h>
 
@@ -170,5 +171,37 @@ BOOST_AUTO_TEST_CASE( normalSubSubClassTypeId )
 	auto baseType = a->GetTypeId();
 	BOOST_REQUIRE(baseType);
 	BOOST_REQUIRE_EQUAL(*baseType, "::TestModule::D3");
+}
+
+BOOST_AUTO_TEST_CASE( localClassTypeId )
+{
+	Locals::LocalClassPtr base = new Locals::LocalClass(1, "One");
+	BOOST_REQUIRE(base);
+	auto a = Slicer::ModelPart::CreateFor(base);
+	BOOST_REQUIRE(a);
+	auto baseType = a->GetTypeId();
+	BOOST_REQUIRE(!baseType);
+}
+
+BOOST_AUTO_TEST_CASE( localSubClassTypeId )
+{
+	Locals::LocalClassPtr base = new Locals::LocalSubClass(1, "One", 3.1);
+	BOOST_REQUIRE(base);
+	auto a = Slicer::ModelPart::CreateFor(base);
+	BOOST_REQUIRE(a);
+	auto baseType = a->GetTypeId();
+	BOOST_REQUIRE(baseType);
+	BOOST_REQUIRE_EQUAL(*baseType, "::Locals::LocalSubClass");
+}
+
+BOOST_AUTO_TEST_CASE( localSubSubClassTypeId )
+{
+	Locals::LocalClassPtr base = new Locals::LocalSub2Class(1, "One", 3.1, 1);
+	BOOST_REQUIRE(base);
+	auto a = Slicer::ModelPart::CreateFor(base);
+	BOOST_REQUIRE(a);
+	auto baseType = a->GetTypeId();
+	BOOST_REQUIRE(baseType);
+	BOOST_REQUIRE_EQUAL(*baseType, "::Locals::LocalSub2Class");
 }
 
