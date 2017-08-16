@@ -140,3 +140,35 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_enum )
 	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
 }
 
+BOOST_AUTO_TEST_CASE( normalClassTypeId )
+{
+	TestModule::BasePtr base = new TestModule::Base(1);
+	BOOST_REQUIRE(base);
+	auto a = Slicer::ModelPart::CreateFor(base);
+	BOOST_REQUIRE(a);
+	auto baseType = a->GetTypeId();
+	BOOST_REQUIRE(!baseType);
+}
+
+BOOST_AUTO_TEST_CASE( normalSubClassTypeId )
+{
+	TestModule::BasePtr base = new TestModule::D1(1, 2);
+	BOOST_REQUIRE(base);
+	auto a = Slicer::ModelPart::CreateFor(base);
+	BOOST_REQUIRE(a);
+	auto baseType = a->GetTypeId();
+	BOOST_REQUIRE(baseType);
+	BOOST_REQUIRE_EQUAL(*baseType, "::TestModule::D1");
+}
+
+BOOST_AUTO_TEST_CASE( normalSubSubClassTypeId )
+{
+	TestModule::BasePtr base = new TestModule::D3(1, 2, 3);
+	BOOST_REQUIRE(base);
+	auto a = Slicer::ModelPart::CreateFor(base);
+	BOOST_REQUIRE(a);
+	auto baseType = a->GetTypeId();
+	BOOST_REQUIRE(baseType);
+	BOOST_REQUIRE_EQUAL(*baseType, "::TestModule::D3");
+}
+
