@@ -12,17 +12,17 @@ namespace fs = boost::filesystem;
 
 typedef std::map<std::string, unsigned int> ComponentsCount;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {
-	{ "enums.ice", 2 },
-	{ "structs.ice", 4 },
 	{ "classes.ice", 4 },
-	{ "optionals.ice", 1 },
 	{ "collections.ice", 6 },
+	{ "db.ice", 4 },
+	{ "enums.ice", 2 },
 	{ "inheritance.ice", 12 },
 	{ "interfaces.ice", 0 },
 	{ "json.ice", 2 },
-	{ "xml.ice", 5 },
-	{ "db.ice", 4 },
-	{ "types.ice", 3 }
+	{ "optionals.ice", 1 },
+	{ "structs.ice", 4 },
+	{ "types.ice", 3 },
+	{ "xml.ice", 5 }
 };
 
 unsigned int
