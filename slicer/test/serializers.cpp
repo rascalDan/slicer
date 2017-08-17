@@ -15,6 +15,7 @@
 #include <types.h>
 #include <json.h>
 #include <xml.h>
+#include <locals.h>
 #include <fstream>
 #include "helpers.h"
 #include <definedDirs.h>
@@ -485,6 +486,21 @@ BOOST_AUTO_TEST_CASE( json_objectmap )
 BOOST_AUTO_TEST_CASE( json_objectmapMember )
 {
 	verifyByFile<TestJson::HasProperitiesPtr, Slicer::JsonFileDeserializer>("objectmapMember.json", checkObjectMapMember);
+}
+
+BOOST_AUTO_TEST_CASE( json_localClass )
+{
+	verifyByFile<Locals::LocalClassPtr, Slicer::JsonFileDeserializer>("localClass.json");
+}
+
+BOOST_AUTO_TEST_CASE( json_localSub2Class )
+{
+	verifyByFile<Locals::LocalClassPtr, Slicer::JsonFileDeserializer>("localSub2Class.json");
+}
+
+BOOST_AUTO_TEST_CASE( json_localSubClass )
+{
+	verifyByFile<Locals::LocalSubClassPtr, Slicer::JsonFileDeserializer>("localSub2Class.json");
 }
 
 BOOST_AUTO_TEST_CASE( json_simpleArray )
