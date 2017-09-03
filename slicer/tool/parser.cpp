@@ -56,7 +56,7 @@ namespace Slicer {
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model, %s)) return;\n",
+				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model, &%s)) return;\n",
 						conversion.ExchangeType,
 						conversion.ConvertToModelFunc);
 			}
@@ -76,7 +76,7 @@ namespace Slicer {
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (tryConvertTo< %s >(vtp, Model, %s)) return;\n",
+				fprintbf(cpp, "\tif (tryConvertTo< %s >(vtp, Model, &%s)) return;\n",
 						conversion.ExchangeType,
 						conversion.ConvertToExchangeFunc);
 			}
