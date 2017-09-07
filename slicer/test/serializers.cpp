@@ -181,8 +181,16 @@ checkOptionals_areset(const TestModule::OptionalsPtr & opts)
 	BOOST_REQUIRE_EQUAL(opts->optStruct->a, 1);
 	BOOST_REQUIRE_EQUAL(opts->optStruct->b, 2);
 	BOOST_REQUIRE(opts->optClass);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->a, 1);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->b, 2);
+	BOOST_REQUIRE(*opts->optClass);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.year, 2017);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.month, 9);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.day, 7);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.hour, 20);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.minute, 40);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.second, 30);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->date.year, 2017);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->date.month, 9);
+	BOOST_REQUIRE_EQUAL((*opts->optClass)->date.day, 7);
 	BOOST_REQUIRE_EQUAL(opts->optSeq->size(), 2);
 	BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->a, 3);
 	BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->b, 4);
@@ -604,6 +612,6 @@ BOOST_AUTO_TEST_SUITE_END();
 
 BOOST_AUTO_TEST_CASE( customerModelPartCounters )
 {
-	BOOST_REQUIRE_EQUAL(27, TestModule::completions);
+	BOOST_REQUIRE_EQUAL(21, TestModule::completions);
 }
 

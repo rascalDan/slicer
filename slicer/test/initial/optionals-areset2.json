@@ -1,1 +1,1 @@
-{"optClass":{"a":1,"b":2},"optDict":[{"key":10,"value":{"a":11,"b":12}},{"key":13,"value":{"a":14,"b":15}}],"optSeq":[{"a":3,"b":4},{"a":5,"b":6}],"optSimple":4,"optStruct":{"a":1,"b":2}}
+{"optClass":{"date":"2017-09-07","dt":"2017-Sep-07 20:40:30"},"optDict":[{"key":10,"value":{"a":11,"b":12}},{"key":13,"value":{"a":14,"b":15}}],"optSeq":[{"a":3,"b":4},{"a":5,"b":6}],"optSimple":4,"optStruct":{"a":1,"b":2}}
