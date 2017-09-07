@@ -67,6 +67,7 @@ namespace Slicer {
 		tm.tm_mday = in.day;
 		tm.tm_mon = in.month- 1;
 		tm.tm_year = in.year - 1900;
+		tm.tm_isdst = -1;
 		mktime(&tm);
 		char buf[BUFSIZ];
 		auto len = strftime(buf, BUFSIZ, "%Y-%b-%d %H:%M:%S", &tm);
