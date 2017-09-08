@@ -62,12 +62,12 @@ namespace Slicer {
 			template<typename ET, typename MT>
 			inline static bool tryConvertFrom(const ValueSourcePtr & vsp, MT * model);
 			template<typename ET, typename MT, typename Conv>
-			inline static bool tryConvertTo(const ValueTargetPtr & vsp, MT * model, const Conv & conv);
+			inline static bool tryConvertTo(const ValueTargetPtr & vsp, const MT * model, const Conv & conv);
 			template<typename ET, typename MT>
-			inline static bool tryConvertTo(const ValueTargetPtr & vsp, MT * model);
+			inline static bool tryConvertTo(const ValueTargetPtr & vsp, const MT * model);
 	};
 
-	template<typename T, typename MT, typename M, MT M::* MV>
+	template<typename T, typename M, T M::* MV>
 	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
@@ -76,6 +76,18 @@ namespace Slicer {
 
 			virtual void SetValue(ValueSourcePtr s) override;
 			virtual void GetValue(ValueTargetPtr s) override;
+	};
+
+	template<typename T, typename M, IceUtil::Optional<T> M::* MV>
+	class DLL_PUBLIC ModelPartForConverted<IceUtil::Optional<T>, M, MV> : public ModelPartForConvertedBase, protected ModelPartModel<IceUtil::Optional<T>> {
+		public:
+			typedef IceUtil::Optional<T> element_type;
+
+			ModelPartForConverted(IceUtil::Optional<T> * h);
+
+			virtual void SetValue(ValueSourcePtr s) override;
+			virtual void GetValue(ValueTargetPtr s) override;
+			virtual bool HasValue() const override;
 	};
 
 	class DLL_PUBLIC ModelPartForOptionalBase : public ModelPart {

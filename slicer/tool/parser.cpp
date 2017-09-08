@@ -269,13 +269,7 @@ namespace Slicer {
 			}
 			fprintbf(cpp, " %s, ",
 					Slice::typeToString(type, dm->optional()));
-			if (dm->optional()) {
-				fprintbf(cpp, "ModelPartForOptional< ");
-			}
 			createNewModelPartPtrFor(type, dm, getAllMetadata(dm));
-			if (dm->optional()) {
-				fprintbf(cpp, " > ");
-			}
 			fprintbf(cpp, " >(&%s, \"%s\"",
 					dm->scoped(),
 					name ? *name : dm->name());
@@ -430,8 +424,7 @@ namespace Slicer {
 	void
 	Slicer::createModelPartForConverted(const Slice::TypePtr & type, const std::string & container, const Slice::DataMemberPtr & dm) const
 	{
-		fprintbf(cpp, "ModelPartForConverted< %s, ",
-				Slice::typeToString(type));
+		fprintbf(cpp, "ModelPartForConverted< ");
 		if (dm->optional()) {
 			fprintbf(cpp, "IceUtil::Optional< %s >",
 					Slice::typeToString(type));
@@ -459,8 +452,14 @@ namespace Slicer {
 				boost::algorithm::replace_all_copy(*cmp, ".", "::"));
 		}
 		else {
+			if (dm && dm->optional()) {
+				fprintbf(cpp, "ModelPartForOptional< ");
+			}
 			fprintbf(cpp, "%s< %s >",
 					getBasicModelPart(type), Slice::ClassDeclPtr::dynamicCast(type) ? type->typeId() : Slice::typeToString(type));
+			if (dm && dm->optional()) {
+				fprintbf(cpp, " > ");
+			}
 		}
 	}
 
