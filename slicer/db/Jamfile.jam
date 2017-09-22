@@ -13,7 +13,7 @@ lib IceUtil ;
 
 lib slicer-db :
 	[ glob *.cpp : test*.cpp ]
-	[ glob *.ice ]
+	[ glob *.ice : test*.ice ]
 	:
 	<include>..
 	<library>pthread
@@ -30,6 +30,16 @@ lib slicer-db :
 
 path-constant me : . ;
 
+lib testCommon :
+	[ glob testConversions.cpp test*.ice ]
+	:
+	<dependency>../tool//slicer
+	<slicer>yes
+	<slicerbin>../tool//slicer
+	<implicit-dependency>../test//types
+	<library>../test//types
+	;
+
 run testSelect.cpp
 	: : :
 	<define>BOOST_TEST_DYN_LINK
@@ -43,6 +53,8 @@ run testSelect.cpp
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<library>testCommon
+	<implicit-dependency>testCommon
 	<include>..
 	<dependency>slicer.sql
 	:
@@ -61,6 +73,8 @@ run testInsert.cpp
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<library>testCommon
+	<implicit-dependency>testCommon
 	<include>..
 	<dependency>slicer.sql
 	:
@@ -79,6 +93,8 @@ run testPatch.cpp
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<library>testCommon
+	<implicit-dependency>testCommon
 	<include>..
 	<dependency>slicer.sql
 	;
@@ -96,6 +112,8 @@ run testUpdate.cpp
 	<library>../test//common
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<library>testCommon
+	<implicit-dependency>testCommon
 	<include>..
 	<dependency>slicer.sql
 	:

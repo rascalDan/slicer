@@ -14,7 +14,6 @@ typedef std::map<std::string, unsigned int> ComponentsCount;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {
 	{ "classes.ice", 4 },
 	{ "collections.ice", 6 },
-	{ "db.ice", 4 },
 	{ "enums.ice", 2 },
 	{ "inheritance.ice", 12 },
 	{ "interfaces.ice", 0 },

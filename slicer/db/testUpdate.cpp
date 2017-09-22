@@ -9,7 +9,7 @@
 #include "sqlUpdateSerializer.h"
 #include <types.h>
 #include <common.h>
-#include <db.h>
+#include <testModels.h>
 #include <sqlExceptions.h>
 
 class StandardMockDatabase : public PQ::Mock {

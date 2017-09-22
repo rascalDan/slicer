@@ -1,7 +1,5 @@
 #include "conversions.h"
 #include <boost/numeric/conversion/cast.hpp>
-#include <visibility.h>
-#include <db.h>
 
 #define SHORT(x) boost::numeric_cast< ::Ice::Short , int64_t >(x)
 
@@ -89,20 +87,6 @@ namespace Slicer {
 		return ::TestModule::DateTime({
 				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday),
 				SHORT(tm.tm_hour), SHORT(tm.tm_min), SHORT(tm.tm_sec)});
-	}
-
-	DLL_PUBLIC
-	::TestDatabase::TimespanPtr
-	timedurationToTimespan(const boost::posix_time::time_duration & td)
-	{
-		return new ::TestDatabase::Timespan(SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()));
-	}
-
-	DLL_PUBLIC
-	boost::posix_time::time_duration
-	timespanToTimeduration(const ::TestDatabase::TimespanPtr & ts)
-	{
-		return boost::posix_time::time_duration((ts->days * 24) + ts->hours, ts->minutes, ts->seconds);
 	}
 
 	DLL_PUBLIC
