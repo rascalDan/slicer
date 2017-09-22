@@ -51,12 +51,10 @@ namespace Slicer {
 		int paramNo = 0;
 		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
 			if (isValue(h)) {
-				if (cmp->HasValue()) {
-					cmp->GetValue(new SqlBinder(*upd, paramNo++));
+				if (!cmp->GetValue(new SqlBinder(*upd, paramNo))) {
+					upd->bindNull(paramNo);
 				}
-				else {
-					upd->bindNull(paramNo++);
-				}
+				paramNo++;
 			}
 		});
 		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {

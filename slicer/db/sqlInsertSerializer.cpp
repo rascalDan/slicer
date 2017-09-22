@@ -96,12 +96,10 @@ namespace Slicer {
 	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
 	{
 		if (isBind(h)) {
-			if (cmp->HasValue()) {
-				cmp->GetValue(new SqlBinder(*ins, paramNo++));
+			if (!cmp->GetValue(new SqlBinder(*ins, paramNo))) {
+				ins->bindNull(paramNo);
 			}
-			else {
-				ins->bindNull(paramNo++);
-			}
+			paramNo++;
 		}
 	}
 

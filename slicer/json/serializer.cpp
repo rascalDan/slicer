@@ -218,41 +218,48 @@ namespace Slicer {
 	void
 	JsonSerializer::ModelTreeIterate(json::Value * n, const std::string & name, ModelPartPtr mp)
 	{
-		if (name.empty() || !n) {
+		if (name.empty() || !n || !mp) {
 			return;
 		}
-		if (mp && mp->HasValue()) {
-			switch (mp->GetType()) {
-				case mpt_Null:
-					boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value())});
-					return;
-				case mpt_Simple:
-					mp->GetValue(new JsonValueTarget(*boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value())}).first->second));
-					break;
-				case mpt_Complex:
-					{
-						auto nn = json::ValuePtr(new json::Value(json::Object()));
-						if (auto typeIdName = mp->GetTypeIdProperty()) {
-							if (auto typeId = mp->GetTypeId()) {
-								boost::get<json::Object>(*nn).insert({*typeIdName, json::ValuePtr(new json::Value(*typeId))});
-								mp = mp->GetSubclassModelPart(*typeId);
-							}
-						}
-						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterate, boost::get<json::Object>(*n).insert({name, nn}).first->second.get(), _1, _2));
-						break;
+		switch (mp->GetType()) {
+			case mpt_Null:
+				boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value())});
+				return;
+			case mpt_Simple:
+				{
+					json::Value v;
+					if (mp->GetValue(new JsonValueTarget(v))) {
+						boost::get<json::Object>(*n).insert({ name, json::ValuePtr(new json::Value(v)) });
 					}
-				case mpt_Sequence:
-					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
 					break;
-				case mpt_Dictionary:
+				}
+			case mpt_Complex:
+				if (mp->HasValue()) {
+					auto nn = json::ValuePtr(new json::Value(json::Object()));
+					if (auto typeIdName = mp->GetTypeIdProperty()) {
+						if (auto typeId = mp->GetTypeId()) {
+							boost::get<json::Object>(*nn).insert({*typeIdName, json::ValuePtr(new json::Value(*typeId))});
+							mp = mp->GetSubclassModelPart(*typeId);
+						}
+					}
+					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterate, boost::get<json::Object>(*n).insert({name, nn}).first->second.get(), _1, _2));
+				}
+				break;
+			case mpt_Sequence:
+				if (mp->HasValue()) {
+					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
+				}
+				break;
+			case mpt_Dictionary:
+				if (mp->HasValue()) {
 					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
 						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateDictObj, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Object()))}).first->second.get(), _2));
 					}
 					else {
 						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
 					}
-					break;
-			}
+				}
+				break;
 		}
 	}
 

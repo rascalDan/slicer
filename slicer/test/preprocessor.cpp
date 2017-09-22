@@ -20,7 +20,7 @@ ComponentsCount COMPONENTS_IN_TEST_ICE = {
 	{ "interfaces.ice", 0 },
 	{ "json.ice", 2 },
 	{ "locals.ice", 7 },
-	{ "optionals.ice", 1 },
+	{ "optionals.ice", 2 },
 	{ "structs.ice", 4 },
 	{ "types.ice", 3 },
 	{ "xml.ice", 5 }

@@ -44,7 +44,7 @@ namespace Slicer {
 			ModelPartForSimple(T * h);
 
 			virtual void SetValue(ValueSourcePtr s) override;
-			virtual void GetValue(ValueTargetPtr s) override;
+			virtual bool GetValue(ValueTargetPtr s) override;
 	};
 
 	class DLL_PUBLIC ModelPartForConvertedBase : public ModelPart {
@@ -62,9 +62,9 @@ namespace Slicer {
 			template<typename ET, typename MT>
 			inline static bool tryConvertFrom(const ValueSourcePtr & vsp, MT * model);
 			template<typename ET, typename MT, typename Conv>
-			inline static bool tryConvertTo(const ValueTargetPtr & vsp, const MT * model, const Conv & conv);
+			inline static TryConvertResult tryConvertTo(const ValueTargetPtr & vsp, const MT * model, const Conv & conv);
 			template<typename ET, typename MT>
-			inline static bool tryConvertTo(const ValueTargetPtr & vsp, const MT * model);
+			inline static TryConvertResult tryConvertTo(const ValueTargetPtr & vsp, const MT * model);
 	};
 
 	template<typename T, typename M, T M::* MV>
@@ -75,7 +75,7 @@ namespace Slicer {
 			ModelPartForConverted(T * h);
 
 			virtual void SetValue(ValueSourcePtr s) override;
-			virtual void GetValue(ValueTargetPtr s) override;
+			virtual bool GetValue(ValueTargetPtr s) override;
 	};
 
 	template<typename T, typename M, IceUtil::Optional<T> M::* MV>
@@ -86,7 +86,7 @@ namespace Slicer {
 			ModelPartForConverted(IceUtil::Optional<T> * h);
 
 			virtual void SetValue(ValueSourcePtr s) override;
-			virtual void GetValue(ValueTargetPtr s) override;
+			virtual bool GetValue(ValueTargetPtr s) override;
 			virtual bool HasValue() const override;
 	};
 
@@ -111,7 +111,7 @@ namespace Slicer {
 		public:
 			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h);
 			virtual void Create() override;
-			virtual void GetValue(ValueTargetPtr s) override;
+			virtual bool GetValue(ValueTargetPtr s) override;
 			virtual ModelPartType GetType() const override;
 
 		protected:
@@ -248,7 +248,7 @@ namespace Slicer {
 
 			virtual void SetValue(ValueSourcePtr s) override;
 
-			virtual void GetValue(ValueTargetPtr s) override;
+			virtual bool GetValue(ValueTargetPtr s) override;
 
 			static const Metadata metadata;
 			static const Enumerations enumerations;

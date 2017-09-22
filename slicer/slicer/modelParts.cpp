@@ -87,9 +87,10 @@ namespace Slicer {
 	{
 	}
 
-	void
+	bool
 	ModelPart::GetValue(ValueTargetPtr)
 	{
+		return false;
 	}
 
 	const Metadata &

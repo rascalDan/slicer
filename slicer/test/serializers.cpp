@@ -33,7 +33,15 @@ class FileBased {
 		void
 		verifyByFile(const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
 		{
+			verifyByFile<T, DeserializerIn>(infile, infile, check);
+		}
+
+		template<typename T, typename DeserializerIn>
+		void
+		verifyByFile(const fs::path & infile, const fs::path & expOutFile, const boost::function<void(const T &)> & check = NULL)
+		{
 			const fs::path input = rootDir / "initial" / infile;
+			const fs::path expected = rootDir / "initial" / expOutFile;
 			const fs::path tmpf = binDir / "byFile";
 			fs::create_directory(tmpf);
 			const fs::path output = tmpf / infile;
@@ -60,7 +68,7 @@ class FileBased {
 			}
 
 			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-			diff(input, output);
+			diff(expected, output);
 		}
 
 		template<typename T, typename Deserializer, typename Serializer, typename Internal>
@@ -519,6 +527,34 @@ BOOST_AUTO_TEST_CASE( json_simpleArray )
 BOOST_AUTO_TEST_CASE( xml_simpleArray )
 {
 	verifyByFile<TestModule::SimpleSeq, Slicer::XmlFileDeserializer>("simpleArray2.xml");
+}
+
+BOOST_AUTO_TEST_CASE( json_emptyToNull )
+{
+	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>("optionals2.json", [](const auto & o) {
+		BOOST_REQUIRE(o);
+		BOOST_REQUIRE(!o->optConverted);
+		BOOST_REQUIRE_EQUAL(o->nonOptConverted, 4);
+	});
+}
+
+BOOST_AUTO_TEST_CASE( json_emptyToNull_withValue )
+{
+	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>("optionals3.json", [](const auto & o) {
+		BOOST_REQUIRE(o);
+		BOOST_REQUIRE(o->optConverted);
+		BOOST_REQUIRE_EQUAL(*o->optConverted, 10);
+		BOOST_REQUIRE_EQUAL(o->nonOptConverted, 4);
+	});
+}
+
+BOOST_AUTO_TEST_CASE( json_emptyToNull_omitted )
+{
+	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>("optionals5.json", "optionals2.json", [](const auto & o) {
+		BOOST_REQUIRE(o);
+		BOOST_REQUIRE(!o->optConverted);
+		BOOST_REQUIRE_EQUAL(o->nonOptConverted, 4);
+	});
 }
 
 BOOST_AUTO_TEST_CASE( json_streams )

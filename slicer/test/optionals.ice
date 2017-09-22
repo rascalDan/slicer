@@ -15,6 +15,12 @@ module TestModule {
 		[	"slicer:conversion:boost.posix_time.ptime:boost.posix_time.to_iso_extended_string:boost.posix_time.time_from_string:nodeclare" ]
 		optional(5) string optConverted;
 	};
+	class Optionals2 {
+		[	"slicer:conversion:std.string:Slicer.str2int:Slicer.int2str:nodeclare" ]
+		optional(0) int optConverted;
+		[	"slicer:conversion:std.string:Slicer.str2int:Slicer.int2str:nodeclare" ]
+		int nonOptConverted;
+	};
 };
 
 #endif

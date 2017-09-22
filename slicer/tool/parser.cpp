@@ -70,19 +70,19 @@ namespace Slicer {
 					Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
 
-			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
+			fprintbf(cpp, "template<> DLL_PUBLIC\nbool\n");
 			createModelPartForConverted(type, c->scoped(), dm);
 			fprintbf(cpp, "::GetValue(ValueTargetPtr vtp)\n{\n");
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (tryConvertTo< %s >(vtp, Model, &%s)) return;\n",
+				fprintbf(cpp, "\tif (auto r = tryConvertTo< %s >(vtp, Model, &%s)) return (r == tcr_Value);\n",
 						conversion.ExchangeType,
 						conversion.ConvertToExchangeFunc);
 			}
 			// Default conversion
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
-				fprintbf(cpp, "\tif (tryConvertTo< %s >(vtp, Model)) return;\n",
+				fprintbf(cpp, "\tif (auto r = tryConvertTo< %s >(vtp, Model)) return (r == tcr_Value);\n",
 					Slice::typeToString(type));
 			}
 			// Failed to convert

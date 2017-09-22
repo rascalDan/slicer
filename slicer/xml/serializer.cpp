@@ -172,6 +172,11 @@ namespace Slicer {
 				XmlValueTarget(boost::bind(&xmlpp::Element::set_first_child_text, p, _1))
 			{
 			}
+
+			XmlContentValueTarget(const CurrentElementCreator & cec) :
+				XmlValueTarget(boost::bind(&xmlpp::Element::set_first_child_text, boost::bind(&CurrentElementCreator::deref, &cec), _1))
+			{
+			}
 	};
 
 	void
@@ -294,7 +299,7 @@ namespace Slicer {
 	void
 	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp, HookCommonPtr hp, const ElementCreator & ec)
 	{
-		if (!mp->HasValue() || name.empty()) {
+		if (name.empty()) {
 			return;
 		}
 		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
@@ -314,7 +319,8 @@ namespace Slicer {
 				ModelTreeProcessElement(n, mp, boost::bind(&xmlpp::Element::add_child_element, _1, name, Glib::ustring()));
 			}
 			else {
-				ModelTreeProcessElement(ec(n, name), mp, defaultElementCreator);
+				CurrentElementCreator cec(boost::bind(ec, n, name));
+				ModelTreeProcessElement(cec, mp, defaultElementCreator);
 			}
 		}
 	}
@@ -337,25 +343,27 @@ namespace Slicer {
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
 				mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
-					ModelTreeProcessElement(element->add_child_element(name), mp->GetChild(valueName), defaultElementCreator);
+					CurrentElementCreator cec([&element, &name]() { return element->add_child_element(name); });
+					ModelTreeProcessElement(cec, mp->GetChild(valueName), defaultElementCreator);
 				}));
 			}
 		});
 	}
 
 	void
-	XmlSerializer::ModelTreeProcessElement(xmlpp::Element * element, ModelPartPtr mp, const ElementCreator & ec)
+	XmlSerializer::ModelTreeProcessElement(const CurrentElementCreator & cec, ModelPartPtr mp, const ElementCreator & ec)
 	{
-		auto typeIdPropName = mp->GetTypeIdProperty();
-		auto typeId = mp->GetTypeId();
-		if (typeId && typeIdPropName) {
-			element->set_attribute(*typeIdPropName, *typeId);
-			mp = mp->GetSubclassModelPart(*typeId);
-		}
 		if (mp->GetType() == mpt_Simple) {
-			mp->GetValue(new XmlContentValueTarget(element));
+			mp->GetValue(new XmlContentValueTarget(cec));
 		}
-		else {
+		else if (mp->HasValue()) {
+			auto typeIdPropName = mp->GetTypeIdProperty();
+			auto typeId = mp->GetTypeId();
+			auto element = cec.get();
+			if (typeId && typeIdPropName) {
+				element->set_attribute(*typeIdPropName, *typeId);
+				mp = mp->GetSubclassModelPart(*typeId);
+			}
 			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3, ec));
 		}
 	}

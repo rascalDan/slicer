@@ -103,6 +103,12 @@ namespace Slicer {
 		mpt_Dictionary,
 	};
 
+	enum TryConvertResult {
+		tcr_NoAction = 0,
+		tcr_NoValue,
+		tcr_Value,
+	};
+
 	class ChildRef : virtual public IceUtil::Shared {
 		public:
 			virtual ModelPartPtr Child() const = 0;
@@ -169,7 +175,7 @@ namespace Slicer {
 			virtual void Create();
 			virtual void Complete();
 			virtual void SetValue(ValueSourcePtr);
-			virtual void GetValue(ValueTargetPtr);
+			virtual bool GetValue(ValueTargetPtr);
 			virtual bool HasValue() const = 0;
 			virtual const Metadata & GetMetadata() const;
 			virtual bool IsOptional() const;

@@ -104,6 +104,26 @@ namespace Slicer {
 	{
 		return boost::posix_time::time_duration((ts->days * 24) + ts->hours, ts->minutes, ts->seconds);
 	}
+
+	DLL_PUBLIC
+	IceUtil::Optional<Ice::Int>
+	str2int(const std::string & s)
+	{
+		if (s.empty()) {
+			return IceUtil::None;
+		}
+		return boost::lexical_cast<Ice::Int>(s);
+	}
+
+	DLL_PUBLIC
+	std::string
+	int2str(const IceUtil::Optional<Ice::Int> & i)
+	{
+		if (!i) {
+			return std::string();
+		}
+		return boost::lexical_cast<std::string>(*i);
+	}
 }
 
 namespace TestModule {
