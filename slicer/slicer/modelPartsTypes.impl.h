@@ -215,6 +215,7 @@ namespace Slicer {
 		template <typename Y>
 		IceUtil::Optional<T> operator()(Y & y) const { return y; }
 		static bool valueExists(const T &) { return true; }
+		static bool valueExists(const IceUtil::Optional<T> &) { return true; }
 	};
 
 	template<typename ET, typename MT, typename Conv>
