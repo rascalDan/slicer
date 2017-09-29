@@ -43,11 +43,10 @@ namespace Slicer {
 			}
 			return;
 		}
-		SqlSourcePtr h = new SqlSource(cmd[0]);
-		if (!h->isNull()) {
+		if (!cmd[0].isNull()) {
 			auto fmp = mp->GetAnonChild();
 			fmp->Create();
-			fmp->SetValue(h);
+			fmp->SetValue(SqlSource(cmd[0]));
 			fmp->Complete();
 		}
 		if (cmd.fetch()) {
@@ -101,10 +100,9 @@ namespace Slicer {
 									return boost::iequals(c.name, h->name);
 								});
 								if (fmpr) {
-									SqlSourcePtr h = new SqlSource(c);
 									auto fmp = fmpr->Child();
 									fmp->Create();
-									fmp->SetValue(h);
+									fmp->SetValue(SqlSource(c));
 									fmp->Complete();
 								}
 							}
@@ -117,8 +115,7 @@ namespace Slicer {
 						rmp->Create();
 						const DB::Column & c = cmd[0];
 						if (!c.isNull()) {
-							SqlSourcePtr h = new SqlSource(c);
-							rmp->SetValue(h);
+							rmp->SetValue(SqlSource(c));
 						}
 						rmp->Complete();
 					}

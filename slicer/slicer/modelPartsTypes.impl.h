@@ -149,17 +149,17 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	void ModelPartForSimple<T>::SetValue(ValueSourcePtr s)
+	void ModelPartForSimple<T>::SetValue(ValueSource && s)
 	{
 		BOOST_ASSERT(this->Model);
-		s->set(*this->Model);
+		s.set(*this->Model);
 	}
 
 	template<typename T>
-	bool ModelPartForSimple<T>::GetValue(ValueTargetPtr s)
+	bool ModelPartForSimple<T>::GetValue(ValueTarget && s)
 	{
 		BOOST_ASSERT(this->Model);
-		s->get(*this->Model);
+		s.get(*this->Model);
 		return true;
 	}
 
@@ -220,9 +220,9 @@ namespace Slicer {
 
 	template<typename ET, typename MT, typename Conv>
 	inline
-	bool ModelPartForConvertedBase::tryConvertFrom(const ValueSourcePtr & vsp, MT * model, const Conv & conv)
+	bool ModelPartForConvertedBase::tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv)
 	{
-		if (auto vspt = dynamic_cast<TValueSource<ET> *>(vsp.get())) {
+		if (auto vspt = dynamic_cast<TValueSource<ET> *>(&vsp)) {
 			typedef typename callable_traits<Conv>::template arg<0>::type CA;
 			ET tmp;
 			vspt->set(tmp);
@@ -237,9 +237,9 @@ namespace Slicer {
 
 	template<typename ET, typename MT>
 	inline
-	bool ModelPartForConvertedBase::tryConvertFrom(const ValueSourcePtr & vsp, MT * model)
+	bool ModelPartForConvertedBase::tryConvertFrom(ValueSource & vsp, MT * model)
 	{
-		if (auto vspt = dynamic_cast<TValueSource<ET> *>(vsp.get())) {
+		if (auto vspt = dynamic_cast<TValueSource<ET> *>(&vsp)) {
 			if (Coerce<ET>::valueExists(*model)) {
 				vspt->set(Coerce<ET>()(*model));
 			}
@@ -250,9 +250,9 @@ namespace Slicer {
 
 	template<typename ET, typename MT, typename Conv>
 	inline
-	TryConvertResult ModelPartForConvertedBase::tryConvertTo(const ValueTargetPtr & vsp, const MT * model, const Conv & conv)
+	TryConvertResult ModelPartForConvertedBase::tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv)
 	{
-		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(vsp.get())) {
+		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(&vsp)) {
 			typedef typename callable_traits<Conv>::template arg<0>::type CA;
 			typedef typename std::remove_const<typename std::remove_reference<CA>::type>::type CAR;
 			if (Coerce<CAR>::valueExists(*model)) {
@@ -269,9 +269,9 @@ namespace Slicer {
 
 	template<typename ET, typename MT>
 	inline
-	TryConvertResult ModelPartForConvertedBase::tryConvertTo(const ValueTargetPtr & vsp, const MT * model)
+	TryConvertResult ModelPartForConvertedBase::tryConvertTo(ValueTarget & vsp, const MT * model)
 	{
-		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(vsp.get())) {
+		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(&vsp)) {
 			if (Coerce<ET>::valueExists(*model)) {
 				vspt->get(Coerce<ET>()(*model));
 				return tcr_Value;
@@ -310,11 +310,11 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	bool ModelPartForOptional<T>::GetValue(ValueTargetPtr s)
+	bool ModelPartForOptional<T>::GetValue(ValueTarget && s)
 	{
 		BOOST_ASSERT(this->Model);
 		if (*this->Model) {
-			return modelPart->GetValue(s);
+			return modelPart->GetValue(std::move(s));
 		}
 		return false;
 	}
@@ -546,19 +546,19 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	void ModelPartForEnum<T>::SetValue(ValueSourcePtr s)
+	void ModelPartForEnum<T>::SetValue(ValueSource && s)
 	{
 		BOOST_ASSERT(this->Model);
 		std::string val;
-		s->set(val);
+		s.set(val);
 		*this->Model = lookup(val);
 	}
 
 	template<typename T>
-	bool ModelPartForEnum<T>::GetValue(ValueTargetPtr s)
+	bool ModelPartForEnum<T>::GetValue(ValueTarget && s)
 	{
 		BOOST_ASSERT(this->Model);
-		s->get(lookup(*this->Model));
+		s.get(lookup(*this->Model));
 		return true;
 	}
 

@@ -47,7 +47,6 @@ namespace Slicer {
 			using TValueTarget<Ice::Double>::get;
 			using TValueTarget<std::string>::get;
 	};
-	typedef IceUtil::Handle<ValueTarget> ValueTargetPtr;
 
 	template <typename T>
 	class TValueSource {
@@ -73,7 +72,6 @@ namespace Slicer {
 			using TValueSource<Ice::Double>::set;
 			using TValueSource<std::string>::set;
 	};
-	typedef IceUtil::Handle<ValueSource> ValueSourcePtr;
 
 	class ModelPart;
 	class ModelPartForRootBase;
@@ -174,8 +172,8 @@ namespace Slicer {
 			virtual ModelPartType GetType() const = 0;
 			virtual void Create();
 			virtual void Complete();
-			virtual void SetValue(ValueSourcePtr);
-			virtual bool GetValue(ValueTargetPtr);
+			virtual void SetValue(ValueSource &&);
+			virtual bool GetValue(ValueTarget &&);
 			virtual bool HasValue() const = 0;
 			virtual const Metadata & GetMetadata() const;
 			virtual bool IsOptional() const;

@@ -83,12 +83,12 @@ namespace Slicer {
 	}
 
 	void
-	ModelPart::SetValue(ValueSourcePtr)
+	ModelPart::SetValue(ValueSource &&)
 	{
 	}
 
 	bool
-	ModelPart::GetValue(ValueTargetPtr)
+	ModelPart::GetValue(ValueTarget &&)
 	{
 		return false;
 	}

@@ -187,9 +187,9 @@ namespace Slicer {
 			emp->Create();
 			auto key = emp->GetChild(keyName);
 			auto value = emp->GetChild(valueName);
-			key->SetValue(new XmlValueSource(attr->get_name()));
+			key->SetValue(XmlValueSource(attr->get_name()));
 			key->Complete();
-			value->SetValue(new XmlValueSource(attr->get_value()));
+			value->SetValue(XmlValueSource(attr->get_value()));
 			value->Complete();
 			emp->Complete();
 		}
@@ -205,7 +205,7 @@ namespace Slicer {
 				emp->Create();
 				auto key = emp->GetChild(keyName);
 				auto value = emp->GetChildRef(valueName);
-				key->SetValue(new XmlValueSource(element->get_name()));
+				key->SetValue(XmlValueSource(element->get_name()));
 				key->Complete();
 				DocumentTreeIterateElement(element, value->Child(), value);
 				emp->Complete();
@@ -242,7 +242,7 @@ namespace Slicer {
 				DocumentTreeIterate(firstChild, smp);
 			}
 			else {
-				smp->SetValue(new XmlContentValueSource());
+				smp->SetValue(XmlContentValueSource());
 			}
 		}
 		smp->Complete();
@@ -270,7 +270,7 @@ namespace Slicer {
 						boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
 				if (smp) {
 					smp->Create();
-					smp->SetValue(new XmlAttributeValueSource(attribute));
+					smp->SetValue(XmlAttributeValueSource(attribute));
 					smp->Complete();
 				}
 			}
@@ -280,10 +280,10 @@ namespace Slicer {
 					smp = mp->GetAnonChild(boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
 				}
 				if (smp) {
-					smp->SetValue(new XmlContentValueSource(content));
+					smp->SetValue(XmlContentValueSource(content));
 				}
 				else {
-					mp->SetValue(new XmlContentValueSource(content));
+					mp->SetValue(XmlContentValueSource(content));
 				}
 			}
 			node = node->get_next_sibling();
@@ -303,10 +303,10 @@ namespace Slicer {
 			return;
 		}
 		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
-			mp->GetValue(new XmlAttributeValueTarget(n, name));
+			mp->GetValue(XmlAttributeValueTarget(n, name));
 		}
 		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_text)) {
-			mp->GetValue(new XmlContentValueTarget(n));
+			mp->GetValue(XmlContentValueTarget(n));
 		}
 		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_attributes)) {
 			ModelTreeIterateDictAttrs(n->add_child_element(name), mp);
@@ -330,8 +330,8 @@ namespace Slicer {
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
-				mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
-					mp->GetChild(valueName)->GetValue(new XmlAttributeValueTarget(element, name));
+				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp,element](const auto & name) {
+					mp->GetChild(valueName)->GetValue(XmlAttributeValueTarget(element, name));
 				}));
 			}
 		});
@@ -342,7 +342,7 @@ namespace Slicer {
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
-				mp->GetChild(keyName)->GetValue(new XmlValueTarget([&mp,element](const auto & name) {
+				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp,element](const auto & name) {
 					CurrentElementCreator cec([&element, &name]() { return element->add_child_element(name); });
 					ModelTreeProcessElement(cec, mp->GetChild(valueName), defaultElementCreator);
 				}));
@@ -354,7 +354,7 @@ namespace Slicer {
 	XmlSerializer::ModelTreeProcessElement(const CurrentElementCreator & cec, ModelPartPtr mp, const ElementCreator & ec)
 	{
 		if (mp->GetType() == mpt_Simple) {
-			mp->GetValue(new XmlContentValueTarget(cec));
+			mp->GetValue(XmlContentValueTarget(cec));
 		}
 		else if (mp->HasValue()) {
 			auto typeIdPropName = mp->GetTypeIdProperty();

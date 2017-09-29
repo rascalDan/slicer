@@ -52,7 +52,7 @@ namespace Slicer {
 		if (!conversions.empty()) {
 			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
 			createModelPartForConverted(type, c->scoped(), dm);
-			fprintbf(cpp, "::SetValue(ValueSourcePtr vsp)\n{\n");
+			fprintbf(cpp, "::SetValue(ValueSource && vsp)\n{\n");
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
@@ -72,7 +72,7 @@ namespace Slicer {
 
 			fprintbf(cpp, "template<> DLL_PUBLIC\nbool\n");
 			createModelPartForConverted(type, c->scoped(), dm);
-			fprintbf(cpp, "::GetValue(ValueTargetPtr vtp)\n{\n");
+			fprintbf(cpp, "::GetValue(ValueTarget && vtp)\n{\n");
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {

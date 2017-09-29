@@ -152,10 +152,10 @@ namespace Slicer {
 		return NULL;
 	}
 
-	void ModelPartForOptionalBase::SetValue(ValueSourcePtr s)
+	void ModelPartForOptionalBase::SetValue(ValueSource && s)
 	{
 		if (this->hasModel()) {
-			modelPart->SetValue(s);
+			modelPart->SetValue(std::move(s));
 		}
 	}
 

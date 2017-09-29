@@ -87,7 +87,7 @@ namespace Slicer {
 		SqlAutoIdInsertSerializer::bindObjectAndExecute(cmp, ins);
 		cmp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
 			if (isAuto(h)) {
-				cmp->SetValue(new IdSave(connection));
+				cmp->SetValue(IdSave(connection));
 			}
 		});
 	}
@@ -96,7 +96,7 @@ namespace Slicer {
 	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
 	{
 		if (isBind(h)) {
-			if (!cmp->GetValue(new SqlBinder(*ins, paramNo))) {
+			if (!cmp->GetValue(SqlBinder(*ins, paramNo))) {
 				ins->bindNull(paramNo);
 			}
 			paramNo++;

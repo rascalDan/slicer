@@ -133,7 +133,7 @@ namespace Slicer {
 			void operator()(const SimpleT & v) const
 			{
 				modelPart->Create();
-				modelPart->SetValue(new JsonValueSource(v));
+				modelPart->SetValue(JsonValueSource(v));
 				modelPart->Complete();
 			}
 			void operator()(const json::Null &) const
@@ -156,7 +156,7 @@ namespace Slicer {
 						auto key = emp->GetChild(keyName);
 						auto value = emp->GetChild(valueName);
 						key->Create();
-						key->SetValue(new JsonValueSource(element.first));
+						key->SetValue(JsonValueSource(element.first));
 						key->Complete();
 						boost::apply_visitor(DocumentTreeIterate(value), *element.second);
 						emp->Complete();
@@ -208,7 +208,7 @@ namespace Slicer {
 		json::Object::key_type k;
 		auto v = json::ValuePtr(new json::Value());
 		json::Value kv;
-		mp->GetChild(keyName)->GetValue(new JsonValueTarget(kv));
+		mp->GetChild(keyName)->GetValue(JsonValueTarget(kv));
 		JsonValueSource s(kv);
 		s.set(k);
 		ModelTreeIterateRoot(v.get(), mp->GetChild(valueName));
@@ -228,7 +228,7 @@ namespace Slicer {
 			case mpt_Simple:
 				{
 					json::Value v;
-					if (mp->GetValue(new JsonValueTarget(v))) {
+					if (mp->GetValue(JsonValueTarget(v))) {
 						boost::get<json::Object>(*n).insert({ name, json::ValuePtr(new json::Value(v)) });
 					}
 					break;
@@ -272,7 +272,7 @@ namespace Slicer {
 					*n = json::Null();
 					return;
 				case mpt_Simple:
-					mp->GetValue(new JsonValueTarget(*n));
+					mp->GetValue(JsonValueTarget(*n));
 					break;
 				case mpt_Complex:
 					*n = json::Object();
