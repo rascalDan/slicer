@@ -28,7 +28,7 @@ namespace Slicer {
 		public:
 			virtual void get(const T &) const = 0;
 	};
-	class ValueTarget : virtual public IceUtil::Shared,
+	class ValueTarget :
 			public TValueTarget<bool>,
 			public TValueTarget<Ice::Byte>,
 			public TValueTarget<Ice::Short>,
@@ -53,7 +53,7 @@ namespace Slicer {
 		public:
 			virtual void set(T &) const = 0;
 	};
-	class ValueSource : virtual public IceUtil::Shared,
+	class ValueSource :
 			public TValueSource<bool>,
 			public TValueSource<Ice::Byte>,
 			public TValueSource<Ice::Short>,
