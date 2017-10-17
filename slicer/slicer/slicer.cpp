@@ -3,39 +3,28 @@
 #include <compileTimeFormatter.h>
 
 namespace Slicer {
-	Slicer::MemberChildRef::MemberChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
+	Slicer::ChildRef::ChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
 		mpp(mp),
 		mdr(md)
 	{
 	}
 
+	Slicer::ChildRef::ChildRef(ModelPartPtr m) :
+		mpp(m),
+		mdr(emptyMetadata)
+	{
+	}
+
 	ModelPartPtr
-	Slicer::MemberChildRef::Child() const
+	Slicer::ChildRef::Child() const
 	{
 		return mpp;
 	}
 
 	const Metadata &
-	Slicer::MemberChildRef::ChildMetaData() const
+	Slicer::ChildRef::ChildMetaData() const
 	{
 		return mdr;
-	}
-
-	Slicer::ImplicitChildRef::ImplicitChildRef(ModelPartPtr m) :
-		mpp(m)
-	{
-	}
-
-	ModelPartPtr
-	Slicer::ImplicitChildRef::Child() const
-	{
-		return mpp;
-	}
-
-	const Metadata &
-	Slicer::ImplicitChildRef::ChildMetaData() const
-	{
-		return emptyMetadata;
 	}
 
 	AdHocFormatter(InvalidEnumerationSymbolMsg, "Invalid enumeration symbol [%?] for type [%?]");

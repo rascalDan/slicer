@@ -38,7 +38,7 @@ namespace Slicer {
 	ModelPartForRootBase::GetAnonChildRef(const HookFilter &)
 	{
 		mp->Create();
-		return new ImplicitChildRef(mp);
+		return new ChildRef(mp);
 	}
 
 	ChildRefPtr

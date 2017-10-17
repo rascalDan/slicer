@@ -339,7 +339,7 @@ namespace Slicer {
 	{
 		for (const auto & h : hooks) {
 			if (h->filter(flt)) {
-				return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
+				return new ChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
 		}
 		return NULL;
@@ -350,7 +350,7 @@ namespace Slicer {
 	{
 		for (const auto & h : hooks) {
 			if (h->filter(flt, name)) {
-				return new MemberChildRef(h->Get(GetModel()), h->GetMetadata());
+				return new ChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
 		}
 		return NULL;
@@ -583,7 +583,7 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		this->Model->push_back(typename element_type::value_type());
-		return new ImplicitChildRef(ModelPart::CreateFor(this->Model->back()));
+		return new ChildRef(ModelPart::CreateFor(this->Model->back()));
 	}
 
 	template<typename T>
@@ -638,7 +638,7 @@ namespace Slicer {
 	ChildRefPtr ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
+		return new ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>
@@ -648,7 +648,7 @@ namespace Slicer {
 		if (name != pairName) {
 			throw IncorrectElementName(name);
 		}
-		return new ImplicitChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
+		return new ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>

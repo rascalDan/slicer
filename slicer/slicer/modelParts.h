@@ -107,11 +107,19 @@ namespace Slicer {
 		tcr_Value,
 	};
 
-	class ChildRef : virtual public IceUtil::Shared {
+	class DLL_PUBLIC ChildRef : virtual public IceUtil::Shared {
 		public:
-			virtual ModelPartPtr Child() const = 0;
-			virtual const Metadata & ChildMetaData() const = 0;
+			ChildRef(ModelPartPtr);
+			ChildRef(ModelPartPtr, const Metadata &);
+
+			ModelPartPtr Child() const;
+			const Metadata & ChildMetaData() const;
+
+		private:
+			ModelPartPtr mpp;
+			const Metadata & mdr;
 	};
+
 	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
 
 	class DLL_PUBLIC HookCommon : virtual public IceUtil::Shared {
@@ -125,29 +133,6 @@ namespace Slicer {
 			virtual const Metadata & GetMetadata() const = 0;
 
 			const std::string name;
-	};
-
-	class DLL_PUBLIC ImplicitChildRef : public ChildRef {
-		public:
-			ImplicitChildRef(ModelPartPtr);
-
-			ModelPartPtr Child() const;
-			const Metadata & ChildMetaData() const;
-
-		private:
-			ModelPartPtr mpp;
-	};
-
-	class DLL_PUBLIC MemberChildRef : public ChildRef {
-		public:
-			MemberChildRef(ModelPartPtr, const Metadata &);
-
-			ModelPartPtr Child() const;
-			const Metadata & ChildMetaData() const;
-
-		private:
-			ModelPartPtr mpp;
-			const Metadata & mdr;
 	};
 
 	class DLL_PUBLIC ModelPart : virtual public IceUtil::Shared {
