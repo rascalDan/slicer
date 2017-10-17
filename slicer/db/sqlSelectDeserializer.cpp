@@ -100,7 +100,7 @@ namespace Slicer {
 									return boost::iequals(c.name, h->name);
 								});
 								if (fmpr) {
-									auto fmp = fmpr->Child();
+									auto fmp = fmpr.Child();
 									fmp->Create();
 									fmp->SetValue(SqlSource(c));
 									fmp->Complete();

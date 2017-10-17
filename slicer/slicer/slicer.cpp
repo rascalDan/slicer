@@ -3,9 +3,9 @@
 #include <compileTimeFormatter.h>
 
 namespace Slicer {
-	Slicer::ChildRef::ChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
-		mpp(mp),
-		mdr(md)
+	Slicer::ChildRef::ChildRef() :
+		mpp(),
+		mdr(emptyMetadata)
 	{
 	}
 
@@ -15,8 +15,19 @@ namespace Slicer {
 	{
 	}
 
+	Slicer::ChildRef::ChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) :
+		mpp(mp),
+		mdr(md)
+	{
+	}
+
 	ModelPartPtr
 	Slicer::ChildRef::Child() const
+	{
+		return mpp;
+	}
+
+	Slicer::ChildRef::operator bool() const
 	{
 		return mpp;
 	}

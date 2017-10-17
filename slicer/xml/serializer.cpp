@@ -207,7 +207,7 @@ namespace Slicer {
 				auto value = emp->GetChildRef(valueName);
 				key->SetValue(XmlValueSource(element->get_name()));
 				key->Complete();
-				DocumentTreeIterateElement(element, value->Child(), value);
+				DocumentTreeIterateElement(element, value.Child(), value);
 				emp->Complete();
 			}
 			node = node->get_next_sibling();
@@ -215,7 +215,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlDeserializer::DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr smp, ChildRefPtr smpr)
+	XmlDeserializer::DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr smp, const ChildRef & smpr)
 	{
 		if (auto typeIdPropName = smp->GetTypeIdProperty()) {
 			if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
@@ -223,13 +223,13 @@ namespace Slicer {
 			}
 		}
 		smp->Create();
-		if (metaDataFlagSet(smpr->ChildMetaData(), md_attributes)) {
+		if (metaDataFlagSet(smpr.ChildMetaData(), md_attributes)) {
 			auto attrs(element->get_attributes());
 			if (!attrs.empty()) {
 				DocumentTreeIterateDictAttrs(attrs, smp);
 			}
 		}
-		else if (metaDataFlagSet(smpr->ChildMetaData(), md_elements)) {
+		else if (metaDataFlagSet(smpr.ChildMetaData(), md_elements)) {
 			DocumentTreeIterateDictElements(element, smp);
 		}
 		else {
@@ -256,8 +256,8 @@ namespace Slicer {
 				auto smpr = mp->GetChildRef(element->get_name(),
 						boost::bind(metaDataFlagNotSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
 				if (smpr) {
-					auto smp = smpr->Child();
-					if (metaDataFlagSet(smpr->ChildMetaData(), md_bare)) {
+					auto smp = smpr.Child();
+					if (metaDataFlagSet(smpr.ChildMetaData(), md_bare)) {
 						smp = smp->GetAnonChild();
 					}
 					if (smp) {

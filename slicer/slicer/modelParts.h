@@ -107,20 +107,20 @@ namespace Slicer {
 		tcr_Value,
 	};
 
-	class DLL_PUBLIC ChildRef : virtual public IceUtil::Shared {
+	class DLL_PUBLIC ChildRef {
 		public:
+			ChildRef();
 			ChildRef(ModelPartPtr);
 			ChildRef(ModelPartPtr, const Metadata &);
 
 			ModelPartPtr Child() const;
 			const Metadata & ChildMetaData() const;
+			operator bool() const;
 
 		private:
 			ModelPartPtr mpp;
 			const Metadata & mdr;
 	};
-
-	typedef IceUtil::Handle<ChildRef> ChildRefPtr;
 
 	class DLL_PUBLIC HookCommon : virtual public IceUtil::Shared {
 		public:
@@ -149,8 +149,8 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler &) = 0;
 			ModelPartPtr GetAnonChild(const HookFilter & = HookFilter());
 			ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter());
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter & = HookFilter()) = 0;
-			virtual ChildRefPtr GetChildRef(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
+			virtual ChildRef GetAnonChildRef(const HookFilter & = HookFilter()) = 0;
+			virtual ChildRef GetChildRef(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const;
@@ -181,8 +181,8 @@ namespace Slicer {
 			ModelPartForRootBase(ModelPartPtr mp);
 
 			virtual const std::string & GetRootName() const = 0;
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override;
+			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string & name, const HookFilter &) override;
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual ModelPartType GetType() const override;
 			virtual bool IsOptional() const override;

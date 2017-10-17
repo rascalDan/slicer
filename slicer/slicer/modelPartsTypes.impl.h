@@ -335,25 +335,25 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ChildRefPtr ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
+	ChildRef ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
 	{
 		for (const auto & h : hooks) {
 			if (h->filter(flt)) {
-				return new ChildRef(h->Get(GetModel()), h->GetMetadata());
+				return ChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
 		}
-		return NULL;
+		return ChildRef();
 	}
 
 	template<typename T>
-	ChildRefPtr ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt)
+	ChildRef ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt)
 	{
 		for (const auto & h : hooks) {
 			if (h->filter(flt, name)) {
-				return new ChildRef(h->Get(GetModel()), h->GetMetadata());
+				return ChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
 		}
-		return NULL;
+		return ChildRef();
 	}
 
 	template<typename T>
@@ -579,11 +579,11 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ChildRefPtr ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
+	ChildRef ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
 		this->Model->push_back(typename element_type::value_type());
-		return new ChildRef(ModelPart::CreateFor(this->Model->back()));
+		return ChildRef(ModelPart::CreateFor(this->Model->back()));
 	}
 
 	template<typename T>
@@ -635,20 +635,20 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ChildRefPtr ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
+	ChildRef ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		return new ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
+		return ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>
-	ChildRefPtr ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &)
+	ChildRef ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
 		if (name != pairName) {
 			throw IncorrectElementName(name);
 		}
-		return new ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
+		return ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
 	}
 
 	template<typename T>

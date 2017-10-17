@@ -29,8 +29,8 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPartForSimpleBase : public ModelPart {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string &, const HookFilter &) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
@@ -50,8 +50,8 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPartForConvertedBase : public ModelPart {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string &, const HookFilter &) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
@@ -94,8 +94,8 @@ namespace Slicer {
 		public:
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual void Complete() override;
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override;
-			virtual ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override;
+			virtual ChildRef GetAnonChildRef(const HookFilter & flt) override;
+			virtual ChildRef GetChildRef(const std::string & name, const HookFilter & flt) override;
 			virtual void SetValue(ValueSource && s) override;
 			virtual bool HasValue() const override;
 			virtual bool IsOptional() const override;
@@ -167,8 +167,8 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter & flt) override;
-			ChildRefPtr GetChildRef(const std::string & name, const HookFilter & flt) override;
+			virtual ChildRef GetAnonChildRef(const HookFilter & flt) override;
+			ChildRef GetChildRef(const std::string & name, const HookFilter & flt) override;
 
 			virtual const Metadata & GetMetadata() const override;
 
@@ -229,8 +229,8 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPartForEnumBase : public ModelPart {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;
-			ChildRefPtr GetAnonChildRef(const HookFilter &) override;
-			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			ChildRef GetAnonChildRef(const HookFilter &) override;
+			ChildRef GetChildRef(const std::string &, const HookFilter &) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
@@ -272,9 +272,9 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
-			ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			ChildRef GetAnonChildRef(const HookFilter &) override;
 
-			ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			ChildRef GetChildRef(const std::string &, const HookFilter &) override;
 
 			virtual const Metadata & GetMetadata() const override;
 
@@ -316,9 +316,9 @@ namespace Slicer {
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
-			ChildRefPtr GetAnonChildRef(const HookFilter &) override;
+			ChildRef GetAnonChildRef(const HookFilter &) override;
 
-			ChildRefPtr GetChildRef(const std::string & name, const HookFilter &) override;
+			ChildRef GetChildRef(const std::string & name, const HookFilter &) override;
 
 			virtual const Metadata & GetMetadata() const override;
 
@@ -341,8 +341,8 @@ namespace Slicer {
 		public:
 			virtual ModelPartType GetType() const override;
 			virtual bool HasValue() const override;
-			virtual ChildRefPtr GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRefPtr GetChildRef(const std::string &, const HookFilter &) override;
+			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string &, const HookFilter &) override;
 
 			virtual ModelPartPtr GetContainedModelPart() override = 0;
 			virtual void OnEachChild(const ChildHandler & ch) override = 0;

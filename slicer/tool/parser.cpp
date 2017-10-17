@@ -325,7 +325,7 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Sequence %s\n", s->name());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "ChildRefPtr ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt)\n{\n",
+		fprintbf(cpp, "ChildRef ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt)\n{\n",
 				s->scoped());
 		auto iname = metaDataValue("slicer:item:", s->getMetaData());
 		if (iname) {
