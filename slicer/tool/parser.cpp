@@ -384,25 +384,19 @@ namespace Slicer {
 				components);
 		fprintbf(cpp, "\t\tC%d::Hooks r;\n",
 				components);
-		auto kname = metaDataValue("slicer:key:", d->getMetaData());
-		auto vname = metaDataValue("slicer:value:", d->getMetaData());
+		auto addHook = [&](const std::string & name, const char * element, const Slice::TypePtr & t) {
 		fprintbf(cpp, "\t\t");
-		auto ktype = d->keyType();
 		fprintbf(cpp, "r.push_back(std::make_unique< C%d::Hook< const %s, ",
 				components,
-				Slice::typeToString(ktype));
-		createNewModelPartPtrFor(ktype);
-		fprintbf(cpp, " > >(&%s::value_type::first, \"%s\"));\n\t\t",
+					Slice::typeToString(t));
+			createNewModelPartPtrFor(t);
+			fprintbf(cpp, " > >(&%s::value_type::%s, \"%s\"));\n",
 				d->scoped(),
-				kname ? *kname : "key");
-		auto vtype = d->valueType();
-		fprintbf(cpp, "r.push_back(std::make_unique< C%d::Hook< const %s, ",
-				components,
-				Slice::typeToString(vtype));
-		createNewModelPartPtrFor(vtype);
-		fprintbf(cpp, " > >(&%s::value_type::second, \"%s\"));\n",
-				d->scoped(),
-				vname ? *vname : "value");
+					element,
+					name);
+		};
+		addHook(metaDataValue("slicer:key:", d->getMetaData()).value_or("key"), "first", d->keyType());
+		addHook(metaDataValue("slicer:value:", d->getMetaData()).value_or("value"), "second", d->valueType());
 		fprintbf(cpp, "\t\treturn r;\n");
 		fprintbf(cpp, "\t}());\n");
 		fprintbf(cpp, "\n");
