@@ -249,7 +249,9 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const ModelPartForComplex< %s >::Hooks ",
 				it->scoped());
-		fprintbf(cpp, "ModelPartForComplex< %s >::hooks {\n",
+		fprintbf(cpp, "ModelPartForComplex< %s >::hooks ([](){\n",
+				it->scoped());
+		fprintbf(cpp, "\t\tModelPartForComplex< %s >::Hooks r;\n",
 				it->scoped());
 		for (const auto & dm : dataMembers) {
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
@@ -258,7 +260,7 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			fprintbf(cpp, "\t\tnew ");
+			fprintbf(cpp, "\t\tr.push_back(std::make_unique<");
 			auto type = dm->type();
 			createNewModelPartPtrFor(it);
 			if (hasMetadata(dm->getMetaData())) {
@@ -270,16 +272,17 @@ namespace Slicer {
 			fprintbf(cpp, " %s, ",
 					Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, getAllMetadata(dm));
-			fprintbf(cpp, " >(&%s, \"%s\"",
+			fprintbf(cpp, " > >(&%s, \"%s\"",
 					dm->scoped(),
 					name ? *name : dm->name());
 			if (hasMetadata(dm->getMetaData())) {
-				fprintbf(cpp, ", ");
+				fprintbf(cpp, ", Metadata ");
 				copyMetadata(dm->getMetaData());
 			}
-			fprintbf(cpp, " ),\n");
+			fprintbf(cpp, " ));\n");
 		}
-		fprintbf(cpp, "\t};\n\n");
+		fprintbf(cpp, "\t\treturn r;\n");
+		fprintbf(cpp, "\t}());\n\n");
 	}
 
 	void
@@ -373,28 +376,31 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const ModelPartForComplex< %s::value_type >::Hooks ",
 				d->scoped());
-		fprintbf(cpp, "ModelPartForComplex< %s::value_type >::hooks {\n",
+		fprintbf(cpp, "ModelPartForComplex< %s::value_type >::hooks ([](){\n",
+				d->scoped());
+		fprintbf(cpp, "\t\tModelPartForComplex< %s::value_type >::Hooks r;\n",
 				d->scoped());
 		auto kname = metaDataValue("slicer:key:", d->getMetaData());
 		auto vname = metaDataValue("slicer:value:", d->getMetaData());
 		fprintbf(cpp, "\t\t");
 		auto ktype = d->keyType();
-		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< const %s, ",
+		fprintbf(cpp, "r.push_back(std::make_unique< ModelPartForComplex< %s::value_type >::Hook< const %s, ",
 				d->scoped(),
 				Slice::typeToString(ktype));
 		createNewModelPartPtrFor(ktype);
-		fprintbf(cpp, " >(&%s::value_type::first, \"%s\"),\n\t\t",
+		fprintbf(cpp, " > >(&%s::value_type::first, \"%s\"));\n\t\t",
 				d->scoped(),
 				kname ? *kname : "key");
 		auto vtype = d->valueType();
-		fprintbf(cpp, "new ModelPartForComplex< %s::value_type >::Hook< %s, ",
+		fprintbf(cpp, "r.push_back(std::make_unique< ModelPartForComplex< %s::value_type >::Hook< %s, ",
 				d->scoped(),
 				Slice::typeToString(vtype));
 		createNewModelPartPtrFor(vtype);
-		fprintbf(cpp, " >(&%s::value_type::second, \"%s\"),\n",
+		fprintbf(cpp, " > >(&%s::value_type::second, \"%s\"));\n",
 				d->scoped(),
 				vname ? *vname : "value");
-		fprintbf(cpp, "\t};\n");
+		fprintbf(cpp, "\t\treturn r;\n");
+		fprintbf(cpp, "\t}());\n");
 		fprintbf(cpp, "\n");
 
 		auto name = metaDataValue("slicer:root:", d->getMetaData());

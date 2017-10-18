@@ -52,7 +52,7 @@ namespace Slicer {
 
 	void ModelPartForRootBase::OnEachChild(const ChildHandler & ch)
 	{
-		ch(GetRootName(), mp, NULL);
+		ch(GetRootName(), mp, nullptr);
 	}
 
 	ModelPartType

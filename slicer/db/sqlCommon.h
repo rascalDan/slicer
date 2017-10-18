@@ -5,11 +5,11 @@
 #include <modelParts.h>
 
 namespace Slicer {
-	bool isPKey(HookCommonPtr);
-	bool isAuto(HookCommonPtr);
-	bool isNotAuto(HookCommonPtr);
-	bool isBind(HookCommonPtr);
-	bool isValue(HookCommonPtr);
+	bool isPKey(const HookCommon *);
+	bool isAuto(const HookCommon *);
+	bool isNotAuto(const HookCommon *);
+	bool isBind(const HookCommon *);
+	bool isValue(const HookCommon *);
 }
 
 #endif

@@ -79,13 +79,13 @@ namespace Slicer {
 
 	typedef IceUtil::Handle<ModelPart> ModelPartPtr;
 	typedef IceUtil::Handle<ModelPartForRootBase> ModelPartForRootPtr;
-	typedef IceUtil::Handle<HookCommon> HookCommonPtr;
+	typedef std::unique_ptr<HookCommon> HookCommonPtr;
 	typedef IceUtil::Optional<std::string> TypeId;
 
-	typedef boost::function<void(const std::string &, ModelPartPtr, HookCommonPtr)> ChildHandler;
+	typedef boost::function<void(const std::string &, ModelPartPtr, const HookCommon *)> ChildHandler;
 
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
-	typedef boost::function<bool(HookCommonPtr)> HookFilter;
+	typedef boost::function<bool(const HookCommon *)> HookFilter;
 	typedef std::map<std::string, ClassRef> ClassRefMap;
 	DLL_PUBLIC ClassRefMap * classRefMap();
 	typedef boost::bimap<std::string, std::string> ClassNameMap;
@@ -122,7 +122,7 @@ namespace Slicer {
 			const Metadata & mdr;
 	};
 
-	class DLL_PUBLIC HookCommon : virtual public IceUtil::Shared {
+	class DLL_PUBLIC HookCommon {
 		public:
 			HookCommon(const std::string &);
 

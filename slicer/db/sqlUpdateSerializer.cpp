@@ -40,7 +40,7 @@ namespace Slicer {
 	SqlUpdateSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
 	{
 		ModifyPtr ins = createUpdate(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, HookCommonPtr) {
+		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
 	}
@@ -49,7 +49,7 @@ namespace Slicer {
 	SqlUpdateSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * upd)
 	{
 		int paramNo = 0;
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
+		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
 			if (isValue(h)) {
 				if (!cmp->GetValue(SqlBinder(*upd, paramNo))) {
 					upd->bindNull(paramNo);
@@ -57,7 +57,7 @@ namespace Slicer {
 				paramNo++;
 			}
 		});
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
+		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
 			if (isPKey(h)) {
 				cmp->GetValue(SqlBinder(*upd, paramNo++));
 			}
@@ -73,7 +73,7 @@ namespace Slicer {
 		AdHoc::Buffer update;
 		update.appendbf("UPDATE %s SET ", tableName);
 		int fieldNo = 0;
-		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, HookCommonPtr h) {
+		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, const HookCommon * h) {
 			if (isValue(h)) {
 				if (fieldNo++) {
 					update.append(", ");
@@ -83,7 +83,7 @@ namespace Slicer {
 		});
 		update.append(" WHERE ", AdHoc::Buffer::Use);
 		fieldNo = 0;
-		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, HookCommonPtr h) {
+		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, const HookCommon * h) {
 			if (isPKey(h)) {
 				if (fieldNo++) {
 					update.append(" AND ");

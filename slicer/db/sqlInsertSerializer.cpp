@@ -41,7 +41,7 @@ namespace Slicer {
 	SqlInsertSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
 	{
 		ModifyPtr ins = createInsert(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, HookCommonPtr) {
+		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
 	}
@@ -85,7 +85,7 @@ namespace Slicer {
 	SqlFetchIdInsertSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * ins) const
 	{
 		SqlAutoIdInsertSerializer::bindObjectAndExecute(cmp, ins);
-		cmp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, HookCommonPtr h) {
+		cmp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
 			if (isAuto(h)) {
 				cmp->SetValue(IdSave(connection));
 			}
@@ -93,7 +93,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
+	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, const HookCommon * h) const
 	{
 		if (isBind(h)) {
 			if (!cmp->GetValue(SqlBinder(*ins, paramNo))) {
@@ -104,7 +104,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, HookCommonPtr h) const
+	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, const HookCommon * h) const
 	{
 		if (isNotAuto(h)) {
 			SqlInsertSerializer::bindObjectAndExecuteField(paramNo, ins, cmp, h);
@@ -127,7 +127,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, HookCommonPtr h) const
+	SqlInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const
 	{
 		if (isBind(h)) {
 			if (fieldNo++) {
@@ -138,7 +138,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlAutoIdInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, HookCommonPtr h) const
+	SqlAutoIdInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const
 	{
 		if (isNotAuto(h)) {
 			if (fieldNo++) {

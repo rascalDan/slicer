@@ -141,7 +141,7 @@ namespace Slicer {
 					virtual ModelPartPtr Get(T * t) const = 0;
 					virtual const Metadata & GetMetadata() const override;
 			};
-			typedef IceUtil::Handle<HookBase> HookPtr;
+			typedef std::unique_ptr<HookBase> HookPtr;
 
 			template <typename MT, typename MP>
 			class DLL_PRIVATE Hook : public HookBase {

@@ -297,7 +297,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp, HookCommonPtr hp, const ElementCreator & ec)
+	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartPtr mp, const HookCommon * hp, const ElementCreator & ec)
 	{
 		if (name.empty()) {
 			return;

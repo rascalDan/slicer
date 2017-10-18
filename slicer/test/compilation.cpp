@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_class )
 }
 
 void
-hookHandler(std::vector<std::string> * names, const std::string & name, Slicer::ModelPartPtr mpp, Slicer::HookCommonPtr h)
+hookHandler(std::vector<std::string> * names, const std::string & name, Slicer::ModelPartPtr mpp, const Slicer::HookCommon * h)
 {
 	names->push_back(name);
 	BOOST_REQUIRE(mpp);

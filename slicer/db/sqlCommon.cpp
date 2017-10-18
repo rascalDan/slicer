@@ -9,28 +9,28 @@ namespace Slicer {
 	const std::string md_ignore = "db:ignore";
 	const std::string md_global_ignore = "ignore";
 
-	bool isPKey(HookCommonPtr h)
+	bool isPKey(const HookCommon * h)
 	{
 		return metaDataFlagSet(h->GetMetadata(), md_pkey) && isBind(h);
 	}
 
-	bool isAuto(HookCommonPtr h)
+	bool isAuto(const HookCommon * h)
 	{
 		return metaDataFlagSet(h->GetMetadata(), md_auto) && isBind(h);
 	}
 
-	bool isNotAuto(HookCommonPtr h)
+	bool isNotAuto(const HookCommon * h)
 	{
 		return metaDataFlagNotSet(h->GetMetadata(), md_auto) && isBind(h);
 	}
 
-	bool isBind(HookCommonPtr h)
+	bool isBind(const HookCommon * h)
 	{
 		return metaDataFlagNotSet(h->GetMetadata(), md_global_ignore) &&
 			metaDataFlagNotSet(h->GetMetadata(), md_ignore);
 	}
 
-	bool isValue(HookCommonPtr h)
+	bool isValue(const HookCommon * h)
 	{
 		return metaDataFlagNotSet(h->GetMetadata(), md_auto) &&
 			metaDataFlagNotSet(h->GetMetadata(), md_pkey) && isBind(h);
