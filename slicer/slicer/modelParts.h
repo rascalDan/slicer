@@ -127,7 +127,6 @@ namespace Slicer {
 			HookCommon(const std::string &);
 
 			bool filter(const HookFilter & flt);
-			bool filter(const HookFilter & flt, const std::string &);
 			void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);
 
 			virtual const Metadata & GetMetadata() const = 0;
@@ -150,7 +149,7 @@ namespace Slicer {
 			ModelPartPtr GetAnonChild(const HookFilter & = HookFilter());
 			ModelPartPtr GetChild(const std::string & memberName, const HookFilter & = HookFilter());
 			virtual ChildRef GetAnonChildRef(const HookFilter & = HookFilter()) = 0;
-			virtual ChildRef GetChildRef(const std::string & memberName, const HookFilter & = HookFilter()) = 0;
+			virtual ChildRef GetChildRef(const std::string & memberName, const HookFilter & = HookFilter(), bool matchCase = true) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
 			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const;
@@ -182,7 +181,7 @@ namespace Slicer {
 
 			virtual const std::string & GetRootName() const = 0;
 			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRef GetChildRef(const std::string & name, const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual ModelPartType GetType() const override;
 			virtual bool IsOptional() const override;

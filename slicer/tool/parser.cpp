@@ -330,14 +330,15 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Sequence %s\n", s->name());
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "ChildRef ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt)\n{\n",
+		fprintbf(cpp, "ChildRef ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)\n{\n",
 				s->scoped());
 		auto iname = metaDataValue("slicer:item:", s->getMetaData());
 		if (iname) {
-			fprintbf(cpp, "\tif (!name.empty() && name != \"%s\") { throw IncorrectElementName(name); }\n",
+			fprintbf(cpp, "\tif (!name.empty() && !optionalCaseEq(name, \"%s\", matchCase)) { throw IncorrectElementName(name); }\n",
 					*iname);
 		}
 		else {
+			fprintbf(cpp, "\t(void)matchCase;\n");
 			fprintbf(cpp, "\t(void)name;\n");
 		}
 		fprintbf(cpp, "\treturn GetAnonChildRef(flt);\n}\n\n");

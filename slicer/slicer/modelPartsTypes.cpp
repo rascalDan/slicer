@@ -1,4 +1,6 @@
 #include "modelPartsTypes.impl.h"
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace Slicer {
 	MODELPARTFOR(std::string, ModelPartForSimple);
@@ -28,6 +30,12 @@ namespace Slicer {
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
 
+	bool
+	optionalCaseEq(const std::string & a, const std::string & b, bool matchCase)
+	{
+		return (matchCase ? boost::equals(a, b) : boost::iequals(a, b));
+	}
+
 	// ModelPartForRootBase
 	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) :
 		mp(m)
@@ -42,9 +50,9 @@ namespace Slicer {
 	}
 
 	ChildRef
-	ModelPartForRootBase::GetChildRef(const std::string & name, const HookFilter & hf)
+	ModelPartForRootBase::GetChildRef(const std::string & name, const HookFilter & hf, bool matchCase)
 	{
-		if (name != GetRootName()) {
+		if (!optionalCaseEq(name, GetRootName(), matchCase)) {
 			throw IncorrectElementName(name);
 		}
 		return GetAnonChildRef(hf);
@@ -75,14 +83,14 @@ namespace Slicer {
 
 	void ModelPartForSimpleBase::OnEachChild(const ChildHandler &) { }
 	ChildRef ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &) { return ChildRef(); }
-	ChildRef ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &) { return ChildRef(); }
+	ChildRef ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &, bool) { return ChildRef(); }
 	bool ModelPartForSimpleBase::HasValue() const { return true; }
 	ModelPartType ModelPartForSimpleBase::GetType() const { return type; }
 	const ModelPartType ModelPartForSimpleBase::type = mpt_Simple;
 
 	void ModelPartForConvertedBase::OnEachChild(const ChildHandler &) { }
 	ChildRef ModelPartForConvertedBase::GetAnonChildRef(const HookFilter &) { return ChildRef(); }
-	ChildRef ModelPartForConvertedBase::GetChildRef(const std::string &, const HookFilter &) { return ChildRef(); }
+	ChildRef ModelPartForConvertedBase::GetChildRef(const std::string &, const HookFilter &, bool) { return ChildRef(); }
 	bool ModelPartForConvertedBase::HasValue() const { return true; }
 	ModelPartType ModelPartForConvertedBase::GetType() const { return type; }
 	const ModelPartType ModelPartForConvertedBase::type = mpt_Simple;
@@ -122,6 +130,11 @@ namespace Slicer {
 		return "::" + std::string(buf.get());
 	}
 
+	std::string ModelPartForComplexBase::hookNameLower(const HookCommon & h)
+	{
+		return boost::algorithm::to_lower_copy(h.name);
+	}
+
 	void ModelPartForOptionalBase::OnEachChild(const ChildHandler & ch)
 	{
 		if (this->hasModel()) {
@@ -144,10 +157,10 @@ namespace Slicer {
 		return ChildRef();
 	}
 
-	ChildRef ModelPartForOptionalBase::GetChildRef(const std::string & name, const HookFilter & flt)
+	ChildRef ModelPartForOptionalBase::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
 	{
 		if (this->hasModel()) {
-			return modelPart->GetChildRef(name, flt);
+			return modelPart->GetChildRef(name, flt, matchCase);
 		}
 		return ChildRef();
 	}
@@ -176,7 +189,7 @@ namespace Slicer {
 
 	void ModelPartForEnumBase::OnEachChild(const ChildHandler &) { }
 	ChildRef ModelPartForEnumBase::GetAnonChildRef(const HookFilter &) { return ChildRef(); }
-	ChildRef ModelPartForEnumBase::GetChildRef(const std::string &, const HookFilter &) { return ChildRef(); }
+	ChildRef ModelPartForEnumBase::GetChildRef(const std::string &, const HookFilter &, bool) { return ChildRef(); }
 	bool ModelPartForEnumBase::HasValue() const { return true; }
 	ModelPartType ModelPartForEnumBase::GetType() const { return type; }
 	const ModelPartType ModelPartForEnumBase::type = mpt_Simple;
@@ -191,7 +204,7 @@ namespace Slicer {
 
 	// Streams
 	ChildRef ModelPartForStreamBase::GetAnonChildRef(const Slicer::HookFilter &) { throw InvalidStreamOperation(__FUNCTION__); }
-	ChildRef ModelPartForStreamBase::GetChildRef(const std::string &, const Slicer::HookFilter &) { throw InvalidStreamOperation(__FUNCTION__); }
+	ChildRef ModelPartForStreamBase::GetChildRef(const std::string &, const Slicer::HookFilter &, bool) { throw InvalidStreamOperation(__FUNCTION__); }
 	ModelPartType ModelPartForStreamBase::GetType() const { return mpt_Sequence; }
 	bool ModelPartForStreamBase::HasValue() const { return true; }
 	// Stream Roots

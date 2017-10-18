@@ -3,12 +3,17 @@
 
 #include "modelParts.h"
 #include <Ice/ObjectF.h>
+#include <boost/multi_index/sequenced_index_fwd.hpp>
+#include <boost/multi_index/ordered_index_fwd.hpp>
+#include <boost/multi_index/global_fun.hpp>
 
 namespace Slicer {
 	template<typename T>
 	struct isLocal {
 		static constexpr bool value = false;
 	};
+
+	DLL_PUBLIC bool optionalCaseEq(const std::string & a, const std::string & b, bool matchCase);
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
@@ -30,7 +35,7 @@ namespace Slicer {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;
 			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRef GetChildRef(const std::string &, const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
@@ -51,7 +56,7 @@ namespace Slicer {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;
 			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRef GetChildRef(const std::string &, const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
@@ -95,7 +100,7 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual void Complete() override;
 			virtual ChildRef GetAnonChildRef(const HookFilter & flt) override;
-			virtual ChildRef GetChildRef(const std::string & name, const HookFilter & flt) override;
+			virtual ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
 			virtual void SetValue(ValueSource && s) override;
 			virtual bool HasValue() const override;
 			virtual bool IsOptional() const override;
@@ -130,6 +135,7 @@ namespace Slicer {
 			static void unregisterClass(const std::string & className, const std::string * typeName);
 			static TypeId GetTypeId(const std::string & id, const std::string & className);
 			static std::string demangle(const char * mangled);
+			static std::string hookNameLower(const HookCommon &);
 	};
 
 	template<typename T>
@@ -168,19 +174,25 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
 			virtual ChildRef GetAnonChildRef(const HookFilter & flt) override;
-			ChildRef GetChildRef(const std::string & name, const HookFilter & flt) override;
+			ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
 
 			virtual const Metadata & GetMetadata() const override;
 
 			virtual T * GetModel() = 0;
 
-			typedef std::vector<HookPtr> Hooks;
+			typedef boost::multi_index_container<
+				HookPtr,
+				boost::multi_index::indexed_by<
+					boost::multi_index::sequenced<>,
+					boost::multi_index::ordered_non_unique<boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>>,
+					boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<const HookCommon &, std::string, &ModelPartForComplexBase::hookNameLower>>
+				>> Hooks;
 
 			template<typename H, typename ... P>
-			static void addHook(Hooks &, const P & ...);
+			DLL_PRIVATE static void addHook(Hooks &, const P & ...);
 
-			static const Hooks hooks;
-			static const Metadata metadata;
+			DLL_PRIVATE static const Hooks hooks;
+			DLL_PRIVATE static const Metadata metadata;
 	};
 
 	template<typename T>
@@ -233,7 +245,7 @@ namespace Slicer {
 		public:
 			virtual void OnEachChild(const ChildHandler &) override;
 			ChildRef GetAnonChildRef(const HookFilter &) override;
-			ChildRef GetChildRef(const std::string &, const HookFilter &) override;
+			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 			virtual bool HasValue() const override;
 			virtual ModelPartType GetType() const override;
 			static const ModelPartType type;
@@ -277,7 +289,7 @@ namespace Slicer {
 
 			ChildRef GetAnonChildRef(const HookFilter &) override;
 
-			ChildRef GetChildRef(const std::string &, const HookFilter &) override;
+			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 
 			virtual const Metadata & GetMetadata() const override;
 
@@ -321,7 +333,7 @@ namespace Slicer {
 
 			ChildRef GetAnonChildRef(const HookFilter &) override;
 
-			ChildRef GetChildRef(const std::string & name, const HookFilter &) override;
+			ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
 
 			virtual const Metadata & GetMetadata() const override;
 
@@ -345,7 +357,7 @@ namespace Slicer {
 			virtual ModelPartType GetType() const override;
 			virtual bool HasValue() const override;
 			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRef GetChildRef(const std::string &, const HookFilter &) override;
+			virtual ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 
 			virtual ModelPartPtr GetContainedModelPart() override = 0;
 			virtual void OnEachChild(const ChildHandler & ch) override = 0;

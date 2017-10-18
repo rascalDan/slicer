@@ -2,6 +2,7 @@
 #define SLICER_TEST_CONVERSIONS_H
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
 #include <visibility.h>
 #include <slicer/modelPartsTypes.h>
 #include <types.h>

@@ -7,6 +7,10 @@
 #include <Ice/StreamHelpers.h>
 #include <Ice/BasicStream.h>
 #include <IceUtil/Optional.h>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template class BaseModelPart; \
@@ -337,7 +341,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRef ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
 	{
-		for (const auto & h : hooks) {
+		for (const auto & h : hooks.template get<0>()) {
 			if (h->filter(flt)) {
 				return ChildRef(h->Get(GetModel()), h->GetMetadata());
 			}
@@ -345,12 +349,23 @@ namespace Slicer {
 		return ChildRef();
 	}
 
+	template<typename P> auto begin(const P & p) { return p.first; }
+	template<typename P> auto end(const P & p) { return p.second; }
 	template<typename T>
-	ChildRef ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt)
+	ChildRef ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
 	{
-		for (const auto & h : hooks) {
-			if (h->filter(flt, name)) {
-				return ChildRef(h->Get(GetModel()), h->GetMetadata());
+		if (matchCase) {
+			for (const auto & h : hooks.template get<1>().equal_range(name)) {
+				if (h->filter(flt)) {
+					return ChildRef(h->Get(GetModel()), h->GetMetadata());
+				}
+			}
+		}
+		else {
+			for (const auto & h : hooks.template get<2>().equal_range(boost::algorithm::to_lower_copy(name))) {
+				if (h->filter(flt)) {
+					return ChildRef(h->Get(GetModel()), h->GetMetadata());
+				}
 			}
 		}
 		return ChildRef();
@@ -649,10 +664,10 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ChildRef ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &)
+	ChildRef ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &, bool matchCase)
 	{
 		BOOST_ASSERT(this->Model);
-		if (name != pairName) {
+		if (!optionalCaseEq(name, pairName, matchCase)) {
 			throw IncorrectElementName(name);
 		}
 		return ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));

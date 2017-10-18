@@ -131,12 +131,6 @@ namespace Slicer {
 	}
 
 	bool
-	HookCommon::filter(const HookFilter & flt, const std::string & name)
-	{
-		return (this->name == name && (!flt || flt(this)));
-	}
-
-	bool
 	HookCommon::filter(const HookFilter & flt)
 	{
 		return (!flt || flt(this));
