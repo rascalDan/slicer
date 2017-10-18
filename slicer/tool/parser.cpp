@@ -261,9 +261,9 @@ namespace Slicer {
 			if (!t) {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
-			auto name = metaDataValue("slicer:name:", dm->getMetaData());
-			fprintbf(cpp, "\t\tr.push_back(std::make_unique<C%d::",
-					components);
+			auto name = metaDataValue("slicer:name:", dm->getMetaData()).value_or_eval(std::bind(&Slice::DataMember::name, dm));
+			fprintbf(cpp, "\t\tC%d::addHook<C%d::",
+					components, components);
 			auto type = dm->type();
 			if (hasMetadata(dm->getMetaData())) {
 				fprintbf(cpp, "HookMetadata<");
@@ -274,14 +274,14 @@ namespace Slicer {
 			fprintbf(cpp, " %s, ",
 					Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, getAllMetadata(dm));
-			fprintbf(cpp, " > >(&%s, \"%s\"",
+			fprintbf(cpp, " > >(r, &%s, \"%s\"",
 					dm->scoped(),
-					name ? *name : dm->name());
+					name);
 			if (hasMetadata(dm->getMetaData())) {
 				fprintbf(cpp, ", Metadata ");
 				copyMetadata(dm->getMetaData());
 			}
-			fprintbf(cpp, " ));\n");
+			fprintbf(cpp, ");\n");
 		}
 		fprintbf(cpp, "\t\treturn r;\n");
 		fprintbf(cpp, "\t}());\n\n");
@@ -385,13 +385,13 @@ namespace Slicer {
 		fprintbf(cpp, "\t\tC%d::Hooks r;\n",
 				components);
 		auto addHook = [&](const std::string & name, const char * element, const Slice::TypePtr & t) {
-		fprintbf(cpp, "\t\t");
-		fprintbf(cpp, "r.push_back(std::make_unique< C%d::Hook< const %s, ",
-				components,
+			fprintbf(cpp, "\t\t");
+			fprintbf(cpp, "C%d::addHook< C%d::Hook< const %s, ",
+					components, components,
 					Slice::typeToString(t));
 			createNewModelPartPtrFor(t);
-			fprintbf(cpp, " > >(&%s::value_type::%s, \"%s\"));\n",
-				d->scoped(),
+			fprintbf(cpp, " > >(r, &%s::value_type::%s, \"%s\");\n",
+					d->scoped(),
 					element,
 					name);
 		};

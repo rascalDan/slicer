@@ -363,6 +363,13 @@ namespace Slicer {
 	}
 
 	template<typename T>
+	template<typename H, typename ... P>
+	void ModelPartForComplex<T>::addHook(Hooks & h, const P & ... p)
+	{
+		h.push_back(std::make_unique<H>(p...));
+	}
+
+	template<typename T>
 	ModelPartForComplex<T>::HookBase::HookBase(const std::string & n) :
 		HookCommon(n)
 	{

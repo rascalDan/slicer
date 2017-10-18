@@ -176,6 +176,9 @@ namespace Slicer {
 
 			typedef std::vector<HookPtr> Hooks;
 
+			template<typename H, typename ... P>
+			static void addHook(Hooks &, const P & ...);
+
 			static const Hooks hooks;
 			static const Metadata metadata;
 	};
