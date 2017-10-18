@@ -180,6 +180,10 @@ namespace Slicer {
 
 			virtual T * GetModel() = 0;
 
+		protected:
+			template<typename R>
+			DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
+
 			typedef boost::multi_index_container<
 				HookPtr,
 				boost::multi_index::indexed_by<

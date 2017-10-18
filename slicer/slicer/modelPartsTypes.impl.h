@@ -338,37 +338,36 @@ namespace Slicer {
 		}
 	}
 
+	template<typename P> auto begin(const P & p) { return p.first; }
+	template<typename P> auto end(const P & p) { return p.second; }
 	template<typename T>
-	ChildRef ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
+	template<typename R>
+	ChildRef ModelPartForComplex<T>::GetChildRefFromRange(const R & range, const HookFilter & flt)
 	{
-		for (const auto & h : hooks.template get<0>()) {
+		auto model = GetModel();
+		for (const auto & h : range) {
 			if (h->filter(flt)) {
-				return ChildRef(h->Get(GetModel()), h->GetMetadata());
+				return ChildRef(h->Get(model), h->GetMetadata());
 			}
 		}
 		return ChildRef();
 	}
 
-	template<typename P> auto begin(const P & p) { return p.first; }
-	template<typename P> auto end(const P & p) { return p.second; }
+	template<typename T>
+	ChildRef ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
+	{
+		return GetChildRefFromRange(hooks.template get<0>(), flt);
+	}
+
 	template<typename T>
 	ChildRef ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
 	{
 		if (matchCase) {
-			for (const auto & h : hooks.template get<1>().equal_range(name)) {
-				if (h->filter(flt)) {
-					return ChildRef(h->Get(GetModel()), h->GetMetadata());
-				}
-			}
+			return GetChildRefFromRange(hooks.template get<1>().equal_range(name), flt);
 		}
 		else {
-			for (const auto & h : hooks.template get<2>().equal_range(boost::algorithm::to_lower_copy(name))) {
-				if (h->filter(flt)) {
-					return ChildRef(h->Get(GetModel()), h->GetMetadata());
-				}
-			}
+			return GetChildRefFromRange(hooks.template get<2>().equal_range(name), flt);
 		}
-		return ChildRef();
 	}
 
 	template<typename T>
