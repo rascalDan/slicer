@@ -193,10 +193,10 @@ namespace Slicer {
 				>> Hooks;
 
 			template<typename H, typename ... P>
-			DLL_PRIVATE static void addHook(Hooks &, const P & ...);
+			static void addHook(Hooks &, const P & ...);
 
-			DLL_PRIVATE static const Hooks hooks;
-			DLL_PRIVATE static const Metadata metadata;
+			static const Hooks hooks;
+			static const Metadata metadata;
 	};
 
 	template<typename T>
