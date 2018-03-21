@@ -56,81 +56,68 @@ namespace Slicer {
 		return ModelObject && mp->HasValue();
 	}
 
-#define IfLocal(T) \
-	typename std::enable_if<Slicer::isLocal<T>::value>::type
-#define IfNotLocal(T) \
-	typename std::enable_if<!Slicer::isLocal<T>::value>::type
-
 	template<typename T>
-	IfNotLocal(T)
+	void
 	typeWrite(::Ice::OutputStreamPtr & s, const ::IceUtil::Optional<T> & m)
 	{
-		typedef Ice::StreamableTraits<T> traits;
-		typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
-		s->startEncapsulation();
-		if (m && s->writeOptional(0, SOH::optionalFormat)) {
-			SOH::write(s.get(), *m);
-		}
-		s->endEncapsulation();
-	}
-
-	template<typename T>
-	IfLocal(T)
-	typeWrite(::Ice::OutputStreamPtr &, const ::IceUtil::Optional<T> &)
-	{
-		throw LocalTypeException();
-	}
-
-	template<typename T>
-	IfNotLocal(T)
-	typeWrite(::Ice::OutputStreamPtr & s, const T & m)
-	{
-		s->write(m);
-	}
-
-	template<typename T>
-	IfLocal(T)
-	typeWrite(::Ice::OutputStreamPtr &, const T &)
-	{
-		throw LocalTypeException();
-	}
-
-	template<typename T>
-	IfNotLocal(T)
-	typeRead(::Ice::InputStreamPtr & s, ::IceUtil::Optional<T> & m)
-	{
-		typedef Ice::StreamableTraits<T> traits;
-		typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
-		s->startEncapsulation();
-		if (s->readOptional(0, SOH::optionalFormat)) {
-			m.__setIsSet();
-			SOH::read(s.get(), *m);
+		if constexpr (!Slicer::isLocal<T>::value) {
+			typedef Ice::StreamableTraits<T> traits;
+			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
+			s->startEncapsulation();
+			if (m && s->writeOptional(0, SOH::optionalFormat)) {
+				SOH::write(s.get(), *m);
+			}
+			s->endEncapsulation();
 		}
 		else {
-			m = IceUtil::None;
+			throw LocalTypeException();
 		}
-		s->endEncapsulation();
 	}
 
 	template<typename T>
-	IfLocal(T)
-	typeRead(::Ice::InputStreamPtr &, ::IceUtil::Optional<T> &)
+	void
+	typeWrite(::Ice::OutputStreamPtr & s, const T & m)
 	{
-		throw LocalTypeException();
+		if constexpr (!Slicer::isLocal<T>::value) {
+			s->write(m);
+		}
+		else {
+			throw LocalTypeException();
+		}
 	}
 
 	template<typename T>
-	IfNotLocal(T)
+	void
+	typeRead(::Ice::InputStreamPtr & s, ::IceUtil::Optional<T> & m)
+	{
+		if constexpr (!Slicer::isLocal<T>::value) {
+			typedef Ice::StreamableTraits<T> traits;
+			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
+			s->startEncapsulation();
+			if (s->readOptional(0, SOH::optionalFormat)) {
+				m.__setIsSet();
+				SOH::read(s.get(), *m);
+			}
+			else {
+				m = IceUtil::None;
+			}
+			s->endEncapsulation();
+		}
+		else {
+			throw LocalTypeException();
+		}
+	}
+
+	template<typename T>
+	void
 	typeRead(::Ice::InputStreamPtr & s, T & m)
 	{
-		s->read(m);
-	}
-
-	template<typename T>
-	IfLocal(T)
-	typeRead(::Ice::InputStreamPtr &, T &)
-	{
-		throw LocalTypeException();
+		if constexpr (!Slicer::isLocal<T>::value) {
+			s->read(m);
+		}
+		else {
+			throw LocalTypeException();
+		}
 	}
 
 	template<typename T>
