@@ -7,6 +7,7 @@
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/bind.hpp>
 
 namespace Slicer {
 	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, const std::string & t) :

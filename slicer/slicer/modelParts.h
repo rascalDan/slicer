@@ -8,8 +8,8 @@
 #include <Ice/StreamF.h>
 #include <stdexcept>
 #include <boost/function.hpp>
-#include <boost/bimap.hpp>
 #include <vector>
+#include <list>
 #include <visibility.h>
 
 namespace Slicer {
@@ -84,10 +84,6 @@ namespace Slicer {
 
 	typedef boost::function<ModelPartPtr(void *)> ClassRef;
 	typedef boost::function<bool(const HookCommon *)> HookFilter;
-	typedef std::map<std::string, ClassRef> ClassRefMap;
-	DLL_PUBLIC ClassRefMap * classRefMap();
-	typedef boost::bimap<std::string, std::string> ClassNameMap;
-	DLL_PUBLIC ClassNameMap * classNameMap();
 	typedef std::list<std::string> Metadata;
 	DLL_PUBLIC extern const Metadata emptyMetadata;
 
@@ -160,9 +156,6 @@ namespace Slicer {
 			virtual const Metadata & GetMetadata() const;
 			virtual bool IsOptional() const;
 			virtual ModelPartPtr GetContainedModelPart();
-
-			static const std::string & ToExchangeTypeName(const std::string &);
-			static const std::string & ToModelTypeName(const std::string &);
 	};
 
 	template<typename T>

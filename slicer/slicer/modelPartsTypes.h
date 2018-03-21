@@ -3,9 +3,12 @@
 
 #include "modelParts.h"
 #include <Ice/ObjectF.h>
+#include <boost/multi_index_container_fwd.hpp>
 #include <boost/multi_index/sequenced_index_fwd.hpp>
 #include <boost/multi_index/ordered_index_fwd.hpp>
 #include <boost/multi_index/global_fun.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/bimap.hpp>
 
 namespace Slicer {
 	template<typename T>
@@ -136,6 +139,9 @@ namespace Slicer {
 			static TypeId GetTypeId(const std::string & id, const std::string & className);
 			static std::string demangle(const char * mangled);
 			static std::string hookNameLower(const HookCommon &);
+
+			static const std::string & ToExchangeTypeName(const std::string &);
+			static const std::string & ToModelTypeName(const std::string &);
 	};
 
 	template<typename T>
@@ -227,6 +233,8 @@ namespace Slicer {
 			static const std::string * typeName;
 
 			static ModelPartPtr CreateModelPart(void *);
+
+		private:
 			static void initClassName();
 			static void deleteClassName();
 			static void registerClass() __attribute__ ((constructor(210)));

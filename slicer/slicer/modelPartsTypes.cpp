@@ -1,8 +1,63 @@
 #include "modelPartsTypes.impl.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/bimap.hpp>
 
 namespace Slicer {
+	typedef std::map<std::string, ClassRef> ClassRefMap;
+	typedef boost::bimap<std::string, std::string> ClassNameMap;
+
+	static void createClassMaps() __attribute__((constructor(208)));
+	static void deleteClassMaps() __attribute__((destructor(208)));
+	static ClassNameMap * names;
+	static ClassRefMap * refs;
+
+	void createClassMaps()
+	{
+		names = new ClassNameMap();
+		refs = new ClassRefMap();
+	}
+
+	static void deleteClassMaps()
+	{
+		delete names;
+		delete refs;
+		names = nullptr;
+		refs = nullptr;
+	}
+
+	ClassNameMap *
+	classNameMap()
+	{
+		return names;
+	}
+
+	ClassRefMap *
+	classRefMap()
+	{
+		return refs;
+	}
+
+	const std::string &
+	ModelPartForComplexBase::ToModelTypeName(const std::string & name)
+	{
+		auto mapped = classNameMap()->right.find(name);
+		if (mapped != classNameMap()->right.end()) {
+			return mapped->second;
+		}
+		return name;
+	}
+
+	const std::string &
+	ModelPartForComplexBase::ToExchangeTypeName(const std::string & name)
+	{
+		auto mapped = classNameMap()->left.find(name);
+		if (mapped != classNameMap()->left.end()) {
+			return mapped->second;
+		}
+		return name;
+	}
+
 	MODELPARTFOR(std::string, ModelPartForSimple);
 	MODELPARTFOR(bool, ModelPartForSimple);
 	MODELPARTFOR(Ice::Float, ModelPartForSimple);
@@ -113,7 +168,7 @@ namespace Slicer {
 	}
 	ModelPartPtr ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
 	{
-		auto ref = classRefMap()->find(ModelPart::ToModelTypeName(name));
+		auto ref = classRefMap()->find(ToModelTypeName(name));
 		if (ref == classRefMap()->end()) {
 			throw UnknownType(name);
 		}
@@ -121,7 +176,7 @@ namespace Slicer {
 	}
 	TypeId ModelPartForComplexBase::GetTypeId(const std::string & id, const std::string & className)
 	{
-		return (id == className) ? TypeId() : ModelPart::ToExchangeTypeName(id);
+		return (id == className) ? TypeId() : ToExchangeTypeName(id);
 	}
 
 	std::string ModelPartForComplexBase::demangle(const char * mangled)

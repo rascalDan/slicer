@@ -6,6 +6,7 @@
 #include <buffer.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
+#include <boost/bind.hpp>
 
 namespace Slicer {
 	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :

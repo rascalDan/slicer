@@ -4,6 +4,7 @@
 #include <slicer/metadata.h>
 #include <compileTimeFormatter.h>
 #include <scopeExit.h>
+#include <boost/bind.hpp>
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");
