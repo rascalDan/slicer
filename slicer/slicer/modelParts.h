@@ -1,13 +1,11 @@
 #ifndef SLICER_MODELPARTS_H
 #define SLICER_MODELPARTS_H
 
-#include <Ice/Config.h>
 #include <IceUtil/Shared.h>
 #include <IceUtil/Handle.h>
 #include <IceUtil/Optional.h>
 #include <Ice/Handle.h>
 #include <Ice/StreamF.h>
-#include <Slice/Parser.h>
 #include <stdexcept>
 #include <boost/function.hpp>
 #include <boost/bimap.hpp>
