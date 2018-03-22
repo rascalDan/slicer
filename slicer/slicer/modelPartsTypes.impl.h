@@ -13,9 +13,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
-	template class BaseModelPart; \
-	template class ModelPartForRoot<Type>; \
-	template class ModelPartForRoot< IceUtil::Optional<Type> >; \
 	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return new ModelPartType(nullptr); } \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(&s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(const Type & s) { return CreateFor(const_cast<Type &>(s)); } \
@@ -25,6 +22,9 @@
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(&s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const IceUtil::Optional<Type> & s) { return CreateRootFor(const_cast<IceUtil::Optional<Type> &>(s)); } \
+	template class BaseModelPart; \
+	template class ModelPartForRoot<Type>; \
+	template class ModelPartForRoot< IceUtil::Optional<Type> >; \
 
 #define MODELPARTFOR(Type, ModelPartType) \
 	CUSTOMMODELPARTFOR(Type, ModelPartType<Type>, ModelPartType<Type>)

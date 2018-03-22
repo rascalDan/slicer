@@ -57,15 +57,6 @@ namespace Slicer {
 		return name;
 	}
 
-	MODELPARTFOR(std::string, ModelPartForSimple);
-	MODELPARTFOR(bool, ModelPartForSimple);
-	MODELPARTFOR(Ice::Float, ModelPartForSimple);
-	MODELPARTFOR(Ice::Double, ModelPartForSimple);
-	MODELPARTFOR(Ice::Byte, ModelPartForSimple);
-	MODELPARTFOR(Ice::Short, ModelPartForSimple);
-	MODELPARTFOR(Ice::Int, ModelPartForSimple);
-	MODELPARTFOR(Ice::Long, ModelPartForSimple);
-
 	template<> const std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
 	template<> const std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
 	template<> const std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
@@ -83,6 +74,15 @@ namespace Slicer {
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>::rootName = "OptionalShort";
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
 	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
+
+	MODELPARTFOR(std::string, ModelPartForSimple);
+	MODELPARTFOR(bool, ModelPartForSimple);
+	MODELPARTFOR(Ice::Float, ModelPartForSimple);
+	MODELPARTFOR(Ice::Double, ModelPartForSimple);
+	MODELPARTFOR(Ice::Byte, ModelPartForSimple);
+	MODELPARTFOR(Ice::Short, ModelPartForSimple);
+	MODELPARTFOR(Ice::Int, ModelPartForSimple);
+	MODELPARTFOR(Ice::Long, ModelPartForSimple);
 
 	bool
 	optionalCaseEq(const std::string & a, const std::string & b, bool matchCase)
