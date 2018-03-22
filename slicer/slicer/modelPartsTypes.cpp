@@ -1,7 +1,6 @@
 #include "modelPartsTypes.impl.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/bimap.hpp>
 
 namespace Slicer {
 	typedef std::map<std::string, ClassRef> ClassRefMap;
