@@ -2,11 +2,10 @@ import testing ;
 import package ;
 
 lib pthread ;
-lib Ice ;
+lib Ice++11 ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
-lib IceUtil ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-ice :
@@ -16,8 +15,7 @@ lib slicer-ice :
 	<library>boost_system
 	<library>boost_filesystem
 	<library>pthread
-	<library>Ice
-	<library>IceUtil
+	<library>Ice++11
 	<library>adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer

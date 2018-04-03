@@ -28,7 +28,7 @@ namespace Slicer {
 			DB::Command & command;
 			const unsigned int idx;
 	};
-	typedef IceUtil::Handle<SqlBinder> SqlBinderPtr;
+	typedef std::shared_ptr<SqlBinder> SqlBinderPtr;
 }
 
 #endif

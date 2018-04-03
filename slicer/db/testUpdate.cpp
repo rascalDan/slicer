@@ -12,6 +12,8 @@
 #include <testModels.h>
 #include <sqlExceptions.h>
 
+using namespace std::literals;
+
 class StandardMockDatabase : public PQ::Mock {
 	public:
 		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
@@ -28,19 +30,19 @@ typedef boost::shared_ptr<DB::SelectCommand> SelectPtr;
 BOOST_AUTO_TEST_CASE( update_builtinsNotFound )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	TestModule::BuiltInsPtr ubi = new TestModule::BuiltIns(false, 5, 17, 64, 129, -1.2, -1.4, "string");
+	TestModule::BuiltInsPtr ubi = std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 129, -1.2, -1.4, "string");
 	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubi, db.get(), "builtins"), Slicer::NoRowsFound);
 }
 
 BOOST_AUTO_TEST_CASE( update_builtins )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	TestModule::BuiltInsPtr bi1 = new TestModule::BuiltIns(true, 4, 16, 64, 128, 1.2, 3.4, "text1");
-	TestModule::BuiltInsPtr bi2 = new TestModule::BuiltIns(true, 3, 15, 63, 127, 5.2, 5.4, "text2");
+	TestModule::BuiltInsPtr bi1 = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text1");
+	TestModule::BuiltInsPtr bi2 = std::make_shared<TestModule::BuiltIns>(true, 3, 15, 63, 127, 5.2, 5.4, "text2");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi1, db.get(), "builtins");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi2, db.get(), "builtins");
 
-	TestModule::BuiltInsPtr ubi = new TestModule::BuiltIns(false, 5, 17, 64, 128, -1.2, -1.4, "string");
+	TestModule::BuiltInsPtr ubi = std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 128, -1.2, -1.4, "string");
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubi, db.get(), "builtins");
 
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins ORDER BY mint DESC"));
@@ -68,8 +70,8 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	TestModule::BuiltInSeq ubis {
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(false, 5, 17, 64, 128, -1.2, -1.4, "string")),
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(false, 5, 21, 63, 127, -4.2, -5.4, "string updated"))
+		TestModule::BuiltInsPtr(std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 128, -1.2, -1.4, "string")),
+		TestModule::BuiltInsPtr(std::make_shared<TestModule::BuiltIns>(false, 5, 21, 63, 127, -4.2, -5.4, "string updated"))
 	};
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubis, db.get(), "builtins");
 
@@ -102,7 +104,7 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 	BOOST_REQUIRE_EQUAL(2, bis.size());
 	BOOST_REQUIRE_EQUAL("string updated", *bis[0]->mstring);
 	BOOST_REQUIRE_EQUAL("string", *bis[1]->mstring);
-	bis[0]->mstring = "not null";
+	bis[0]->mstring = "not null"s;
 	bis[1]->mstring = IceUtil::Optional<std::string>();
 	bis[0]->mfloat = IceUtil::Optional<Ice::Float>();
 	bis[1]->mbyte = IceUtil::Optional<Ice::Byte>();

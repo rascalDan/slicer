@@ -308,7 +308,7 @@ namespace Slicer {
 				e->scoped());
 		fprintbf(cpp, "{\n\tModelPartForEnum< %s >::Enumerations e;\n",
 				e->scoped());
-		for (const auto & ee : e->getEnumerators()) {
+		for (const auto & ee : e->enumerators()) {
 			fprintbf(cpp, "\te.insert( { %s, \"%s\" } );\n", ee->scoped(), ee->name());
 		}
 		fprintbf(cpp, "\treturn e;\n}());\n\n");

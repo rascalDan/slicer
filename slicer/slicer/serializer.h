@@ -1,25 +1,23 @@
 #ifndef SLICER_SERIALIZER_H
 #define SLICER_SERIALIZER_H
 
-#include <IceUtil/Shared.h>
-#include <IceUtil/Handle.h>
 #include <boost/filesystem/path.hpp>
 #include <slicer/modelParts.h>
 #include <visibility.h>
 #include <factory.h>
 
 namespace Slicer {
-	class DLL_PUBLIC Serializer : public IceUtil::Shared {
+	class DLL_PUBLIC Serializer {
 		public:
 			virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
-	typedef IceUtil::Handle<Serializer> SerializerPtr;
+	typedef std::shared_ptr<Serializer> SerializerPtr;
 
-	class DLL_PUBLIC Deserializer : public IceUtil::Shared {
+	class DLL_PUBLIC Deserializer {
 		public:
 			virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
-	typedef IceUtil::Handle<Deserializer> DeserializerPtr;
+	typedef std::shared_ptr<Deserializer> DeserializerPtr;
 
 	typedef AdHoc::Factory<Serializer, std::ostream &> StreamSerializerFactory;
 	typedef AdHoc::Factory<Deserializer, std::istream &> StreamDeserializerFactory;

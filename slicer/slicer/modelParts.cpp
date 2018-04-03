@@ -16,7 +16,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPart::GetSubclassModelPart(const std::string &)
 	{
-		return this;
+		return shared_from_this();
 	}
 
 	TypeId
@@ -71,7 +71,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPart::GetContainedModelPart()
 	{
-		return this;
+		return shared_from_this();
 	}
 
 	HookCommon::HookCommon(const std::string & n) :

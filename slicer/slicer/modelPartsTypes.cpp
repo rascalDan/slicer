@@ -263,8 +263,8 @@ namespace Slicer {
 	bool ModelPartForStreamBase::HasValue() const { return true; }
 	// Stream Roots
 	ModelPartForStreamRootBase::ModelPartForStreamRootBase(ModelPartPtr mp) : ModelPartForRootBase(mp) { }
-	void ModelPartForStreamRootBase::Write(Ice::OutputStreamPtr&) const { throw InvalidStreamOperation(__FUNCTION__); }
-	void ModelPartForStreamRootBase::Read(Ice::InputStreamPtr&) { throw InvalidStreamOperation(__FUNCTION__); }
+	void ModelPartForStreamRootBase::Write(Ice::OutputStream&) const { throw InvalidStreamOperation(__FUNCTION__); }
+	void ModelPartForStreamRootBase::Read(Ice::InputStream&) { throw InvalidStreamOperation(__FUNCTION__); }
 	bool ModelPartForStreamRootBase::HasValue() const { return mp->HasValue(); }
 	void ModelPartForStreamRootBase::OnEachChild(const ChildHandler & ch) { ch(GetRootName(), mp, NULL); }
 }

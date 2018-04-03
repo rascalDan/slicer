@@ -12,7 +12,8 @@ namespace fs = boost::filesystem;
 
 typedef std::map<std::string, unsigned int> ComponentsCount;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {
-	{ "classes.ice", 4 },
+	{ "classtype.ice", 1 },
+	{ "classes.ice", 3 },
 	{ "collections.ice", 6 },
 	{ "enums.ice", 2 },
 	{ "inheritance.ice", 12 },

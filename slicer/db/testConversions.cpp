@@ -10,7 +10,7 @@ namespace Slicer {
 	::TestDatabase::TimespanPtr
 	timedurationToTimespan(const boost::posix_time::time_duration & td)
 	{
-		return new ::TestDatabase::Timespan(SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()));
+		return std::make_shared<::TestDatabase::Timespan>(SHORT(td.hours() / 24), SHORT(td.hours() % 24), SHORT(td.minutes()), SHORT(td.seconds()));
 	}
 
 	DLL_PUBLIC

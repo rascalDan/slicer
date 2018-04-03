@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( optionalBuiltins )
 
 BOOST_AUTO_TEST_CASE( classes )
 {
-	TestModule::BuiltInsPtr x = new TestModule::BuiltIns();
+	TestModule::BuiltInsPtr x = std::make_shared<TestModule::BuiltIns>();
 	x->mbool = true;
 	x->mbyte = 14;
 	x->mshort = 31434;

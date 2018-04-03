@@ -25,8 +25,8 @@ namespace Slicer {
 
 			const std::string & GetRootName() const override;
 			virtual bool HasValue() const override;
-			void Write(::Ice::OutputStreamPtr &) const override;
-			void Read(::Ice::InputStreamPtr &) override;
+			void Write(::Ice::OutputStream &) const override;
+			void Read(::Ice::InputStream &) override;
 
 			static const std::string rootName;
 
@@ -206,9 +206,9 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<IceInternal::Handle<T> > {
+	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<std::shared_ptr<T> > {
 		public:
-			typedef IceInternal::Handle<T> element_type;
+			typedef std::shared_ptr<T> element_type;
 
 			ModelPartForClass(element_type * h);
 
@@ -388,8 +388,8 @@ namespace Slicer {
 		public:
 			ModelPartForStreamRootBase(ModelPartPtr mp);
 
-			virtual void Write(Ice::OutputStreamPtr&) const override;
-			virtual void Read(Ice::InputStreamPtr&) override;
+			virtual void Write(Ice::OutputStream&) const override;
+			virtual void Read(Ice::InputStream&) override;
 			virtual bool HasValue() const override;
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual const std::string & GetRootName() const override = 0;

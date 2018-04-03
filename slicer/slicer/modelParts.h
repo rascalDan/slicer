@@ -1,11 +1,9 @@
 #ifndef SLICER_MODELPARTS_H
 #define SLICER_MODELPARTS_H
 
-#include <IceUtil/Shared.h>
-#include <IceUtil/Handle.h>
 #include <IceUtil/Optional.h>
-#include <Ice/Handle.h>
-#include <Ice/StreamF.h>
+#include <Ice/InputStream.h>
+#include <Ice/OutputStream.h>
 #include <stdexcept>
 #include <boost/function.hpp>
 #include <vector>
@@ -13,14 +11,6 @@
 #include <visibility.h>
 
 namespace Slicer {
-	// This allows IceUtil::Handle to play nicely with boost::things
-	template <class T>
-	T *
-	get_pointer(const IceUtil::Handle<T> & p)
-	{
-		return p.get();
-	}
-
 	template <typename T>
 	class TValueTarget {
 		public:
@@ -75,8 +65,8 @@ namespace Slicer {
 	class ModelPartForRootBase;
 	class HookCommon;
 
-	typedef IceUtil::Handle<ModelPart> ModelPartPtr;
-	typedef IceUtil::Handle<ModelPartForRootBase> ModelPartForRootPtr;
+	typedef std::shared_ptr<ModelPart> ModelPartPtr;
+	typedef std::shared_ptr<ModelPartForRootBase> ModelPartForRootPtr;
 	typedef std::unique_ptr<HookCommon> HookCommonPtr;
 	typedef IceUtil::Optional<std::string> TypeId;
 
@@ -128,7 +118,7 @@ namespace Slicer {
 			const std::string name;
 	};
 
-	class DLL_PUBLIC ModelPart : virtual public IceUtil::Shared {
+	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
 		public:
 			virtual ~ModelPart() = default;
 
@@ -176,8 +166,8 @@ namespace Slicer {
 			virtual void OnEachChild(const ChildHandler & ch) override;
 			virtual ModelPartType GetType() const override;
 			virtual bool IsOptional() const override;
-			virtual void Write(::Ice::OutputStreamPtr &) const = 0;
-			virtual void Read(::Ice::InputStreamPtr &) = 0;
+			virtual void Write(::Ice::OutputStream &) const = 0;
+			virtual void Read(::Ice::InputStream &) = 0;
 			virtual ModelPartPtr GetContainedModelPart() override;
 
 			ModelPartPtr mp;

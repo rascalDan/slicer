@@ -6,8 +6,6 @@ import toolset ;
 
 lib dl ;
 lib pthread ;
-lib Ice ;
-lib IceUtil ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_date_time ;

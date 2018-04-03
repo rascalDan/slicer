@@ -1,6 +1,8 @@
 #ifndef SLICER_TEST_STRUCTS
 #define SLICER_TEST_STRUCTS
 
+#include <classtype.ice>
+
 ["slicer:include:conversions.h"]
 module TestModule {
 	struct DateTime {
@@ -22,7 +24,6 @@ module TestModule {
 		int a;
 		int b;
 	};
-	class ClassType;
 	struct StructStruct {
 		ClassType cls;
 		StructType str;

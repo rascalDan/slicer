@@ -8,7 +8,6 @@ lib jsonpp : : : :
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
-lib IceUtil ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-json :
@@ -17,7 +16,6 @@ lib slicer-json :
 	<include>..
 	<library>boost_system
 	<library>boost_filesystem
-	<library>IceUtil
 	<library>jsonpp
 	<library>../..//glibmm
 	<library>adhocutil

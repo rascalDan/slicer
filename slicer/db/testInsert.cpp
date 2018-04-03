@@ -10,11 +10,20 @@
 #include <common.h>
 #include <testModels.h>
 
+using namespace std::literals;
+
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
 // LCOV_EXCL_STOP
+
+namespace std {
+	template<typename T>
+	ostream & operator<<(ostream & s, const IceUtil::Optional<T> &) {
+		return s;
+	}
+}
 
 class StandardMockDatabase : public PQ::Mock {
 	public:
@@ -32,7 +41,7 @@ typedef boost::shared_ptr<DB::SelectCommand> SelectPtr;
 BOOST_AUTO_TEST_CASE( insert_builtins )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	TestModule::BuiltInsPtr bi = new TestModule::BuiltIns(true, 4, 16, 64, 128, 1.2, 3.4, "text");
+	TestModule::BuiltInsPtr bi = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi, db.get(), "builtins");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins"));
 	auto bi2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInsPtr>(*sel);
@@ -50,8 +59,8 @@ BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	TestModule::BuiltInSeq bis = {
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 65, 129, 2.3, 4.5, "more text")),
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 66, 130, 3.4, 5.6, "even more text"))
+		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 65, 129, 2.3, 4.5, "more text"),
+		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 66, 130, 3.4, 5.6, "even more text")
 	};
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bis, db.get(), "builtins");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins ORDER BY mint"));
@@ -71,8 +80,8 @@ BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	TestModule::BuiltInSeq bis = {
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
+		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
+		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
 	};
 	Slicer::SerializeAny<Slicer::SqlAutoIdInsertSerializer>(bis, db.get(), "builtins");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (1, 2) ORDER BY mint"));
@@ -95,8 +104,8 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	TestModule::BuiltInSeq bis = {
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
+		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
+		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
 	};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db.get(), "builtins");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (3, 4) ORDER BY mint"));
@@ -119,8 +128,8 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
 	TestDatabase::BuiltInSeq bis = {
-		TestDatabase::BuiltInsPtr(new TestDatabase::BuiltIns(true, IceUtil::Optional<Ice::Byte>(), 17, 0, 129, 2.3, 4.5, "more text")),
-		TestDatabase::BuiltInsPtr(new TestDatabase::BuiltIns(true, 6, 18, 0, 130, 3.4, IceUtil::Optional<Ice::Double>(), "even more text"))
+		std::make_shared<TestDatabase::BuiltIns>(true, IceUtil::None, 17, 0, 129, 2.3, 4.5, "more text"s),
+		std::make_shared<TestDatabase::BuiltIns>(true, 6, 18, 0, 130, 3.4, IceUtil::None, "even more text"s)
 	};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db.get(), "builtins");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM builtins WHERE mint IN (5, 6) ORDER BY mint"));
@@ -142,11 +151,11 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 BOOST_AUTO_TEST_CASE( insert_converted )
 {
 	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
-	TestDatabase::SpecificTypesPtr st = new TestDatabase::SpecificTypes {
-		{2015, 10, 16, 19, 12, 34},
-		{2015, 10, 16},
-		new TestDatabase::Timespan(1, 2, 3, 4)
-	};
+	TestDatabase::SpecificTypesPtr st = std::make_shared<TestDatabase::SpecificTypes>(
+		TestModule::DateTime {2015, 10, 16, 19, 12, 34},
+		TestModule::IsoDate {2015, 10, 16},
+		std::make_shared<TestDatabase::Timespan>(1, 2, 3, 4)
+	);
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(st, db.get(), "converted");
 	auto sel = SelectPtr(db->newSelectCommand("SELECT * FROM converted"));
 	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(*sel);

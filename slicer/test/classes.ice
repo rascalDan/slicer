@@ -1,6 +1,7 @@
 #ifndef SLICER_TEST_CLASSES
 #define SLICER_TEST_CLASSES
 
+#include <classtype.ice>
 #include <structs.ice>
 
 module TestModule {
@@ -22,11 +23,6 @@ module TestModule {
 		float mfloat;
 		double mdouble;
 		string mstring;
-	};
-	[ "slicer:custommodelpart:TestModule.AbValidator" ]
-	class ClassType {
-		int a;
-		int b;
 	};
 	class ClassClass {
 		ClassType cls;

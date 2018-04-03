@@ -1,19 +1,37 @@
 import package ;
 
-lib Slice ;
-lib Ice ;
-lib IceUtil ;
+lib Ice++11 ;
 lib po : : <name>boost_program_options ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 lib boost_system ;
 lib boost_filesystem ;
+lib mcpp ;
+
+lib Slice :
+	../../ice/cpp/src/Slice/Parser.cpp
+	../../ice/cpp/src/Slice/Grammar.cpp
+	../../ice/cpp/src/Slice/Preprocessor.cpp
+	../../ice/cpp/src/Slice/CPlusPlusUtil.cpp
+	../../ice/cpp/src/Slice/SliceUtil.cpp
+	../../ice/cpp/src/Slice/FileTracker.cpp
+	../../ice/cpp/src/Slice/Scanner.cpp
+	:
+	<define>register=
+	<cxxflags>-fPIC
+	<cxxflags>-UICE_CPP11_MAPPING
+	<cxxflags>-Wno-error=unused-parameter
+	<include>../../ice/cpp/src
+	<link>static
+	: :
+	<include>../../ice/cpp/src
+	;
 
 lib slicer-compiler :
 	parser.cpp
 	:
 	<library>Slice
-	<library>Ice
-	<library>IceUtil
+	<library>Ice++11
+	<library>mcpp
 	<library>boost_system
 	<library>boost_filesystem
 	<library>adhocutil

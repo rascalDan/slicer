@@ -1,6 +1,5 @@
 #include "serializer.h"
 #include "Ice/Initialize.h"
-#include "Ice/Stream.h"
 #include "Ice/Communicator.h"
 
 NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSerializerFactory);
@@ -26,9 +25,9 @@ namespace Slicer {
 	void
 	IceBlobSerializer::Serialize(ModelPartForRootPtr mp)
 	{
-		auto s = Ice::createOutputStream(ic);
+		Ice::OutputStream s(ic);
 		mp->Write(s);
-		s->finished(blob);
+		s.finished(blob);
 	}
 
 	IceStreamSerializer::IceStreamSerializer(std::ostream & os) :
@@ -52,7 +51,7 @@ namespace Slicer {
 	void
 	IceBlobDeserializer::Deserialize(ModelPartForRootPtr mp)
 	{
-		auto s = Ice::createInputStream(ic, blob);
+		Ice::InputStream s(ic, blob);
 		mp->Read(s);
 	}
 

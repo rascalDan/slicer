@@ -3,9 +3,7 @@
 
 #include "modelPartsTypes.h"
 #include "common.h"
-#include <Ice/Stream.h>
 #include <Ice/StreamHelpers.h>
-#include <Ice/BasicStream.h>
 #include <IceUtil/Optional.h>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -13,13 +11,13 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
-	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return new ModelPartType(nullptr); } \
-	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return new ModelPartType(&s); } \
+	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
+	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return std::make_shared<ModelPartType>(&s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(const Type & s) { return CreateFor(const_cast<Type &>(s)); } \
-	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return new ModelPartForOptional<ModelPartType>(&s); } \
+	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return std::make_shared<ModelPartForOptional<ModelPartType>>(&s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(const IceUtil::Optional<Type> & s) { return CreateFor(const_cast<IceUtil::Optional<Type> &>(s)); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return new ModelPartForRoot<Type>(&s); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return new ModelPartForRoot<IceUtil::Optional<Type> >(&s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return std::make_shared<ModelPartForRoot<Type>>(&s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return std::make_shared<ModelPartForRoot<IceUtil::Optional<Type>>>(&s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const IceUtil::Optional<Type> & s) { return CreateRootFor(const_cast<IceUtil::Optional<Type> &>(s)); } \
 	template class BaseModelPart; \
@@ -31,7 +29,7 @@
 #define MODELPARTFORSTREAM(StreamImpl) \
 	namespace Slicer { \
 		template<> ModelPartForRootPtr ModelPart::CreateRootFor(const StreamImpl & stream) { \
-			return new ModelPartForStreamRoot<typename StreamImpl::element_type>(const_cast<StreamImpl *>(&stream)); \
+			return std::make_shared<ModelPartForStreamRoot<typename StreamImpl::element_type>>(const_cast<StreamImpl *>(&stream)); \
 		} \
 	}
 
@@ -58,16 +56,16 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeWrite(::Ice::OutputStreamPtr & s, const ::IceUtil::Optional<T> & m)
+	typeWrite(::Ice::OutputStream & s, const ::IceUtil::Optional<T> & m)
 	{
 		if constexpr (!Slicer::isLocal<T>::value) {
 			typedef Ice::StreamableTraits<T> traits;
 			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
-			s->startEncapsulation();
-			if (m && s->writeOptional(0, SOH::optionalFormat)) {
-				SOH::write(s.get(), *m);
+			s.startEncapsulation();
+			if (m && s.writeOptional(0, SOH::optionalFormat)) {
+				SOH::write(&s, *m);
 			}
-			s->endEncapsulation();
+			s.endEncapsulation();
 		}
 		else {
 			throw LocalTypeException();
@@ -76,10 +74,10 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeWrite(::Ice::OutputStreamPtr & s, const T & m)
+	typeWrite(::Ice::OutputStream & s, const T & m)
 	{
 		if constexpr (!Slicer::isLocal<T>::value) {
-			s->write(m);
+			s.write(m);
 		}
 		else {
 			throw LocalTypeException();
@@ -88,20 +86,20 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeRead(::Ice::InputStreamPtr & s, ::IceUtil::Optional<T> & m)
+	typeRead(::Ice::InputStream & s, ::IceUtil::Optional<T> & m)
 	{
 		if constexpr (!Slicer::isLocal<T>::value) {
 			typedef Ice::StreamableTraits<T> traits;
 			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
-			s->startEncapsulation();
-			if (s->readOptional(0, SOH::optionalFormat)) {
-				m.__setIsSet();
-				SOH::read(s.get(), *m);
+			s.startEncapsulation();
+			if (s.readOptional(0, SOH::optionalFormat)) {
+				m = T();
+				SOH::read(&s, *m);
 			}
 			else {
 				m = IceUtil::None;
 			}
-			s->endEncapsulation();
+			s.endEncapsulation();
 		}
 		else {
 			throw LocalTypeException();
@@ -110,10 +108,10 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeRead(::Ice::InputStreamPtr & s, T & m)
+	typeRead(::Ice::InputStream & s, T & m)
 	{
 		if constexpr (!Slicer::isLocal<T>::value) {
-			s->read(m);
+			s.read(m);
 		}
 		else {
 			throw LocalTypeException();
@@ -121,13 +119,13 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	void ModelPartForRoot<T>::Write(::Ice::OutputStreamPtr & s) const
+	void ModelPartForRoot<T>::Write(::Ice::OutputStream & s) const
 	{
 		typeWrite(s, *ModelObject);
 	}
 
 	template<typename T>
-	void ModelPartForRoot<T>::Read(::Ice::InputStreamPtr & s)
+	void ModelPartForRoot<T>::Read(::Ice::InputStream & s)
 	{
 		typeRead(s, *ModelObject);
 	}
@@ -171,7 +169,7 @@ namespace Slicer {
 	bool ModelPartForConverted<IceUtil::Optional<T>, M, MV>::HasValue() const
 	{
 		BOOST_ASSERT(this->Model);
-		return *this->Model;
+		return (bool)*this->Model;
 	}
 
 	// Function traits helpers
@@ -195,7 +193,7 @@ namespace Slicer {
 		template <typename Y>
 		const T & operator()(const IceUtil::Optional<Y> & x) const { return *x; }
 		static bool valueExists(const T &) { return true; }
-		static bool valueExists(const IceUtil::Optional<T> & y) { return y; }
+		static bool valueExists(const IceUtil::Optional<T> & y) { return y.has_value(); }
 	};
 	template <typename X>
 	struct Coerce<IceUtil::Optional<X>> {
@@ -278,7 +276,7 @@ namespace Slicer {
 		ModelPartModel<IceUtil::Optional< typename T::element_type> >(h)
 	{
 		if (this->Model && *this->Model) {
-			modelPart = new T(&**this->Model);
+			modelPart = std::make_shared<T>(&**this->Model);
 		}
 	}
 
@@ -286,7 +284,7 @@ namespace Slicer {
 	bool ModelPartForOptional<T>::hasModel() const
 	{
 		BOOST_ASSERT(this->Model);
-		return *this->Model;
+		return (bool)*this->Model;
 	}
 
 	template<typename T>
@@ -295,7 +293,7 @@ namespace Slicer {
 		BOOST_ASSERT(this->Model);
 		if (!*this->Model) {
 			*this->Model = typename T::element_type();
-			modelPart = new T(&**this->Model);
+			modelPart = std::make_shared<T>(&**this->Model);
 			modelPart->Create();
 		}
 	}
@@ -394,7 +392,7 @@ namespace Slicer {
 	template<typename MT, typename MP>
 	ModelPartPtr ModelPartForComplex<T>::Hook<MT, MP>::Get(T * t) const
 	{
-		return new MP(t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : NULL);
+		return std::make_shared<MP>(t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : NULL);
 	}
 
 	template<typename T>
@@ -423,7 +421,7 @@ namespace Slicer {
 	void ModelPartForClass<T>::Create()
 	{
 		BOOST_ASSERT(this->Model);
-		*this->Model = new T();
+		*this->Model = std::make_shared<T>();
 	}
 
 	template<typename T>
@@ -443,7 +441,7 @@ namespace Slicer {
 	bool ModelPartForClass<T>::HasValue() const
 	{
 		BOOST_ASSERT(this->Model);
-		return *this->Model;
+		return (bool)*this->Model;
 	}
 
 	template<typename T>
@@ -455,7 +453,7 @@ namespace Slicer {
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::CreateModelPart(void * p)
 	{
-		return new ModelPartForClass<T>(static_cast<element_type *>(p));
+		return std::make_shared<ModelPartForClass<T>>(static_cast<element_type *>(p));
 	}
 
 	template<typename T>
@@ -638,7 +636,7 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		for (auto & pair : *this->Model) {
-			ch(pairName, new ModelPartForStruct<typename T::value_type>(&pair), NULL);
+			ch(pairName, std::make_shared<ModelPartForStruct<typename T::value_type>>(&pair), NULL);
 		}
 	}
 
@@ -646,7 +644,7 @@ namespace Slicer {
 	ChildRef ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		return ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
+		return ChildRef(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model));
 	}
 
 	template<typename T>
@@ -656,7 +654,7 @@ namespace Slicer {
 		if (!optionalCaseEq(name, pairName, matchCase)) {
 			throw IncorrectElementName(name);
 		}
-		return ChildRef(new ModelPartForDictionaryElementInserter<T>(this->Model));
+		return ChildRef(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model));
 	}
 
 	template<typename T>
@@ -668,7 +666,7 @@ namespace Slicer {
 	template<typename T>
 	ModelPartPtr ModelPartForDictionary<T>::GetContainedModelPart()
 	{
-		return new ModelPartForStruct<typename T::value_type>(nullptr);
+		return std::make_shared<ModelPartForStruct<typename T::value_type>>(nullptr);
 	}
 
 	// ModelPartForStream
@@ -697,7 +695,7 @@ namespace Slicer {
 
 	template<typename T>
 	ModelPartForStreamRoot<T>::ModelPartForStreamRoot(Stream<T> * s) :
-		ModelPartForStreamRootBase(new ModelPartForStream<T>(s))
+		ModelPartForStreamRootBase(std::make_shared<ModelPartForStream<T>>(s))
 	{
 	}
 

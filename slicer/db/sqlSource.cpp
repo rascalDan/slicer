@@ -58,7 +58,9 @@ namespace Slicer {
 	void
 	SqlSource::set(Ice::Long & b) const
 	{
-		column >> b;
+		int64_t cb;
+		column >> cb;
+		b = boost::numeric_cast<Ice::Long>(cb);
 	}
 
 	void

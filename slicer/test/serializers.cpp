@@ -25,6 +25,13 @@ namespace fs = boost::filesystem;
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
+BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::SomeNumbers )
+namespace std {
+	template<typename T>
+	ostream & operator<<(ostream & s, const IceUtil::Optional<T> &) {
+		return s;
+	}
+}
 // LCOV_EXCL_STOP
 
 class FileBased {
@@ -144,30 +151,30 @@ void
 checkInherits_types(const TestModule::InheritanceContPtr & i)
 {
 	BOOST_REQUIRE(i->b);
-	BOOST_REQUIRE(TestModule::D1Ptr::dynamicCast(i->b));
-	BOOST_REQUIRE_EQUAL(TestModule::D1Ptr::dynamicCast(i->b)->a, 1);
-	BOOST_REQUIRE_EQUAL(TestModule::D1Ptr::dynamicCast(i->b)->b, 2);
+	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D1>(i->b));
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D1>(i->b)->a, 1);
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D1>(i->b)->b, 2);
 	BOOST_REQUIRE_EQUAL(i->bs.size(), 3);
 	BOOST_REQUIRE(i->bs[0]);
-	BOOST_REQUIRE(TestModule::D2Ptr::dynamicCast(i->bs[0]));
-	BOOST_REQUIRE_EQUAL(TestModule::D2Ptr::dynamicCast(i->bs[0])->a, 1);
-	BOOST_REQUIRE_EQUAL(TestModule::D2Ptr::dynamicCast(i->bs[0])->c, 100);
+	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0]));
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0])->a, 1);
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0])->c, 100);
 	BOOST_REQUIRE(i->bs[1]);
-	BOOST_REQUIRE(TestModule::D3Ptr::dynamicCast(i->bs[1]));
-	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i->bs[1])->a, 2);
-	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i->bs[1])->c, 100);
-	BOOST_REQUIRE_EQUAL(TestModule::D3Ptr::dynamicCast(i->bs[1])->d, 200);
+	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1]));
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->a, 2);
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->c, 100);
+	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->d, 200);
 	BOOST_REQUIRE(i->bs[2]);
 	BOOST_REQUIRE_EQUAL(i->bs[2]->a, 3);
-	BOOST_REQUIRE(!TestModule::D1Ptr::dynamicCast(i->bs[2]));
-	BOOST_REQUIRE(!TestModule::D2Ptr::dynamicCast(i->bs[2]));
-	BOOST_REQUIRE(!TestModule::D3Ptr::dynamicCast(i->bs[2]));
+	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D1>(i->bs[2]));
+	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D2>(i->bs[2]));
+	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D3>(i->bs[2]));
 	BOOST_REQUIRE_EQUAL(i->bm.size(), 3);
-	BOOST_REQUIRE(TestModule::D1Ptr::dynamicCast(i->bm.find(10)->second));
-	BOOST_REQUIRE(TestModule::D3Ptr::dynamicCast(i->bm.find(12)->second));
-	BOOST_REQUIRE(!TestModule::D1Ptr::dynamicCast(i->bm.find(14)->second));
-	BOOST_REQUIRE(!TestModule::D2Ptr::dynamicCast(i->bm.find(14)->second));
-	BOOST_REQUIRE(!TestModule::D3Ptr::dynamicCast(i->bm.find(14)->second));
+	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D1>(i->bm.find(10)->second));
+	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D3>(i->bm.find(12)->second));
+	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D1>(i->bm.find(14)->second));
+	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D2>(i->bm.find(14)->second));
+	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D3>(i->bm.find(14)->second));
 }
 
 void
@@ -260,14 +267,14 @@ checkBare(const TestXml::BareContainers & bc)
 void
 checkSomeEnums(const TestModule::SomeEnumsPtr & se)
 {
-	BOOST_REQUIRE_EQUAL(se->one, TestModule::Ten);
-	BOOST_REQUIRE_EQUAL(se->two, TestModule::FiftyFive);
+	BOOST_REQUIRE_EQUAL(se->one, TestModule::SomeNumbers::Ten);
+	BOOST_REQUIRE_EQUAL(se->two, TestModule::SomeNumbers::FiftyFive);
 }
 
 void
 checkSomeNumbers(const TestModule::SomeNumbers & sn)
 {
-	BOOST_REQUIRE_EQUAL(sn, TestModule::FiftyFive);
+	BOOST_REQUIRE_EQUAL(sn, TestModule::SomeNumbers::FiftyFive);
 }
 
 void
@@ -591,10 +598,10 @@ BOOST_AUTO_TEST_CASE( xml_streams )
 
 BOOST_AUTO_TEST_CASE( invalid_enum )
 {
-	Slicer::DeserializerPtr jdeserializer = new Slicer::JsonFileDeserializer(rootDir / "initial" / "invalidEnum.json");
+	auto jdeserializer = std::make_shared<Slicer::JsonFileDeserializer>(rootDir / "initial" / "invalidEnum.json");
 	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
 
-	Slicer::DeserializerPtr xdeserializer = new Slicer::XmlFileDeserializer(rootDir / "initial" / "invalidEnum.xml");
+	auto xdeserializer = std::make_shared<Slicer::XmlFileDeserializer>(rootDir / "initial" / "invalidEnum.xml");
 	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
 
@@ -625,7 +632,7 @@ BOOST_AUTO_TEST_CASE( missingConversion )
 		Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)
 	), Slicer::NoConversionFound);
 
-	TestModule2::MissingConvPtr obj = new TestModule2::MissingConv("2016-06-30 12:34:56");
+	auto obj = std::make_shared<TestModule2::MissingConv>("2016-06-30 12:34:56");
 	json::Value v;
 	BOOST_REQUIRE_THROW(
 		Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v),

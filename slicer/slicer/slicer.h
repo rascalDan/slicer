@@ -1,7 +1,6 @@
 #ifndef SLICER_H
 #define SLICER_H
 
-#include <Ice/Handle.h>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 
@@ -19,7 +18,7 @@ namespace Slicer {
 	Object
 	DeserializeAny(SerializerParams && ... sp)
 	{
-		return DeserializeAnyWith<Object>(new Deserializer(sp ...));
+		return DeserializeAnyWith<Object>(std::make_shared<Deserializer>(sp ...));
 	}
 
 	template <typename Object>
@@ -33,7 +32,7 @@ namespace Slicer {
 	void
 	SerializeAny(const Object & object, SerializerParams && ... sp)
 	{
-		SerializeAnyWith(object, new Serializer(sp ...));
+		SerializeAnyWith(object, std::make_shared<Serializer>(sp ...));
 	}
 }
 

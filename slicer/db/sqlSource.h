@@ -28,7 +28,7 @@ namespace Slicer {
 		private:
 			const DB::Column & column;
 	};
-	typedef IceUtil::Handle<SqlSource> SqlSourcePtr;
+	typedef std::shared_ptr<SqlSource> SqlSourcePtr;
 }
 
 #endif

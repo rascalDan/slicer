@@ -10,6 +10,8 @@
 #include <testModels.h>
 #include <sqlExceptions.h>
 
+using namespace std::literals;
+
 class StandardMockDatabase : public PQ::Mock {
 	public:
 		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
@@ -93,9 +95,9 @@ BOOST_AUTO_TEST_CASE( select_inherit_single )
 				"SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
 				FROM test \
 				WHERE id = 2"));
-	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BasePtr>(*sel, "tc");
+	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BasePtr>(*sel, "tc"s);
 	BOOST_REQUIRE(bi);
-	auto d2 = TestModule::D2Ptr::dynamicCast(bi);
+	auto d2 = std::dynamic_pointer_cast<TestModule::D2>(bi);
 	BOOST_REQUIRE(d2);
 	BOOST_REQUIRE_EQUAL(2, d2->a);
 	BOOST_REQUIRE_EQUAL(300, d2->c);
@@ -124,11 +126,11 @@ BOOST_AUTO_TEST_CASE( select_inherit_sequence )
 				FROM test \
 				WHERE id < 4 \
 				ORDER BY id DESC"));
-	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BaseSeq>(*sel, "tc");
+	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BaseSeq>(*sel, "tc"s);
 	BOOST_REQUIRE_EQUAL(3, bi.size());
-	auto d3 = TestModule::D3Ptr::dynamicCast(bi[0]);
-	auto d2 = TestModule::D2Ptr::dynamicCast(bi[1]);
-	auto d1 = TestModule::D1Ptr::dynamicCast(bi[2]);
+	auto d3 = std::dynamic_pointer_cast<TestModule::D3>(bi[0]);
+	auto d2 = std::dynamic_pointer_cast<TestModule::D2>(bi[1]);
+	auto d1 = std::dynamic_pointer_cast<TestModule::D1>(bi[2]);
 	BOOST_REQUIRE(d3);
 	BOOST_REQUIRE(d2);
 	BOOST_REQUIRE(d1);
@@ -264,7 +266,7 @@ BOOST_AUTO_TEST_CASE( select_null )
 	sel = SelectPtr(db->newSelectCommand("SELECT MAX(id) optSimple FROM test WHERE id IS NOT NULL"));
 	oi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::OptionalsPtr>(*sel);
 	BOOST_REQUIRE(oi->optSimple);
-	BOOST_REQUIRE_EQUAL(oi->optSimple.get(), 4);
+	BOOST_REQUIRE_EQUAL(*oi->optSimple, 4);
 
 	sel = SelectPtr(db->newSelectCommand("SELECT MAX(id) FROM test WHERE false"));
 	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(*sel);

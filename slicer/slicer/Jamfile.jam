@@ -1,8 +1,7 @@
 import package ;
 
 lib pthread ;
-lib Ice ;
-lib IceUtil ;
+lib Ice++11 ;
 lib boost_system ;
 lib boost_filesystem ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
@@ -12,8 +11,7 @@ lib slicer :
 	[ glob *.ice ]
 	:
 	<library>pthread
-	<library>Ice
-	<library>IceUtil
+	<library>Ice++11
 	<library>boost_system
 	<library>adhocutil
 	<include>..
