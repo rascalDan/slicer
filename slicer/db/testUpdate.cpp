@@ -1,9 +1,8 @@
 #define BOOST_TEST_MODULE db_update
 #include <boost/test/unit_test.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <pq-mock.h>
+#include "testMockCommon.h"
 #include <slicer/slicer.h>
-#include <definedDirs.h>
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include "sqlUpdateSerializer.h"
@@ -14,26 +13,18 @@
 
 using namespace std::literals;
 
-class StandardMockDatabase : public DB::PluginMock<PQ::Mock> {
-	public:
-		StandardMockDatabase() : DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
-				rootDir.parent_path() / "db" / "slicer.sql" })
-		{
-		}
-};
-
 BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
 BOOST_AUTO_TEST_CASE( update_builtinsNotFound )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInsPtr ubi = std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 129, -1.2, -1.4, "string");
 	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubi, db, "builtins"), Slicer::NoRowsFound);
 }
 
 BOOST_AUTO_TEST_CASE( update_builtins )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInsPtr bi1 = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text1");
 	TestModule::BuiltInsPtr bi2 = std::make_shared<TestModule::BuiltIns>(true, 3, 15, 63, 127, 5.2, 5.4, "text2");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi1, db, "builtins");
@@ -65,7 +56,6 @@ BOOST_AUTO_TEST_CASE( update_builtins )
 
 BOOST_AUTO_TEST_CASE( update_builtins_seq )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInSeq ubis {
 		TestModule::BuiltInsPtr(std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 128, -1.2, -1.4, "string")),
 		TestModule::BuiltInsPtr(std::make_shared<TestModule::BuiltIns>(false, 5, 21, 63, 127, -4.2, -5.4, "string updated"))
@@ -95,7 +85,6 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 
 BOOST_AUTO_TEST_CASE( update_withNulls )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
 	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel);
 	BOOST_REQUIRE_EQUAL(2, bis.size());
@@ -120,8 +109,9 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 
 BOOST_AUTO_TEST_CASE( update_unsupportedModel )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::ClassMap cm;
 	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
 }
+
+BOOST_AUTO_TEST_SUITE_END();
 

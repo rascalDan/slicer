@@ -1,9 +1,8 @@
 #define BOOST_TEST_MODULE db_insert
 #include <boost/test/unit_test.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <pq-mock.h>
+#include "testMockCommon.h"
 #include <slicer/slicer.h>
-#include <definedDirs.h>
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include <types.h>
@@ -25,19 +24,12 @@ namespace std {
 	}
 }
 
-class StandardMockDatabase : public DB::PluginMock<PQ::Mock> {
-	public:
-		StandardMockDatabase() : DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
-				rootDir.parent_path() / "db" / "slicer.sql" })
-		{
-		}
-};
-
 BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
 BOOST_AUTO_TEST_CASE( insert_builtins )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInsPtr bi = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins");
@@ -54,7 +46,6 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 
 BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInSeq bis = {
 		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 65, 129, 2.3, 4.5, "more text"),
 		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 66, 130, 3.4, 5.6, "even more text")
@@ -75,7 +66,6 @@ BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 
 BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInSeq bis = {
 		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
 		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
@@ -99,7 +89,6 @@ BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
 
 BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInSeq bis = {
 		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
 		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
@@ -123,7 +112,6 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 
 BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestDatabase::BuiltInSeq bis = {
 		std::make_shared<TestDatabase::BuiltIns>(true, IceUtil::None, 17, 0, 129, 2.3, 4.5, "more text"s),
 		std::make_shared<TestDatabase::BuiltIns>(true, 6, 18, 0, 130, 3.4, IceUtil::None, "even more text"s)
@@ -147,7 +135,6 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 
 BOOST_AUTO_TEST_CASE( insert_converted )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestDatabase::SpecificTypesPtr st = std::make_shared<TestDatabase::SpecificTypes>(
 		TestModule::DateTime {2015, 10, 16, 19, 12, 34},
 		TestModule::IsoDate {2015, 10, 16},
@@ -166,8 +153,9 @@ BOOST_AUTO_TEST_CASE( insert_converted )
 
 BOOST_AUTO_TEST_CASE( insert_unsupportedModel )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::ClassMap cm;
 	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlInsertSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
 }
+
+BOOST_AUTO_TEST_SUITE_END();
 

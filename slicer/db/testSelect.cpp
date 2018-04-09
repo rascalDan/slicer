@@ -1,9 +1,8 @@
 #define BOOST_TEST_MODULE db_select
 #include <boost/test/unit_test.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <pq-mock.h>
+#include "testMockCommon.h"
 #include <slicer/slicer.h>
-#include <definedDirs.h>
 #include "sqlSelectDeserializer.h"
 #include <types.h>
 #include <common.h>
@@ -12,19 +11,12 @@
 
 using namespace std::literals;
 
-class StandardMockDatabase : public DB::PluginMock<PQ::Mock> {
-	public:
-		StandardMockDatabase() : DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
-				rootDir.parent_path() / "db" / "slicer.sql" })
-		{
-		}
-};
-
 BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
 BOOST_AUTO_TEST_CASE( select_simple_int )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT MAX(id) FROM test");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::Int>(sel);
 	BOOST_REQUIRE_EQUAL(4, bi);
@@ -32,7 +24,6 @@ BOOST_AUTO_TEST_CASE( select_simple_int )
 
 BOOST_AUTO_TEST_CASE( select_simple_double )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT MAX(fl) FROM test");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::Double>(sel);
 	BOOST_REQUIRE_CLOSE(1234.1234, bi, 0.0001);
@@ -40,7 +31,6 @@ BOOST_AUTO_TEST_CASE( select_simple_double )
 
 BOOST_AUTO_TEST_CASE( select_simple_string )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT MAX(string) FROM test");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, std::string>(sel);
 	BOOST_REQUIRE_EQUAL("text two", bi);
@@ -48,7 +38,6 @@ BOOST_AUTO_TEST_CASE( select_simple_string )
 
 BOOST_AUTO_TEST_CASE( select_simple_true )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT true");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, bool>(sel);
 	BOOST_REQUIRE_EQUAL(true, bi);
@@ -56,7 +45,6 @@ BOOST_AUTO_TEST_CASE( select_simple_true )
 
 BOOST_AUTO_TEST_CASE( select_simple_false )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT NOT(true)");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, bool>(sel);
 	BOOST_REQUIRE_EQUAL(false, bi);
@@ -64,7 +52,6 @@ BOOST_AUTO_TEST_CASE( select_simple_false )
 
 BOOST_AUTO_TEST_CASE( select_single )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select(
 				"SELECT boolean mbool, \
 				id mbyte, id mshort, id mint, id mlong, \
@@ -87,7 +74,6 @@ BOOST_AUTO_TEST_CASE( select_single )
 
 BOOST_AUTO_TEST_CASE( select_inherit_single )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select(
 				"SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
 				FROM test \
@@ -102,7 +88,6 @@ BOOST_AUTO_TEST_CASE( select_inherit_single )
 
 BOOST_AUTO_TEST_CASE( select_simple_sequence )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select(
 				"SELECT string \
 				FROM test \
@@ -117,7 +102,6 @@ BOOST_AUTO_TEST_CASE( select_simple_sequence )
 
 BOOST_AUTO_TEST_CASE( select_inherit_sequence )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select(
 				"SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
 				FROM test \
@@ -142,7 +126,6 @@ BOOST_AUTO_TEST_CASE( select_inherit_sequence )
 
 BOOST_AUTO_TEST_CASE( select_inherit_datetime )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select(
 				"SELECT dt, to_char(dt, 'YYYY-MM-DD') date, ts \
 				FROM test \
@@ -172,28 +155,24 @@ BoostThrowWrapperHelper(P && ... p)
 
 BOOST_AUTO_TEST_CASE( select_unsupportedModel )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::ClassMap>(sel), Slicer::UnsupportedModelType);
 }
 
 BOOST_AUTO_TEST_CASE( select_tooManyRowsSimple )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(sel), Slicer::TooManyRowsReturned);
 }
 
 BOOST_AUTO_TEST_CASE( select_noRowsSimple )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(sel), Slicer::NoRowsReturned);
 }
 
 BOOST_AUTO_TEST_CASE( select_noRowsSimpleOptional )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(sel);
 	BOOST_REQUIRE(!v);
@@ -201,14 +180,12 @@ BOOST_AUTO_TEST_CASE( select_noRowsSimpleOptional )
 
 BOOST_AUTO_TEST_CASE( select_tooManyRowsSimpleOptional )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<IceUtil::Optional<Ice::Int>>(sel), Slicer::TooManyRowsReturned);
 }
 
 BOOST_AUTO_TEST_CASE( select_simpleOptional )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT MAX(id) FROM test");
 	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(sel);
 	BOOST_REQUIRE(v);
@@ -217,7 +194,6 @@ BOOST_AUTO_TEST_CASE( select_simpleOptional )
 
 BOOST_AUTO_TEST_CASE( select_noRowsComplexOptional )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select(
 				"SELECT boolean mbool, \
 				id mbyte, id mshort, id mint, id mlong, \
@@ -231,21 +207,18 @@ BOOST_AUTO_TEST_CASE( select_noRowsComplexOptional )
 
 BOOST_AUTO_TEST_CASE( select_tooManyRowsComplex )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::BuiltInsPtr>(sel), Slicer::TooManyRowsReturned);
 }
 
 BOOST_AUTO_TEST_CASE( select_noRowsComplex )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::BuiltInsPtr>(sel), Slicer::NoRowsReturned);
 }
 
 BOOST_AUTO_TEST_CASE( select_emptySequence )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BaseSeq>(sel);
 	BOOST_REQUIRE_EQUAL(0, bi.size());
@@ -253,7 +226,6 @@ BOOST_AUTO_TEST_CASE( select_emptySequence )
 
 BOOST_AUTO_TEST_CASE( select_null )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	db->execute("INSERT INTO test(id) VALUES(NULL)");
 
 	auto sel = db->select("SELECT id optSimple FROM test WHERE id IS NULL");
@@ -269,4 +241,6 @@ BOOST_AUTO_TEST_CASE( select_null )
 	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(sel);
 	BOOST_REQUIRE(!v);
 }
+
+BOOST_AUTO_TEST_SUITE_END();
 

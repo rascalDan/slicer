@@ -29,13 +29,17 @@ lib slicer-db :
 path-constant me : . ;
 
 lib testCommon :
-	[ glob testConversions.cpp test*.ice ]
+	[ glob testConversions.cpp testMockCommon.cpp test*.ice ]
 	:
 	<dependency>../tool//slicer
 	<slicer>yes
 	<slicerbin>../tool//slicer
 	<implicit-dependency>../test//types
 	<library>../test//types
+	<library>../test//common
+	<library>dbpp-postgresql
+	<library>dbppcore
+	<library>adhocutil
 	: :
 	<library>adhocutil
 	;

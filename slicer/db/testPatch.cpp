@@ -1,9 +1,8 @@
 #define BOOST_TEST_MODULE db_patch
 #include <boost/test/unit_test.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <pq-mock.h>
+#include "testMockCommon.h"
 #include <slicer/slicer.h>
-#include <definedDirs.h>
 #include "sqlTablePatchSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include <types.h>
@@ -17,19 +16,12 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::PrimaryKey);
 // LCOV_EXCL_STOP
 
-class StandardMockDatabase : public DB::PluginMock<PQ::Mock> {
-	public:
-		StandardMockDatabase() : DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
-				rootDir.parent_path() / "db" / "slicer.sql" })
-		{
-		}
-};
-
 BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
 BOOST_AUTO_TEST_CASE( insert_builtins )
 {
-	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInSeq bis = {
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
@@ -48,4 +40,6 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 	DB::ColumnNames cols = {"mbool", "mbyte", "mdouble", "mfloat", "mint", "mlong", "mshort", "mstring"};
 	BOOST_REQUIRE_EQUAL(cols, tp.cols);
 }
+
+BOOST_AUTO_TEST_SUITE_END();
 
