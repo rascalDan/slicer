@@ -8,19 +8,17 @@
 namespace Slicer {
 	class DLL_PUBLIC SqlUpdateSerializer : public Slicer::Serializer {
 		public:
-			typedef boost::shared_ptr<DB::ModifyCommand> ModifyPtr;
-
-			SqlUpdateSerializer(DB::Connection * const, const std::string & tableName);
+			SqlUpdateSerializer(DB::ConnectionPtr const, const std::string & tableName);
 
 			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
 
 		protected:
 			void SerializeObject(Slicer::ModelPartPtr) const;
 			void SerializeSequence(Slicer::ModelPartPtr) const;
-			ModifyPtr createUpdate(Slicer::ModelPartPtr) const;
+			DB::ModifyCommandPtr createUpdate(Slicer::ModelPartPtr) const;
 			static void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *);
 
-			DB::Connection * const connection;
+			DB::ConnectionPtr const connection;
 			const std::string tableName;
 	};
 }

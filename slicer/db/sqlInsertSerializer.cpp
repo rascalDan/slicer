@@ -10,7 +10,7 @@
 #include <boost/bind.hpp>
 
 namespace Slicer {
-	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, const std::string & t) :
+	SqlInsertSerializer::SqlInsertSerializer(DB::ConnectionPtr const c, const std::string & t) :
 		connection(c),
 		tableName(t)
 	{
@@ -41,7 +41,7 @@ namespace Slicer {
 	void
 	SqlInsertSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
 	{
-		ModifyPtr ins = createInsert(mp->GetContainedModelPart());
+		auto ins = createInsert(mp->GetContainedModelPart());
 		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
@@ -57,7 +57,7 @@ namespace Slicer {
 
 	class IdSave : public Slicer::ValueSource {
 		public:
-			IdSave(DB::Connection * const c) :
+			IdSave(const DB::ConnectionPtr & c) :
 				connection(c)
 			{
 			}
@@ -79,7 +79,7 @@ namespace Slicer {
 			NumType(Ice::Double);
 
 		private:
-			DB::Connection * const connection;
+			const DB::ConnectionPtr & connection;
 	};
 
 	void
@@ -112,7 +112,7 @@ namespace Slicer {
 		}
 	}
 
-	SqlInsertSerializer::ModifyPtr
+	DB::ModifyCommandPtr
 	SqlInsertSerializer::createInsert(Slicer::ModelPartPtr mp) const
 	{
 		AdHoc::Buffer insert;
@@ -124,7 +124,7 @@ namespace Slicer {
 			insert.append("?, ");
 		}
 		insert.append("?)");
-		return ModifyPtr(connection->newModifyCommand(insert));
+		return connection->modify(insert);
 	}
 
 	void

@@ -9,7 +9,7 @@
 #include <boost/bind.hpp>
 
 namespace Slicer {
-	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :
+	SqlUpdateSerializer::SqlUpdateSerializer(DB::ConnectionPtr const c, const std::string & t) :
 		connection(c),
 		tableName(t)
 	{
@@ -40,7 +40,7 @@ namespace Slicer {
 	void
 	SqlUpdateSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
 	{
-		ModifyPtr ins = createUpdate(mp->GetContainedModelPart());
+		auto ins = createUpdate(mp->GetContainedModelPart());
 		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
@@ -68,7 +68,7 @@ namespace Slicer {
 		}
 	}
 
-	SqlUpdateSerializer::ModifyPtr
+	DB::ModifyCommandPtr
 	SqlUpdateSerializer::createUpdate(Slicer::ModelPartPtr mp) const
 	{
 		AdHoc::Buffer update;
@@ -92,7 +92,7 @@ namespace Slicer {
 				update.appendbf("%s = ?", name);
 			}
 		});
-		return ModifyPtr(connection->newModifyCommand(update));
+		return connection->modify(update);
 	}
 }
 

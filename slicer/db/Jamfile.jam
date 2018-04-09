@@ -36,6 +36,8 @@ lib testCommon :
 	<slicerbin>../tool//slicer
 	<implicit-dependency>../test//types
 	<library>../test//types
+	: :
+	<library>adhocutil
 	;
 
 run testSelect.cpp

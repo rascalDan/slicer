@@ -7,7 +7,7 @@
 namespace Slicer {
 	class DLL_PUBLIC SqlTablePatchSerializer : public Slicer::Serializer {
 		public:
-			SqlTablePatchSerializer(DB::Connection *, DB::TablePatch &);
+			SqlTablePatchSerializer(DB::ConnectionPtr, DB::TablePatch &);
 			~SqlTablePatchSerializer();
 
 			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
@@ -16,7 +16,7 @@ namespace Slicer {
 			void createTemporaryTable();
 			void dropTemporaryTable();
 
-			DB::Connection * db;
+			DB::ConnectionPtr db;
 			DB::TablePatch & tablePatch;
 	};
 }

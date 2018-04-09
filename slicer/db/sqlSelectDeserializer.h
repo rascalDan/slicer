@@ -8,7 +8,7 @@
 namespace Slicer {
 	class DLL_PUBLIC SqlSelectDeserializer : public Slicer::Deserializer {
 		public:
-			SqlSelectDeserializer(DB::SelectCommand &, IceUtil::Optional<std::string> typeIdCol = IceUtil::Optional<std::string>());
+			SqlSelectDeserializer(DB::SelectCommandPtr, IceUtil::Optional<std::string> typeIdCol = IceUtil::Optional<std::string>());
 
 			virtual void Deserialize(Slicer::ModelPartForRootPtr) override;
 
@@ -18,7 +18,7 @@ namespace Slicer {
 			void DLL_PRIVATE DeserializeSequence(Slicer::ModelPartPtr);
 			void DLL_PRIVATE DeserializeRow(Slicer::ModelPartPtr);
 
-			DB::SelectCommand & cmd;
+			DB::SelectCommandPtr cmd;
 			unsigned int columnCount;
 			IceUtil::Optional<std::string> typeIdColName;
 			IceUtil::Optional<unsigned int> typeIdColIdx;

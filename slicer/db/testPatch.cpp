@@ -17,9 +17,9 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::PrimaryKey);
 // LCOV_EXCL_STOP
 
-class StandardMockDatabase : public PQ::Mock {
+class StandardMockDatabase : public DB::PluginMock<PQ::Mock> {
 	public:
-		StandardMockDatabase() : PQ::Mock("user=postgres dbname=postgres", "pqmock", {
+		StandardMockDatabase() : DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
 				rootDir.parent_path() / "db" / "slicer.sql" })
 		{
 		}
@@ -27,22 +27,19 @@ class StandardMockDatabase : public PQ::Mock {
 
 BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
 
-typedef boost::shared_ptr<DB::Connection> DBPtr;
-typedef boost::shared_ptr<DB::SelectCommand> SelectPtr;
-
 BOOST_AUTO_TEST_CASE( insert_builtins )
 {
-	auto db = DBPtr(DB::MockDatabase::openConnectionTo("pqmock"));
+	auto db = DB::MockDatabase::openConnectionTo("pqmock");
 	TestModule::BuiltInSeq bis = {
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
 	};
 	DB::TablePatch tp;
-	DB::TransactionScope tx(db.get());
+	DB::TransactionScope tx(db);
 	tp.dest = "builtins";
-	Slicer::SerializeAny<Slicer::SqlTablePatchSerializer>(bis, db.get(), tp);
+	Slicer::SerializeAny<Slicer::SqlTablePatchSerializer>(bis, db, tp);
 	auto cmd = db->select("SELECT COUNT(*) FROM builtins");
-	auto c = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, int>(*cmd);
+	auto c = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, int>(cmd);
 	BOOST_REQUIRE_EQUAL(2, c);
 	BOOST_REQUIRE_EQUAL(2, tp.pk.size());
 	DB::PrimaryKey pk = {"mint", "mlong"};
