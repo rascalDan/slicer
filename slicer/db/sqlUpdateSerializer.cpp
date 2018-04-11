@@ -9,7 +9,7 @@
 #include <boost/bind.hpp>
 
 namespace Slicer {
-	SqlUpdateSerializer::SqlUpdateSerializer(DB::ConnectionPtr const c, const std::string & t) :
+	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :
 		connection(c),
 		tableName(t)
 	{

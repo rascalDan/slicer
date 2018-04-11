@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 	TestModule::BuiltInsPtr bi = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins");
-	auto bi2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInsPtr>(sel);
+	auto bi2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInsPtr>(sel.get());
 	BOOST_REQUIRE_EQUAL(bi->mbool, bi2->mbool);
 	BOOST_REQUIRE_EQUAL(bi->mbyte, bi2->mbyte);
 	BOOST_REQUIRE_EQUAL(bi->mshort, bi2->mshort);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 	};
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(3, bis2.size());
 	BOOST_REQUIRE_EQUAL(bis.back()->mbool, bis2.back()->mbool);
 	BOOST_REQUIRE_EQUAL(bis.back()->mbyte, bis2.back()->mbyte);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
 	};
 	Slicer::SerializeAny<Slicer::SqlAutoIdInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins WHERE mint IN (1, 2) ORDER BY mint");
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(2, bis2.size());
 	BOOST_REQUIRE_EQUAL(bis.front()->mint, 0);
 	BOOST_REQUIRE_EQUAL(bis.back()->mint, 0);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 	};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins WHERE mint IN (3, 4) ORDER BY mint");
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(2, bis2.size());
 	BOOST_REQUIRE_EQUAL(bis.front()->mint, 3);
 	BOOST_REQUIRE_EQUAL(bis.back()->mint, 4);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 	};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins WHERE mint IN (5, 6) ORDER BY mint");
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(2, bis2.size());
 	BOOST_REQUIRE_EQUAL(bis.front()->mint, 5);
 	BOOST_REQUIRE_EQUAL(bis.back()->mint, 6);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( insert_converted )
 	);
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(st, db, "converted");
 	auto sel = db->select("SELECT * FROM converted");
-	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(sel);
+	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(sel.get());
 	BOOST_REQUIRE_EQUAL(st->date, st2->date);
 	BOOST_REQUIRE_EQUAL(st->dt, st2->dt);
 	BOOST_REQUIRE_EQUAL(st->ts->days, st2->ts->days);

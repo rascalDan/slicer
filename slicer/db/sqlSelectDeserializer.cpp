@@ -4,7 +4,7 @@
 #include <common.h>
 
 namespace Slicer {
-	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommandPtr c, IceUtil::Optional<std::string> tc) :
+	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, IceUtil::Optional<std::string> tc) :
 		cmd(c),
 		typeIdColName(tc)
 	{

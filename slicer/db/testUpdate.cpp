@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( update_builtins )
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubi, db, "builtins");
 
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint DESC");
-	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel);
+	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(2, bis.size());
 	BOOST_REQUIRE_EQUAL(bis.front()->mbool, ubi->mbool);
 	BOOST_REQUIRE_EQUAL(bis.front()->mbyte, ubi->mbyte);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubis, db, "builtins");
 
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
-	auto ubis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel);
+	auto ubis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(2, ubis2.size());
 	BOOST_REQUIRE_EQUAL(ubis.front()->mbool, ubis2.back()->mbool);
 	BOOST_REQUIRE_EQUAL(ubis.front()->mbyte, ubis2.back()->mbyte);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 BOOST_AUTO_TEST_CASE( update_withNulls )
 {
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
-	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel);
+	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(2, bis.size());
 	BOOST_REQUIRE_EQUAL("string updated", *bis[0]->mstring);
 	BOOST_REQUIRE_EQUAL("string", *bis[1]->mstring);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 	bis[1]->mdouble = IceUtil::Optional<Ice::Double>();
 	BOOST_TEST_CHECKPOINT("Do update");
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db, "builtins");
-	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel);
+	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE(bis2[0]->mstring);
 	BOOST_REQUIRE(!bis2[1]->mstring);
 	BOOST_REQUIRE(bis2[0]->mbyte);

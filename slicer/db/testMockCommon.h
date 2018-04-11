@@ -14,7 +14,8 @@ class DLL_PUBLIC ConnectionFixture {
 	public:
 		ConnectionFixture();
 
-		DB::ConnectionPtr db;
+		DB::ConnectionPtr _db;
+		DB::Connection * const db;
 };
 
 #endif

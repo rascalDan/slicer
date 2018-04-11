@@ -8,7 +8,8 @@ DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
 }
 
 ConnectionFixture::ConnectionFixture() :
-	db(DB::MockDatabase::openConnectionTo("pqmock"))
+	_db(DB::MockDatabase::openConnectionTo("pqmock")),
+	db(_db.get())
 {
 }
 

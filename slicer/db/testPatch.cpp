@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 	tp.dest = "builtins";
 	Slicer::SerializeAny<Slicer::SqlTablePatchSerializer>(bis, db, tp);
 	auto cmd = db->select("SELECT COUNT(*) FROM builtins");
-	auto c = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, int>(cmd);
+	auto c = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, int>(cmd.get());
 	BOOST_REQUIRE_EQUAL(2, c);
 	BOOST_REQUIRE_EQUAL(2, tp.pk.size());
 	DB::PrimaryKey pk = {"mint", "mlong"};

@@ -8,7 +8,7 @@
 namespace Slicer {
 	class DLL_PUBLIC SqlUpdateSerializer : public Slicer::Serializer {
 		public:
-			SqlUpdateSerializer(DB::ConnectionPtr const, const std::string & tableName);
+			SqlUpdateSerializer(DB::Connection * const, const std::string & tableName);
 
 			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
 
@@ -18,7 +18,7 @@ namespace Slicer {
 			DB::ModifyCommandPtr createUpdate(Slicer::ModelPartPtr) const;
 			static void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *);
 
-			DB::ConnectionPtr const connection;
+			DB::Connection * const connection;
 			const std::string tableName;
 	};
 }

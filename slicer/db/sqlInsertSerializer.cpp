@@ -10,7 +10,7 @@
 #include <boost/bind.hpp>
 
 namespace Slicer {
-	SqlInsertSerializer::SqlInsertSerializer(DB::ConnectionPtr const c, const std::string & t) :
+	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, const std::string & t) :
 		connection(c),
 		tableName(t)
 	{
@@ -57,7 +57,7 @@ namespace Slicer {
 
 	class IdSave : public Slicer::ValueSource {
 		public:
-			IdSave(const DB::ConnectionPtr & c) :
+			IdSave(DB::Connection * const c) :
 				connection(c)
 			{
 			}
@@ -79,7 +79,7 @@ namespace Slicer {
 			NumType(Ice::Double);
 
 		private:
-			const DB::ConnectionPtr & connection;
+			DB::Connection * const connection;
 	};
 
 	void
