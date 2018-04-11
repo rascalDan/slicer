@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
 	};
 	DB::TablePatch tp;
-	DB::TransactionScope tx(db);
+	DB::TransactionScope tx(*db);
 	tp.dest = "builtins";
 	Slicer::SerializeAny<Slicer::SqlTablePatchSerializer>(bis, db, tp);
 	auto cmd = db->select("SELECT COUNT(*) FROM builtins");
