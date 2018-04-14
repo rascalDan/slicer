@@ -9,12 +9,16 @@
 namespace Slicer {
 	class DLL_PUBLIC Serializer {
 		public:
+			virtual ~Serializer() = default;
+
 			virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
 	typedef std::shared_ptr<Serializer> SerializerPtr;
 
 	class DLL_PUBLIC Deserializer {
 		public:
+			virtual ~Deserializer() = default;
+
 			virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
 	typedef std::shared_ptr<Deserializer> DeserializerPtr;

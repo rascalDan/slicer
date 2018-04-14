@@ -150,6 +150,8 @@ namespace Slicer {
 			class DLL_PRIVATE HookBase : public HookCommon {
 				public:
 					HookBase(const std::string & n);
+					virtual ~HookBase() = default;
+
 					virtual ModelPartPtr Get(T * t) const = 0;
 					virtual const Metadata & GetMetadata() const override;
 			};
