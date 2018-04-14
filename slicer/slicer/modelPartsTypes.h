@@ -360,7 +360,7 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC Stream {
 		public:
-			typedef boost::function<void(const T &)> Consumer;
+			typedef std::function<void(const T &)> Consumer;
 			typedef T element_type;
 
 			virtual void Produce(const Consumer & c) = 0;

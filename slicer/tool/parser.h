@@ -2,13 +2,10 @@
 #define SLICER_PARSER_H
 
 #include <Slice/Parser.h>
-#include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 #include <visibility.h>
 
 namespace Slicer {
-	typedef boost::shared_ptr<FILE> FilePtr;
-
 	class DLL_PUBLIC Slicer : public Slice::ParserVisitor {
 		public:
 			typedef std::vector<std::string> Args;

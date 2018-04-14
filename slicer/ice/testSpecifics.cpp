@@ -21,7 +21,7 @@ testCompare(const X & x)
 
 template<typename X>
 void
-testCompare(const X & x, const boost::function<bool(const X &, const X &)> & cmp)
+testCompare(const X & x, const std::function<bool(const X &, const X &)> & cmp)
 {
 	BOOST_TEST_CHECKPOINT(typeid(X).name());
 	std::stringstream strm;

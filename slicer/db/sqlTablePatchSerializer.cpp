@@ -4,7 +4,7 @@
 #include <slicer/metadata.h>
 #include <compileTimeFormatter.h>
 #include <scopeExit.h>
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");
@@ -26,7 +26,7 @@ namespace Slicer {
 		tablePatch.cols.clear();
 
 		createTemporaryTable();
-		AdHoc::ScopeExit tidy(boost::bind(&SqlTablePatchSerializer::dropTemporaryTable, this));
+		AdHoc::ScopeExit tidy(std::bind(&SqlTablePatchSerializer::dropTemporaryTable, this));
 
 		SqlInsertSerializer ins(db, tablePatch.src);
 		ins.Serialize(mpr);

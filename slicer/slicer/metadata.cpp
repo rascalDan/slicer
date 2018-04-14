@@ -35,7 +35,7 @@ Slicer::metaDataSplit(const std::string & metadata)
 	return parts;
 }
 
-boost::optional<std::string>
+std::optional<std::string>
 Slicer::metaDataValue(const std::string & prefix, const std::list<std::string> & metadata)
 {
 	for (const auto & md : metadata) {
@@ -43,6 +43,6 @@ Slicer::metaDataValue(const std::string & prefix, const std::list<std::string> &
 			return md.substr(prefix.length());
 		}
 	}
-	return boost::optional<std::string>();
+	return std::optional<std::string>();
 }
 

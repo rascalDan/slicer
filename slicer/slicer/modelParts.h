@@ -5,7 +5,7 @@
 #include <Ice/InputStream.h>
 #include <Ice/OutputStream.h>
 #include <stdexcept>
-#include <boost/function.hpp>
+#include <functional>
 #include <vector>
 #include <list>
 #include <visibility.h>
@@ -70,10 +70,10 @@ namespace Slicer {
 	typedef std::unique_ptr<HookCommon> HookCommonPtr;
 	typedef Ice::optional<std::string> TypeId;
 
-	typedef boost::function<void(const std::string &, ModelPartPtr, const HookCommon *)> ChildHandler;
+	typedef std::function<void(const std::string &, ModelPartPtr, const HookCommon *)> ChildHandler;
 
-	typedef boost::function<ModelPartPtr(void *)> ClassRef;
-	typedef boost::function<bool(const HookCommon *)> HookFilter;
+	typedef std::function<ModelPartPtr(void *)> ClassRef;
+	typedef std::function<bool(const HookCommon *)> HookFilter;
 	typedef std::list<std::string> Metadata;
 	DLL_PUBLIC extern const Metadata emptyMetadata;
 

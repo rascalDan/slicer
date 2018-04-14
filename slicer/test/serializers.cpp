@@ -11,7 +11,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/format.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include <types.h>
 #include <json.h>
 #include <xml.h>
@@ -22,6 +22,7 @@
 #include "conversions.h"
 
 namespace fs = boost::filesystem;
+namespace pl = std::placeholders;
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
@@ -38,14 +39,14 @@ class FileBased {
 	public:
 		template<typename T, typename DeserializerIn>
 		void
-		verifyByFile(const fs::path & infile, const boost::function<void(const T &)> & check = NULL)
+		verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = NULL)
 		{
 			verifyByFile<T, DeserializerIn>(infile, infile, check);
 		}
 
 		template<typename T, typename DeserializerIn>
 		void
-		verifyByFile(const fs::path & infile, const fs::path & expOutFile, const boost::function<void(const T &)> & check = NULL)
+		verifyByFile(const fs::path & infile, const fs::path & expOutFile, const std::function<void(const T &)> & check = NULL)
 		{
 			const fs::path input = rootDir / "initial" / infile;
 			const fs::path expected = rootDir / "initial" / expOutFile;
@@ -81,10 +82,10 @@ class FileBased {
 		template<typename T, typename Deserializer, typename Serializer, typename Internal>
 		void
 		verifyByHelper(const fs::path & infile,
-				const boost::function<Internal(const fs::path &)> & in,
-				const boost::function<void(const Internal &, const fs::path &)> & out,
-				const boost::function<void(Internal &)> & ifree,
-				const boost::function<void(const T &)> & check = NULL)
+				const std::function<Internal(const fs::path &)> & in,
+				const std::function<void(const Internal &, const fs::path &)> & out,
+				const std::function<void(Internal &)> & ifree,
+				const std::function<void(const T &)> & check = NULL)
 		{
 			const fs::path input = rootDir / "initial" / infile;
 			const fs::path tmph = binDir / "byHandler";
@@ -378,22 +379,22 @@ BOOST_AUTO_TEST_CASE( structtype_json )
 
 BOOST_AUTO_TEST_CASE( simplestring_xml )
 {
-	verifyByFile<std::string, Slicer::XmlFileDeserializer>("string.xml", boost::bind(checkAssertEq<std::string>, "test string", _1));
+	verifyByFile<std::string, Slicer::XmlFileDeserializer>("string.xml", std::bind(checkAssertEq<std::string>, "test string", pl::_1));
 }
 
 BOOST_AUTO_TEST_CASE( simpleint_xml )
 {
-	verifyByFile<Ice::Int, Slicer::XmlFileDeserializer>("int.xml", boost::bind(checkAssertEq<Ice::Int>, 27, _1));
+	verifyByFile<Ice::Int, Slicer::XmlFileDeserializer>("int.xml", std::bind(checkAssertEq<Ice::Int>, 27, pl::_1));
 }
 
 BOOST_AUTO_TEST_CASE( simplestring_json )
 {
-	verifyByFile<std::string, Slicer::JsonFileDeserializer>("string2.json", boost::bind(checkAssertEq<std::string>, "test string", _1));
+	verifyByFile<std::string, Slicer::JsonFileDeserializer>("string2.json", std::bind(checkAssertEq<std::string>, "test string", pl::_1));
 }
 
 BOOST_AUTO_TEST_CASE( simpleint_json )
 {
-	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", boost::bind(checkAssertEq<Ice::Int>, 27, _1));
+	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", std::bind(checkAssertEq<Ice::Int>, 27, pl::_1));
 }
 
 BOOST_AUTO_TEST_CASE( complexClass_xmlattrAndText )

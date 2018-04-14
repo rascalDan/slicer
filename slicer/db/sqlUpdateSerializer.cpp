@@ -6,9 +6,11 @@
 #include <buffer.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace Slicer {
+	using namespace std::placeholders;
+
 	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :
 		connection(c),
 		tableName(t)
@@ -20,10 +22,10 @@ namespace Slicer {
 	{
 		switch (mp->GetType()) {
 			case Slicer::mpt_Sequence:
-				mp->OnEachChild(boost::bind(&SqlUpdateSerializer::SerializeSequence, this, _2));
+				mp->OnEachChild(std::bind(&SqlUpdateSerializer::SerializeSequence, this, _2));
 				return;
 			case Slicer::mpt_Complex:
-				mp->OnEachChild(boost::bind(&SqlUpdateSerializer::SerializeObject, this, _2));
+				mp->OnEachChild(std::bind(&SqlUpdateSerializer::SerializeObject, this, _2));
 				return;
 			default:
 				throw UnsupportedModelType();

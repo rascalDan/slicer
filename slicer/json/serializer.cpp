@@ -2,7 +2,7 @@
 #include <slicer/metadata.h>
 #include <jsonpp.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <stdexcept>
 #include <fstream>
 #include <glibmm/ustring.h>
@@ -20,6 +20,8 @@ namespace Slicer {
 	const std::string md_object = "json:object";
 	const std::string keyName = "key";
 	const std::string valueName = "value";
+
+	using namespace std::placeholders;
 
 	class JsonValueSource : public ValueSource {
 		public:
@@ -242,21 +244,21 @@ namespace Slicer {
 							mp = mp->GetSubclassModelPart(*typeId);
 						}
 					}
-					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterate, boost::get<json::Object>(*n).insert({name, nn}).first->second.get(), _1, _2));
+					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, boost::get<json::Object>(*n).insert({name, nn}).first->second.get(), _1, _2));
 				}
 				break;
 			case mpt_Sequence:
 				if (mp->HasValue()) {
-					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
+					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
 				}
 				break;
 			case mpt_Dictionary:
 				if (mp->HasValue()) {
 					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
-						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateDictObj, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Object()))}).first->second.get(), _2));
+						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateDictObj, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Object()))}).first->second.get(), _2));
 					}
 					else {
-						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
+						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
 					}
 				}
 				break;
@@ -282,20 +284,20 @@ namespace Slicer {
 							mp = mp->GetSubclassModelPart(*typeId);
 						}
 					}
-					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
+					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
 					break;
 				case mpt_Sequence:
 					*n = json::Array();
-					mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateSeq, n, _2));
+					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, n, _2));
 					break;
 				case mpt_Dictionary:
 					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
 						*n = json::Object();
-						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateDictObj, n, _2));
+						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateDictObj, n, _2));
 					}
 					else {
 						*n = json::Array();
-						mp->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
+						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
 					}
 					break;
 			}
@@ -324,7 +326,7 @@ namespace Slicer {
 	JsonStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value doc;
-		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
+		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
 		json::serializeValue(doc, strm, "utf-8");
 	}
 
@@ -351,7 +353,7 @@ namespace Slicer {
 	JsonFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value doc;
-		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
+		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
 		std::ofstream outFile(path.string());
 		json::serializeValue(doc, outFile, "utf-8");
 	}
@@ -376,7 +378,7 @@ namespace Slicer {
 	void
 	JsonValueSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
-		modelRoot->OnEachChild(boost::bind(&JsonSerializer::ModelTreeIterateRoot, &value, _2));
+		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &value, _2));
 	}
 }
 

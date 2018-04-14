@@ -12,7 +12,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlSerializer : public Serializer {
 		protected:
-			typedef boost::function<xmlpp::Element *(xmlpp::Element *, const Glib::ustring &)> ElementCreator;
+			typedef std::function<xmlpp::Element *(xmlpp::Element *, const Glib::ustring &)> ElementCreator;
 			static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartPtr mp, const HookCommon * hp, const ElementCreator &);
 			static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartPtr mp);
 

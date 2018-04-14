@@ -4,8 +4,7 @@
 #include <libxml++/document.h>
 #include <libxml++/parsers/domparser.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
-#include <boost/intrusive_ptr.hpp>
+#include <functional>
 #include <stdexcept>
 #include <glibmm/ustring.h>
 #include <compileTimeFormatter.h>
@@ -16,6 +15,8 @@ NAMEDFACTORY("application/xml", Slicer::XmlStreamSerializer, Slicer::StreamSeria
 NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDeserializerFactory);
 
 namespace Slicer {
+	using namespace std::placeholders;
+
 	const std::string md_attribute = "xml:attribute";
 	const std::string md_text = "xml:text";
 	const std::string md_bare = "xml:bare";
@@ -23,7 +24,8 @@ namespace Slicer {
 	const std::string md_elements = "xml:elements";
 	const std::string keyName = "key";
 	const std::string valueName = "value";
-	const auto defaultElementCreator = boost::bind(&xmlpp::Element::add_child_element, _1, _2, Glib::ustring());
+	typedef xmlpp::Element * (xmlpp::Element::* ElementCreatorF) (const Glib::ustring &, const Glib::ustring &);
+	const auto defaultElementCreator = std::bind((ElementCreatorF)&xmlpp::Element::add_child_element, _1, _2, Glib::ustring());
 
 	static const Glib::ustring TrueText("true");
 	static const Glib::ustring FalseText("false");
@@ -103,7 +105,7 @@ namespace Slicer {
 
 	class XmlValueTarget : public ValueTarget {
 		public:
-			XmlValueTarget(boost::function<void(const Glib::ustring &)> a) :
+			XmlValueTarget(std::function<void(const Glib::ustring &)> a) :
 				apply(a)
 			{
 			}
@@ -154,14 +156,14 @@ namespace Slicer {
 			}
 
 		private:
-			const boost::function<void(const Glib::ustring &)> apply;
+			const std::function<void(const Glib::ustring &)> apply;
 	};
 
 
 	class XmlAttributeValueTarget : public XmlValueTarget {
 		public:
 			XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
-				XmlValueTarget(boost::bind(&xmlpp::Element::set_attribute, p, Glib::ustring(n), _1, Glib::ustring()))
+				XmlValueTarget(std::bind(&xmlpp::Element::set_attribute, p, Glib::ustring(n), _1, Glib::ustring()))
 			{
 			}
 	};
@@ -169,12 +171,12 @@ namespace Slicer {
 	class XmlContentValueTarget : public XmlValueTarget {
 		public:
 			XmlContentValueTarget(xmlpp::Element * p) :
-				XmlValueTarget(boost::bind(&xmlpp::Element::set_first_child_text, p, _1))
+				XmlValueTarget(std::bind(&xmlpp::Element::set_first_child_text, p, _1))
 			{
 			}
 
 			XmlContentValueTarget(const CurrentElementCreator & cec) :
-				XmlValueTarget(boost::bind(&xmlpp::Element::set_first_child_text, boost::bind(&CurrentElementCreator::deref, &cec), _1))
+				XmlValueTarget(std::bind(&xmlpp::Element::set_first_child_text, std::bind(&CurrentElementCreator::deref, &cec), _1))
 			{
 			}
 	};
@@ -254,7 +256,7 @@ namespace Slicer {
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
 				auto smpr = mp->GetChildRef(element->get_name(),
-						boost::bind(metaDataFlagNotSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
+						std::bind(metaDataFlagNotSet, std::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
 				if (smpr) {
 					auto smp = smpr.Child();
 					if (metaDataFlagSet(smpr.ChildMetaData(), md_bare)) {
@@ -267,7 +269,7 @@ namespace Slicer {
 			}
 			else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
 				auto smp = mp->GetChild(attribute->get_name(),
-						boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
+						std::bind(metaDataFlagSet, std::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
 				if (smp) {
 					smp->Create();
 					smp->SetValue(XmlAttributeValueSource(attribute));
@@ -277,7 +279,7 @@ namespace Slicer {
 			else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
 				ModelPartPtr smp;
 				if (!content->is_white_space()) {
-					smp = mp->GetAnonChild(boost::bind(metaDataFlagSet, boost::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
+					smp = mp->GetAnonChild(std::bind(metaDataFlagSet, std::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
 				}
 				if (smp) {
 					smp->SetValue(XmlContentValueSource(content));
@@ -316,10 +318,10 @@ namespace Slicer {
 		}
 		else {
 			if (hp && metaDataFlagSet(hp->GetMetadata(), md_bare)) {
-				ModelTreeProcessElement(n, mp, boost::bind(&xmlpp::Element::add_child_element, _1, name, Glib::ustring()));
+				ModelTreeProcessElement(n, mp, std::bind((ElementCreatorF)&xmlpp::Element::add_child_element, _1, name, Glib::ustring()));
 			}
 			else {
-				CurrentElementCreator cec(boost::bind(ec, n, name));
+				CurrentElementCreator cec(std::bind(ec, n, name));
 				ModelTreeProcessElement(cec, mp, defaultElementCreator);
 			}
 		}
@@ -364,7 +366,7 @@ namespace Slicer {
 				element->set_attribute(*typeIdPropName, *typeId);
 				mp = mp->GetSubclassModelPart(*typeId);
 			}
-			mp->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3, ec));
+			mp->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3, ec));
 		}
 	}
 
@@ -397,7 +399,7 @@ namespace Slicer {
 	XmlStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::Document doc;
-		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
+		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
 		doc.write_to_stream(strm);
 	}
 
@@ -423,7 +425,7 @@ namespace Slicer {
 	XmlFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::Document doc;
-		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
+		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
 		doc.write_to_file_formatted(path.string());
 	}
 
@@ -447,7 +449,7 @@ namespace Slicer {
 	XmlDocumentSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		doc = new xmlpp::Document();
-		modelRoot->OnEachChild(boost::bind(&XmlSerializer::ModelTreeIterateRoot, doc, _1, _2));
+		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, doc, _1, _2));
 	}
 
 	AdHocFormatter(BadBooleanValueMsg, "Bad boolean value [%?]");

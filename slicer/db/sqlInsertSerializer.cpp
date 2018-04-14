@@ -7,9 +7,11 @@
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace Slicer {
+	using namespace std::placeholders;
+
 	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, const std::string & t) :
 		connection(c),
 		tableName(t)
@@ -21,10 +23,10 @@ namespace Slicer {
 	{
 		switch (mp->GetType()) {
 			case Slicer::mpt_Sequence:
-				mp->OnEachChild(boost::bind(&SqlInsertSerializer::SerializeSequence, this, _2));
+				mp->OnEachChild(std::bind(&SqlInsertSerializer::SerializeSequence, this, _2));
 				return;
 			case Slicer::mpt_Complex:
-				mp->OnEachChild(boost::bind(&SqlInsertSerializer::SerializeObject, this, _2));
+				mp->OnEachChild(std::bind(&SqlInsertSerializer::SerializeObject, this, _2));
 				return;
 			default:
 				throw UnsupportedModelType();
@@ -51,7 +53,7 @@ namespace Slicer {
 	SqlInsertSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * ins) const
 	{
 		int paramNo = 0;
-		cmp->OnEachChild(boost::bind(&SqlInsertSerializer::bindObjectAndExecuteField, this, boost::ref(paramNo), ins, _2, _3));
+		cmp->OnEachChild(std::bind(&SqlInsertSerializer::bindObjectAndExecuteField, this, std::ref(paramNo), ins, _2, _3));
 		ins->execute();
 	}
 
@@ -118,7 +120,7 @@ namespace Slicer {
 		AdHoc::Buffer insert;
 		insert.appendbf("INSERT INTO %s(", tableName);
 		int fieldNo = 0;
-		mp->OnEachChild(boost::bind(&SqlInsertSerializer::createInsertField, this, boost::ref(fieldNo), boost::ref(insert), _1, _3));
+		mp->OnEachChild(std::bind(&SqlInsertSerializer::createInsertField, this, std::ref(fieldNo), std::ref(insert), _1, _3));
 		insert.append(") VALUES (", AdHoc::Buffer::Use);
 		for (; fieldNo > 1; --fieldNo) {
 			insert.append("?, ");

@@ -10,6 +10,8 @@
 BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
 // LCOV_EXCL_STOP
 
+namespace pl = std::placeholders;
+
 #define TypeTest(Var, Expr, Explicit, Expected) \
 	Var obj = Expr; \
 	Slicer::ModelPartPtr mpp = Slicer::ModelPart::CreateFor(obj); \
@@ -51,7 +53,7 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_sequenceclasses )
 	BOOST_REQUIRE(cmpp);
 	BOOST_REQUIRE_EQUAL(Slicer::mpt_Complex, cmpp->GetType());
 	std::vector<std::string> names;
-	cmpp->OnEachChild(boost::bind(&hookHandler, &names, _1, _2, _3));
+	cmpp->OnEachChild(std::bind(&hookHandler, &names, pl::_1, pl::_2, pl::_3));
 	BOOST_REQUIRE_EQUAL(2, names.size());
 	BOOST_REQUIRE_EQUAL("a", names.front());
 	BOOST_REQUIRE_EQUAL("b", names.back());
@@ -64,7 +66,7 @@ BOOST_AUTO_TEST_CASE( compile_auto_modelpart_type_sequencestructs )
 	BOOST_REQUIRE(cmpp);
 	BOOST_REQUIRE_EQUAL(Slicer::mpt_Complex, cmpp->GetType());
 	std::vector<std::string> names;
-	cmpp->OnEachChild(boost::bind(&hookHandler, &names, _1, _2, _3));
+	cmpp->OnEachChild(std::bind(&hookHandler, &names, pl::_1, pl::_2, pl::_3));
 	BOOST_REQUIRE_EQUAL(2, names.size());
 	BOOST_REQUIRE_EQUAL("a", names.front());
 	BOOST_REQUIRE_EQUAL("b", names.back());

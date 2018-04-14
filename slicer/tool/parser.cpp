@@ -8,7 +8,6 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <Slice/CPlusPlusUtil.h>
-#include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <fprintbf.h>
 #include <safeMapFind.h>
@@ -261,7 +260,7 @@ namespace Slicer {
 			if (!t) {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
-			auto name = metaDataValue("slicer:name:", dm->getMetaData()).value_or_eval(std::bind(&Slice::DataMember::name, dm));
+			auto name = metaDataValue("slicer:name:", dm->getMetaData()).value_or(dm->name());
 			fprintbf(cpp, "\t\tC%d::addHook<C%d::",
 					components, components);
 			auto type = dm->type();
@@ -575,9 +574,9 @@ namespace Slicer {
 		if (cpp != NULL && !cppPath.empty()) {
 			throw CompilerError("Both file handle and path provided.");
 		}
-		FilePtr cppfile(
+		auto cppfile = std::unique_ptr<FILE, decltype(&fclose)>(
 			cpp || cppPath.empty() ? cpp : fopen(cppPath.string(), "w"),
-			cppPath.empty() ? fflush : fclose);
+					cppPath.empty() ? fflush : fclose);
 		if (!cppfile && !cppPath.empty()) {
 			throw CompilerError("Failed to open output file");
 		}
