@@ -27,7 +27,6 @@ namespace Slicer {
 			boost::filesystem::path cppPath;
 			boost::filesystem::path headerPrefix;
 			std::vector<boost::filesystem::path> includes;
-			bool allowIcePrefix;
 
 			unsigned int Execute();
 			unsigned int Components() const;

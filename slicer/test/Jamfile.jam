@@ -17,12 +17,11 @@ generators.override $(__name__).slicer : slice.slicer ;
 feature.feature slicerbin : : free dependency ;
 toolset.flags slicer SLICERBIN <slicerbin> ;
 toolset.flags slicer INCLUDES <include> ;
-toolset.flags slicer ALLOWICE <allow-ice>yes : --ice ;
 
 actions slicer bind SLICERBIN
 {
-  slice2cpp -I"$(INCLUDES)" --checksum --output-dir $(1[1]:D) $(2) --dll-export JAM_DLL_PUBLIC $(ALLOWICE[1])
-	"$(SLICERBIN)" -I"$(INCLUDES)" $(2) $(1[2]) $(ALLOWICE[1]) --headerPrefix="\"\""
+  slice2cpp -I"$(INCLUDES)" --checksum --output-dir $(1[1]:D) $(2) --dll-export JAM_DLL_PUBLIC
+	"$(SLICERBIN)" -I"$(INCLUDES)" $(2) $(1[2]) --headerPrefix="\"\""
 }
 
 lib types :

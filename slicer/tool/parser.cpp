@@ -18,7 +18,6 @@ namespace Slicer {
 	Slicer::Slicer() :
 		cpp(NULL),
 		headerPrefix("slicer"),
-		allowIcePrefix(false),
 		components(0),
 		classNo(0)
 	{
@@ -595,7 +594,7 @@ namespace Slicer {
 				throw CompilerError("preprocess failed");
 			}
 
-			Slice::UnitPtr u = Slice::Unit::createUnit(false, false, allowIcePrefix, false);
+			Slice::UnitPtr u = Slice::Unit::createUnit(false, false, false, false);
 
 			int parseStatus = u->parse(slicePath.string(), cppHandle, false);
 
