@@ -152,7 +152,7 @@ namespace Slicer {
 		fprintbf(cpp, "const std::string ModelPartForRoot< %s >::rootName(\"%s\");\n\n",
 				type, name);
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "const std::string ModelPartForRoot< IceUtil::Optional< %s > >::rootName(\"Optional%s\");\n\n",
+		fprintbf(cpp, "const std::string ModelPartForRoot< Ice::optional< %s > >::rootName(\"Optional%s\");\n\n",
 				type, name);
 	}
 
@@ -431,7 +431,7 @@ namespace Slicer {
 	{
 		fprintbf(cpp, "ModelPartForConverted< ");
 		if (dm->optional()) {
-			fprintbf(cpp, "IceUtil::Optional< %s >",
+			fprintbf(cpp, "Ice::optional< %s >",
 					Slice::typeToString(type));
 		}
 		else {

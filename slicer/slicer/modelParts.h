@@ -1,7 +1,7 @@
 #ifndef SLICER_MODELPARTS_H
 #define SLICER_MODELPARTS_H
 
-#include <IceUtil/Optional.h>
+#include <Ice/Optional.h>
 #include <Ice/InputStream.h>
 #include <Ice/OutputStream.h>
 #include <stdexcept>
@@ -68,7 +68,7 @@ namespace Slicer {
 	typedef std::shared_ptr<ModelPart> ModelPartPtr;
 	typedef std::shared_ptr<ModelPartForRootBase> ModelPartForRootPtr;
 	typedef std::unique_ptr<HookCommon> HookCommonPtr;
-	typedef IceUtil::Optional<std::string> TypeId;
+	typedef Ice::optional<std::string> TypeId;
 
 	typedef boost::function<void(const std::string &, ModelPartPtr, const HookCommon *)> ChildHandler;
 
@@ -136,7 +136,7 @@ namespace Slicer {
 			virtual ChildRef GetChildRef(const std::string & memberName, const HookFilter & = HookFilter(), bool matchCase = true) = 0;
 			virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 			virtual TypeId GetTypeId() const;
-			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const;
+			virtual Ice::optional<std::string> GetTypeIdProperty() const;
 			virtual ModelPartType GetType() const = 0;
 			virtual void Create();
 			virtual void Complete();

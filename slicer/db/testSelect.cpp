@@ -174,20 +174,20 @@ BOOST_AUTO_TEST_CASE( select_noRowsSimple )
 BOOST_AUTO_TEST_CASE( select_noRowsSimpleOptional )
 {
 	auto sel = db->select("SELECT id FROM test WHERE false");
-	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(sel.get());
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::optional<Ice::Int>>(sel.get());
 	BOOST_REQUIRE(!v);
 }
 
 BOOST_AUTO_TEST_CASE( select_tooManyRowsSimpleOptional )
 {
 	auto sel = db->select("SELECT id FROM test");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<IceUtil::Optional<Ice::Int>>(sel.get()), Slicer::TooManyRowsReturned);
+	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::optional<Ice::Int>>(sel.get()), Slicer::TooManyRowsReturned);
 }
 
 BOOST_AUTO_TEST_CASE( select_simpleOptional )
 {
 	auto sel = db->select("SELECT MAX(id) FROM test");
-	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(sel.get());
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::optional<Ice::Int>>(sel.get());
 	BOOST_REQUIRE(v);
 	BOOST_REQUIRE_EQUAL(4, *v);
 }
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE( select_noRowsComplexOptional )
 				string mstring \
 				FROM test \
 				WHERE false");
-	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<TestModule::BuiltInsPtr>>(sel.get());
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::optional<TestModule::BuiltInsPtr>>(sel.get());
 	BOOST_REQUIRE(!v);
 }
 
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( select_null )
 	BOOST_REQUIRE_EQUAL(*oi->optSimple, 4);
 
 	sel = db->select("SELECT MAX(id) FROM test WHERE false");
-	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, IceUtil::Optional<Ice::Int>>(sel.get());
+	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::optional<Ice::Int>>(sel.get());
 	BOOST_REQUIRE(!v);
 }
 

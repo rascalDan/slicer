@@ -14,15 +14,15 @@
 	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
 	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return std::make_shared<ModelPartType>(&s); } \
 	template<> ModelPartPtr ModelPart::CreateFor(const Type & s) { return CreateFor(const_cast<Type &>(s)); } \
-	template<> ModelPartPtr ModelPart::CreateFor(IceUtil::Optional<Type> & s) { return std::make_shared<ModelPartForOptional<ModelPartType>>(&s); } \
-	template<> ModelPartPtr ModelPart::CreateFor(const IceUtil::Optional<Type> & s) { return CreateFor(const_cast<IceUtil::Optional<Type> &>(s)); } \
+	template<> ModelPartPtr ModelPart::CreateFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForOptional<ModelPartType>>(&s); } \
+	template<> ModelPartPtr ModelPart::CreateFor(const Ice::optional<Type> & s) { return CreateFor(const_cast<Ice::optional<Type> &>(s)); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return std::make_shared<ModelPartForRoot<Type>>(&s); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(IceUtil::Optional<Type> & s) { return std::make_shared<ModelPartForRoot<IceUtil::Optional<Type>>>(&s); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForRoot<Ice::optional<Type>>>(&s); } \
 	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const IceUtil::Optional<Type> & s) { return CreateRootFor(const_cast<IceUtil::Optional<Type> &>(s)); } \
+	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const Ice::optional<Type> & s) { return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); } \
 	template class BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
-	template class ModelPartForRoot< IceUtil::Optional<Type> >; \
+	template class ModelPartForRoot< Ice::optional<Type> >; \
 
 #define MODELPARTFOR(Type, ModelPartType) \
 	CUSTOMMODELPARTFOR(Type, ModelPartType<Type>, ModelPartType<Type>)
@@ -56,7 +56,7 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeWrite(::Ice::OutputStream & s, const ::IceUtil::Optional<T> & m)
+	typeWrite(::Ice::OutputStream & s, const ::Ice::optional<T> & m)
 	{
 		if constexpr (!Slicer::isLocal<T>::value) {
 			typedef Ice::StreamableTraits<T> traits;
@@ -86,7 +86,7 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeRead(::Ice::InputStream & s, ::IceUtil::Optional<T> & m)
+	typeRead(::Ice::InputStream & s, ::Ice::optional<T> & m)
 	{
 		if constexpr (!Slicer::isLocal<T>::value) {
 			typedef Ice::StreamableTraits<T> traits;
@@ -159,14 +159,14 @@ namespace Slicer {
 	{
 	}
 
-	template<typename T, typename M, IceUtil::Optional<T> M::* MV>
-	ModelPartForConverted<IceUtil::Optional<T>, M, MV>::ModelPartForConverted(IceUtil::Optional<T> * h) :
-		ModelPartModel<IceUtil::Optional<T>>(h)
+	template<typename T, typename M, Ice::optional<T> M::* MV>
+	ModelPartForConverted<Ice::optional<T>, M, MV>::ModelPartForConverted(Ice::optional<T> * h) :
+		ModelPartModel<Ice::optional<T>>(h)
 	{
 	}
 
-	template<typename T, typename M, IceUtil::Optional<T> M::* MV>
-	bool ModelPartForConverted<IceUtil::Optional<T>, M, MV>::HasValue() const
+	template<typename T, typename M, Ice::optional<T> M::* MV>
+	bool ModelPartForConverted<Ice::optional<T>, M, MV>::HasValue() const
 	{
 		BOOST_ASSERT(this->Model);
 		return (bool)*this->Model;
@@ -189,22 +189,22 @@ namespace Slicer {
 		T & operator()(T & x) const { return x; }
 		const T & operator()(const T & x) const { return x; }
 		template <typename Y>
-		T & operator()(IceUtil::Optional<Y> & x) const { if (!x) x = Y(); return *x; }
+		T & operator()(Ice::optional<Y> & x) const { if (!x) x = Y(); return *x; }
 		template <typename Y>
-		const T & operator()(const IceUtil::Optional<Y> & x) const { return *x; }
+		const T & operator()(const Ice::optional<Y> & x) const { return *x; }
 		static bool valueExists(const T &) { return true; }
-		static bool valueExists(const IceUtil::Optional<T> & y) { return y.has_value(); }
+		static bool valueExists(const Ice::optional<T> & y) { return y.has_value(); }
 	};
 	template <typename X>
-	struct Coerce<IceUtil::Optional<X>> {
+	struct Coerce<Ice::optional<X>> {
 		typedef typename std::remove_const<typename std::remove_reference<X>::type>::type T;
 
-		IceUtil::Optional<T> & operator()(IceUtil::Optional<T> & x) const { return x; }
-		const IceUtil::Optional<T> & operator()(const IceUtil::Optional<T> & x) const { return x; }
+		Ice::optional<T> & operator()(Ice::optional<T> & x) const { return x; }
+		const Ice::optional<T> & operator()(const Ice::optional<T> & x) const { return x; }
 		template <typename Y>
-		IceUtil::Optional<T> operator()(Y & y) const { return y; }
+		Ice::optional<T> operator()(Y & y) const { return y; }
 		static bool valueExists(const T &) { return true; }
-		static bool valueExists(const IceUtil::Optional<T> &) { return true; }
+		static bool valueExists(const Ice::optional<T> &) { return true; }
 	};
 
 	template<typename ET, typename MT, typename Conv>
@@ -272,8 +272,8 @@ namespace Slicer {
 
 	// ModelPartForOptional
 	template<typename T>
-	ModelPartForOptional<T>::ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h) :
-		ModelPartModel<IceUtil::Optional< typename T::element_type> >(h)
+	ModelPartForOptional<T>::ModelPartForOptional(Ice::optional< typename T::element_type > * h) :
+		ModelPartModel<Ice::optional< typename T::element_type> >(h)
 	{
 		if (this->Model && *this->Model) {
 			modelPart = std::make_shared<T>(&**this->Model);
@@ -445,7 +445,7 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	IceUtil::Optional<std::string> ModelPartForClass<T>::GetTypeIdProperty() const
+	Ice::optional<std::string> ModelPartForClass<T>::GetTypeIdProperty() const
 	{
 		return typeIdProperty;
 	}

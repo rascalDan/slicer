@@ -66,14 +66,14 @@ namespace Slicer {
 	template<> const std::string Slicer::ModelPartForRoot<Ice::Int>::rootName = "Int";
 	template<> const std::string Slicer::ModelPartForRoot<Ice::Long>::rootName = "Long";
 
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<std::string>>::rootName = "OptionalString";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<bool>>::rootName = "OptionalBoolean";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Float>>::rootName = "OptionalFloat";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Double>>::rootName = "OptionalDouble";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Byte>>::rootName = "OptionalByte";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Short>>::rootName = "OptionalShort";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Int>>::rootName = "OptionalInt";
-	template<> const std::string Slicer::ModelPartForRoot<IceUtil::Optional<Ice::Long>>::rootName = "OptionalLong";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<std::string>>::rootName = "OptionalString";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<bool>>::rootName = "OptionalBoolean";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Float>>::rootName = "OptionalFloat";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Double>>::rootName = "OptionalDouble";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Byte>>::rootName = "OptionalByte";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Short>>::rootName = "OptionalShort";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Int>>::rootName = "OptionalInt";
+	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Long>>::rootName = "OptionalLong";
 
 	MODELPARTFOR(std::string, ModelPartForSimple);
 	MODELPARTFOR(bool, ModelPartForSimple);

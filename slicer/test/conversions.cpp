@@ -90,7 +90,7 @@ namespace Slicer {
 	}
 
 	DLL_PUBLIC
-	IceUtil::Optional<Ice::Int>
+	Ice::optional<Ice::Int>
 	str2int(const std::string & s)
 	{
 		if (s.empty()) {
@@ -101,7 +101,7 @@ namespace Slicer {
 
 	DLL_PUBLIC
 	std::string
-	int2str(const IceUtil::Optional<Ice::Int> & i)
+	int2str(const Ice::optional<Ice::Int> & i)
 	{
 		if (!i) {
 			return std::string();

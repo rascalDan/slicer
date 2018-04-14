@@ -32,11 +32,11 @@ namespace Slicer {
 	std::string
 	dateTimeToString(const ::TestModule::DateTime & in);
 	DLL_PUBLIC
-	IceUtil::Optional<Ice::Int>
+	Ice::optional<Ice::Int>
 	str2int(const std::string &);
 	DLL_PUBLIC
 	std::string
-	int2str(const IceUtil::Optional<Ice::Int> &);
+	int2str(const Ice::optional<Ice::Int> &);
 }
 
 #endif

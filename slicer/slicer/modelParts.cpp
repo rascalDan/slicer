@@ -25,10 +25,10 @@ namespace Slicer {
 		return TypeId();
 	}
 
-	IceUtil::Optional<std::string>
+	Ice::optional<std::string>
 	ModelPart::GetTypeIdProperty() const
 	{
-		return IceUtil::Optional<std::string>();
+		return Ice::optional<std::string>();
 	}
 
 	void

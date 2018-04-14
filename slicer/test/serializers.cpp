@@ -28,7 +28,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
 BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::SomeNumbers )
 namespace std {
 	template<typename T>
-	ostream & operator<<(ostream & s, const IceUtil::Optional<T> &) {
+	ostream & operator<<(ostream & s, const Ice::optional<T> &) {
 		return s;
 	}
 }

@@ -55,13 +55,13 @@ testCompareOptional(const X & d)
 {
 	BOOST_TEST_CHECKPOINT(typeid(X).name());
 	std::stringstream strm;
-	IceUtil::Optional<X> x;
+	Ice::optional<X> x;
 	Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
-	auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, IceUtil::Optional<X>>(strm);
+	auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, Ice::optional<X>>(strm);
 	BOOST_REQUIRE(!x2);
 	x = d;
 	Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
-	auto x3 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, IceUtil::Optional<X>>(strm);
+	auto x3 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, Ice::optional<X>>(strm);
 	BOOST_REQUIRE_EQUAL(d, *x3);
 }
 

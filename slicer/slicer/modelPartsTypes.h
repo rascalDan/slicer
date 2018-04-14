@@ -86,12 +86,12 @@ namespace Slicer {
 			virtual bool GetValue(ValueTarget && s) override;
 	};
 
-	template<typename T, typename M, IceUtil::Optional<T> M::* MV>
-	class DLL_PUBLIC ModelPartForConverted<IceUtil::Optional<T>, M, MV> : public ModelPartForConvertedBase, protected ModelPartModel<IceUtil::Optional<T>> {
+	template<typename T, typename M, Ice::optional<T> M::* MV>
+	class DLL_PUBLIC ModelPartForConverted<Ice::optional<T>, M, MV> : public ModelPartForConvertedBase, protected ModelPartModel<Ice::optional<T>> {
 		public:
-			typedef IceUtil::Optional<T> element_type;
+			typedef Ice::optional<T> element_type;
 
-			ModelPartForConverted(IceUtil::Optional<T> * h);
+			ModelPartForConverted(Ice::optional<T> * h);
 
 			virtual void SetValue(ValueSource && s) override;
 			virtual bool GetValue(ValueTarget && s) override;
@@ -115,9 +115,9 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForOptional : public ModelPartForOptionalBase, protected ModelPartModel<IceUtil::Optional<typename T::element_type> > {
+	class DLL_PUBLIC ModelPartForOptional : public ModelPartForOptionalBase, protected ModelPartModel<Ice::optional<typename T::element_type> > {
 		public:
-			ModelPartForOptional(IceUtil::Optional< typename T::element_type > * h);
+			ModelPartForOptional(Ice::optional< typename T::element_type > * h);
 			virtual void Create() override;
 			virtual bool GetValue(ValueTarget && s) override;
 			virtual ModelPartType GetType() const override;
@@ -228,7 +228,7 @@ namespace Slicer {
 			template<typename dummy = T>
 			std::string getTypeId(typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
 
-			virtual IceUtil::Optional<std::string> GetTypeIdProperty() const override;
+			virtual Ice::optional<std::string> GetTypeIdProperty() const override;
 
 			static const std::string typeIdProperty;
 			static const std::string * className;

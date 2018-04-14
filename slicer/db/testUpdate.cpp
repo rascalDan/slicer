@@ -91,11 +91,11 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 	BOOST_REQUIRE_EQUAL("string updated", *bis[0]->mstring);
 	BOOST_REQUIRE_EQUAL("string", *bis[1]->mstring);
 	bis[0]->mstring = "not null"s;
-	bis[1]->mstring = IceUtil::Optional<std::string>();
-	bis[0]->mfloat = IceUtil::Optional<Ice::Float>();
-	bis[1]->mbyte = IceUtil::Optional<Ice::Byte>();
-	bis[0]->mshort = IceUtil::Optional<Ice::Short>();
-	bis[1]->mdouble = IceUtil::Optional<Ice::Double>();
+	bis[1]->mstring = Ice::optional<std::string>();
+	bis[0]->mfloat = Ice::optional<Ice::Float>();
+	bis[1]->mbyte = Ice::optional<Ice::Byte>();
+	bis[0]->mshort = Ice::optional<Ice::Short>();
+	bis[1]->mdouble = Ice::optional<Ice::Double>();
 	BOOST_TEST_CHECKPOINT("Do update");
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db, "builtins");
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
