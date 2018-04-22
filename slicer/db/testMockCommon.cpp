@@ -2,8 +2,9 @@
 #include <definedDirs.h>
 
 StandardMockDatabase::StandardMockDatabase() :
-DB::PluginMock<PQ::Mock>("user=postgres dbname=postgres", "pqmock", {
-		rootDir.parent_path() / "db" / "slicer.sql" })
+DB::PluginMock<PQ::Mock>("pqmock", {
+		rootDir.parent_path() / "db" / "slicer.sql" },
+		"user=postgres dbname=postgres")
 {
 }
 
