@@ -2,13 +2,6 @@
 #define SLICER_MODELPARTSTYPES_H
 
 #include "modelParts.h"
-#include <Ice/ObjectF.h>
-#include <boost/multi_index_container_fwd.hpp>
-#include <boost/multi_index/sequenced_index_fwd.hpp>
-#include <boost/multi_index/ordered_index_fwd.hpp>
-#include <boost/multi_index/global_fun.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/bimap.hpp>
 
 namespace Slicer {
 	template<typename T>
@@ -147,37 +140,14 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
 		public:
-			class DLL_PRIVATE HookBase : public HookCommon {
-				public:
-					HookBase(const std::string & n);
-					virtual ~HookBase() = default;
-
-					virtual ModelPartPtr Get(T * t) const = 0;
-					virtual const Metadata & GetMetadata() const override;
-			};
+			class DLL_PRIVATE HookBase;
 			typedef std::unique_ptr<HookBase> HookPtr;
 
 			template <typename MT, typename MP>
-			class DLL_PRIVATE Hook : public HookBase {
-				public:
-					Hook(MT T::* m, const std::string & n);
-
-					ModelPartPtr Get(T * t) const override;
-
-				private:
-					const MT T::* member;
-			};
+			class DLL_PRIVATE Hook;
 
 			template <typename MT, typename MP>
-			class DLL_PRIVATE HookMetadata : public Hook<MT, MP> {
-				public:
-					HookMetadata(MT T::* member, const std::string & n, const Metadata & md);
-
-					virtual const Metadata & GetMetadata() const override;
-
-					const Metadata metadata;
-			};
-
+			class DLL_PRIVATE HookMetadata;
 
 			virtual void OnEachChild(const ChildHandler & ch) override;
 
@@ -192,13 +162,7 @@ namespace Slicer {
 			template<typename R>
 			DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
 
-			typedef boost::multi_index_container<
-				HookPtr,
-				boost::multi_index::indexed_by<
-					boost::multi_index::sequenced<>,
-					boost::multi_index::ordered_non_unique<boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>>,
-					boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<const HookCommon &, std::string, &ModelPartForComplexBase::hookNameLower>>
-				>> Hooks;
+			class DLL_PRIVATE Hooks;
 
 			template<typename H, typename ... P>
 			static void addHook(Hooks &, const P & ...);
@@ -269,7 +233,7 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
 		public:
 			typedef T element_type;
-			typedef boost::bimap<T, std::string> Enumerations;
+			class DLL_PRIVATE Enumerations;
 
 			ModelPartForEnum(T * s);
 

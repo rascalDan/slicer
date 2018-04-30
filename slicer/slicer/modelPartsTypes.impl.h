@@ -8,7 +8,10 @@
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/global_fun.hpp>
+#include <boost/multi_index/member.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/bimap.hpp>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
@@ -316,6 +319,15 @@ namespace Slicer {
 
 	// ModelPartForComplex
 	template<typename T>
+	class ModelPartForComplex<T>::Hooks : public boost::multi_index_container<
+		HookPtr,
+		boost::multi_index::indexed_by<
+			boost::multi_index::sequenced<>,
+			boost::multi_index::ordered_non_unique<boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>>,
+			boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<const HookCommon &, std::string, &ModelPartForComplexBase::hookNameLower>>>> {
+	};
+
+	template<typename T>
 	void ModelPartForComplex<T>::OnEachChild(const ChildHandler & ch)
 	{
 		for (const auto & h : hooks) {
@@ -369,46 +381,57 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartForComplex<T>::HookBase::HookBase(const std::string & n) :
-		HookCommon(n)
-	{
-	}
+	class DLL_PRIVATE ModelPartForComplex<T>::HookBase : public HookCommon {
+		public:
+			HookBase(const std::string & n) :
+				HookCommon(n)
+			{
+			}
+			virtual ~HookBase() = default;
 
-	template<typename T>
-	const Metadata & ModelPartForComplex<T>::HookBase::GetMetadata() const
-	{
-		return emptyMetadata;
-	}
-
-	template<typename T>
-	template<typename MT, typename MP>
-	ModelPartForComplex<T>::Hook<MT, MP>::Hook(MT T::* m, const std::string & n) :
-		HookBase(n),
-		member(m)
-	{
-	}
+			virtual ModelPartPtr Get(T * t) const = 0;
+			virtual const Metadata & GetMetadata() const override
+			{
+				return emptyMetadata;
+			}
+	};
 
 	template<typename T>
 	template<typename MT, typename MP>
-	ModelPartPtr ModelPartForComplex<T>::Hook<MT, MP>::Get(T * t) const
-	{
-		return std::make_shared<MP>(t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : NULL);
-	}
+	class DLL_PRIVATE ModelPartForComplex<T>::Hook : public ModelPartForComplex<T>::HookBase {
+		public:
+			Hook(MT T::* m, const std::string & n) :
+				HookBase(n),
+				member(m)
+			{
+			}
+
+			ModelPartPtr Get(T * t) const override
+			{
+				return std::make_shared<MP>(t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : NULL);
+			}
+
+		private:
+			const MT T::* member;
+	};
 
 	template<typename T>
 	template<typename MT, typename MP>
-	ModelPartForComplex<T>::HookMetadata<MT, MP>::HookMetadata(MT T::* member, const std::string & n, const Metadata & md) :
-		Hook<MT, MP>(member, n),
-		metadata(md)
-	{
-	}
+	class DLL_PRIVATE ModelPartForComplex<T>::HookMetadata : public ModelPartForComplex<T>::template Hook<MT, MP> {
+		public:
+			HookMetadata(MT T::* member, const std::string & n, const Metadata & md) :
+				Hook<MT, MP>(member, n),
+				metadata(md)
+			{
+			}
 
-	template<typename T>
-	template<typename MT, typename MP>
-	const Metadata & ModelPartForComplex<T>::HookMetadata<MT, MP>::GetMetadata() const
-	{
-		return metadata;
-	}
+			virtual const Metadata & GetMetadata() const override
+			{
+				return metadata;
+			}
+
+			const Metadata metadata;
+	};
 
 	// ModelPartForClass
 	template<typename T>
@@ -519,6 +542,10 @@ namespace Slicer {
 	}
 
 	// ModelPartForEnum
+	template<typename T>
+	class ModelPartForEnum<T>::Enumerations : public boost::bimap<T, std::string> {
+	};
+
 	template<typename T>
 	ModelPartForEnum<T>::ModelPartForEnum(T * s) :
 		ModelPartModel<T>(s)
