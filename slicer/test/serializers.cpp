@@ -649,7 +649,7 @@ BOOST_AUTO_TEST_CASE( conversion )
 	json::Value v;
 	Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v);
 	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56",
-			boost::get<json::String>(*boost::get<json::Object>(v)["conv"]));
+			std::get<json::String>(std::get<json::Object>(v)["conv"]));
 }
 
 BOOST_AUTO_TEST_SUITE_END();

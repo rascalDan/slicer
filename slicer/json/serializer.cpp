@@ -32,42 +32,42 @@ namespace Slicer {
 
 			void set(bool & v) const override
 			{
-				v = boost::get<bool>(value);
+				v = std::get<bool>(value);
 			}
 
 			void set(Ice::Byte & v) const override
 			{
-				v = boost::numeric_cast<Ice::Byte>(boost::get<json::Number>(value));
+				v = boost::numeric_cast<Ice::Byte>(std::get<json::Number>(value));
 			}
 
 			void set(Ice::Short & v) const override
 			{
-				v = boost::numeric_cast<Ice::Short>(boost::get<json::Number>(value));
+				v = boost::numeric_cast<Ice::Short>(std::get<json::Number>(value));
 			}
 
 			void set(Ice::Int & v) const override
 			{
-				v = boost::numeric_cast<Ice::Int>(boost::get<json::Number>(value));
+				v = boost::numeric_cast<Ice::Int>(std::get<json::Number>(value));
 			}
 
 			void set(Ice::Long & v) const override
 			{
-				v = boost::numeric_cast<Ice::Long>(boost::get<json::Number>(value));
+				v = boost::numeric_cast<Ice::Long>(std::get<json::Number>(value));
 			}
 
 			void set(Ice::Float & v) const override
 			{
-				v = boost::numeric_cast<Ice::Float>(boost::get<json::Number>(value));
+				v = boost::numeric_cast<Ice::Float>(std::get<json::Number>(value));
 			}
 
 			void set(Ice::Double & v) const override
 			{
-				v = boost::numeric_cast<Ice::Double>(boost::get<json::Number>(value));
+				v = boost::numeric_cast<Ice::Double>(std::get<json::Number>(value));
 			}
 
 			void set(std::string & v) const override
 			{
-				v = boost::get<json::String>(value);
+				v = std::get<json::String>(value);
 			}
 
 		protected:
@@ -126,7 +126,7 @@ namespace Slicer {
 			json::Value & target;
 	};
 
-	class DocumentTreeIterate : public boost::static_visitor<> {
+	class DocumentTreeIterate {
 		public:
 			DocumentTreeIterate(ModelPartPtr & mp) : modelPart(mp)
 			{
@@ -146,8 +146,8 @@ namespace Slicer {
 			{
 				if (auto typeIdName = modelPart->GetTypeIdProperty()) {
 					auto typeAttrItr = o.find(*typeIdName);
-					if (typeAttrItr != o.end() && boost::get<json::String>(typeAttrItr->second.get())) {
-						modelPart = modelPart->GetSubclassModelPart(boost::get<json::String>(*typeAttrItr->second));
+					if (typeAttrItr != o.end() && std::holds_alternative<json::String>(typeAttrItr->second)) {
+						modelPart = modelPart->GetSubclassModelPart(std::get<json::String>(typeAttrItr->second));
 					}
 				}
 				modelPart->Create();
@@ -160,7 +160,7 @@ namespace Slicer {
 						key->Create();
 						key->SetValue(JsonValueSource(element.first));
 						key->Complete();
-						boost::apply_visitor(DocumentTreeIterate(value), *element.second);
+						std::visit(DocumentTreeIterate(value), element.second);
 						emp->Complete();
 					}
 				}
@@ -169,7 +169,7 @@ namespace Slicer {
 						auto emp = modelPart->GetChild(element.first);
 						if (emp) {
 							emp->Create();
-							boost::apply_visitor(DocumentTreeIterate(emp), *element.second);
+							std::visit(DocumentTreeIterate(emp), element.second);
 							emp->Complete();
 						}
 					}
@@ -183,7 +183,7 @@ namespace Slicer {
 					auto emp = modelPart->GetAnonChild();
 					if (emp) {
 						emp->Create();
-						boost::apply_visitor(DocumentTreeIterate(emp), *element);
+						std::visit(DocumentTreeIterate(emp), element);
 						emp->Complete();
 					}
 				}
@@ -197,23 +197,23 @@ namespace Slicer {
 	JsonSerializer::ModelTreeIterateSeq(json::Value * n, ModelPartPtr mp)
 	{
 		if (!mp->HasValue()) return;
-		auto arr = boost::get<json::Array>(n);
-		arr->push_back(json::ValuePtr(new json::Value()));
-		ModelTreeIterateRoot(arr->back().get(), mp);
+		auto arr = std::get_if<json::Array>(n);
+		arr->emplace_back();
+		ModelTreeIterateRoot(&arr->back(), mp);
 	}
 
 	void
 	JsonSerializer::ModelTreeIterateDictObj(json::Value * n, ModelPartPtr mp)
 	{
 		if (!mp->HasValue()) return;
-		auto obj = boost::get<json::Object>(n);
+		auto obj = std::get_if<json::Object>(n);
 		json::Object::key_type k;
-		auto v = json::ValuePtr(new json::Value());
+		json::Value v;
 		json::Value kv;
 		mp->GetChild(keyName)->GetValue(JsonValueTarget(kv));
 		JsonValueSource s(kv);
 		s.set(k);
-		ModelTreeIterateRoot(v.get(), mp->GetChild(valueName));
+		ModelTreeIterateRoot(&v, mp->GetChild(valueName));
 		obj->insert({ k, v });
 	}
 
@@ -225,40 +225,40 @@ namespace Slicer {
 		}
 		switch (mp->GetType()) {
 			case mpt_Null:
-				boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value())});
+				std::get<json::Object>(*n).insert({name, json::Null()});
 				return;
 			case mpt_Simple:
 				{
 					json::Value v;
 					if (mp->GetValue(JsonValueTarget(v))) {
-						boost::get<json::Object>(*n).insert({ name, json::ValuePtr(new json::Value(v)) });
+						std::get<json::Object>(*n).insert({ name, v });
 					}
 					break;
 				}
 			case mpt_Complex:
 				if (mp->HasValue()) {
-					auto nn = json::ValuePtr(new json::Value(json::Object()));
+					json::Object nn;
 					if (auto typeIdName = mp->GetTypeIdProperty()) {
 						if (auto typeId = mp->GetTypeId()) {
-							boost::get<json::Object>(*nn).insert({*typeIdName, json::ValuePtr(new json::Value(*typeId))});
+							nn.insert({*typeIdName, *typeId});
 							mp = mp->GetSubclassModelPart(*typeId);
 						}
 					}
-					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, boost::get<json::Object>(*n).insert({name, nn}).first->second.get(), _1, _2));
+					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, &std::get<json::Object>(*n).insert({name, nn}).first->second, _1, _2));
 				}
 				break;
 			case mpt_Sequence:
 				if (mp->HasValue()) {
-					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
+					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, &std::get<json::Object>(*n).insert({name, json::Array()}).first->second, _2));
 				}
 				break;
 			case mpt_Dictionary:
 				if (mp->HasValue()) {
 					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
-						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateDictObj, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Object()))}).first->second.get(), _2));
+						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateDictObj, &std::get<json::Object>(*n).insert({name, json::Object()}).first->second, _2));
 					}
 					else {
-						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, boost::get<json::Object>(*n).insert({name, json::ValuePtr(new json::Value(json::Array()))}).first->second.get(), _2));
+						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, &std::get<json::Object>(*n).insert({name, json::Array()}).first->second, _2));
 					}
 				}
 				break;
@@ -280,7 +280,7 @@ namespace Slicer {
 					*n = json::Object();
 					if (auto typeIdName = mp->GetTypeIdProperty()) {
 						if (auto typeId = mp->GetTypeId()) {
-							boost::get<json::Object>(*n).insert({*typeIdName, json::ValuePtr(new json::Value(*typeId))});
+							std::get<json::Object>(*n).insert({*typeIdName, *typeId});
 							mp = mp->GetSubclassModelPart(*typeId);
 						}
 					}
@@ -319,7 +319,7 @@ namespace Slicer {
 	{
 		json::Value obj = json::parseValue(strm);
 		auto mp = modelRoot->GetAnonChild();
-		boost::apply_visitor(DocumentTreeIterate(mp), obj);
+		std::visit(DocumentTreeIterate(mp), obj);
 	}
 
 	void
@@ -346,7 +346,7 @@ namespace Slicer {
 		std::ifstream inFile(path.string());
 		json::Value obj = json::parseValue(inFile);
 		auto mp = modelRoot->GetAnonChild();
-		boost::apply_visitor(DocumentTreeIterate(mp), obj);
+		std::visit(DocumentTreeIterate(mp), obj);
 	}
 
 	void
@@ -372,7 +372,7 @@ namespace Slicer {
 	JsonValueDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
 		auto mp = modelRoot->GetAnonChild();
-		boost::apply_visitor(DocumentTreeIterate(mp), value);
+		std::visit(DocumentTreeIterate(mp), value);
 	}
 
 	void
