@@ -4,8 +4,13 @@
 #include <cxxabi.h>
 
 namespace Slicer {
-	typedef std::map<std::string, ClassRef> ClassRefMap;
-	typedef boost::bimap<std::string, std::string> ClassNameMap;
+	typedef std::map<std::string, ClassRef, std::less<>> ClassRefMap;
+	typedef boost::multi_index_container<
+		std::pair<std::string, std::string>,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<std::string, std::string>, const std::string, &std::pair<std::string, std::string>::first>, std::less<>>,
+			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<std::string, std::string>, const std::string, &std::pair<std::string, std::string>::second>, std::less<>>
+		>> ClassNameMap;
 
 	static void createClassMaps() __attribute__((constructor(208)));
 	static void deleteClassMaps() __attribute__((destructor(208)));
@@ -41,9 +46,10 @@ namespace Slicer {
 	const std::string &
 	ModelPartForComplexBase::ToModelTypeName(const std::string & name)
 	{
-		auto mapped = classNameMap()->right.find(name);
-		if (mapped != classNameMap()->right.end()) {
-			return mapped->second;
+		auto & right = classNameMap()->get<1>();
+		auto mapped = right.find(name);
+		if (mapped != right.end()) {
+			return mapped->first;
 		}
 		return name;
 	}
@@ -51,8 +57,9 @@ namespace Slicer {
 	const std::string &
 	ModelPartForComplexBase::ToExchangeTypeName(const std::string & name)
 	{
-		auto mapped = classNameMap()->left.find(name);
-		if (mapped != classNameMap()->left.end()) {
+		auto & left = classNameMap()->get<0>();
+		auto mapped = left.find(name);
+		if (mapped != left.end()) {
 			return mapped->second;
 		}
 		return name;
@@ -163,7 +170,7 @@ namespace Slicer {
 	{
 		Slicer::classRefMap()->erase(className);
 		if (typeName) {
-			Slicer::classNameMap()->left.erase(className);
+			classNameMap()->get<0>().erase(className);
 		}
 	}
 	ModelPartPtr ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
@@ -183,11 +190,6 @@ namespace Slicer {
 	{
 		auto buf = std::unique_ptr<char, decltype(free)*>(abi::__cxa_demangle(mangled, NULL, NULL, NULL), std::free);
 		return "::" + std::string(buf.get());
-	}
-
-	std::string ModelPartForComplexBase::hookNameLower(const HookCommon & h)
-	{
-		return boost::algorithm::to_lower_copy(h.name);
 	}
 
 	void ModelPartForOptionalBase::OnEachChild(const ChildHandler & ch)

@@ -11,7 +11,6 @@
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/bimap.hpp>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
@@ -323,8 +322,8 @@ namespace Slicer {
 		HookPtr,
 		boost::multi_index::indexed_by<
 			boost::multi_index::sequenced<>,
-			boost::multi_index::ordered_non_unique<boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>>,
-			boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<const HookCommon &, std::string, &ModelPartForComplexBase::hookNameLower>>>> {
+			boost::multi_index::ordered_non_unique<boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>, std::less<>>,
+			boost::multi_index::ordered_non_unique<boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>, case_less>>> {
 	};
 
 	template<typename T>
@@ -543,7 +542,12 @@ namespace Slicer {
 
 	// ModelPartForEnum
 	template<typename T>
-	class ModelPartForEnum<T>::Enumerations : public boost::bimap<T, std::string> {
+	class ModelPartForEnum<T>::Enumerations : public boost::multi_index_container<
+		std::pair<T, std::string>,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<T, std::string>, const T, &std::pair<T, std::string>::first>>,
+			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<T, std::string>, const std::string, &std::pair<T, std::string>::second>, std::less<>>
+			>> {
 	};
 
 	template<typename T>
@@ -561,18 +565,20 @@ namespace Slicer {
 	template<typename T>
 	T ModelPartForEnum<T>::lookup(const std::string & val)
 	{
-		auto i = enumerations.right.find(val);
-		if (i == enumerations.right.end()) {
-			throw InvalidEnumerationSymbol(val, typeid(T).name());
+		auto & right = enumerations.template get<1>();
+		auto i = right.find(val);
+		if (i == right.end()) {
+			throw InvalidEnumerationSymbol(std::string(val), typeid(T).name());
 		}
-		return i->second;
+		return i->first;
 	}
 
 	template<typename T>
 	const std::string & ModelPartForEnum<T>::lookup(T val)
 	{
-		auto i = enumerations.left.find(val);
-		if (i == enumerations.left.end()) {
+		auto & left = enumerations.template get<0>();
+		auto i = left.find(val);
+		if (i == left.end()) {
 			throw InvalidEnumerationValue((::Ice::Int)val, typeid(T).name());
 		}
 		return i->second;

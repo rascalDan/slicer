@@ -1,5 +1,6 @@
 #include "modelParts.h"
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace Slicer {
 	const Metadata emptyMetadata;
@@ -89,6 +90,12 @@ namespace Slicer {
 	HookCommon::apply(const ChildHandler & ch, const ModelPartPtr & modelPart)
 	{
 		ch(this->name, modelPart, this);
+	}
+
+	bool
+	case_less::operator()(std::string_view && a, std::string_view && b) const
+	{
+		return boost::ilexicographical_compare(a, b);
 	}
 }
 

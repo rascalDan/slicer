@@ -118,6 +118,10 @@ namespace Slicer {
 			const std::string name;
 	};
 
+	struct DLL_PUBLIC case_less {
+		bool operator()(std::string_view && lhs, std::string_view && rhs) const;
+	};
+
 	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
 		public:
 			virtual ~ModelPart() = default;
