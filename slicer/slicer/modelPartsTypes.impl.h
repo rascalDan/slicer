@@ -563,7 +563,7 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	T ModelPartForEnum<T>::lookup(const std::string & val)
+	T ModelPartForEnum<T>::lookup(const std::string_view & val)
 	{
 		auto & right = enumerations.template get<1>();
 		auto i = right.find(val);
