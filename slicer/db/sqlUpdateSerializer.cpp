@@ -43,7 +43,7 @@ namespace Slicer {
 	SqlUpdateSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
 	{
 		auto ins = createUpdate(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
+		mp->OnEachChild([&ins](const std::string &, ModelPartPtr cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
 	}
