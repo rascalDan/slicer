@@ -1,5 +1,6 @@
 import testing ;
 import package ;
+import ../test/slicer.jam ;
 
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;

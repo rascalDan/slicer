@@ -1,8 +1,5 @@
 import testing ;
-import generators ;
-import type ;
-import feature ;
-import toolset ;
+import ./slicer.jam ;
 
 lib dl ;
 lib pthread ;
@@ -11,18 +8,6 @@ lib boost_filesystem ;
 lib boost_date_time ;
 lib boost_utf : : <name>boost_unit_test_framework ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
-
-generators.register-standard $(__name__).slicer : SLICE : CPP CPP(slicer-%) H : <slicer>yes ;
-generators.override $(__name__).slicer : slice.slicer ;
-feature.feature slicerbin : : free dependency ;
-toolset.flags slicer SLICERBIN <slicerbin> ;
-toolset.flags slicer INCLUDES <include> ;
-
-actions slicer bind SLICERBIN
-{
-  slice2cpp -I"$(INCLUDES)" --checksum --output-dir $(1[1]:D) $(2) --dll-export JAM_DLL_PUBLIC
-	"$(SLICERBIN)" -I"$(INCLUDES)" $(2) $(1[2]) --headerPrefix="\"\""
-}
 
 lib types :
 	[ glob *.ice ]
