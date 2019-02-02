@@ -2,7 +2,6 @@ import testing ;
 import ./slicer.jam ;
 
 lib dl ;
-lib pthread ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_date_time ;

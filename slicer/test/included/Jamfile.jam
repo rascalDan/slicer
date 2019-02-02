@@ -1,15 +1,11 @@
 lib dl ;
-lib pthread ;
-lib Ice++11 ;
 
 lib included :
 	included.ice
 	:
-	<library>pthread
-	<library>Ice++11
+	<library>../..//Ice
 	: :
-	<library>pthread
-	<library>Ice++11
+	<library>../..//Ice
 	<include>.
 	;
 

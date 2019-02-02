@@ -1,6 +1,5 @@
 import package ;
 
-lib Ice++11 ;
 lib po : : <name>boost_program_options ;
 lib boost_system ;
 lib boost_filesystem ;
@@ -10,7 +9,7 @@ lib slicer-compiler :
 	parser.cpp
 	:
 	<library>slice//Slice
-	<library>Ice++11
+	<library>..//Ice++11
 	<library>mcpp
 	<library>boost_system
 	<library>boost_filesystem

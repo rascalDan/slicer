@@ -1,7 +1,5 @@
 import package ;
 
-lib pthread ;
-lib Ice++11 ;
 lib boost_system ;
 lib boost_filesystem ;
 
@@ -9,8 +7,7 @@ lib slicer :
 	[ glob *.cpp ]
 	[ glob *.ice ]
 	:
-	<library>pthread
-	<library>Ice++11
+	<library>..//Ice
 	<library>boost_system
 	<library>..//adhocutil
 	<include>..
