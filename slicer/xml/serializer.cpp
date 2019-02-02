@@ -403,12 +403,12 @@ namespace Slicer {
 		doc.write_to_stream(strm);
 	}
 
-	XmlFileSerializer::XmlFileSerializer(const boost::filesystem::path & p) :
+	XmlFileSerializer::XmlFileSerializer(const std::filesystem::path & p) :
 		path(p)
 	{
 	}
 
-	XmlFileDeserializer::XmlFileDeserializer(const boost::filesystem::path & p) :
+	XmlFileDeserializer::XmlFileDeserializer(const std::filesystem::path & p) :
 		path(p)
 	{
 	}

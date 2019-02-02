@@ -1,7 +1,7 @@
 #ifndef SLICER_SERIALIZER_H
 #define SLICER_SERIALIZER_H
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include <slicer/modelParts.h>
 #include <visibility.h>
 #include <factory.h>
@@ -25,8 +25,8 @@ namespace Slicer {
 
 	typedef AdHoc::Factory<Serializer, std::ostream &> StreamSerializerFactory;
 	typedef AdHoc::Factory<Deserializer, std::istream &> StreamDeserializerFactory;
-	typedef AdHoc::Factory<Serializer, const boost::filesystem::path &> FileSerializerFactory;
-	typedef AdHoc::Factory<Deserializer, const boost::filesystem::path &> FileDeserializerFactory;
+	typedef AdHoc::Factory<Serializer, const std::filesystem::path &> FileSerializerFactory;
+	typedef AdHoc::Factory<Deserializer, const std::filesystem::path &> FileDeserializerFactory;
 }
 
 #endif

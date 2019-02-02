@@ -330,12 +330,12 @@ namespace Slicer {
 		json::serializeValue(doc, strm, "utf-8");
 	}
 
-	JsonFileSerializer::JsonFileSerializer(const boost::filesystem::path & p) :
+	JsonFileSerializer::JsonFileSerializer(const std::filesystem::path & p) :
 		path(p)
 	{
 	}
 
-	JsonFileDeserializer::JsonFileDeserializer(const boost::filesystem::path & p) :
+	JsonFileDeserializer::JsonFileDeserializer(const std::filesystem::path & p) :
 		path(p)
 	{
 	}

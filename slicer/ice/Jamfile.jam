@@ -1,16 +1,14 @@
 import testing ;
 import package ;
 
-lib boost_system ;
-lib boost_filesystem ;
+lib stdc++fs ;
 lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib slicer-ice :
 	[ glob *.cpp : test*.cpp ]
 	:
 	<include>..
-	<library>boost_system
-	<library>boost_filesystem
+	<library>stdc++fs
 	<library>..//Ice
 	<library>..//adhocutil
 	<library>../slicer//slicer

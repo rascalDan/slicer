@@ -1,8 +1,7 @@
 import package ;
 
 lib po : : <name>boost_program_options ;
-lib boost_system ;
-lib boost_filesystem ;
+lib stdc++fs ;
 lib mcpp ;
 
 lib slicer-compiler :
@@ -11,8 +10,7 @@ lib slicer-compiler :
 	<library>slice//Slice
 	<library>..//Ice++11
 	<library>mcpp
-	<library>boost_system
-	<library>boost_filesystem
+	<library>stdc++fs
 	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer

@@ -1,8 +1,7 @@
 import testing ;
 import package ;
 
-lib boost_system ;
-lib boost_filesystem ;
+lib stdc++fs ;
 lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib slicer-xml :
@@ -10,8 +9,7 @@ lib slicer-xml :
 	[ glob *.ice ]
 	:
 	<include>..
-	<library>boost_system
-	<library>boost_filesystem
+	<library>stdc++fs
 	<library>..//Ice
 	<library>../..//libxmlpp
 	<library>..//adhocutil
@@ -25,6 +23,7 @@ run testSpecifics.cpp
 	: : :
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-xml
+	<library>stdc++fs
 	<implicit-dependency>slicer-xml
 	<library>boost_utf
 	<library>../test//types

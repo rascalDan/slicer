@@ -3,12 +3,12 @@
 
 #include <string>
 #include <visibility.h>
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 // These are just thin wrappers that throw exceptions
 DLL_PUBLIC
 void
-diff(const boost::filesystem::path & left, const boost::filesystem::path & right);
+diff(const std::filesystem::path & left, const std::filesystem::path & right);
 
 #endif
 

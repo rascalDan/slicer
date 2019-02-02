@@ -2,7 +2,7 @@
 #define SLICER_PARSER_H
 
 #include <Slice/Parser.h>
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include <visibility.h>
 
 namespace Slicer {
@@ -23,10 +23,10 @@ namespace Slicer {
 			Slicer();
 
 			FILE * cpp;
-			boost::filesystem::path slicePath;
-			boost::filesystem::path cppPath;
-			boost::filesystem::path headerPrefix;
-			std::vector<boost::filesystem::path> includes;
+			std::filesystem::path slicePath;
+			std::filesystem::path cppPath;
+			std::filesystem::path headerPrefix;
+			std::vector<std::filesystem::path> includes;
 
 			unsigned int Execute();
 			unsigned int Components() const;

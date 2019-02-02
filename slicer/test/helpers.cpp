@@ -3,7 +3,7 @@
 #include <boost/test/test_tools.hpp>
 
 void
-diff(const boost::filesystem::path & left, const boost::filesystem::path & right)
+diff(const std::filesystem::path & left, const std::filesystem::path & right)
 {
 	std::ifstream fl(left.string());
 	std::ifstream fr(right.string());

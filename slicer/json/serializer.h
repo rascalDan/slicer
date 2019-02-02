@@ -26,12 +26,12 @@ namespace Slicer {
 
 	class DLL_PUBLIC JsonFileSerializer : public JsonSerializer {
 		public:
-			JsonFileSerializer(const boost::filesystem::path &);
+			JsonFileSerializer(const std::filesystem::path &);
 
 			virtual void Serialize(ModelPartForRootPtr) override;
 
 		protected:
-			const boost::filesystem::path path;
+			const std::filesystem::path path;
 	};
 
 	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
@@ -56,12 +56,12 @@ namespace Slicer {
 
 	class DLL_PUBLIC JsonFileDeserializer : public Deserializer {
 		public:
-			JsonFileDeserializer(const boost::filesystem::path &);
+			JsonFileDeserializer(const std::filesystem::path &);
 
 			virtual void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
-			const boost::filesystem::path path;
+			const std::filesystem::path path;
 	};
 
 	class DLL_PUBLIC JsonValueDeserializer : public Deserializer {

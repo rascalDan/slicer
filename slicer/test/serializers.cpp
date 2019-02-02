@@ -8,8 +8,6 @@
 #include <xml/serializer.h>
 #include <libxml2/libxml/parser.h>
 #include <json/serializer.h>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <boost/format.hpp>
 #include <functional>
 #include <types.h>
@@ -21,7 +19,7 @@
 #include <definedDirs.h>
 #include "conversions.h"
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 namespace pl = std::placeholders;
 
 // LCOV_EXCL_START
@@ -53,8 +51,8 @@ class FileBased {
 			const fs::path tmpf = binDir / "byFile";
 			fs::create_directory(tmpf);
 			const fs::path output = tmpf / infile;
-			const fs::path outputJson = tmpf / fs::change_extension(infile, "json");
-			const fs::path outputXml = tmpf / fs::change_extension(infile, "xml");
+			const fs::path outputJson = tmpf / fs::path(infile).replace_extension("json");
+			const fs::path outputXml = tmpf / fs::path(infile).replace_extension("xml");
 
 			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
 			T p = Slicer::DeserializeAny<DeserializerIn, T>(input);
@@ -570,7 +568,7 @@ BOOST_AUTO_TEST_CASE( json_streams )
 	const auto tmpf = binDir / "byStream";
 	const auto inFile = rootDir / "initial" / "inherit-c.json";
 	const auto outFile = tmpf / "streamout.json";
-	boost::filesystem::create_directories(tmpf);
+	std::filesystem::create_directories(tmpf);
 	{
 		std::ifstream in(inFile.string());
 		auto d = Slicer::DeserializeAny<Slicer::JsonStreamDeserializer, TestModule::InheritanceContPtr>(in);
@@ -586,7 +584,7 @@ BOOST_AUTO_TEST_CASE( xml_streams )
 	const auto tmpf = binDir / "byStream";
 	const auto inFile = rootDir / "initial" / "inherit-b.xml";
 	const auto outFile = tmpf / "streamout.xml";
-	boost::filesystem::create_directories(tmpf);
+	fs::create_directories(tmpf);
 	{
 		std::ifstream in(inFile.string());
 		auto d = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::InheritanceContPtr>(in);

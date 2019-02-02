@@ -34,12 +34,12 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlFileSerializer : public XmlSerializer {
 		public:
-			XmlFileSerializer(const boost::filesystem::path &);
+			XmlFileSerializer(const std::filesystem::path &);
 
 			virtual void Serialize(ModelPartForRootPtr) override;
 
 		protected:
-			const boost::filesystem::path path;
+			const std::filesystem::path path;
 	};
 
 	class DLL_PUBLIC XmlDocumentSerializer : public XmlSerializer {
@@ -73,12 +73,12 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlFileDeserializer : public XmlDeserializer {
 		public:
-			XmlFileDeserializer(const boost::filesystem::path &);
+			XmlFileDeserializer(const std::filesystem::path &);
 
 			virtual void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
-			const boost::filesystem::path path;
+			const std::filesystem::path path;
 	};
 
 	class DLL_PUBLIC XmlDocumentDeserializer : public XmlDeserializer {

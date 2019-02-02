@@ -1,21 +1,18 @@
 import package ;
 
-lib boost_system ;
-lib boost_filesystem ;
+lib stdc++fs ;
 
 lib slicer :
 	[ glob *.cpp ]
 	[ glob *.ice ]
 	:
 	<library>..//Ice
-	<library>boost_system
 	<library>..//adhocutil
 	<include>..
 	: :
 	<include>..
 	<include>.
-	<library>boost_system
-	<library>boost_filesystem
+	<library>stdc++fs
 	;
 
 alias install : install-lib install-slice ;

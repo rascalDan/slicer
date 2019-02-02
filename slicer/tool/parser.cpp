@@ -8,11 +8,10 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <Slice/CPlusPlusUtil.h>
-#include <boost/filesystem/convenience.hpp>
 #include <fprintbf.h>
 #include <safeMapFind.h>
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace Slicer {
 	Slicer::Slicer() :
@@ -97,7 +96,7 @@ namespace Slicer {
 		if (!cpp) return true;
 
 		fprintbf(cpp, "// Begin Slicer code\n\n");
-		fprintbf(cpp, "#include <%s>\n\n", fs::change_extension(topLevelFile.filename(), ".h").string());
+		fprintbf(cpp, "#include <%s>\n\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
 		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "modelPartsTypes.impl.h").string());
 		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "common.h").string());
 		for (const auto & m : u->modules()) {
@@ -574,7 +573,7 @@ namespace Slicer {
 			throw CompilerError("Both file handle and path provided.");
 		}
 		auto cppfile = std::unique_ptr<FILE, decltype(&fclose)>(
-			cpp || cppPath.empty() ? cpp : fopen(cppPath.string(), "w"),
+			cpp || cppPath.empty() ? cpp : fopen(cppPath.c_str(), "w"),
 					cppPath.empty() ? fflush : fclose);
 		if (!cppfile && !cppPath.empty()) {
 			throw CompilerError("Failed to open output file");

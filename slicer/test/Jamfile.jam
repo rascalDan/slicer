@@ -2,8 +2,7 @@ import testing ;
 import ./slicer.jam ;
 
 lib dl ;
-lib boost_system ;
-lib boost_filesystem ;
+lib stdc++fs ;
 lib boost_date_time ;
 lib boost_utf : : <name>boost_unit_test_framework ;
 
@@ -30,8 +29,7 @@ lib types :
 path-constant me : . ;
 
 alias common : : : :
-	<library>boost_filesystem
-	<library>boost_system
+	<library>stdc++fs
 	<define>BOOST_TEST_DYN_LINK
 	<library>boost_utf
 	<implicit-dependency>types
