@@ -8,6 +8,8 @@ build-project db ;
 build-project ice ;
 build-project test ;
 
+lib adhocutil : : : : <include>/usr/include/adhocutil ;
+
 explicit install ;
 explicit install-xml ;
 explicit install-json ;

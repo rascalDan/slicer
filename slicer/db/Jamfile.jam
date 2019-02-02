@@ -4,7 +4,6 @@ import ../test/slicer.jam ;
 
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
-lib adhocutil : : : : <include>/usr/include/adhocutil ;
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
@@ -20,7 +19,7 @@ lib slicer-db :
 	<library>Ice++11
 	<library>dbppcore
 	<library>../..//glibmm
-	<library>adhocutil
+	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
 	: :
@@ -40,9 +39,9 @@ lib testCommon :
 	<library>../test//common
 	<library>dbpp-postgresql
 	<library>dbppcore
-	<library>adhocutil
+	<library>..//adhocutil
 	: :
-	<library>adhocutil
+	<library>..//adhocutil
 	;
 
 run testSelect.cpp

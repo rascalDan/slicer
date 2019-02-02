@@ -8,7 +8,6 @@ lib jsonpp : : : :
 lib boost_system ;
 lib boost_filesystem ;
 lib boost_utf : : <name>boost_unit_test_framework ;
-lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer-json :
 	[ glob *.cpp : test*.cpp ]
@@ -18,7 +17,7 @@ lib slicer-json :
 	<library>boost_filesystem
 	<library>jsonpp
 	<library>../..//glibmm
-	<library>adhocutil
+	<library>..//adhocutil
 	<library>../slicer//slicer
 	: :
 	<library>jsonpp

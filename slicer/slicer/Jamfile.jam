@@ -4,7 +4,6 @@ lib pthread ;
 lib Ice++11 ;
 lib boost_system ;
 lib boost_filesystem ;
-lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib slicer :
 	[ glob *.cpp ]
@@ -13,7 +12,7 @@ lib slicer :
 	<library>pthread
 	<library>Ice++11
 	<library>boost_system
-	<library>adhocutil
+	<library>..//adhocutil
 	<include>..
 	: :
 	<include>..

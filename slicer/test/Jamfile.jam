@@ -7,7 +7,6 @@ lib boost_system ;
 lib boost_filesystem ;
 lib boost_date_time ;
 lib boost_utf : : <name>boost_unit_test_framework ;
-lib adhocutil : : : : <include>/usr/include/adhocutil ;
 
 lib types :
 	[ glob *.ice ]
@@ -17,7 +16,7 @@ lib types :
 	<slicer>yes
 	<slicerbin>../tool//slicer
 	<include>.
-	<library>adhocutil
+	<library>..//adhocutil
 	<library>boost_date_time
 	<library>included//included
 	<library>../slicer//slicer
@@ -43,7 +42,7 @@ alias common : : : :
 run preprocessor.cpp
 	: : :
 	<library>common
-	<library>adhocutil
+	<library>..//adhocutil
 	<include>..
 	<library>../tool//slicer-compiler
 	<dependency>types
