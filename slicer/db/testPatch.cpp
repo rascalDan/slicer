@@ -23,8 +23,8 @@ BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 BOOST_AUTO_TEST_CASE( insert_builtins )
 {
 	TestModule::BuiltInSeq bis = {
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 5, 17, 0, 129, 2.3, 4.5, "more text")),
-		TestModule::BuiltInsPtr(new TestModule::BuiltIns(true, 6, 18, 0, 130, 3.4, 5.6, "even more text"))
+		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
+		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
 	};
 	DB::TablePatch tp;
 	DB::TransactionScope tx(*db);
