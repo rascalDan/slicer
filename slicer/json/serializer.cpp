@@ -343,7 +343,7 @@ namespace Slicer {
 	void
 	JsonFileDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
-		std::ifstream inFile(path.string());
+		std::ifstream inFile(path);
 		json::Value obj = json::parseValue(inFile);
 		auto mp = modelRoot->GetAnonChild();
 		std::visit(DocumentTreeIterate(mp), obj);
@@ -354,7 +354,7 @@ namespace Slicer {
 	{
 		json::Value doc;
 		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
-		std::ofstream outFile(path.string());
+		std::ofstream outFile(path);
 		json::serializeValue(doc, outFile, "utf-8");
 	}
 

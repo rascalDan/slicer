@@ -586,7 +586,7 @@ namespace Slicer {
 				args.push_back("-I" + include.string());
 			}
 
-			Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath.string(), args);
+			Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath, args);
 			FILE * cppHandle = icecpp->preprocess(false);
 
 			if (cppHandle == NULL) {
@@ -595,7 +595,7 @@ namespace Slicer {
 
 			Slice::UnitPtr u = Slice::Unit::createUnit(false, false, false, false);
 
-			int parseStatus = u->parse(slicePath.string(), cppHandle, false);
+			int parseStatus = u->parse(slicePath, cppHandle, false);
 
 			if (!icecpp->close()) {
 				throw CompilerError("preprocess close failed");

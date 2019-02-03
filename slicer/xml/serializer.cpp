@@ -416,7 +416,7 @@ namespace Slicer {
 	void
 	XmlFileDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
 	{
-		xmlpp::DomParser dom(path.string());
+		xmlpp::DomParser dom(path);
 		auto doc = dom.get_document();
 		DocumentTreeIterate(doc, modelRoot);
 	}
@@ -426,7 +426,7 @@ namespace Slicer {
 	{
 		xmlpp::Document doc;
 		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
-		doc.write_to_file_formatted(path.string());
+		doc.write_to_file_formatted(path);
 	}
 
 	XmlDocumentSerializer::XmlDocumentSerializer(xmlpp::Document * & d) :
