@@ -13,15 +13,15 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
-	template<> ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
-	template<> ModelPartPtr ModelPart::CreateFor(Type & s) { return std::make_shared<ModelPartType>(&s); } \
-	template<> ModelPartPtr ModelPart::CreateFor(const Type & s) { return CreateFor(const_cast<Type &>(s)); } \
-	template<> ModelPartPtr ModelPart::CreateFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForOptional<ModelPartType>>(&s); } \
-	template<> ModelPartPtr ModelPart::CreateFor(const Ice::optional<Type> & s) { return CreateFor(const_cast<Ice::optional<Type> &>(s)); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return std::make_shared<ModelPartForRoot<Type>>(&s); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForRoot<Ice::optional<Type>>>(&s); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
-	template<> ModelPartForRootPtr ModelPart::CreateRootFor(const Ice::optional<Type> & s) { return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); } \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Type & s) { return std::make_shared<ModelPartType>(&s); } \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(const Type & s) { return CreateFor(const_cast<Type &>(s)); } \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForOptional<ModelPartType>>(&s); } \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(const Ice::optional<Type> & s) { return CreateFor(const_cast<Ice::optional<Type> &>(s)); } \
+	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) { return std::make_shared<ModelPartForRoot<Type>>(&s); } \
+	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForRoot<Ice::optional<Type>>>(&s); } \
+	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
+	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Ice::optional<Type> & s) { return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); } \
 	template class BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
 	template class ModelPartForRoot< Ice::optional<Type> >; \
@@ -30,11 +30,15 @@
 	CUSTOMMODELPARTFOR(Type, ModelPartType<Type>, ModelPartType<Type>)
 #define MODELPARTFORSTREAM(StreamImpl) \
 	namespace Slicer { \
-		template<> ModelPartForRootPtr ModelPart::CreateRootFor(const StreamImpl & stream) { \
+		template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const StreamImpl & stream) { \
 			return std::make_shared<ModelPartForStreamRoot<typename StreamImpl::element_type>>(const_cast<StreamImpl *>(&stream)); \
 		} \
 	}
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-var-template"
+#endif
 namespace Slicer {
 	// ModelPartForRoot
 	template<typename T>
@@ -739,6 +743,9 @@ namespace Slicer {
 		return ModelPartForRoot<std::vector<T>>::rootName;
 	}
 }
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif
 
