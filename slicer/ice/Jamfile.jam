@@ -2,7 +2,6 @@ import testing ;
 import package ;
 
 lib stdc++fs ;
-lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib slicer-ice :
 	[ glob *.cpp : test*.cpp ]
@@ -20,7 +19,7 @@ run testSpecifics.cpp
 	: : :
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-ice
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer

@@ -6,7 +6,6 @@ lib jsonpp : : : :
 	;
 
 lib stdc++fs ;
-lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib slicer-json :
 	[ glob *.cpp : test*.cpp ]
@@ -26,7 +25,7 @@ run testSpecifics.cpp
 	<define>BOOST_TEST_DYN_LINK
 	<library>slicer-json
 	<library>stdc++fs
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer

@@ -2,7 +2,6 @@ import testing ;
 import package ;
 
 lib stdc++fs ;
-lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib slicer-xml :
 	[ glob *.cpp : test*.cpp ]
@@ -26,7 +25,7 @@ run testSpecifics.cpp
 	<library>slicer-xml
 	<library>stdc++fs
 	<implicit-dependency>slicer-xml
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer

@@ -5,7 +5,6 @@ import ../test/slicer.jam ;
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
 lib stdc++fs ;
-lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib slicer-db :
 	[ glob *.cpp : test*.cpp ]
@@ -47,7 +46,7 @@ run testSelect.cpp
 	<implicit-dependency>slicer-db
 	<library>dbpp-postgresql
 	<library>stdc++fs
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
@@ -66,7 +65,7 @@ run testInsert.cpp
 	<library>slicer-db
 	<library>dbpp-postgresql
 	<library>stdc++fs
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
@@ -85,7 +84,7 @@ run testPatch.cpp
 	<library>slicer-db
 	<library>dbpp-postgresql
 	<library>stdc++fs
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
@@ -103,7 +102,7 @@ run testUpdate.cpp
 	<implicit-dependency>slicer-db
 	<library>dbpp-postgresql
 	<library>stdc++fs
-	<library>boost_utf
+	<library>..//boost_utf
 	<library>../test//types
 	<library>../test//common
 	<library>../slicer//slicer

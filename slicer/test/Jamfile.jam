@@ -4,7 +4,6 @@ import ./slicer.jam ;
 lib dl ;
 lib stdc++fs ;
 lib boost_date_time ;
-lib boost_utf : : <name>boost_unit_test_framework ;
 
 lib types :
 	[ glob *.ice ]
@@ -31,7 +30,7 @@ path-constant me : . ;
 alias common : : : :
 	<library>stdc++fs
 	<define>BOOST_TEST_DYN_LINK
-	<library>boost_utf
+	<library>..//boost_utf
 	<implicit-dependency>types
 	<define>ROOT=\"$(me)\"
 	;
