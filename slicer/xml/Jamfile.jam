@@ -15,6 +15,7 @@ lib slicer-xml :
 	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<toolset>tidy:<xcheckxx>clang-analyzer-optin.cplusplus.VirtualCall
 	: :
 	<library>../..//libxmlpp
 	;

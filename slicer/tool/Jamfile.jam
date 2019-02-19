@@ -15,6 +15,9 @@ lib slicer-compiler :
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
 	<include>..
+	<toolset>tidy:<xcheckxx>clang-analyzer-cplusplus.NewDelete
+	<toolset>tidy:<xcheckxx>clang-analyzer-cplusplus.InnerPointer
+	<toolset>tidy:<xcheckxx>clang-analyzer-cplusplus.NewDeleteLeaks
 	: :
 	<include>..
 	<library>../slicer//slicer
