@@ -106,7 +106,7 @@ namespace Slicer {
 		if (!i) {
 			return std::string();
 		}
-		return boost::lexical_cast<std::string>(*i);
+		return std::to_string(*i);
 	}
 }
 

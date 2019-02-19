@@ -65,9 +65,11 @@ namespace Slicer {
 			}
 
 #define NonNumType(T) \
+			/* NOLINTNEXTLINE(bugprone-macro-parentheses) */ \
 			void set(T &) const override { throw UnsuitableIdFieldType(#T); }
 
 #define NumType(T) \
+			/* NOLINTNEXTLINE(bugprone-macro-parentheses) */ \
 			void set(T & v) const override { v = boost::numeric_cast<T>(connection->insertId()); }
 
 			NonNumType(bool);

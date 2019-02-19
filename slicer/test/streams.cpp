@@ -13,7 +13,7 @@
 void TestStream::Produce(const Consumer & c)
 {
 	for (int x = 0; x < 10; x += 1) {
-		auto str = boost::lexical_cast<std::string>(x);
+		auto str = std::to_string(x);
 		c(str);
 	}
 }

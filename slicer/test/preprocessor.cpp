@@ -8,8 +8,6 @@
 #include <definedDirs.h>
 #include "helpers.h"
 
-namespace fs = std::filesystem;
-
 typedef std::map<std::string, unsigned int> ComponentsCount;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {
 	{ "classtype.ice", 1 },
