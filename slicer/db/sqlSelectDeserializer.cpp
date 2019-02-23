@@ -6,6 +6,7 @@
 namespace Slicer {
 	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, Ice::optional<std::string> tc) :
 		cmd(c),
+		columnCount(0),
 		typeIdColName(tc)
 	{
 	}
@@ -73,7 +74,7 @@ namespace Slicer {
 		}
 		DeserializeRow(mp);
 		if (cmd->fetch()) {
-			while (cmd->fetch()) ;
+			while (cmd->fetch()) {}
 			throw TooManyRowsReturned();
 		}
 	}

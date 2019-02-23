@@ -26,23 +26,22 @@ namespace Slicer {
 	std::string
 	isoDateToString(const ::TestModule::IsoDate & in)
 	{
-		struct tm tm;
-		memset(&tm, 0, sizeof(struct tm));
+		struct tm tm {};
 		tm.tm_mday = in.day;
 		tm.tm_mon = in.month - 1;
 		tm.tm_year = in.year - 1900;
 		mktime(&tm);
-		char buf[BUFSIZ];
-		auto len = strftime(buf, BUFSIZ, "%Y-%m-%d", &tm);
-		return std::string(buf, len);
+		std::string buf(BUFSIZ, '\0');
+		auto len = strftime(buf.data(), BUFSIZ, "%Y-%m-%d", &tm);
+		buf.resize(len);
+		return buf;
 	}
 
 	DLL_PUBLIC
 	::TestModule::IsoDate
 	stringToIsoDate(const std::string & in)
 	{
-		struct tm tm;
-		memset(&tm, 0, sizeof(struct tm));
+		struct tm tm {};
 		auto end = strptime(in.c_str(), "%Y-%m-%d", &tm);
 		if (!end || *end) {
 			// LCOV_EXCL_START
@@ -57,8 +56,7 @@ namespace Slicer {
 	std::string
 	dateTimeToString(const ::TestModule::DateTime & in)
 	{
-		struct tm tm;
-		memset(&tm, 0, sizeof(struct tm));
+		struct tm tm {};
 		tm.tm_sec = in.second;
 		tm.tm_min = in.minute;
 		tm.tm_hour = in.hour;
@@ -67,17 +65,17 @@ namespace Slicer {
 		tm.tm_year = in.year - 1900;
 		tm.tm_isdst = -1;
 		mktime(&tm);
-		char buf[BUFSIZ];
-		auto len = strftime(buf, BUFSIZ, "%Y-%b-%d %H:%M:%S", &tm);
-		return std::string(buf, len);
+		std::string buf(BUFSIZ, '\0');
+		auto len = strftime(buf.data(), BUFSIZ, "%Y-%b-%d %H:%M:%S", &tm);
+		buf.resize(len);
+		return buf;
 	}
 
 	DLL_PUBLIC
 	::TestModule::DateTime
 	stringToDateTime(const std::string & in)
 	{
-		struct tm tm;
-		memset(&tm, 0, sizeof(struct tm));
+		struct tm tm {};
 		auto end = strptime(in.c_str(), "%Y-%b-%d %H:%M:%S", &tm);
 		if (!end || *end) {
 			// LCOV_EXCL_START

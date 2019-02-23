@@ -59,7 +59,7 @@ namespace Slicer {
 
 	class IdSave : public Slicer::ValueSource {
 		public:
-			IdSave(DB::Connection * const c) :
+			explicit IdSave(DB::Connection * const c) :
 				connection(c)
 			{
 			}

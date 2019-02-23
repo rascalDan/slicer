@@ -32,7 +32,7 @@ namespace Slicer {
 
 	class XmlValueSource : public ValueSource {
 		public:
-			XmlValueSource(const Glib::ustring & s) :
+			explicit XmlValueSource(const Glib::ustring & s) :
 				value(s)
 			{
 			}
@@ -85,11 +85,11 @@ namespace Slicer {
 
 	class XmlContentValueSource : public XmlValueSource {
 		public:
-			XmlContentValueSource() :
+			explicit XmlContentValueSource() :
 				XmlValueSource(Glib::ustring())
 			{
 			}
-			XmlContentValueSource(const xmlpp::ContentNode * c) :
+			explicit XmlContentValueSource(const xmlpp::ContentNode * c) :
 				XmlValueSource(c->get_content())
 			{
 			}
@@ -97,7 +97,7 @@ namespace Slicer {
 
 	class XmlAttributeValueSource : public XmlValueSource {
 		public:
-			XmlAttributeValueSource(const xmlpp::Attribute * a) :
+			explicit XmlAttributeValueSource(const xmlpp::Attribute * a) :
 				XmlValueSource(a->get_value())
 			{
 			}
@@ -105,12 +105,12 @@ namespace Slicer {
 
 	class XmlValueTarget : public ValueTarget {
 		public:
-			XmlValueTarget(std::function<void(const Glib::ustring &)> a) :
+			explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) :
 				apply(a)
 			{
 			}
 
-			virtual void get(const bool & value) const
+			void get(const bool & value) const override
 			{
 				if (value) {
 					apply(TrueText);
@@ -120,37 +120,37 @@ namespace Slicer {
 				}
 			}
 
-			virtual void get(const Ice::Byte & value) const
+			void get(const Ice::Byte & value) const override
 			{
 				apply(boost::lexical_cast<Glib::ustring>((int)value));
 			}
 
-			virtual void get(const Ice::Short & value) const
+			void get(const Ice::Short & value) const override
 			{
 				apply(boost::lexical_cast<Glib::ustring>(value));
 			}
 
-			virtual void get(const Ice::Int & value) const
+			void get(const Ice::Int & value) const override
 			{
 				apply(boost::lexical_cast<Glib::ustring>(value));
 			}
 
-			virtual void get(const Ice::Long & value) const
+			void get(const Ice::Long & value) const override
 			{
 				apply(boost::lexical_cast<Glib::ustring>(value));
 			}
 
-			virtual void get(const Ice::Float & value) const
+			void get(const Ice::Float & value) const override
 			{
 				apply(boost::lexical_cast<Glib::ustring>(value));
 			}
 
-			virtual void get(const Ice::Double & value) const
+			void get(const Ice::Double & value) const override
 			{
 				apply(boost::lexical_cast<Glib::ustring>(value));
 			}
 
-			virtual void get(const std::string & value) const
+			void get(const std::string & value) const override
 			{
 				apply(value);
 			}
@@ -162,7 +162,7 @@ namespace Slicer {
 
 	class XmlAttributeValueTarget : public XmlValueTarget {
 		public:
-			XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
+			explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
 				XmlValueTarget(std::bind(&xmlpp::Element::set_attribute, p, Glib::ustring(n), _1, Glib::ustring()))
 			{
 			}
@@ -170,12 +170,12 @@ namespace Slicer {
 
 	class XmlContentValueTarget : public XmlValueTarget {
 		public:
-			XmlContentValueTarget(xmlpp::Element * p) :
+			explicit XmlContentValueTarget(xmlpp::Element * p) :
 				XmlValueTarget(std::bind(&xmlpp::Element::set_first_child_text, p, _1))
 			{
 			}
 
-			XmlContentValueTarget(const CurrentElementCreator & cec) :
+			explicit XmlContentValueTarget(const CurrentElementCreator & cec) :
 				XmlValueTarget(std::bind(&xmlpp::Element::set_first_child_text, std::bind(&CurrentElementCreator::deref, &cec), _1))
 			{
 			}

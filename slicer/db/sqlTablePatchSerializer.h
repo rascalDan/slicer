@@ -8,7 +8,6 @@ namespace Slicer {
 	class DLL_PUBLIC SqlTablePatchSerializer : public Slicer::Serializer {
 		public:
 			SqlTablePatchSerializer(DB::Connection * const, DB::TablePatch &);
-			~SqlTablePatchSerializer();
 
 			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
 

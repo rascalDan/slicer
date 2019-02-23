@@ -8,7 +8,8 @@ build-project db ;
 build-project ice ;
 build-project test ;
 
-lib boost_utf : : <name>boost_unit_test_framework ;
+lib boost_utf : : <name>boost_unit_test_framework : :
+	<toolset>tidy:<xcheckxx>hicpp-* ;
 lib adhocutil : : : : <include>/usr/include/adhocutil ;
 lib Ice++11 ;
 lib pthread ;

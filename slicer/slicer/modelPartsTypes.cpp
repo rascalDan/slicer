@@ -260,13 +260,17 @@ namespace Slicer {
 	const ModelPartType ModelPartForDictionaryBase::type = mpt_Dictionary;
 
 	// Streams
+	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	ChildRef ModelPartForStreamBase::GetAnonChildRef(const Slicer::HookFilter &) { throw InvalidStreamOperation(__FUNCTION__); }
+	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	ChildRef ModelPartForStreamBase::GetChildRef(const std::string &, const Slicer::HookFilter &, bool) { throw InvalidStreamOperation(__FUNCTION__); }
 	ModelPartType ModelPartForStreamBase::GetType() const { return mpt_Sequence; }
 	bool ModelPartForStreamBase::HasValue() const { return true; }
 	// Stream Roots
 	ModelPartForStreamRootBase::ModelPartForStreamRootBase(ModelPartPtr mp) : ModelPartForRootBase(mp) { }
+	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void ModelPartForStreamRootBase::Write(Ice::OutputStream&) const { throw InvalidStreamOperation(__FUNCTION__); }
+	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void ModelPartForStreamRootBase::Read(Ice::InputStream&) { throw InvalidStreamOperation(__FUNCTION__); }
 	bool ModelPartForStreamRootBase::HasValue() const { return mp->HasValue(); }
 	void ModelPartForStreamRootBase::OnEachChild(const ChildHandler & ch) { ch(GetRootName(), mp, NULL); }

@@ -25,7 +25,7 @@ namespace Slicer {
 	void
 	Slicer::defineConversions(Slice::DataMemberPtr dm) const
 	{
-		if (!cpp) return;
+		if (!cpp) { return; }
 
 		auto type = dm->type();
 		auto c = Slice::ContainedPtr::dynamicCast(dm->container());
@@ -93,7 +93,7 @@ namespace Slicer {
 	Slicer::visitUnitStart(const Slice::UnitPtr & u)
 	{
 		fs::path topLevelFile(u->topLevelFile());
-		if (!cpp) return true;
+		if (!cpp) { return true; }
 
 		fprintbf(cpp, "// Begin Slicer code\n\n");
 		fprintbf(cpp, "#include <%s>\n\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
@@ -112,7 +112,7 @@ namespace Slicer {
 	void
 	Slicer::visitUnitEnd(const Slice::UnitPtr&)
 	{
-		if (!cpp) return;
+		if (!cpp) { return; }
 
 		fprintbf(cpp, "}\n\n");
 		fprintbf(cpp, "// End Slicer code\n\n");
@@ -121,7 +121,7 @@ namespace Slicer {
 	bool
 	Slicer::visitModuleStart(const Slice::ModulePtr & m)
 	{
-		if (!cpp) return true;
+		if (!cpp) { return true; }
 
 		fprintbf(cpp, "// Begin module %s\n\n", m->name());
 		for (const auto & c : m->structs()) {
@@ -161,7 +161,7 @@ namespace Slicer {
 
 		components += 1;
 
-		if (!cpp) return true;
+		if (!cpp) { return true; }
 
 		auto decl = c->declaration();
 		fprintbf(cpp, "// Class %s\n", c->name());
@@ -220,7 +220,7 @@ namespace Slicer {
 
 		components += 1;
 
-		if (!cpp) return true;
+		if (!cpp) { return true; }
 
 		fprintbf(cpp, "// Struct %s\n", c->name());
 		visitComplexDataMembers(c, c->dataMembers());
@@ -241,7 +241,7 @@ namespace Slicer {
 	void
 	Slicer::visitComplexDataMembers(Slice::ConstructedPtr it, const Slice::DataMemberList & dataMembers) const
 	{
-		if (!cpp) return;
+		if (!cpp) { return; }
 
 		fprintbf(cpp, "typedef ModelPartForComplex< %s > C%d;\n",
 				it->scoped(), components);
@@ -291,7 +291,7 @@ namespace Slicer {
 
 		components += 1;
 
-		if (!cpp) return;
+		if (!cpp) { return; }
 
 		fprintbf(cpp, "// Enumeration %s\n", e->name());
 		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata ModelPartForEnum< %s >::metadata ",
@@ -323,7 +323,7 @@ namespace Slicer {
 
 		components += 1;
 
-		if (!cpp) return;
+		if (!cpp) { return; }
 
 		fprintbf(cpp, "// Sequence %s\n", s->name());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
@@ -364,7 +364,7 @@ namespace Slicer {
 
 		components += 1;
 
-		if (!cpp) return;
+		if (!cpp) { return; }
 
 		fprintbf(cpp, "// Dictionary %s\n", d->name());
 		auto iname = metaDataValue("slicer:item:", d->getMetaData());

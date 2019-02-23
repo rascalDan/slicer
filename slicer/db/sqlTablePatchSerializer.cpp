@@ -15,10 +15,6 @@ namespace Slicer {
 		tablePatch.src = ttname::get(this);
 	}
 
-	SqlTablePatchSerializer::~SqlTablePatchSerializer()
-	{
-	}
-
 	void
 	SqlTablePatchSerializer::Serialize(Slicer::ModelPartForRootPtr mpr)
 	{

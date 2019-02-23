@@ -25,7 +25,7 @@ namespace Slicer {
 
 	class JsonValueSource : public ValueSource {
 		public:
-			JsonValueSource(const json::Value & s) :
+			explicit JsonValueSource(const json::Value & s) :
 				value(s)
 			{
 			}
@@ -76,48 +76,48 @@ namespace Slicer {
 
 	class JsonValueTarget : public ValueTarget {
 		public:
-			JsonValueTarget(json::Value & t) :
+			explicit JsonValueTarget(json::Value & t) :
 				target(t)
 			{
 				target = json::Null();
 			}
 
-			virtual void get(const bool & value) const
+			void get(const bool & value) const override
 			{
 				target = value;
 			}
 
-			virtual void get(const Ice::Byte & value) const
+			void get(const Ice::Byte & value) const override
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void get(const Ice::Short & value) const
+			void get(const Ice::Short & value) const override
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void get(const Ice::Int & value) const
+			void get(const Ice::Int & value) const override
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void get(const Ice::Long & value) const
+			void get(const Ice::Long & value) const override
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void get(const Ice::Float & value) const
+			void get(const Ice::Float & value) const override
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void get(const Ice::Double & value) const
+			void get(const Ice::Double & value) const override
 			{
 				target = boost::numeric_cast<json::Number>(value);
 			}
 
-			virtual void get(const std::string & value) const
+			void get(const std::string & value) const override
 			{
 				target = value;
 			}
@@ -128,7 +128,7 @@ namespace Slicer {
 
 	class DocumentTreeIterate {
 		public:
-			DocumentTreeIterate(ModelPartPtr & mp) : modelPart(mp)
+			explicit DocumentTreeIterate(ModelPartPtr & mp) : modelPart(mp)
 			{
 			}
 			template<typename SimpleT>
@@ -196,7 +196,9 @@ namespace Slicer {
 	void
 	JsonSerializer::ModelTreeIterateSeq(json::Value * n, ModelPartPtr mp)
 	{
-		if (!mp->HasValue()) return;
+		if (!mp->HasValue()) {
+			return;
+		}
 		auto arr = std::get_if<json::Array>(n);
 		arr->emplace_back();
 		ModelTreeIterateRoot(&arr->back(), mp);
@@ -205,7 +207,9 @@ namespace Slicer {
 	void
 	JsonSerializer::ModelTreeIterateDictObj(json::Value * n, ModelPartPtr mp)
 	{
-		if (!mp->HasValue()) return;
+		if (!mp->HasValue()) {
+			return;
+		}
 		auto obj = std::get_if<json::Object>(n);
 		json::Object::key_type k;
 		json::Value v;
