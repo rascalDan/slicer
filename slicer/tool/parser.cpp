@@ -15,7 +15,7 @@ namespace fs = std::filesystem;
 
 namespace Slicer {
 	Slicer::Slicer() :
-		cpp(NULL),
+		cpp(nullptr),
 		headerPrefix("slicer"),
 		components(0),
 		classNo(0)
@@ -569,7 +569,7 @@ namespace Slicer {
 	unsigned int
 	Slicer::Execute()
 	{
-		if (cpp != NULL && !cppPath.empty()) {
+		if (cpp && !cppPath.empty()) {
 			throw CompilerError("Both file handle and path provided.");
 		}
 		auto cppfile = std::unique_ptr<FILE, decltype(&fclose)>(
@@ -589,7 +589,7 @@ namespace Slicer {
 			Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath, args);
 			FILE * cppHandle = icecpp->preprocess(false);
 
-			if (cppHandle == NULL) {
+			if (!cppHandle) {
 				throw CompilerError("preprocess failed");
 			}
 
@@ -612,7 +612,7 @@ namespace Slicer {
 			u->destroy();
 
 			if (!cppPath.empty()) {
-				cpp = NULL;
+				cpp = nullptr;
 			}
 
 			return Components() - initial;

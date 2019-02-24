@@ -53,14 +53,14 @@ namespace Slicer {
 	ModelPart::GetAnonChild(const HookFilter & flt)
 	{
 		auto ref = GetAnonChildRef(flt);
-		return ref ? ref.Child() : ModelPartPtr(NULL);
+		return ref ? ref.Child() : ModelPartPtr(nullptr);
 	}
 
 	ModelPartPtr
 	ModelPart::GetChild(const std::string & memberName, const HookFilter & flt)
 	{
 		auto ref = GetChildRef(memberName, flt);
-		return ref ? ref.Child() : ModelPartPtr(NULL);
+		return ref ? ref.Child() : ModelPartPtr(nullptr);
 	}
 
 	bool
@@ -75,8 +75,8 @@ namespace Slicer {
 		return shared_from_this();
 	}
 
-	HookCommon::HookCommon(const std::string & n) :
-		name(n)
+	HookCommon::HookCommon(std::string n) :
+		name(std::move(n))
 	{
 	}
 

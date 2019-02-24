@@ -334,13 +334,13 @@ namespace Slicer {
 		json::serializeValue(doc, strm, "utf-8");
 	}
 
-	JsonFileSerializer::JsonFileSerializer(const std::filesystem::path & p) :
-		path(p)
+	JsonFileSerializer::JsonFileSerializer(std::filesystem::path p) :
+		path(std::move(p))
 	{
 	}
 
-	JsonFileDeserializer::JsonFileDeserializer(const std::filesystem::path & p) :
-		path(p)
+	JsonFileDeserializer::JsonFileDeserializer(std::filesystem::path p) :
+		path(std::move(p))
 	{
 	}
 

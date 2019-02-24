@@ -11,9 +11,9 @@
 namespace Slicer {
 	using namespace std::placeholders;
 
-	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, const std::string & t) :
+	SqlUpdateSerializer::SqlUpdateSerializer(DB::Connection * const c, std::string t) :
 		connection(c),
-		tableName(t)
+		tableName(std::move(t))
 	{
 	}
 

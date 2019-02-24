@@ -20,7 +20,6 @@
 #include "conversions.h"
 
 namespace fs = std::filesystem;
-namespace pl = std::placeholders;
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
@@ -37,14 +36,14 @@ class FileBased {
 	public:
 		template<typename T, typename DeserializerIn>
 		void
-		verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = NULL)
+		verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = nullptr)
 		{
 			verifyByFile<T, DeserializerIn>(infile, infile, check);
 		}
 
 		template<typename T, typename DeserializerIn>
 		void
-		verifyByFile(const fs::path & infile, const fs::path & expOutFile, const std::function<void(const T &)> & check = NULL)
+		verifyByFile(const fs::path & infile, const fs::path & expOutFile, const std::function<void(const T &)> & check = nullptr)
 		{
 			const fs::path input = rootDir / "initial" / infile;
 			const fs::path expected = rootDir / "initial" / expOutFile;
@@ -83,7 +82,7 @@ class FileBased {
 				const std::function<Internal(const fs::path &)> & in,
 				const std::function<void(const Internal &, const fs::path &)> & out,
 				const std::function<void(Internal &)> & ifree,
-				const std::function<void(const T &)> & check = NULL)
+				const std::function<void(const T &)> & check = nullptr)
 		{
 			const fs::path input = rootDir / "initial" / infile;
 			const fs::path tmph = binDir / "byHandler";
@@ -238,13 +237,6 @@ checkStruct(const TestModule::StructType & st)
 	BOOST_REQUIRE_EQUAL(st.b, 13);
 }
 
-template<class T>
-void
-checkAssertEq(const T & expected, const T & actual)
-{
-	BOOST_REQUIRE_EQUAL(expected, actual);
-}
-
 void
 checkEntityRef(const TestXml::EntityRef & er)
 {
@@ -377,22 +369,30 @@ BOOST_AUTO_TEST_CASE( structtype_json )
 
 BOOST_AUTO_TEST_CASE( simplestring_xml )
 {
-	verifyByFile<std::string, Slicer::XmlFileDeserializer>("string.xml", std::bind(checkAssertEq<std::string>, "test string", pl::_1));
+	verifyByFile<std::string, Slicer::XmlFileDeserializer>("string.xml", [](const auto & s) {
+		BOOST_REQUIRE_EQUAL("test string", s);
+	});
 }
 
 BOOST_AUTO_TEST_CASE( simpleint_xml )
 {
-	verifyByFile<Ice::Int, Slicer::XmlFileDeserializer>("int.xml", std::bind(checkAssertEq<Ice::Int>, 27, pl::_1));
+	verifyByFile<Ice::Int, Slicer::XmlFileDeserializer>("int.xml", [](const auto & i) {
+		BOOST_REQUIRE_EQUAL(27, i);
+	});
 }
 
 BOOST_AUTO_TEST_CASE( simplestring_json )
 {
-	verifyByFile<std::string, Slicer::JsonFileDeserializer>("string2.json", std::bind(checkAssertEq<std::string>, "test string", pl::_1));
+	verifyByFile<std::string, Slicer::JsonFileDeserializer>("string2.json", [](const auto & s) {
+		BOOST_REQUIRE_EQUAL("test string", s);
+	});
 }
 
 BOOST_AUTO_TEST_CASE( simpleint_json )
 {
-	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", std::bind(checkAssertEq<Ice::Int>, 27, pl::_1));
+	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", [](const auto & i) {
+		BOOST_REQUIRE_EQUAL(27, i);
+	});
 }
 
 BOOST_AUTO_TEST_CASE( complexClass_xmlattrAndText )
@@ -626,7 +626,7 @@ BOOST_AUTO_TEST_CASE( simple_complete_validator )
 
 BOOST_AUTO_TEST_CASE( missingConversion )
 {
-	auto in = json::parseValue("{\"conv\": \"2016-06-30 12:34:56\"}");
+	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
 	BOOST_REQUIRE_THROW((
 		Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)
 	), Slicer::NoConversionFound);
@@ -640,7 +640,7 @@ BOOST_AUTO_TEST_CASE( missingConversion )
 
 BOOST_AUTO_TEST_CASE( conversion )
 {
-	auto in = json::parseValue("{\"conv\": \"2016-06-30 12:34:56\"}");
+	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
 	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::ConvPtr>(in);
 	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", obj->conv);
 

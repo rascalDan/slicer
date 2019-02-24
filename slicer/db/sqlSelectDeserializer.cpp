@@ -7,7 +7,7 @@ namespace Slicer {
 	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, Ice::optional<std::string> tc) :
 		cmd(c),
 		columnCount(0),
-		typeIdColName(tc)
+		typeIdColName(std::move(tc))
 	{
 	}
 
@@ -96,7 +96,7 @@ namespace Slicer {
 						for (auto col = 0u; col < columnCount; col += 1) {
 							const DB::Column & c = (*cmd)[col];
 							if (!c.isNull()) {
-								auto fmpr = rmp->GetChildRef(c.name, NULL, false);
+								auto fmpr = rmp->GetChildRef(c.name, nullptr, false);
 								if (fmpr) {
 									auto fmp = fmpr.Child();
 									fmp->Create();

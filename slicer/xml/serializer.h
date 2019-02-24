@@ -34,7 +34,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlFileSerializer : public XmlSerializer {
 		public:
-			XmlFileSerializer(const std::filesystem::path &);
+			XmlFileSerializer(std::filesystem::path);
 
 			virtual void Serialize(ModelPartForRootPtr) override;
 
@@ -73,7 +73,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlFileDeserializer : public XmlDeserializer {
 		public:
-			XmlFileDeserializer(const std::filesystem::path &);
+			XmlFileDeserializer(std::filesystem::path);
 
 			virtual void Deserialize(ModelPartForRootPtr) override;
 

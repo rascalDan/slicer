@@ -24,7 +24,7 @@ namespace Slicer {
 	const std::string md_elements = "xml:elements";
 	const std::string keyName = "key";
 	const std::string valueName = "value";
-	typedef xmlpp::Element * (xmlpp::Element::* ElementCreatorF) (const Glib::ustring &, const Glib::ustring &);
+	using ElementCreatorF = xmlpp::Element * (xmlpp::Element::*) (const Glib::ustring &, const Glib::ustring &);
 	const auto defaultElementCreator = std::bind((ElementCreatorF)&xmlpp::Element::add_child_element, _1, _2, Glib::ustring());
 
 	static const Glib::ustring TrueText("true");
@@ -32,8 +32,8 @@ namespace Slicer {
 
 	class XmlValueSource : public ValueSource {
 		public:
-			explicit XmlValueSource(const Glib::ustring & s) :
-				value(s)
+			explicit XmlValueSource(Glib::ustring s) :
+				value(std::move(s))
 			{
 			}
 
@@ -106,7 +106,7 @@ namespace Slicer {
 	class XmlValueTarget : public ValueTarget {
 		public:
 			explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) :
-				apply(a)
+				apply(std::move(a))
 			{
 			}
 
@@ -255,8 +255,9 @@ namespace Slicer {
 	{
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
-				auto smpr = mp->GetChildRef(element->get_name(),
-						std::bind(metaDataFlagNotSet, std::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
+				auto smpr = mp->GetChildRef(element->get_name(), [](const auto & h) {
+					return metaDataFlagNotSet(h->GetMetadata(), md_attribute);
+				});
 				if (smpr) {
 					auto smp = smpr.Child();
 					if (metaDataFlagSet(smpr.ChildMetaData(), md_bare)) {
@@ -268,8 +269,9 @@ namespace Slicer {
 				}
 			}
 			else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
-				auto smp = mp->GetChild(attribute->get_name(),
-						std::bind(metaDataFlagSet, std::bind(&Slicer::HookCommon::GetMetadata, _1), md_attribute));
+				auto smp = mp->GetChild(attribute->get_name(), [](const auto & h) {
+					return metaDataFlagSet(h->GetMetadata(), md_attribute);
+				});
 				if (smp) {
 					smp->Create();
 					smp->SetValue(XmlAttributeValueSource(attribute));
@@ -279,7 +281,9 @@ namespace Slicer {
 			else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
 				ModelPartPtr smp;
 				if (!content->is_white_space()) {
-					smp = mp->GetAnonChild(std::bind(metaDataFlagSet, std::bind(&Slicer::HookCommon::GetMetadata, _1), md_text));
+					smp = mp->GetAnonChild([](const auto & h) {
+						return metaDataFlagSet(h->GetMetadata(), md_text);
+					});
 				}
 				if (smp) {
 					smp->SetValue(XmlContentValueSource(content));
@@ -403,13 +407,13 @@ namespace Slicer {
 		doc.write_to_stream(strm);
 	}
 
-	XmlFileSerializer::XmlFileSerializer(const std::filesystem::path & p) :
-		path(p)
+	XmlFileSerializer::XmlFileSerializer(std::filesystem::path p) :
+		path(std::move(p))
 	{
 	}
 
-	XmlFileDeserializer::XmlFileDeserializer(const std::filesystem::path & p) :
-		path(p)
+	XmlFileDeserializer::XmlFileDeserializer(std::filesystem::path p) :
+		path(std::move(p))
 	{
 	}
 

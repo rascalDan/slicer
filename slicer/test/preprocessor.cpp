@@ -8,7 +8,7 @@
 #include <definedDirs.h>
 #include "helpers.h"
 
-typedef std::map<std::string, unsigned int> ComponentsCount;
+using ComponentsCount = std::map<std::string, unsigned int>;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {
 	{ "classtype.ice", 1 },
 	{ "classes.ice", 3 },

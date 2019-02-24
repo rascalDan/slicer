@@ -108,7 +108,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC HookCommon {
 		public:
-			HookCommon(const std::string &);
+			HookCommon(std::string);
 
 			bool filter(const HookFilter & flt);
 			void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);

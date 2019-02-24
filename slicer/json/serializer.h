@@ -26,7 +26,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC JsonFileSerializer : public JsonSerializer {
 		public:
-			JsonFileSerializer(const std::filesystem::path &);
+			JsonFileSerializer(std::filesystem::path);
 
 			virtual void Serialize(ModelPartForRootPtr) override;
 
@@ -56,7 +56,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC JsonFileDeserializer : public Deserializer {
 		public:
-			JsonFileDeserializer(const std::filesystem::path &);
+			JsonFileDeserializer(std::filesystem::path);
 
 			virtual void Deserialize(ModelPartForRootPtr) override;
 
