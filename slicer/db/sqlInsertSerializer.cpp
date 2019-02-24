@@ -34,14 +34,14 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::SerializeObject(Slicer::ModelPartPtr mp) const
+	SqlInsertSerializer::SerializeObject(const Slicer::ModelPartPtr & mp) const
 	{
 		auto ins = createInsert(mp);
 		bindObjectAndExecute(mp, ins.get());
 	}
 
 	void
-	SqlInsertSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
+	SqlInsertSerializer::SerializeSequence(const Slicer::ModelPartPtr & mp) const
 	{
 		auto ins = createInsert(mp->GetContainedModelPart());
 		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
@@ -50,7 +50,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * ins) const
+	SqlInsertSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * ins) const
 	{
 		int paramNo = 0;
 		cmp->OnEachChild(std::bind(&SqlInsertSerializer::bindObjectAndExecuteField, this, std::ref(paramNo), ins, _2, _3));
@@ -87,7 +87,7 @@ namespace Slicer {
 	};
 
 	void
-	SqlFetchIdInsertSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * ins) const
+	SqlFetchIdInsertSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * ins) const
 	{
 		SqlAutoIdInsertSerializer::bindObjectAndExecute(cmp, ins);
 		cmp->OnEachChild([this](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
@@ -98,7 +98,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, const HookCommon * h) const
+	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, const Slicer::ModelPartPtr & cmp, const HookCommon * h) const
 	{
 		if (isBind(h)) {
 			if (!cmp->GetValue(SqlBinder(*ins, paramNo))) {
@@ -109,7 +109,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, Slicer::ModelPartPtr cmp, const HookCommon * h) const
+	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, const Slicer::ModelPartPtr & cmp, const HookCommon * h) const
 	{
 		if (isNotAuto(h)) {
 			SqlInsertSerializer::bindObjectAndExecuteField(paramNo, ins, cmp, h);
@@ -117,7 +117,7 @@ namespace Slicer {
 	}
 
 	DB::ModifyCommandPtr
-	SqlInsertSerializer::createInsert(Slicer::ModelPartPtr mp) const
+	SqlInsertSerializer::createInsert(const Slicer::ModelPartPtr & mp) const
 	{
 		AdHoc::Buffer insert;
 		insert.appendbf("INSERT INTO %s(", tableName);

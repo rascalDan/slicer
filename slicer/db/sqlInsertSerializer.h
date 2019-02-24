@@ -14,12 +14,12 @@ namespace Slicer {
 			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
 
 		protected:
-			void SerializeObject(Slicer::ModelPartPtr) const;
-			void SerializeSequence(Slicer::ModelPartPtr) const;
-			DB::ModifyCommandPtr createInsert(Slicer::ModelPartPtr) const;
+			void SerializeObject(const Slicer::ModelPartPtr &) const;
+			void SerializeSequence(const Slicer::ModelPartPtr &) const;
+			DB::ModifyCommandPtr createInsert(const Slicer::ModelPartPtr &) const;
 			virtual void createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const;
-			virtual void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *) const;
-			virtual void bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand *, Slicer::ModelPartPtr, const HookCommon *) const;
+			virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
+			virtual void bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
 
 			DB::Connection * const connection;
 			const std::string tableName;
@@ -32,7 +32,7 @@ namespace Slicer {
 
 		protected:
 			virtual void createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const;
-			virtual void bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand *, Slicer::ModelPartPtr, const HookCommon *) const;
+			virtual void bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
 	};
 
 	class DLL_PUBLIC SqlFetchIdInsertSerializer : public SqlAutoIdInsertSerializer {
@@ -41,7 +41,7 @@ namespace Slicer {
 			SqlFetchIdInsertSerializer(const P & ... p) : SqlAutoIdInsertSerializer(p...) { }
 
 		protected:
-			virtual void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *) const;
+			virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
 	};
 }
 

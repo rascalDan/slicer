@@ -13,10 +13,10 @@ namespace Slicer {
 			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
 
 		protected:
-			void SerializeObject(Slicer::ModelPartPtr) const;
-			void SerializeSequence(Slicer::ModelPartPtr) const;
-			DB::ModifyCommandPtr createUpdate(Slicer::ModelPartPtr) const;
-			static void bindObjectAndExecute(Slicer::ModelPartPtr, DB::ModifyCommand *);
+			void SerializeObject(const Slicer::ModelPartPtr &) const;
+			void SerializeSequence(const Slicer::ModelPartPtr &) const;
+			DB::ModifyCommandPtr createUpdate(const Slicer::ModelPartPtr &) const;
+			static void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *);
 
 			DB::Connection * const connection;
 			const std::string tableName;

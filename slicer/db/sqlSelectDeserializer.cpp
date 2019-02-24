@@ -35,7 +35,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeSimple(Slicer::ModelPartPtr mp)
+	SqlSelectDeserializer::DeserializeSimple(const Slicer::ModelPartPtr & mp)
 	{
 		if (!cmd->fetch()) {
 			if (!mp->IsOptional()) {
@@ -55,16 +55,16 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeSequence(Slicer::ModelPartPtr mp)
+	SqlSelectDeserializer::DeserializeSequence(const Slicer::ModelPartPtr & omp)
 	{
-		mp = mp->GetAnonChild();
+		auto mp = omp->GetAnonChild();
 		while (cmd->fetch()) {
 			DeserializeRow(mp);
 		}
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeObject(Slicer::ModelPartPtr mp)
+	SqlSelectDeserializer::DeserializeObject(const Slicer::ModelPartPtr & mp)
 	{
 		if (!cmd->fetch()) {
 			if (!mp->IsOptional()) {
@@ -80,7 +80,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeRow(Slicer::ModelPartPtr mp)
+	SqlSelectDeserializer::DeserializeRow(const Slicer::ModelPartPtr & mp)
 	{
 		auto rmp = mp->GetAnonChild();
 		if (rmp) {

@@ -23,7 +23,7 @@ namespace Slicer {
 	}
 
 	void
-	Slicer::defineConversions(Slice::DataMemberPtr dm) const
+	Slicer::defineConversions(const Slice::DataMemberPtr & dm) const
 	{
 		if (!cpp) { return; }
 
@@ -239,7 +239,7 @@ namespace Slicer {
 	}
 
 	void
-	Slicer::visitComplexDataMembers(Slice::ConstructedPtr it, const Slice::DataMemberList & dataMembers) const
+	Slicer::visitComplexDataMembers(const Slice::ConstructedPtr & it, const Slice::DataMemberList & dataMembers) const
 	{
 		if (!cpp) { return; }
 

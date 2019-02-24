@@ -194,7 +194,7 @@ namespace Slicer {
 	};
 
 	void
-	JsonSerializer::ModelTreeIterateSeq(json::Value * n, ModelPartPtr mp)
+	JsonSerializer::ModelTreeIterateSeq(json::Value * n, const ModelPartPtr & mp)
 	{
 		if (!mp->HasValue()) {
 			return;
@@ -205,7 +205,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonSerializer::ModelTreeIterateDictObj(json::Value * n, ModelPartPtr mp)
+	JsonSerializer::ModelTreeIterateDictObj(json::Value * n, const ModelPartPtr & mp)
 	{
 		if (!mp->HasValue()) {
 			return;

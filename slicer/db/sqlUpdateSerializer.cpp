@@ -33,14 +33,14 @@ namespace Slicer {
 	}
 
 	void
-	SqlUpdateSerializer::SerializeObject(Slicer::ModelPartPtr mp) const
+	SqlUpdateSerializer::SerializeObject(const Slicer::ModelPartPtr & mp) const
 	{
 		auto ins = createUpdate(mp);
 		bindObjectAndExecute(mp, ins.get());
 	}
 
 	void
-	SqlUpdateSerializer::SerializeSequence(Slicer::ModelPartPtr mp) const
+	SqlUpdateSerializer::SerializeSequence(const Slicer::ModelPartPtr & mp) const
 	{
 		auto ins = createUpdate(mp->GetContainedModelPart());
 		mp->OnEachChild([&ins](const std::string &, ModelPartPtr cmp, const HookCommon *) {
@@ -49,7 +49,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlUpdateSerializer::bindObjectAndExecute(Slicer::ModelPartPtr cmp, DB::ModifyCommand * upd)
+	SqlUpdateSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * upd)
 	{
 		int paramNo = 0;
 		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
@@ -71,7 +71,7 @@ namespace Slicer {
 	}
 
 	DB::ModifyCommandPtr
-	SqlUpdateSerializer::createUpdate(Slicer::ModelPartPtr mp) const
+	SqlUpdateSerializer::createUpdate(const Slicer::ModelPartPtr & mp) const
 	{
 		AdHoc::Buffer update;
 		update.appendbf("UPDATE %s SET ", tableName);
