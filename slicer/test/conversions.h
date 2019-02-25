@@ -3,7 +3,7 @@
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <visibility.h>
-#include <slicer/modelPartsTypes.impl.h>
+#include <slicer/modelPartsTypes.h>
 #include <types.h>
 
 namespace TestModule {
