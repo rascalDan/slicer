@@ -9,24 +9,38 @@
 namespace Slicer {
 	class DLL_PUBLIC Serializer {
 		public:
+			Serializer() = default;
+			Serializer(const Serializer &) = delete;
+			Serializer(Serializer &&) = delete;
+
 			virtual ~Serializer() = default;
+
+			Serializer & operator=(const Serializer &) = delete;
+			Serializer & operator=(Serializer &&) = delete;
 
 			virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
-	typedef std::shared_ptr<Serializer> SerializerPtr;
+	using SerializerPtr = std::shared_ptr<Serializer>;
 
 	class DLL_PUBLIC Deserializer {
 		public:
+			Deserializer() = default;
+			Deserializer(const Deserializer &) = delete;
+			Deserializer(Deserializer &&) = delete;
+
 			virtual ~Deserializer() = default;
+
+			Deserializer & operator=(const Deserializer &) = delete;
+			Deserializer & operator=(Deserializer &&) = delete;
 
 			virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
-	typedef std::shared_ptr<Deserializer> DeserializerPtr;
+	using DeserializerPtr = std::shared_ptr<Deserializer>;
 
-	typedef AdHoc::Factory<Serializer, std::ostream &> StreamSerializerFactory;
-	typedef AdHoc::Factory<Deserializer, std::istream &> StreamDeserializerFactory;
-	typedef AdHoc::Factory<Serializer, const std::filesystem::path &> FileSerializerFactory;
-	typedef AdHoc::Factory<Deserializer, const std::filesystem::path &> FileDeserializerFactory;
+	using StreamSerializerFactory = AdHoc::Factory<Serializer, std::ostream &>;
+	using StreamDeserializerFactory = AdHoc::Factory<Deserializer, std::istream &>;
+	using FileSerializerFactory = AdHoc::Factory<Serializer, const std::filesystem::path &>;
+	using FileDeserializerFactory = AdHoc::Factory<Deserializer, const std::filesystem::path &>;
 }
 
 #endif

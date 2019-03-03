@@ -267,7 +267,7 @@ namespace Slicer {
 	ModelPartType ModelPartForStreamBase::GetType() const { return mpt_Sequence; }
 	bool ModelPartForStreamBase::HasValue() const { return true; }
 	// Stream Roots
-	ModelPartForStreamRootBase::ModelPartForStreamRootBase(ModelPartPtr mp) : ModelPartForRootBase(std::move(mp)) { }
+	ModelPartForStreamRootBase::ModelPartForStreamRootBase(const ModelPartPtr & mp) : ModelPartForRootBase(mp) { }
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void ModelPartForStreamRootBase::Write(Ice::OutputStream&) const { throw InvalidStreamOperation(__FUNCTION__); }
 	// NOLINTNEXTLINE(hicpp-no-array-decay)

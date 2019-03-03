@@ -7,7 +7,7 @@
 namespace Slicer {
 	template <typename Object>
 	Object
-	DeserializeAnyWith(DeserializerPtr deserializer)
+	DeserializeAnyWith(const DeserializerPtr & deserializer)
 	{
 		Object object;
 		deserializer->Deserialize(ModelPart::CreateRootFor<Object>(object));
@@ -23,7 +23,7 @@ namespace Slicer {
 
 	template <typename Object>
 	void
-	SerializeAnyWith(const Object & object, SerializerPtr serializer)
+	SerializeAnyWith(const Object & object, const SerializerPtr & serializer)
 	{
 		serializer->Serialize(ModelPart::CreateRootFor<const Object>(object));
 	}

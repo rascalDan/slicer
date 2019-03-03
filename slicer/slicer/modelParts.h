@@ -65,16 +65,14 @@ namespace Slicer {
 	class ModelPartForRootBase;
 	class HookCommon;
 
-	typedef std::shared_ptr<ModelPart> ModelPartPtr;
-	typedef std::shared_ptr<ModelPartForRootBase> ModelPartForRootPtr;
-	typedef std::unique_ptr<HookCommon> HookCommonPtr;
-	typedef Ice::optional<std::string> TypeId;
-
-	typedef std::function<void(const std::string &, ModelPartPtr, const HookCommon *)> ChildHandler;
-
-	typedef std::function<ModelPartPtr(void *)> ClassRef;
-	typedef std::function<bool(const HookCommon *)> HookFilter;
-	typedef std::list<std::string> Metadata;
+	using ModelPartPtr = std::shared_ptr<ModelPart>;
+	using ModelPartForRootPtr = std::shared_ptr<ModelPartForRootBase>;
+	using HookCommonPtr = std::unique_ptr<HookCommon>;
+	using TypeId = Ice::optional<std::string>;
+	using ChildHandler = std::function<void(const std::string &, ModelPartPtr, const HookCommon *)>;
+	using ClassRef = std::function<ModelPartPtr(void *)>;
+	using HookFilter = std::function<bool(const HookCommon *)>;
+	using Metadata = std::list<std::string>;
 	DLL_PUBLIC extern const Metadata emptyMetadata;
 
 	enum ModelPartType {
@@ -93,13 +91,13 @@ namespace Slicer {
 
 	class DLL_PUBLIC ChildRef {
 		public:
-			ChildRef();
-			ChildRef(ModelPartPtr);
-			ChildRef(ModelPartPtr, const Metadata &);
+			explicit ChildRef();
+			explicit ChildRef(ModelPartPtr);
+			explicit ChildRef(ModelPartPtr, const Metadata &);
 
 			ModelPartPtr Child() const;
 			const Metadata & ChildMetaData() const;
-			operator bool() const;
+			explicit operator bool() const;
 
 		private:
 			ModelPartPtr mpp;
@@ -108,7 +106,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC HookCommon {
 		public:
-			HookCommon(std::string);
+			explicit HookCommon(std::string);
 
 			bool filter(const HookFilter & flt);
 			void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);
@@ -124,7 +122,14 @@ namespace Slicer {
 
 	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
 		public:
+			ModelPart() = default;
+			ModelPart(const ModelPart &) = delete;
+			ModelPart(ModelPart &&) = delete;
+
 			virtual ~ModelPart() = default;
+
+			ModelPart & operator=(const ModelPart &) = delete;
+			ModelPart & operator=(ModelPart &&) = delete;
 
 			template<typename T>
 			static ModelPartPtr CreateFor();
@@ -155,24 +160,24 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartModel {
 		protected:
-			ModelPartModel() : Model(nullptr) { }
-			ModelPartModel(T * m) : Model(m) { }
+			explicit ModelPartModel() : Model(nullptr) { }
+			explicit ModelPartModel(T * m) : Model(m) { }
 			T * Model;
 	};
 
 	class DLL_PUBLIC ModelPartForRootBase : public ModelPart {
 		public:
-			ModelPartForRootBase(ModelPartPtr mp);
+			explicit ModelPartForRootBase(ModelPartPtr mp);
 
 			virtual const std::string & GetRootName() const = 0;
-			virtual ChildRef GetAnonChildRef(const HookFilter &) override;
-			virtual ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
-			virtual void OnEachChild(const ChildHandler & ch) override;
-			virtual ModelPartType GetType() const override;
-			virtual bool IsOptional() const override;
+			ChildRef GetAnonChildRef(const HookFilter &) override;
+			ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
+			void OnEachChild(const ChildHandler & ch) override;
+			ModelPartType GetType() const override;
+			bool IsOptional() const override;
 			virtual void Write(::Ice::OutputStream &) const = 0;
 			virtual void Read(::Ice::InputStream &) = 0;
-			virtual ModelPartPtr GetContainedModelPart() override;
+			ModelPartPtr GetContainedModelPart() override;
 
 			ModelPartPtr mp;
 	};
