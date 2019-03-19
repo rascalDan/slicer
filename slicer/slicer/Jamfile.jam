@@ -2,16 +2,19 @@ import package ;
 
 lib stdc++fs ;
 
+obj common : common.ice : <toolset>tidy:<checker>none ;
 lib slicer :
 	[ glob *.cpp ]
-	[ glob *.ice ]
+	common
 	:
 	<library>..//Ice
 	<library>..//adhocutil
 	<include>..
+	<implicit-dependency>common
 	: :
 	<include>..
 	<include>.
+	<implicit-dependency>common
 	<library>stdc++fs
 	;
 

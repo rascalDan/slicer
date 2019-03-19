@@ -3,9 +3,10 @@ import package ;
 
 lib stdc++fs ;
 
+obj xmlExceptions : xmlExceptions.ice : <use>../slicer//slicer <toolset>tidy:<checker>none ;
 lib slicer-xml :
 	[ glob *.cpp : test*.cpp ]
-	[ glob *.ice ]
+	xmlExceptions
 	:
 	<include>..
 	<library>stdc++fs
@@ -14,9 +15,11 @@ lib slicer-xml :
 	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<implicit-dependency>xmlExceptions
 	<toolset>tidy:<xcheckxx>clang-analyzer-optin.cplusplus.VirtualCall
 	: :
 	<library>../..//libxmlpp
+	<implicit-dependency>xmlExceptions
 	;
 
 run testSpecifics.cpp

@@ -4,6 +4,7 @@ lib included :
 	included.ice
 	:
 	<library>../..//Ice
+	<toolset>tidy:<checker>none
 	: :
 	<library>../..//Ice
 	<include>.

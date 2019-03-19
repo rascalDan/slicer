@@ -6,9 +6,10 @@ lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
 lib stdc++fs ;
 
+obj sqlExceptions : sqlExceptions.ice : <use>../slicer//slicer <toolset>tidy:<checker>none ;
 lib slicer-db :
 	[ glob *.cpp : test*.cpp ]
-	[ glob *.ice : test*.ice ]
+	sqlExceptions
 	:
 	<include>..
 	<library>..//Ice
@@ -17,17 +18,28 @@ lib slicer-db :
 	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<implicit-dependency>sqlExceptions
 	: :
 	<library>dbppcore
+	<implicit-dependency>sqlExceptions
 	;
 
 path-constant me : . ;
 
+lib dbicetypes :
+	[ glob test*.ice ]
+	:
+	<slicer>no
+	<library>../slicer//slicer
+	<library>../test//icetypes
+	<implicit-dependency>../test//icetypes
+	<toolset>tidy:<checker>none
+	;
 lib testCommon :
 	[ glob testConversions.cpp testMockCommon.cpp test*.ice ]
 	:
 	<dependency>../tool//slicer
-	<slicer>yes
+	<slicer>pure
 	<slicerbin>../tool//slicer
 	<implicit-dependency>../test//types
 	<library>../test//types
@@ -35,8 +47,12 @@ lib testCommon :
 	<library>dbpp-postgresql
 	<library>dbppcore
 	<library>..//adhocutil
+	<library>dbicetypes
+	<implicit-dependency>dbicetypes
 	: :
 	<library>..//adhocutil
+	<library>dbicetypes
+	<implicit-dependency>dbicetypes
 	;
 
 run testSelect.cpp

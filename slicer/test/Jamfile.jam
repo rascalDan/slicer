@@ -5,23 +5,37 @@ lib dl ;
 lib stdc++fs ;
 lib boost_date_time ;
 
+lib icetypes :
+	[ glob *.ice ]
+	:
+	<slicer>no
+	<include>.
+	<implicit-dependency>included//included
+	<library>included//included
+	<toolset>tidy:<checker>none
+	: :
+	<include>.
+	<implicit-dependency>included//included
+	<library>included//included
+	;
 lib types :
 	[ glob *.ice ]
 	conversions.cpp
 	:
 	<dependency>../tool//slicer
-	<slicer>yes
+	<slicer>pure
 	<slicerbin>../tool//slicer
 	<include>.
 	<library>..//adhocutil
 	<library>boost_date_time
 	<library>included//included
 	<library>../slicer//slicer
-	<implicit-dependency>included//included
+	<library>icetypes
+	<implicit-dependency>icetypes
 	<implicit-dependency>../slicer//slicer
 	: :
 	<include>.
-	<library>included//included
+	<library>icetypes
 	<library>../slicer//slicer
 	;
 
