@@ -146,6 +146,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForSimple<T>::SetValue(ValueSource && s)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		s.set(*this->Model);
 	}
@@ -153,6 +154,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForSimple<T>::GetValue(ValueTarget && s)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		s.get(*this->Model);
 		return true;
@@ -174,6 +176,7 @@ namespace Slicer {
 	template<typename T, typename M, Ice::optional<T> M::* MV>
 	bool ModelPartForConverted<Ice::optional<T>, M, MV>::HasValue() const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		return (bool)*this->Model;
 	}
@@ -289,6 +292,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForOptional<T>::hasModel() const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		return (bool)*this->Model;
 	}
@@ -296,6 +300,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForOptional<T>::Create()
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		if (!*this->Model) {
 			*this->Model = typename T::element_type();
@@ -307,6 +312,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForOptional<T>::GetValue(ValueTarget && s)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		if (*this->Model) {
 			return modelPart->GetValue(std::move(s));
@@ -446,6 +452,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::Create()
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		*this->Model = std::make_shared<T>();
 	}
@@ -459,6 +466,7 @@ namespace Slicer {
 	template<typename T>
 	ModelPartPtr ModelPartForClass<T>::GetSubclassModelPart(const std::string & name)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::getSubclassModelPart(name, this->Model);
 	}
@@ -466,6 +474,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForClass<T>::HasValue() const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		return (bool)*this->Model;
 	}
@@ -507,6 +516,7 @@ namespace Slicer {
 	TypeId
 	ModelPartForClass<T>::GetTypeId() const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::GetTypeId(getTypeId(), *className);
 	}
@@ -591,6 +601,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForEnum<T>::SetValue(ValueSource && s)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		std::string val;
 		s.set(val);
@@ -600,6 +611,7 @@ namespace Slicer {
 	template<typename T>
 	bool ModelPartForEnum<T>::GetValue(ValueTarget && s)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		s.get(lookup(*this->Model));
 		return true;
@@ -615,6 +627,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForSequence<T>::OnEachChild(const ChildHandler & ch)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		for(auto & element : *this->Model) {
 			ch(elementName, elementModelPart(element), NULL);
@@ -624,6 +637,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRef ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		this->Model->push_back(typename element_type::value_type());
 		return ChildRef(ModelPart::CreateFor(this->Model->back()));
@@ -671,6 +685,7 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForDictionary<T>::OnEachChild(const ChildHandler & ch)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		for (auto & pair : *this->Model) {
 			ch(pairName, std::make_shared<ModelPartForStruct<typename T::value_type>>(&pair), NULL);
@@ -680,6 +695,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRef ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		return ChildRef(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model));
 	}
@@ -687,6 +703,7 @@ namespace Slicer {
 	template<typename T>
 	ChildRef ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &, bool matchCase)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		if (!optionalCaseEq(name, pairName, matchCase)) {
 			throw IncorrectElementName(name);
@@ -724,6 +741,7 @@ namespace Slicer {
 	void
 	ModelPartForStream<T>::OnEachChild(const ChildHandler & ch)
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
 		this->Model->Produce([&ch](const T & element) {
 			ch(ModelPartForSequence<std::vector<T>>::elementName, ModelPart::CreateFor(element), NULL);

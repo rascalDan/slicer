@@ -22,9 +22,13 @@ lib types :
 	[ glob *.ice ]
 	conversions.cpp
 	:
-	<dependency>../tool//slicer
+	<toolset>gcc:<dependency>../tool//slicer/<toolset>gcc
+	<toolset>clang:<dependency>../tool//slicer/<toolset>clang
+	<toolset>tidy:<dependency>../tool//slicer/<toolset>gcc
 	<slicer>pure
-	<slicerbin>../tool//slicer
+	<toolset>gcc:<slicerbin>../tool//slicer/<toolset>gcc
+	<toolset>clang:<slicerbin>../tool//slicer/<toolset>clang
+	<toolset>tidy:<slicerbin>../tool//slicer/<toolset>gcc
 	<include>.
 	<library>..//adhocutil
 	<library>boost_date_time

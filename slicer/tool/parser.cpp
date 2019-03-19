@@ -50,16 +50,17 @@ namespace Slicer {
 			fprintbf(cpp, "template<> DLL_PUBLIC\nvoid\n");
 			createModelPartForConverted(type, c->scoped(), dm);
 			fprintbf(cpp, "::SetValue(ValueSource && vsp)\n{\n");
+			fprintbf(cpp, "\t// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)\n");
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model, &%s)) return;\n",
+				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model, &%s)) {\n\t\treturn;\n\t}\n",
 						conversion.ExchangeType,
 						conversion.ConvertToModelFunc);
 			}
 			// Default conversion
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
-				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model)) return;\n",
+				fprintbf(cpp, "\tif (tryConvertFrom< %s >(vsp, Model)) {\n\t\treturn;\n\t}\n",
 						Slice::typeToString(type));
 			}
 			// Failed to convert
@@ -70,16 +71,17 @@ namespace Slicer {
 			fprintbf(cpp, "template<> DLL_PUBLIC\nbool\n");
 			createModelPartForConverted(type, c->scoped(), dm);
 			fprintbf(cpp, "::GetValue(ValueTarget && vtp)\n{\n");
+			fprintbf(cpp, "\t// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)\n");
 			fprintbf(cpp, "\tBOOST_ASSERT(Model);\n");
 
 			for (const auto & conversion : conversions) {
-				fprintbf(cpp, "\tif (auto r = tryConvertTo< %s >(vtp, Model, &%s)) return (r == tcr_Value);\n",
+				fprintbf(cpp, "\tif (auto r = tryConvertTo< %s >(vtp, Model, &%s)) {\n\t\treturn (r == tcr_Value);\n\t}\n",
 						conversion.ExchangeType,
 						conversion.ConvertToExchangeFunc);
 			}
 			// Default conversion
 			if (!dm->hasMetaData("slicer:nodefaultconversion")) {
-				fprintbf(cpp, "\tif (auto r = tryConvertTo< %s >(vtp, Model)) return (r == tcr_Value);\n",
+				fprintbf(cpp, "\tif (auto r = tryConvertTo< %s >(vtp, Model)) {\n\t\treturn (r == tcr_Value);\n\t}\n",
 					Slice::typeToString(type));
 			}
 			// Failed to convert
@@ -199,6 +201,7 @@ namespace Slicer {
 		copyMetadata(c->getMetaData());
 		fprintbf(cpp, ";\n\n");
 
+		fprintbf(cpp, "// NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)\n");
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", c->getMetaData())) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n",
 					Slice::typeToString(decl), getBasicModelPart(decl), c->scoped(), boost::algorithm::replace_all_copy(*cmp, ".", "::"));
@@ -243,8 +246,8 @@ namespace Slicer {
 	{
 		if (!cpp) { return; }
 
-		fprintbf(cpp, "typedef ModelPartForComplex< %s > C%d;\n",
-				it->scoped(), components);
+		fprintbf(cpp, "using C%d = ModelPartForComplex< %s >;\n",
+				components, it->scoped());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const C%d::Hooks ",
 				components);
@@ -373,8 +376,8 @@ namespace Slicer {
 				d->scoped(),
 				iname ? *iname : "element");
 
-		fprintbf(cpp, "typedef ModelPartForComplex< %s::value_type > C%d;\n",
-				d->scoped(), components);
+		fprintbf(cpp, "using C%d = ModelPartForComplex< %s::value_type >;\n",
+				components, d->scoped());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const C%d::Hooks ",
 				components);
@@ -550,6 +553,7 @@ namespace Slicer {
 	void
 	Slicer::defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const
 	{
+		fprintbf(cpp, "// NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)\n");
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", metadata)) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n",
 					type, getBasicModelPart(stype), type, boost::algorithm::replace_all_copy(*cmp, ".", "::"));
