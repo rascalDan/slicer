@@ -44,7 +44,7 @@ namespace Slicer {
 	SqlInsertSerializer::SerializeSequence(const Slicer::ModelPartPtr & mp) const
 	{
 		auto ins = createInsert(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins, this](const std::string &, ModelPartPtr cmp, const HookCommon *) {
+		mp->OnEachChild([&ins, this](const std::string &, const ModelPartPtr & cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
 	}
@@ -90,7 +90,7 @@ namespace Slicer {
 	SqlFetchIdInsertSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * ins) const
 	{
 		SqlAutoIdInsertSerializer::bindObjectAndExecute(cmp, ins);
-		cmp->OnEachChild([this](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
+		cmp->OnEachChild([this](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isAuto(h)) {
 				cmp->SetValue(IdSave(connection));
 			}

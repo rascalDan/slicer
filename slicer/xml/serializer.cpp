@@ -79,7 +79,7 @@ namespace Slicer {
 				v = value.raw();
 			}
 
-		protected:
+		private:
 			const Glib::ustring value;
 	};
 

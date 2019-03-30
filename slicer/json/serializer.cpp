@@ -70,7 +70,7 @@ namespace Slicer {
 				v = std::get<json::String>(value);
 			}
 
-		protected:
+		private:
 			const json::Value & value;
 	};
 

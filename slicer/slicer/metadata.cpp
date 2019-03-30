@@ -31,6 +31,7 @@ std::vector<std::string>
 Slicer::metaDataSplit(const std::string & metadata)
 {
 	std::vector<std::string> parts;
+	// NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
 	boost::algorithm::split(parts, metadata, boost::algorithm::is_any_of(":"), boost::algorithm::token_compress_off);
 	return parts;
 }

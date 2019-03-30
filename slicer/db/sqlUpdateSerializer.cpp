@@ -43,7 +43,7 @@ namespace Slicer {
 	SqlUpdateSerializer::SerializeSequence(const Slicer::ModelPartPtr & mp) const
 	{
 		auto ins = createUpdate(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins](const std::string &, ModelPartPtr cmp, const HookCommon *) {
+		mp->OnEachChild([&ins](const std::string &, const ModelPartPtr & cmp, const HookCommon *) {
 				bindObjectAndExecute(cmp, ins.get());
 			});
 	}
@@ -52,7 +52,7 @@ namespace Slicer {
 	SqlUpdateSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * upd)
 	{
 		int paramNo = 0;
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
+		cmp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isValue(h)) {
 				if (!cmp->GetValue(SqlBinder(*upd, paramNo))) {
 					upd->bindNull(paramNo);
@@ -60,7 +60,7 @@ namespace Slicer {
 				paramNo++;
 			}
 		});
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, ModelPartPtr cmp, const HookCommon * h) {
+		cmp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isPKey(h)) {
 				cmp->GetValue(SqlBinder(*upd, paramNo++));
 			}
@@ -76,7 +76,7 @@ namespace Slicer {
 		AdHoc::Buffer update;
 		update.appendbf("UPDATE %s SET ", tableName);
 		int fieldNo = 0;
-		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, const HookCommon * h) {
+		mp->OnEachChild([&update, &fieldNo]( const std::string & name, const ModelPartPtr &, const HookCommon * h) {
 			if (isValue(h)) {
 				if (fieldNo++) {
 					update.append(", ");
@@ -86,7 +86,7 @@ namespace Slicer {
 		});
 		update.append(" WHERE ", AdHoc::Buffer::Use);
 		fieldNo = 0;
-		mp->OnEachChild([&update, &fieldNo]( const std::string & name, ModelPartPtr, const HookCommon * h) {
+		mp->OnEachChild([&update, &fieldNo]( const std::string & name, const ModelPartPtr &, const HookCommon * h) {
 			if (isPKey(h)) {
 				if (fieldNo++) {
 					update.append(" AND ");
