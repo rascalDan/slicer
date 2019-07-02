@@ -3,7 +3,7 @@
 #include <sqlExceptions.h>
 #include "sqlBinder.h"
 #include "sqlCommon.h"
-#include <buffer.h>
+#include <compileTimeFormatter.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 #include <boost/numeric/conversion/cast.hpp>
@@ -119,37 +119,38 @@ namespace Slicer {
 	DB::ModifyCommandPtr
 	SqlInsertSerializer::createInsert(const Slicer::ModelPartPtr & mp) const
 	{
-		AdHoc::Buffer insert;
-		insert.appendbf("INSERT INTO %s(", tableName);
+		using namespace AdHoc::literals;
+		std::stringstream insert;
+		"INSERT INTO %?("_fmt(insert, tableName);
 		int fieldNo = 0;
 		mp->OnEachChild(std::bind(&SqlInsertSerializer::createInsertField, this, std::ref(fieldNo), std::ref(insert), _1, _3));
-		insert.append(") VALUES (", AdHoc::Buffer::Use);
+		insert << ") VALUES (";
 		for (; fieldNo > 1; --fieldNo) {
-			insert.append("?, ");
+			insert << "?, ";
 		}
-		insert.append("?)");
-		return connection->modify(insert);
+		insert << "?)";
+		return connection->modify(insert.str());
 	}
 
 	void
-	SqlInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const
+	SqlInsertSerializer::createInsertField(int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const
 	{
 		if (isBind(h)) {
 			if (fieldNo++) {
-				insert.append(", ");
+				insert << ',';
 			}
-			insert.append(name);
+			insert << name;
 		}
 	}
 
 	void
-	SqlAutoIdInsertSerializer::createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const
+	SqlAutoIdInsertSerializer::createInsertField(int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const
 	{
 		if (isNotAuto(h)) {
 			if (fieldNo++) {
-				insert.append(", ");
+				insert << ',';
 			}
-			insert.append(name);
+			insert << name;
 		}
 	}
 }

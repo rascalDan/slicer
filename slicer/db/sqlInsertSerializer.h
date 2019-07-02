@@ -4,7 +4,7 @@
 #include <slicer/serializer.h>
 #include <connection.h>
 #include <visibility.h>
-#include <buffer.h>
+#include <ostream>
 
 namespace Slicer {
 	class DLL_PUBLIC SqlInsertSerializer : public Slicer::Serializer {
@@ -17,7 +17,7 @@ namespace Slicer {
 			void SerializeObject(const Slicer::ModelPartPtr &) const;
 			void SerializeSequence(const Slicer::ModelPartPtr &) const;
 			DB::ModifyCommandPtr createInsert(const Slicer::ModelPartPtr &) const;
-			virtual void createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const;
+			virtual void createInsertField(int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
 			virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
 			virtual void bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
 
@@ -31,7 +31,7 @@ namespace Slicer {
 			SqlAutoIdInsertSerializer(const P & ... p) : SqlInsertSerializer(p...) { }
 
 		protected:
-			virtual void createInsertField(int & fieldNo, AdHoc::Buffer & insert, const std::string & name, const HookCommon * h) const;
+			virtual void createInsertField(int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
 			virtual void bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
 	};
 

@@ -3,7 +3,7 @@
 #include <common.h>
 #include "sqlBinder.h"
 #include "sqlCommon.h"
-#include <buffer.h>
+#include <compileTimeFormatter.h>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
 #include <functional>
@@ -73,28 +73,29 @@ namespace Slicer {
 	DB::ModifyCommandPtr
 	SqlUpdateSerializer::createUpdate(const Slicer::ModelPartPtr & mp) const
 	{
-		AdHoc::Buffer update;
-		update.appendbf("UPDATE %s SET ", tableName);
+		using namespace AdHoc::literals;
+		std::stringstream update;
+		"UPDATE %? SET "_fmt(update, tableName);
 		int fieldNo = 0;
 		mp->OnEachChild([&update, &fieldNo]( const std::string & name, const ModelPartPtr &, const HookCommon * h) {
 			if (isValue(h)) {
 				if (fieldNo++) {
-					update.append(", ");
+					update << ", ";
 				}
-				update.appendbf("%s = ?", name);
+				"%? = ?"_fmt(update, name);
 			}
 		});
-		update.append(" WHERE ", AdHoc::Buffer::Use);
+		update << " WHERE ";
 		fieldNo = 0;
 		mp->OnEachChild([&update, &fieldNo]( const std::string & name, const ModelPartPtr &, const HookCommon * h) {
 			if (isPKey(h)) {
 				if (fieldNo++) {
-					update.append(" AND ");
+					update << " AND ";
 				}
-				update.appendbf("%s = ?", name);
+				"%? = ?"_fmt(update, name);
 			}
 		});
-		return connection->modify(update);
+		return connection->modify(update.str());
 	}
 }
 
