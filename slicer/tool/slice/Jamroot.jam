@@ -2,6 +2,8 @@ path-constant ice : ../../../ice ;
 
 project ice :
   requirements
+		<cxxstd>11
+		<warnings>off
 		<include>$(ice)/cpp/src
 		<toolset>tidy:<checker>none
 	;
