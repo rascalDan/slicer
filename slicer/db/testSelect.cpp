@@ -242,5 +242,12 @@ BOOST_AUTO_TEST_CASE( select_null )
 	BOOST_REQUIRE(!v);
 }
 
+BOOST_AUTO_TEST_CASE( bulkSelectTest )
+{
+	auto sel = db->select(R"SQL(select s mint, cast(s as numeric(7,1)) mdouble, cast(s as text) mstring, s % 2 = 0 mbool from generate_series(1, 10000) s)SQL");
+	auto vec = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
+	BOOST_REQUIRE_EQUAL(10000, vec.size());
+}
+
 BOOST_AUTO_TEST_SUITE_END();
 

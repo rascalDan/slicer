@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE streams
 #include <boost/test/unit_test.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <xml/serializer.h>
 #include <json/serializer.h>
 #include <slicer.h>

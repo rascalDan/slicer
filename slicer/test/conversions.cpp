@@ -94,7 +94,7 @@ namespace Slicer {
 		if (s.empty()) {
 			return IceUtil::None;
 		}
-		return boost::lexical_cast<Ice::Int>(s);
+		return std::stoi(s);
 	}
 
 	DLL_PUBLIC

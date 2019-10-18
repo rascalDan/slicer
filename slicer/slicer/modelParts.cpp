@@ -1,6 +1,4 @@
 #include "modelParts.h"
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 
 namespace Slicer {
 	const Metadata emptyMetadata;
@@ -95,7 +93,8 @@ namespace Slicer {
 	bool
 	case_less::operator()(std::string_view && a, std::string_view && b) const
 	{
-		return boost::ilexicographical_compare(a, b);
+		const auto cmp = strncasecmp(a.data(), b.data(), std::min(a.length(), b.length()));
+		return (cmp < 0) || (!cmp && a.length() < b.length());
 	}
 }
 

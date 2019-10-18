@@ -661,3 +661,22 @@ BOOST_AUTO_TEST_CASE( customerModelPartCounters )
 	BOOST_REQUIRE_EQUAL(21, TestModule::completions);
 }
 
+BOOST_FIXTURE_TEST_SUITE(l, Slicer::case_less);
+
+BOOST_AUTO_TEST_CASE(case_less_test)
+{
+	const auto & lc { *this };
+	BOOST_CHECK(!lc("", ""));
+	BOOST_CHECK(lc("a", "b"));
+	BOOST_CHECK(lc("A", "b"));
+	BOOST_CHECK(lc("Aa", "b"));
+	BOOST_CHECK(lc("AA", "b"));
+	BOOST_CHECK(lc("aA", "b"));
+	BOOST_CHECK(lc("A", "B"));
+	BOOST_CHECK(lc("Aa", "Bb"));
+	BOOST_CHECK(lc("AA", "bB"));
+	BOOST_CHECK(lc("aA", "BB"));
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+

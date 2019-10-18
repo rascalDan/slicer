@@ -1,7 +1,7 @@
 #include "serializer.h"
 #include <slicer/metadata.h>
 #include <jsonpp.h>
-#include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <functional>
 #include <stdexcept>
 #include <fstream>
