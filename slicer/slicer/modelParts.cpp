@@ -89,12 +89,5 @@ namespace Slicer {
 	{
 		ch(this->name, modelPart, this);
 	}
-
-	bool
-	case_less::operator()(std::string_view && a, std::string_view && b) const
-	{
-		const auto cmp = strncasecmp(a.data(), b.data(), std::min(a.length(), b.length()));
-		return (cmp < 0) || (!cmp && a.length() < b.length());
-	}
 }
 
