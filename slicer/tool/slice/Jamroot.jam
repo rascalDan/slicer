@@ -6,6 +6,7 @@ project ice :
 		<warnings>off
 		<include>$(ice)/cpp/src
 		<toolset>tidy:<checker>none
+		<coverage>off
 	;
 
 obj Parser : $(ice)/cpp/src/Slice/Parser.cpp ;

@@ -19,8 +19,7 @@ project
 			<toolset>gcc:<variant>release:<linkflags>"-flto=2"
       <variant>debug:<warnings>extra
       <variant>debug:<warnings-as-errors>on
-      <variant>coverage:<cxxflags>"--coverage"
-      <variant>coverage:<linkflags>"--coverage"
+      <variant>coverage:<coverage>on
 			<toolset>tidy:<checkxx>boost-*
 			<toolset>tidy:<checkxx>bugprone-*
 			<toolset>tidy:<checkxx>clang-*
