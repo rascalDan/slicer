@@ -163,7 +163,9 @@ namespace Slicer {
 	class XmlAttributeValueTarget : public XmlValueTarget {
 		public:
 			explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
-				XmlValueTarget(std::bind(&xmlpp::Element::set_attribute, p, Glib::ustring(n), _1, Glib::ustring()))
+				XmlValueTarget([p, n](auto && PH1) {
+					p->set_attribute(n, PH1);
+				})
 			{
 			}
 	};
@@ -171,7 +173,9 @@ namespace Slicer {
 	class XmlContentValueTarget : public XmlValueTarget {
 		public:
 			explicit XmlContentValueTarget(xmlpp::Element * p) :
-				XmlValueTarget(std::bind(&xmlpp::Element::set_first_child_text, p, _1))
+				XmlValueTarget([p](auto && PH1) {
+					p->set_first_child_text(PH1);
+				})
 			{
 			}
 
@@ -322,10 +326,12 @@ namespace Slicer {
 		}
 		else {
 			if (hp && metaDataFlagSet(hp->GetMetadata(), md_bare)) {
-				ModelTreeProcessElement(n, mp, std::bind((ElementCreatorF)&xmlpp::Element::add_child_element, _1, name, Glib::ustring()));
+				ModelTreeProcessElement(n, mp, [name](auto && PH1, auto &&) {
+					return PH1->add_child_element(name);
+				});
 			}
 			else {
-				CurrentElementCreator cec(std::bind(ec, n, name));
+				CurrentElementCreator cec([ec, n, name] { return ec(n, name); });
 				ModelTreeProcessElement(cec, mp, defaultElementCreator);
 			}
 		}
@@ -370,7 +376,9 @@ namespace Slicer {
 				element->set_attribute(*typeIdPropName, *typeId);
 				mp = mp->GetSubclassModelPart(*typeId);
 			}
-			mp->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterate, element, _1, _2, _3, ec));
+			mp->OnEachChild([element, ec](auto && PH1, auto && PH2, auto && PH3) {
+				return XmlSerializer::ModelTreeIterate(element, PH1, PH2, PH3, ec);
+			});
 		}
 	}
 
@@ -403,7 +411,9 @@ namespace Slicer {
 	XmlStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::Document doc;
-		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
+		modelRoot->OnEachChild([&doc](auto && PH1, auto && PH2, auto &&) {
+			return XmlSerializer::ModelTreeIterateRoot(&doc, PH1, PH2);
+		});
 		doc.write_to_stream(strm);
 	}
 
@@ -429,7 +439,9 @@ namespace Slicer {
 	XmlFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		xmlpp::Document doc;
-		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, &doc, _1, _2));
+		modelRoot->OnEachChild([&doc](auto && PH1, auto && PH2, auto &&) {
+			return XmlSerializer::ModelTreeIterateRoot(&doc, PH1, PH2);
+		});
 		doc.write_to_file_formatted(path);
 	}
 
@@ -453,7 +465,9 @@ namespace Slicer {
 	XmlDocumentSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		doc = new xmlpp::Document();
-		modelRoot->OnEachChild(std::bind(&XmlSerializer::ModelTreeIterateRoot, doc, _1, _2));
+		modelRoot->OnEachChild([this](auto && PH1, auto && PH2, auto &&) {
+			return XmlSerializer::ModelTreeIterateRoot(doc, PH1, PH2);
+		});
 	}
 
 	AdHocFormatter(BadBooleanValueMsg, "Bad boolean value [%?]");

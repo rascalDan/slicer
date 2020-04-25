@@ -545,7 +545,7 @@ namespace Slicer {
 			for (auto & pi : {0, 1, 2}) {
 				boost::algorithm::replace_all(split[pi], ".", "::");
 			}
-			rtn.push_back(split);
+			rtn.push_back(ConversionSpec(split));
 		}
 		return rtn;
 	}

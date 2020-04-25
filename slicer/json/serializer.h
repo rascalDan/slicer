@@ -18,7 +18,7 @@ namespace Slicer {
 		public:
 			JsonStreamSerializer(std::ostream &);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			std::ostream & strm;
@@ -28,7 +28,7 @@ namespace Slicer {
 		public:
 			JsonFileSerializer(std::filesystem::path);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			const std::filesystem::path path;
@@ -38,7 +38,7 @@ namespace Slicer {
 		public:
 			JsonValueSerializer(json::Value &);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			json::Value & value;
@@ -48,7 +48,7 @@ namespace Slicer {
 		public:
 			JsonStreamDeserializer(std::istream &);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			std::istream & strm;
@@ -58,7 +58,7 @@ namespace Slicer {
 		public:
 			JsonFileDeserializer(std::filesystem::path);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			const std::filesystem::path path;
@@ -68,7 +68,7 @@ namespace Slicer {
 		public:
 			JsonValueDeserializer(const json::Value &);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			const json::Value & value;

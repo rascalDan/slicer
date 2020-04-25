@@ -65,8 +65,8 @@ namespace Slicer {
 	typeWrite(::Ice::OutputStream & s, const ::Ice::optional<T> & m)
 	{
 		if constexpr (!isLocal<T>::value) {
-			typedef Ice::StreamableTraits<T> traits;
-			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
+			using traits = Ice::StreamableTraits<T>;
+			using SOH = Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>;
 			s.startEncapsulation();
 			if (m && s.writeOptional(0, SOH::optionalFormat)) {
 				SOH::write(&s, *m);
@@ -95,8 +95,8 @@ namespace Slicer {
 	typeRead(::Ice::InputStream & s, ::Ice::optional<T> & m)
 	{
 		if constexpr (!isLocal<T>::value) {
-			typedef Ice::StreamableTraits<T> traits;
-			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
+			using traits = Ice::StreamableTraits<T>;
+			using SOH = Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>;
 			s.startEncapsulation();
 			if (s.readOptional(0, SOH::optionalFormat)) {
 				m = T();
@@ -185,7 +185,7 @@ namespace Slicer {
 	template <typename R, typename ... Args> struct function_traits;
 	template <typename R, typename ... Args> struct function_traits<std::function<R(Args...)>> {
 		template<int A> struct arg {
-			typedef typename std::tuple_element<A, std::tuple<Args...>>::type type;
+			using type = typename std::tuple_element<A, std::tuple<Args...>>::type;
 		};
 	};
 	template <typename F> struct callable_traits : public function_traits<std::function<typename std::remove_pointer<F>::type>> { };
@@ -193,7 +193,7 @@ namespace Slicer {
 	// Converters that remove "optionalness".
 	template <typename X>
 	struct Coerce {
-		typedef typename std::remove_const<typename std::remove_reference<X>::type>::type T;
+		using T = typename std::remove_const<typename std::remove_reference<X>::type>::type;
 
 		T & operator()(T & x) const { return x; }
 		const T & operator()(const T & x) const { return x; }
@@ -206,7 +206,7 @@ namespace Slicer {
 	};
 	template <typename X>
 	struct Coerce<Ice::optional<X>> {
-		typedef typename std::remove_const<typename std::remove_reference<X>::type>::type T;
+		using T = typename std::remove_const<typename std::remove_reference<X>::type>::type;
 
 		Ice::optional<T> & operator()(Ice::optional<T> & x) const { return x; }
 		const Ice::optional<T> & operator()(const Ice::optional<T> & x) const { return x; }
@@ -221,7 +221,7 @@ namespace Slicer {
 	bool ModelPartForConvertedBase::tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv)
 	{
 		if (auto vspt = dynamic_cast<TValueSource<ET> *>(&vsp)) {
-			typedef typename callable_traits<Conv>::template arg<0>::type CA;
+			using CA = typename callable_traits<Conv>::template arg<0>::type;
 			ET tmp;
 			vspt->set(tmp);
 			auto converted = conv(Coerce<CA>()(tmp));
@@ -251,8 +251,8 @@ namespace Slicer {
 	TryConvertResult ModelPartForConvertedBase::tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv)
 	{
 		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(&vsp)) {
-			typedef typename callable_traits<Conv>::template arg<0>::type CA;
-			typedef typename std::remove_const<typename std::remove_reference<CA>::type>::type CAR;
+			using CA = typename callable_traits<Conv>::template arg<0>::type;
+			using CAR = typename std::remove_const<typename std::remove_reference<CA>::type>::type;
 			if (Coerce<CAR>::valueExists(*model)) {
 				auto converted = conv(Coerce<CA>()(*model));
 				if (Coerce<ET>::valueExists(converted)) {
@@ -399,7 +399,7 @@ namespace Slicer {
 			virtual ~HookBase() = default;
 
 			virtual ModelPartPtr Get(T * t) const = 0;
-			virtual const Metadata & GetMetadata() const override
+			const Metadata & GetMetadata() const override
 			{
 				return emptyMetadata;
 			}
@@ -434,7 +434,7 @@ namespace Slicer {
 			{
 			}
 
-			virtual const Metadata & GetMetadata() const override
+			const Metadata & GetMetadata() const override
 			{
 				return metadata;
 			}

@@ -11,7 +11,7 @@ namespace Slicer {
 		public:
 			SqlInsertSerializer(DB::Connection * const, std::string tableName);
 
-			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
+			void Serialize(Slicer::ModelPartForRootPtr) override;
 
 		protected:
 			void SerializeObject(const Slicer::ModelPartPtr &) const;

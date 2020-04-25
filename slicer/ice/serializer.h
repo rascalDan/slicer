@@ -21,7 +21,7 @@ namespace Slicer {
 		public:
 			IceBlobSerializer(Ice::ByteSeq &);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		private:
 			Ice::ByteSeq & blob;
@@ -31,7 +31,7 @@ namespace Slicer {
 		public:
 			IceStreamSerializer(std::ostream &);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			std::ostream & strm;
@@ -42,7 +42,7 @@ namespace Slicer {
 		public:
 			IceBlobDeserializer(const Ice::ByteSeq &);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			const Ice::ByteSeq & blob;
@@ -52,7 +52,7 @@ namespace Slicer {
 		public:
 			IceStreamDeserializer(std::istream &);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			std::istream & strm;
