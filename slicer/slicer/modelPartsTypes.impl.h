@@ -556,11 +556,14 @@ namespace Slicer {
 
 	// ModelPartForEnum
 	template<typename T>
+	using EnumPair = std::pair<T, std::string>;
+
+	template<typename T>
 	class ModelPartForEnum<T>::Enumerations : public boost::multi_index_container<
-		std::pair<T, std::string>,
+		EnumPair<T>,
 		boost::multi_index::indexed_by<
-			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<T, std::string>, const T, &std::pair<T, std::string>::first>>,
-			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<T, std::string>, const std::string, &std::pair<T, std::string>::second>, std::less<>>
+			boost::multi_index::ordered_unique<boost::multi_index::member<EnumPair<T>, const T, &EnumPair<T>::first>>,
+			boost::multi_index::ordered_unique<boost::multi_index::member<EnumPair<T>, const std::string, &EnumPair<T>::second>, std::less<>>
 			>> {
 	};
 
@@ -576,26 +579,29 @@ namespace Slicer {
 		return metadata;
 	}
 
+	template<int Side, typename Ex, typename ExP, typename T, typename V, typename R>
+	inline const auto & ModelPartForEnumLookup(const typename ModelPartForEnum<T>::Enumerations & enumerations,
+			const V & val, R EnumPair<T>::* rv)
+	{
+		const auto & side = enumerations.template get<Side>();
+		if (auto i = side.find(val); i != side.end()) {
+			return (*i).*rv;
+		}
+		throw Ex(ExP(val), typeid(T).name());
+	}
+
 	template<typename T>
 	T ModelPartForEnum<T>::lookup(const std::string_view & val)
 	{
-		auto & right = enumerations.template get<1>();
-		auto i = right.find(val);
-		if (i == right.end()) {
-			throw InvalidEnumerationSymbol(std::string(val), typeid(T).name());
-		}
-		return i->first;
+		return ModelPartForEnumLookup<1, InvalidEnumerationSymbol, std::string, T>(enumerations, val,
+				&EnumPair<T>::first);
 	}
 
 	template<typename T>
 	const std::string & ModelPartForEnum<T>::lookup(T val)
 	{
-		auto & left = enumerations.template get<0>();
-		auto i = left.find(val);
-		if (i == left.end()) {
-			throw InvalidEnumerationValue((::Ice::Int)val, typeid(T).name());
-		}
-		return i->second;
+		return ModelPartForEnumLookup<0, InvalidEnumerationValue, ::Ice::Int, T>(enumerations, val,
+				&EnumPair<T>::second);
 	}
 
 	template<typename T>
