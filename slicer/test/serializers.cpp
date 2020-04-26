@@ -681,3 +681,9 @@ BOOST_AUTO_TEST_CASE(case_less_test)
 
 BOOST_AUTO_TEST_SUITE_END();
 
+BOOST_AUTO_TEST_CASE(enum_lookups)
+{
+	BOOST_CHECK_EQUAL("One", Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup(TestModule::SomeNumbers::One));
+	BOOST_CHECK_EQUAL(TestModule::SomeNumbers::One, Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup("One"));
+}
+
