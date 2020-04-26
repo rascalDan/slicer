@@ -508,6 +508,8 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::unregisterClass()
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(className);
 		ModelPartForComplexBase::unregisterClass(*className, typeName);
 		deleteClassName();
 	}
@@ -518,6 +520,8 @@ namespace Slicer {
 	{
 		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(className);
 		return ModelPartForComplexBase::GetTypeId(getTypeId(), *className);
 	}
 
@@ -525,6 +529,8 @@ namespace Slicer {
 	template<typename dummy>
 	const std::string & ModelPartForClass<T>::getTypeId(typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type *) const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(this->Model);
 		return (*this->Model)->ice_id();
 	}
 
@@ -532,6 +538,8 @@ namespace Slicer {
 	template<typename dummy>
 	std::string ModelPartForClass<T>::getTypeId(typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type *) const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::demangle(typeid(*this->Model->get()).name());
 	}
 
