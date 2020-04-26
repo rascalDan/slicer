@@ -20,7 +20,7 @@
 #include "conversions.h"
 
 #ifdef SLICER_MODELPARTSTYPES_IMPL_H
-#error Test code should have pull in implementation header
+#error Client code should NOT need to pull in implementation header
 #endif
 
 namespace fs = std::filesystem;
