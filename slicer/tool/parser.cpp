@@ -100,7 +100,6 @@ namespace Slicer {
 		fprintbf(cpp, "// Begin Slicer code\n\n");
 		fprintbf(cpp, "#include <%s>\n\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
 		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "modelPartsTypes.impl.h").string());
-		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "common.h").string());
 		for (const auto & m : u->modules()) {
 			for (const auto & i : metaDataValues("slicer:include:", m->getMetaData())) {
 				fprintbf(cpp, "#include <%s>\n", i);
