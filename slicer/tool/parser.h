@@ -63,17 +63,19 @@ namespace Slicer {
 			void createModelPartForConverted(const Slice::TypePtr & type, const std::string & container, const Slice::DataMemberPtr & dm) const;
 			void createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm = Slice::DataMemberPtr(), const Slice::StringList & md = Slice::StringList()) const;
 			[[nodiscard]] std::string getBasicModelPart(const Slice::TypePtr & type) const;
-			void defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const;
+			void defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata);
 
 			void visitComplexDataMembers(const Slice::ConstructedPtr & t, const Slice::DataMemberList &) const;
 
 			void defineConversions(const Slice::DataMemberPtr & dm) const;
 			void defineRoot(const std::string & type, const std::string & name, const Slice::TypePtr & stype) const;
+			void externType(const Slice::TypePtr &) const;
 
 			[[nodiscard]] bool hasMetadata(const std::list<std::string> & metadata) const;
 			void copyMetadata(const std::list<std::string> & metadata) const;
 			static Slice::StringList getAllMetadata(const Slice::DataMemberPtr & dm);
 			static Conversions getConversions(const Slice::StringList & metadata);
+			std::set<std::string> definedTypes;
 #pragma GCC visibility pop
 
 			unsigned int components;
