@@ -12,6 +12,12 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
+#ifdef __clang__
+#define FINALVISMODELPARTS DLL_PUBLIC
+#else
+#define FINALVISMODELPARTS
+#endif
+
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Type & s) { return std::make_shared<ModelPartType>(&s); } \
@@ -22,7 +28,7 @@
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForRoot<Ice::optional<Type>>>(&s); } \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Ice::optional<Type> & s) { return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); } \
-	template class BaseModelPart; \
+	template class FINALVISMODELPARTS BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
 	template class ModelPartForRoot< Ice::optional<Type> >; \
 
