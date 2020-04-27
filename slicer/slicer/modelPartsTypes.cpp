@@ -5,11 +5,12 @@
 
 namespace Slicer {
 	using ClassRefMap = std::map<std::string, ClassRef, std::less<>>;
+	using ClassNamePair = std::pair<std::string, std::string>;
 	using ClassNameMap = boost::multi_index_container<
-		std::pair<std::string, std::string>,
+		ClassNamePair,
 		boost::multi_index::indexed_by<
-			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<std::string, std::string>, const std::string, &std::pair<std::string, std::string>::first>, std::less<>>,
-			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<std::string, std::string>, const std::string, &std::pair<std::string, std::string>::second>, std::less<>>
+			boost::multi_index::ordered_unique<boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::first>, std::less<>>,
+			boost::multi_index::ordered_unique<boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::second>, std::less<>>
 		>>;
 
 	static void createClassMaps() __attribute__((constructor(208)));
