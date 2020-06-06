@@ -26,7 +26,7 @@ namespace Slicer {
 		public:
 			XmlStreamSerializer(std::ostream &);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			std::ostream & strm;
@@ -36,7 +36,7 @@ namespace Slicer {
 		public:
 			XmlFileSerializer(std::filesystem::path);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			const std::filesystem::path path;
@@ -46,7 +46,7 @@ namespace Slicer {
 		public:
 			XmlDocumentSerializer(xmlpp::Document * &);
 
-			virtual void Serialize(ModelPartForRootPtr) override;
+			void Serialize(ModelPartForRootPtr) override;
 
 		protected:
 			xmlpp::Document * & doc;
@@ -65,7 +65,7 @@ namespace Slicer {
 		public:
 			XmlStreamDeserializer(std::istream &);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			std::istream & strm;
@@ -75,7 +75,7 @@ namespace Slicer {
 		public:
 			XmlFileDeserializer(std::filesystem::path);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			const std::filesystem::path path;
@@ -85,7 +85,7 @@ namespace Slicer {
 		public:
 			XmlDocumentDeserializer(const xmlpp::Document *);
 
-			virtual void Deserialize(ModelPartForRootPtr) override;
+			void Deserialize(ModelPartForRootPtr) override;
 
 		protected:
 			const xmlpp::Document * doc;

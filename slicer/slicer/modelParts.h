@@ -95,8 +95,8 @@ namespace Slicer {
 			explicit ChildRef(ModelPartPtr);
 			explicit ChildRef(ModelPartPtr, const Metadata &);
 
-			ModelPartPtr Child() const;
-			const Metadata & ChildMetaData() const;
+			[[nodiscard]] ModelPartPtr Child() const;
+			[[nodiscard]] const Metadata & ChildMetaData() const;
 			explicit operator bool() const;
 
 		private:
@@ -111,8 +111,9 @@ namespace Slicer {
 			bool filter(const HookFilter & flt);
 			void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);
 
-			virtual const Metadata & GetMetadata() const = 0;
+			[[nodiscard]] virtual const Metadata & GetMetadata() const = 0;
 
+			// NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
 			const std::string name;
 	};
 
@@ -167,6 +168,7 @@ namespace Slicer {
 		protected:
 			explicit ModelPartModel() : Model(nullptr) { }
 			explicit ModelPartModel(T * m) : Model(m) { }
+			// NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
 			T * Model;
 	};
 
@@ -184,6 +186,7 @@ namespace Slicer {
 			virtual void Read(::Ice::InputStream &) = 0;
 			ModelPartPtr GetContainedModelPart() override;
 
+			// NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
 			ModelPartPtr mp;
 	};
 }

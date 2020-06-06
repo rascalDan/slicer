@@ -12,6 +12,12 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
+#ifdef __clang__
+#define FINALVISMODELPARTS DLL_PUBLIC
+#else
+#define FINALVISMODELPARTS
+#endif
+
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor<Type>() { return std::make_shared<ModelPartType>(nullptr); } \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Type & s) { return std::make_shared<ModelPartType>(&s); } \
@@ -22,7 +28,7 @@
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) { return std::make_shared<ModelPartForRoot<Ice::optional<Type>>>(&s); } \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) { return CreateRootFor(const_cast<Type &>(s)); } \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Ice::optional<Type> & s) { return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); } \
-	template class BaseModelPart; \
+	template class FINALVISMODELPARTS BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
 	template class ModelPartForRoot< Ice::optional<Type> >; \
 
@@ -65,8 +71,8 @@ namespace Slicer {
 	typeWrite(::Ice::OutputStream & s, const ::Ice::optional<T> & m)
 	{
 		if constexpr (!isLocal<T>::value) {
-			typedef Ice::StreamableTraits<T> traits;
-			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
+			using traits = Ice::StreamableTraits<T>;
+			using SOH = Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>;
 			s.startEncapsulation();
 			if (m && s.writeOptional(0, SOH::optionalFormat)) {
 				SOH::write(&s, *m);
@@ -95,8 +101,8 @@ namespace Slicer {
 	typeRead(::Ice::InputStream & s, ::Ice::optional<T> & m)
 	{
 		if constexpr (!isLocal<T>::value) {
-			typedef Ice::StreamableTraits<T> traits;
-			typedef Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength> SOH;
+			using traits = Ice::StreamableTraits<T>;
+			using SOH = Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>;
 			s.startEncapsulation();
 			if (s.readOptional(0, SOH::optionalFormat)) {
 				m = T();
@@ -185,7 +191,7 @@ namespace Slicer {
 	template <typename R, typename ... Args> struct function_traits;
 	template <typename R, typename ... Args> struct function_traits<std::function<R(Args...)>> {
 		template<int A> struct arg {
-			typedef typename std::tuple_element<A, std::tuple<Args...>>::type type;
+			using type = typename std::tuple_element<A, std::tuple<Args...>>::type;
 		};
 	};
 	template <typename F> struct callable_traits : public function_traits<std::function<typename std::remove_pointer<F>::type>> { };
@@ -193,7 +199,7 @@ namespace Slicer {
 	// Converters that remove "optionalness".
 	template <typename X>
 	struct Coerce {
-		typedef typename std::remove_const<typename std::remove_reference<X>::type>::type T;
+		using T = typename std::remove_const<typename std::remove_reference<X>::type>::type;
 
 		T & operator()(T & x) const { return x; }
 		const T & operator()(const T & x) const { return x; }
@@ -206,7 +212,7 @@ namespace Slicer {
 	};
 	template <typename X>
 	struct Coerce<Ice::optional<X>> {
-		typedef typename std::remove_const<typename std::remove_reference<X>::type>::type T;
+		using T = typename std::remove_const<typename std::remove_reference<X>::type>::type;
 
 		Ice::optional<T> & operator()(Ice::optional<T> & x) const { return x; }
 		const Ice::optional<T> & operator()(const Ice::optional<T> & x) const { return x; }
@@ -221,7 +227,7 @@ namespace Slicer {
 	bool ModelPartForConvertedBase::tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv)
 	{
 		if (auto vspt = dynamic_cast<TValueSource<ET> *>(&vsp)) {
-			typedef typename callable_traits<Conv>::template arg<0>::type CA;
+			using CA = typename callable_traits<Conv>::template arg<0>::type;
 			ET tmp;
 			vspt->set(tmp);
 			auto converted = conv(Coerce<CA>()(tmp));
@@ -251,8 +257,8 @@ namespace Slicer {
 	TryConvertResult ModelPartForConvertedBase::tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv)
 	{
 		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(&vsp)) {
-			typedef typename callable_traits<Conv>::template arg<0>::type CA;
-			typedef typename std::remove_const<typename std::remove_reference<CA>::type>::type CAR;
+			using CA = typename callable_traits<Conv>::template arg<0>::type;
+			using CAR = typename std::remove_const<typename std::remove_reference<CA>::type>::type;
 			if (Coerce<CAR>::valueExists(*model)) {
 				auto converted = conv(Coerce<CA>()(*model));
 				if (Coerce<ET>::valueExists(converted)) {
@@ -399,7 +405,7 @@ namespace Slicer {
 			virtual ~HookBase() = default;
 
 			virtual ModelPartPtr Get(T * t) const = 0;
-			virtual const Metadata & GetMetadata() const override
+			const Metadata & GetMetadata() const override
 			{
 				return emptyMetadata;
 			}
@@ -434,7 +440,7 @@ namespace Slicer {
 			{
 			}
 
-			virtual const Metadata & GetMetadata() const override
+			const Metadata & GetMetadata() const override
 			{
 				return metadata;
 			}
@@ -508,6 +514,8 @@ namespace Slicer {
 	template<typename T>
 	void ModelPartForClass<T>::unregisterClass()
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(className);
 		ModelPartForComplexBase::unregisterClass(*className, typeName);
 		deleteClassName();
 	}
@@ -518,6 +526,8 @@ namespace Slicer {
 	{
 		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
 		BOOST_ASSERT(this->Model);
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(className);
 		return ModelPartForComplexBase::GetTypeId(getTypeId(), *className);
 	}
 
@@ -525,6 +535,8 @@ namespace Slicer {
 	template<typename dummy>
 	const std::string & ModelPartForClass<T>::getTypeId(typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type *) const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(this->Model);
 		return (*this->Model)->ice_id();
 	}
 
@@ -532,6 +544,8 @@ namespace Slicer {
 	template<typename dummy>
 	std::string ModelPartForClass<T>::getTypeId(typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type *) const
 	{
+		// NOLINTNEXTLINE(hicpp-no-array-decay,-warnings-as-errors)
+		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::demangle(typeid(*this->Model->get()).name());
 	}
 
@@ -556,11 +570,14 @@ namespace Slicer {
 
 	// ModelPartForEnum
 	template<typename T>
+	using EnumPair = std::pair<T, std::string>;
+
+	template<typename T>
 	class ModelPartForEnum<T>::Enumerations : public boost::multi_index_container<
-		std::pair<T, std::string>,
+		EnumPair<T>,
 		boost::multi_index::indexed_by<
-			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<T, std::string>, const T, &std::pair<T, std::string>::first>>,
-			boost::multi_index::ordered_unique<boost::multi_index::member<std::pair<T, std::string>, const std::string, &std::pair<T, std::string>::second>, std::less<>>
+			boost::multi_index::ordered_unique<boost::multi_index::member<EnumPair<T>, const T, &EnumPair<T>::first>>,
+			boost::multi_index::ordered_unique<boost::multi_index::member<EnumPair<T>, const std::string, &EnumPair<T>::second>, std::less<>>
 			>> {
 	};
 
@@ -576,26 +593,29 @@ namespace Slicer {
 		return metadata;
 	}
 
+	template<int Side, typename Ex, typename ExP, typename T, typename V, typename R>
+	inline const auto & ModelPartForEnumLookup(const typename ModelPartForEnum<T>::Enumerations & enumerations,
+			const V & val, R EnumPair<T>::* rv)
+	{
+		const auto & side = enumerations.template get<Side>();
+		if (auto i = side.find(val); i != side.end()) {
+			return (*i).*rv;
+		}
+		throw Ex(ExP(val), typeid(T).name());
+	}
+
 	template<typename T>
 	T ModelPartForEnum<T>::lookup(const std::string_view & val)
 	{
-		auto & right = enumerations.template get<1>();
-		auto i = right.find(val);
-		if (i == right.end()) {
-			throw InvalidEnumerationSymbol(std::string(val), typeid(T).name());
-		}
-		return i->first;
+		return ModelPartForEnumLookup<1, InvalidEnumerationSymbol, std::string, T>(enumerations, val,
+				&EnumPair<T>::first);
 	}
 
 	template<typename T>
 	const std::string & ModelPartForEnum<T>::lookup(T val)
 	{
-		auto & left = enumerations.template get<0>();
-		auto i = left.find(val);
-		if (i == left.end()) {
-			throw InvalidEnumerationValue((::Ice::Int)val, typeid(T).name());
-		}
-		return i->second;
+		return ModelPartForEnumLookup<0, InvalidEnumerationValue, ::Ice::Int, T>(enumerations, val,
+				&EnumPair<T>::second);
 	}
 
 	template<typename T>

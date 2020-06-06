@@ -98,9 +98,8 @@ namespace Slicer {
 		if (!cpp) { return true; }
 
 		fprintbf(cpp, "// Begin Slicer code\n\n");
-		fprintbf(cpp, "#include <%s>\n\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
-		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "modelPartsTypes.impl.h").string());
-		fprintbf(cpp, "#include <%s>\n", (headerPrefix / "common.h").string());
+		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "modelPartsTypes.impl.h").string());
+		fprintbf(cpp, "#include <%s>\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
 		for (const auto & m : u->modules()) {
 			for (const auto & i : metaDataValues("slicer:include:", m->getMetaData())) {
 				fprintbf(cpp, "#include <%s>\n", i);
@@ -153,6 +152,15 @@ namespace Slicer {
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const std::string ModelPartForRoot< Ice::optional< %s > >::rootName(\"Optional%s\");\n\n",
 				type, name);
+	}
+
+	void
+	Slicer::externType(const Slice::TypePtr & type) const
+	{
+		if (definedTypes.count(type->typeId())) return;
+
+		fprintbf(cpp, "extern template class %s< %s >;\n",
+				getBasicModelPart(type), Slice::ClassDeclPtr::dynamicCast(type) ? type->typeId() : Slice::typeToString(type));
 	}
 
 	bool
@@ -210,6 +218,7 @@ namespace Slicer {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>);\n\n",
 					Slice::typeToString(decl), c->scoped(), c->scoped());
 		}
+		definedTypes.insert(decl->typeId());
 
 		classNo += 1;
 
@@ -246,6 +255,9 @@ namespace Slicer {
 	{
 		if (!cpp) { return; }
 
+		for (const auto & dm : dataMembers) {
+			externType(dm->type());
+		}
 		fprintbf(cpp, "using C%d = ModelPartForComplex< %s >;\n",
 				components, it->scoped());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
@@ -329,6 +341,7 @@ namespace Slicer {
 		if (!cpp) { return; }
 
 		fprintbf(cpp, "// Sequence %s\n", s->name());
+		externType(s->type());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "ChildRef ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)\n{\n",
 				s->scoped());
@@ -370,6 +383,8 @@ namespace Slicer {
 		if (!cpp) { return; }
 
 		fprintbf(cpp, "// Dictionary %s\n", d->name());
+		externType(d->keyType());
+		externType(d->valueType());
 		auto iname = metaDataValue("slicer:item:", d->getMetaData());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const std::string ModelPartForDictionary< %s >::pairName(\"%s\");\n\n",
@@ -545,13 +560,13 @@ namespace Slicer {
 			for (auto & pi : {0, 1, 2}) {
 				boost::algorithm::replace_all(split[pi], ".", "::");
 			}
-			rtn.push_back(split);
+			rtn.push_back(ConversionSpec(split));
 		}
 		return rtn;
 	}
 
 	void
-	Slicer::defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata) const
+	Slicer::defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata)
 	{
 		fprintbf(cpp, "// NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)\n");
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", metadata)) {
@@ -562,6 +577,7 @@ namespace Slicer {
 			fprintbf(cpp, "MODELPARTFOR(%s, %s);\n\n",
 					type, getBasicModelPart(stype));
 		}
+		definedTypes.insert(stype->typeId());
 	}
 
 	unsigned int

@@ -248,21 +248,37 @@ namespace Slicer {
 							mp = mp->GetSubclassModelPart(*typeId);
 						}
 					}
-					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, &std::get<json::Object>(*n).insert({name, nn}).first->second, _1, _2));
+					mp->OnEachChild(
+							[capture0 = &std::get<json::Object>(*n).insert({name, nn}).first->second]
+							(auto && PH1, auto && PH2, auto &&) {
+								return JsonSerializer::ModelTreeIterate(capture0, PH1, PH2);
+							});
 				}
 				break;
 			case mpt_Sequence:
 				if (mp->HasValue()) {
-					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, &std::get<json::Object>(*n).insert({name, json::Array()}).first->second, _2));
+					mp->OnEachChild(
+							[capture0 = &std::get<json::Object>(*n).insert({name, json::Array()}).first->second]
+							(auto &&, auto && PH2, auto &&) {
+								return JsonSerializer::ModelTreeIterateSeq(capture0, PH2);
+							});
 				}
 				break;
 			case mpt_Dictionary:
 				if (mp->HasValue()) {
 					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
-						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateDictObj, &std::get<json::Object>(*n).insert({name, json::Object()}).first->second, _2));
+						mp->OnEachChild(
+								[capture0 = &std::get<json::Object>(*n).insert({name, json::Object()}).first->second]
+								(auto &&, auto && PH2, auto &&) {
+									return JsonSerializer::ModelTreeIterateDictObj(capture0, PH2);
+								});
 					}
 					else {
-						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, &std::get<json::Object>(*n).insert({name, json::Array()}).first->second, _2));
+						mp->OnEachChild(
+								[capture0 = &std::get<json::Object>(*n).insert({name, json::Array()}).first->second]
+								(auto &&, auto && PH2, auto &&) {
+									return JsonSerializer::ModelTreeIterateSeq(capture0, PH2);
+								});
 					}
 				}
 				break;
@@ -288,20 +304,28 @@ namespace Slicer {
 							mp = mp->GetSubclassModelPart(*typeId);
 						}
 					}
-					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
+					mp->OnEachChild([n](auto && PH1, auto && PH2, auto &&) {
+						return JsonSerializer::ModelTreeIterate(n, PH1, PH2);
+					});
 					break;
 				case mpt_Sequence:
 					*n = json::Array();
-					mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateSeq, n, _2));
+					mp->OnEachChild([n](auto &&, auto && PH2, auto &&) {
+						return JsonSerializer::ModelTreeIterateSeq(n, PH2);
+					});
 					break;
 				case mpt_Dictionary:
 					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
 						*n = json::Object();
-						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateDictObj, n, _2));
+						mp->OnEachChild([n](auto &&, auto && PH2, auto &&) {
+							return JsonSerializer::ModelTreeIterateDictObj(n, PH2);
+						});
 					}
 					else {
 						*n = json::Array();
-						mp->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterate, n, _1, _2));
+						mp->OnEachChild([n](auto && PH1, auto && PH2, auto &&) {
+							return JsonSerializer::ModelTreeIterate(n, PH1, PH2);
+						});
 					}
 					break;
 			}
@@ -330,7 +354,9 @@ namespace Slicer {
 	JsonStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value doc;
-		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
+		modelRoot->OnEachChild([&doc](auto &&, auto && PH2, auto &&) {
+			return JsonSerializer::ModelTreeIterateRoot(&doc, PH2);
+		});
 		json::serializeValue(doc, strm, "utf-8");
 	}
 
@@ -357,7 +383,9 @@ namespace Slicer {
 	JsonFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
 		json::Value doc;
-		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &doc, _2));
+		modelRoot->OnEachChild([&doc](auto &&, auto && PH2, auto &&) {
+			return JsonSerializer::ModelTreeIterateRoot(&doc, PH2);
+		});
 		std::ofstream outFile(path);
 		json::serializeValue(doc, outFile, "utf-8");
 	}
@@ -382,7 +410,9 @@ namespace Slicer {
 	void
 	JsonValueSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
-		modelRoot->OnEachChild(std::bind(&JsonSerializer::ModelTreeIterateRoot, &value, _2));
+		modelRoot->OnEachChild([this](auto &&, auto && PH2, auto &&) {
+			return JsonSerializer::ModelTreeIterateRoot(&value, PH2);
+		});
 	}
 }
 

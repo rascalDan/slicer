@@ -10,7 +10,7 @@ namespace Slicer {
 		public:
 			SqlSelectDeserializer(DB::SelectCommand *, Ice::optional<std::string> typeIdCol = Ice::optional<std::string>());
 
-			virtual void Deserialize(Slicer::ModelPartForRootPtr) override;
+			void Deserialize(Slicer::ModelPartForRootPtr) override;
 
 		protected:
 			void DLL_PRIVATE DeserializeSimple(const Slicer::ModelPartPtr &);

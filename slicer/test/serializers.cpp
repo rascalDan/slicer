@@ -20,7 +20,7 @@
 #include "conversions.h"
 
 #ifdef SLICER_MODELPARTSTYPES_IMPL_H
-#error Test code should have pull in implementation header
+#error Client code should NOT need to pull in implementation header
 #endif
 
 namespace fs = std::filesystem;
@@ -680,4 +680,10 @@ BOOST_AUTO_TEST_CASE(case_less_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_CASE(enum_lookups)
+{
+	BOOST_CHECK_EQUAL("One", Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup(TestModule::SomeNumbers::One));
+	BOOST_CHECK_EQUAL(TestModule::SomeNumbers::One, Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup("One"));
+}
 

@@ -9,7 +9,7 @@ namespace Slicer {
 		public:
 			SqlTablePatchSerializer(DB::Connection * const, DB::TablePatch &);
 
-			virtual void Serialize(Slicer::ModelPartForRootPtr) override;
+			void Serialize(Slicer::ModelPartForRootPtr) override;
 
 		private:
 			void createTemporaryTable();

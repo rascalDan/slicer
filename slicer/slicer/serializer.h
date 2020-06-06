@@ -5,18 +5,15 @@
 #include <slicer/modelParts.h>
 #include <visibility.h>
 #include <factory.h>
+#include <c++11Helpers.h>
 
 namespace Slicer {
 	class DLL_PUBLIC Serializer {
 		public:
 			Serializer() = default;
-			Serializer(const Serializer &) = delete;
-			Serializer(Serializer &&) = delete;
+			SPECIAL_MEMBERS_DEFAULT(Serializer);
 
 			virtual ~Serializer() = default;
-
-			Serializer & operator=(const Serializer &) = delete;
-			Serializer & operator=(Serializer &&) = delete;
 
 			virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
@@ -25,13 +22,9 @@ namespace Slicer {
 	class DLL_PUBLIC Deserializer {
 		public:
 			Deserializer() = default;
-			Deserializer(const Deserializer &) = delete;
-			Deserializer(Deserializer &&) = delete;
+			SPECIAL_MEMBERS_DEFAULT(Deserializer);
 
 			virtual ~Deserializer() = default;
-
-			Deserializer & operator=(const Deserializer &) = delete;
-			Deserializer & operator=(Deserializer &&) = delete;
 
 			virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
