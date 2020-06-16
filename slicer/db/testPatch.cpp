@@ -1,13 +1,13 @@
 #define BOOST_TEST_MODULE db_patch
-#include <boost/test/unit_test.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include "testMockCommon.h"
-#include <slicer/slicer.h>
-#include "sqlTablePatchSerializer.h"
 #include "sqlSelectDeserializer.h"
-#include <types.h>
+#include "sqlTablePatchSerializer.h"
+#include "testMockCommon.h"
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/test/unit_test.hpp>
 #include <common.h>
+#include <slicer/slicer.h>
 #include <testModels.h>
+#include <types.h>
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
@@ -16,16 +16,14 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
 BOOST_TEST_DONT_PRINT_LOG_VALUE(DB::PrimaryKey);
 // LCOV_EXCL_STOP
 
-BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
 BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
-BOOST_AUTO_TEST_CASE( insert_builtins )
+BOOST_AUTO_TEST_CASE(insert_builtins)
 {
-	TestModule::BuiltInSeq bis = {
-		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
-		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
-	};
+	TestModule::BuiltInSeq bis = {std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
+			std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")};
 	DB::TablePatch tp;
 	DB::TransactionScope tx(*db);
 	tp.dest = "builtins";
@@ -42,4 +40,3 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 }
 
 BOOST_AUTO_TEST_SUITE_END();
-

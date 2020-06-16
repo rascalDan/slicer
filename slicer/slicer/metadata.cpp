@@ -1,7 +1,7 @@
 #include "metadata.h"
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 bool
 Slicer::metaDataFlagSet(const std::list<std::string> & md, const std::string & flag)
@@ -46,4 +46,3 @@ Slicer::metaDataValue(const std::string & prefix, const std::list<std::string> &
 	}
 	return std::optional<std::string>();
 }
-

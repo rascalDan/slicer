@@ -1,7 +1,7 @@
 #include "conversions.h"
 #include <boost/numeric/conversion/cast.hpp>
 
-#define SHORT(x) boost::numeric_cast< ::Ice::Short , int64_t >(x)
+#define SHORT(x) boost::numeric_cast<::Ice::Short, int64_t>(x)
 
 namespace Slicer {
 	DLL_PUBLIC
@@ -16,17 +16,16 @@ namespace Slicer {
 	::TestModule::DateTime
 	ptimeToDateTime(const boost::posix_time::ptime & pt)
 	{
-		return ::TestModule::DateTime({
-				SHORT(pt.date().year()), SHORT(pt.date().month()), SHORT(pt.date().day()),
-				SHORT(pt.time_of_day().hours()), SHORT(pt.time_of_day().minutes()), SHORT(pt.time_of_day().seconds())
-			});
+		return ::TestModule::DateTime({SHORT(pt.date().year()), SHORT(pt.date().month()), SHORT(pt.date().day()),
+				SHORT(pt.time_of_day().hours()), SHORT(pt.time_of_day().minutes()), SHORT(pt.time_of_day().seconds())});
 	}
 
 	DLL_PUBLIC
 	std::string
 	isoDateToString(const ::TestModule::IsoDate & in)
 	{
-		struct tm tm {};
+		struct tm tm {
+		};
 		tm.tm_mday = in.day;
 		tm.tm_mon = in.month - 1;
 		tm.tm_year = in.year - 1900;
@@ -41,27 +40,28 @@ namespace Slicer {
 	::TestModule::IsoDate
 	stringToIsoDate(const std::string & in)
 	{
-		struct tm tm {};
+		struct tm tm {
+		};
 		auto end = strptime(in.c_str(), "%Y-%m-%d", &tm);
 		if (!end || *end) {
 			// LCOV_EXCL_START
 			throw std::runtime_error("Invalid iso-date string: " + in);
 			// LCOV_EXCL_STOP
 		}
-		return ::TestModule::IsoDate({
-				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday)});
+		return ::TestModule::IsoDate({SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday)});
 	}
 
 	DLL_PUBLIC
 	std::string
 	dateTimeToString(const ::TestModule::DateTime & in)
 	{
-		struct tm tm {};
+		struct tm tm {
+		};
 		tm.tm_sec = in.second;
 		tm.tm_min = in.minute;
 		tm.tm_hour = in.hour;
 		tm.tm_mday = in.day;
-		tm.tm_mon = in.month- 1;
+		tm.tm_mon = in.month - 1;
 		tm.tm_year = in.year - 1900;
 		tm.tm_isdst = -1;
 		mktime(&tm);
@@ -75,15 +75,15 @@ namespace Slicer {
 	::TestModule::DateTime
 	stringToDateTime(const std::string & in)
 	{
-		struct tm tm {};
+		struct tm tm {
+		};
 		auto end = strptime(in.c_str(), "%Y-%b-%d %H:%M:%S", &tm);
 		if (!end || *end) {
 			// LCOV_EXCL_START
 			throw std::runtime_error("Invalid date string: " + in);
 			// LCOV_EXCL_STOP
 		}
-		return ::TestModule::DateTime({
-				SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday),
+		return ::TestModule::DateTime({SHORT(tm.tm_year + 1900), SHORT(tm.tm_mon + 1), SHORT(tm.tm_mday),
 				SHORT(tm.tm_hour), SHORT(tm.tm_min), SHORT(tm.tm_sec)});
 	}
 
@@ -111,10 +111,7 @@ namespace Slicer {
 namespace TestModule {
 	int completions = 0;
 
-	AbValidator::AbValidator(ClassTypePtr * m) :
-		Slicer::ModelPartForClass<ClassType>(m)
-	{
-	}
+	AbValidator::AbValidator(ClassTypePtr * m) : Slicer::ModelPartForClass<ClassType>(m) { }
 
 	void
 	AbValidator::Complete()
@@ -129,10 +126,7 @@ namespace TestModule {
 		completions += 1;
 	}
 
-	MonthValidator::MonthValidator(::Ice::Short * m) :
-		Slicer::ModelPartForSimple<::Ice::Short>(m)
-	{
-	}
+	MonthValidator::MonthValidator(::Ice::Short * m) : Slicer::ModelPartForSimple<::Ice::Short>(m) { }
 
 	void
 	MonthValidator::Complete()
@@ -147,4 +141,3 @@ namespace TestModule {
 		completions += 1;
 	}
 }
-

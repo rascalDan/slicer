@@ -1,11 +1,7 @@
 #include "sqlBinder.h"
 
 namespace Slicer {
-	SqlBinder::SqlBinder(DB::Command & c, unsigned int i) :
-		command(c),
-		idx(i)
-	{
-	}
+	SqlBinder::SqlBinder(DB::Command & c, unsigned int i) : command(c), idx(i) { }
 
 	void
 	SqlBinder::get(const boost::posix_time::ptime & b) const
@@ -67,4 +63,3 @@ namespace Slicer {
 		command.bindParamS(idx, b);
 	}
 }
-

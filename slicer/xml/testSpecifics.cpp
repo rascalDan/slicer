@@ -1,19 +1,19 @@
 #define BOOST_TEST_MODULE xml_specifics
-#include <boost/test/unit_test.hpp>
-#include <slicer/slicer.h>
 #include "serializer.h"
+#include <boost/test/unit_test.hpp>
 #include <libxml++/parsers/domparser.h>
+#include <slicer/slicer.h>
 #include <types.h>
 #include <xmlExceptions.h>
 
-template <typename T, typename ... P>
+template<typename T, typename... P>
 T
-BoostThrowWrapperHelper(P && ... p)
+BoostThrowWrapperHelper(P &&... p)
 {
 	return Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, T>(p...);
 }
 
-BOOST_AUTO_TEST_CASE( boolean_values )
+BOOST_AUTO_TEST_CASE(boolean_values)
 {
 	xmlpp::DomParser doc;
 	doc.parse_memory("<Boolean>true</Boolean>");
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE( boolean_values )
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<bool>(doc.get_document()), Slicer::BadBooleanValue);
 }
 
-BOOST_AUTO_TEST_CASE( int_values )
+BOOST_AUTO_TEST_CASE(int_values)
 {
 	xmlpp::DomParser doc;
 	doc.parse_memory("<Int>13</Int>");
@@ -47,11 +47,10 @@ BOOST_AUTO_TEST_CASE( int_values )
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), std::bad_cast);
 }
 
-BOOST_AUTO_TEST_CASE( factories )
+BOOST_AUTO_TEST_CASE(factories)
 {
 	BOOST_REQUIRE(Slicer::SerializerPtr(Slicer::FileSerializerFactory::createNew(".xml", "/some.xml")));
 	BOOST_REQUIRE(Slicer::DeserializerPtr(Slicer::FileDeserializerFactory::createNew(".xml", "/some.xml")));
 	BOOST_REQUIRE(Slicer::SerializerPtr(Slicer::StreamSerializerFactory::createNew("application/xml", std::cout)));
 	BOOST_REQUIRE(Slicer::DeserializerPtr(Slicer::StreamDeserializerFactory::createNew("application/xml", std::cin)));
 }
-

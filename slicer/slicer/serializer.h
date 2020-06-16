@@ -1,32 +1,32 @@
 #ifndef SLICER_SERIALIZER_H
 #define SLICER_SERIALIZER_H
 
+#include <c++11Helpers.h>
+#include <factory.h>
 #include <filesystem>
 #include <slicer/modelParts.h>
 #include <visibility.h>
-#include <factory.h>
-#include <c++11Helpers.h>
 
 namespace Slicer {
 	class DLL_PUBLIC Serializer {
-		public:
-			Serializer() = default;
-			SPECIAL_MEMBERS_DEFAULT(Serializer);
+	public:
+		Serializer() = default;
+		SPECIAL_MEMBERS_DEFAULT(Serializer);
 
-			virtual ~Serializer() = default;
+		virtual ~Serializer() = default;
 
-			virtual void Serialize(ModelPartForRootPtr) = 0;
+		virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
 	using SerializerPtr = std::shared_ptr<Serializer>;
 
 	class DLL_PUBLIC Deserializer {
-		public:
-			Deserializer() = default;
-			SPECIAL_MEMBERS_DEFAULT(Deserializer);
+	public:
+		Deserializer() = default;
+		SPECIAL_MEMBERS_DEFAULT(Deserializer);
 
-			virtual ~Deserializer() = default;
+		virtual ~Deserializer() = default;
 
-			virtual void Deserialize(ModelPartForRootPtr) = 0;
+		virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
 	using DeserializerPtr = std::shared_ptr<Deserializer>;
 
@@ -37,4 +37,3 @@ namespace Slicer {
 }
 
 #endif
-

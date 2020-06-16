@@ -73,10 +73,7 @@ namespace Slicer {
 		return shared_from_this();
 	}
 
-	HookCommon::HookCommon(std::string n) :
-		name(std::move(n))
-	{
-	}
+	HookCommon::HookCommon(std::string n) : name(std::move(n)) { }
 
 	bool
 	HookCommon::filter(const HookFilter & flt)
@@ -90,4 +87,3 @@ namespace Slicer {
 		ch(this->name, modelPart, this);
 	}
 }
-

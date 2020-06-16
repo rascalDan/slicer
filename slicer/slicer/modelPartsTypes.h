@@ -4,376 +4,367 @@
 #include "modelParts.h"
 
 namespace Slicer {
-	template<typename T>
-	struct isLocal {
+	template<typename T> struct isLocal {
 		static constexpr bool value = false;
 	};
 
 	DLL_PUBLIC bool optionalCaseEq(const std::string & a, const std::string & b, bool matchCase);
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
-		public:
-			ModelPartForRoot(T * o);
+	template<typename T> class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
+	public:
+		explicit ModelPartForRoot(T * o);
 
-			const std::string & GetRootName() const override;
-			bool HasValue() const override;
-			void Write(::Ice::OutputStream &) const override;
-			void Read(::Ice::InputStream &) override;
+		const std::string & GetRootName() const override;
+		bool HasValue() const override;
+		void Write(::Ice::OutputStream &) const override;
+		void Read(::Ice::InputStream &) override;
 
-			static const std::string rootName;
+		static const std::string rootName;
 
-		private:
-			T * ModelObject;
+	private:
+		T * ModelObject;
 	};
 
 	class DLL_PUBLIC ModelPartForSimpleBase : public ModelPart {
-		public:
-			void OnEachChild(const ChildHandler &) override;
-			ChildRef GetAnonChildRef(const HookFilter &) override;
-			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
-			bool HasValue() const override;
-			ModelPartType GetType() const override;
-			static const ModelPartType type;
+	public:
+		void OnEachChild(const ChildHandler &) override;
+		ChildRef GetAnonChildRef(const HookFilter &) override;
+		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		bool HasValue() const override;
+		ModelPartType GetType() const override;
+		static const ModelPartType type;
 	};
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForSimple : public ModelPartForSimpleBase, protected ModelPartModel<T> {
-		public:
-			using element_type = T;
+	public:
+		using element_type = T;
 
-			ModelPartForSimple(T * h);
+		explicit ModelPartForSimple(T * h);
 
-			void SetValue(ValueSource && s) override;
-			bool GetValue(ValueTarget && s) override;
+		void SetValue(ValueSource && s) override;
+		bool GetValue(ValueTarget && s) override;
 	};
 
 	class DLL_PUBLIC ModelPartForConvertedBase : public ModelPart {
-		public:
-			void OnEachChild(const ChildHandler &) override;
-			ChildRef GetAnonChildRef(const HookFilter &) override;
-			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
-			bool HasValue() const override;
-			ModelPartType GetType() const override;
-			static const ModelPartType type;
+	public:
+		void OnEachChild(const ChildHandler &) override;
+		ChildRef GetAnonChildRef(const HookFilter &) override;
+		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		bool HasValue() const override;
+		ModelPartType GetType() const override;
+		static const ModelPartType type;
 
-		protected:
-			template<typename ET, typename MT, typename Conv>
-			inline static bool tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv);
-			template<typename ET, typename MT>
-			inline static bool tryConvertFrom(ValueSource & vsp, MT * model);
-			template<typename ET, typename MT, typename Conv>
-			inline static TryConvertResult tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv);
-			template<typename ET, typename MT>
-			inline static TryConvertResult tryConvertTo(ValueTarget & vsp, const MT * model);
+	protected:
+		template<typename ET, typename MT, typename Conv>
+		inline static bool tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv);
+		template<typename ET, typename MT> inline static bool tryConvertFrom(ValueSource & vsp, MT * model);
+		template<typename ET, typename MT, typename Conv>
+		inline static TryConvertResult tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv);
+		template<typename ET, typename MT>
+		inline static TryConvertResult tryConvertTo(ValueTarget & vsp, const MT * model);
 	};
 
-	template<typename T, typename M, T M::* MV>
+	template<typename T, typename M, T M::*MV>
 	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase, protected ModelPartModel<T> {
-		public:
-			using element_type = T;
+	public:
+		using element_type = T;
 
-			ModelPartForConverted(T * h);
+		explicit ModelPartForConverted(T * h);
 
-			void SetValue(ValueSource && s) override;
-			bool GetValue(ValueTarget && s) override;
+		void SetValue(ValueSource && s) override;
+		bool GetValue(ValueTarget && s) override;
 	};
 
-	template<typename T, typename M, Ice::optional<T> M::* MV>
-	class DLL_PUBLIC ModelPartForConverted<Ice::optional<T>, M, MV> : public ModelPartForConvertedBase, protected ModelPartModel<Ice::optional<T>> {
-		public:
-			using element_type = Ice::optional<T>;
+	template<typename T, typename M, Ice::optional<T> M::*MV>
+	class DLL_PUBLIC ModelPartForConverted<Ice::optional<T>, M, MV> :
+		public ModelPartForConvertedBase,
+		protected ModelPartModel<Ice::optional<T>> {
+	public:
+		using element_type = Ice::optional<T>;
 
-			ModelPartForConverted(Ice::optional<T> * h);
+		explicit ModelPartForConverted(Ice::optional<T> * h);
 
-			void SetValue(ValueSource && s) override;
-			bool GetValue(ValueTarget && s) override;
-			bool HasValue() const override;
+		void SetValue(ValueSource && s) override;
+		bool GetValue(ValueTarget && s) override;
+		bool HasValue() const override;
 	};
 
 	class DLL_PUBLIC ModelPartForOptionalBase : public ModelPart {
-		public:
-			void OnEachChild(const ChildHandler & ch) override;
-			void Complete() override;
-			ChildRef GetAnonChildRef(const HookFilter & flt) override;
-			ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
-			void SetValue(ValueSource && s) override;
-			bool HasValue() const override;
-			bool IsOptional() const override;
-			const Metadata & GetMetadata() const override;
+	public:
+		void OnEachChild(const ChildHandler & ch) override;
+		void Complete() override;
+		ChildRef GetAnonChildRef(const HookFilter & flt) override;
+		ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
+		void SetValue(ValueSource && s) override;
+		bool HasValue() const override;
+		bool IsOptional() const override;
+		const Metadata & GetMetadata() const override;
 
-		protected:
-			virtual bool hasModel() const = 0;
-			// NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
-			ModelPartPtr modelPart;
+	protected:
+		virtual bool hasModel() const = 0;
+		ModelPartPtr modelPart;
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForOptional : public ModelPartForOptionalBase, protected ModelPartModel<Ice::optional<typename T::element_type> > {
-		public:
-			ModelPartForOptional(Ice::optional< typename T::element_type > * h);
-			void Create() override;
-			bool GetValue(ValueTarget && s) override;
-			ModelPartType GetType() const override;
+	class DLL_PUBLIC ModelPartForOptional :
+		public ModelPartForOptionalBase,
+		protected ModelPartModel<Ice::optional<typename T::element_type>> {
+	public:
+		explicit ModelPartForOptional(Ice::optional<typename T::element_type> * h);
+		void Create() override;
+		bool GetValue(ValueTarget && s) override;
+		ModelPartType GetType() const override;
 
-		protected:
-			bool hasModel() const override;
+	protected:
+		bool hasModel() const override;
 	};
 
 	class DLL_PUBLIC ModelPartForComplexBase : public ModelPart {
-		public:
-			ModelPartType GetType() const override;
-			static const ModelPartType type;
+	public:
+		ModelPartType GetType() const override;
+		static const ModelPartType type;
 
-		protected:
-			ModelPartPtr getSubclassModelPart(const std::string & name, void * m);
+	protected:
+		ModelPartPtr getSubclassModelPart(const std::string & name, void * m);
 
-			static void registerClass(const std::string & className, const std::string * typeName, const ClassRef &);
-			static void unregisterClass(const std::string & className, const std::string * typeName);
-			static TypeId GetTypeId(const std::string & id, const std::string & className);
-			static std::string demangle(const char * mangled);
+		static void registerClass(const std::string & className, const std::string * typeName, const ClassRef &);
+		static void unregisterClass(const std::string & className, const std::string * typeName);
+		static TypeId GetTypeId(const std::string & id, const std::string & className);
+		static std::string demangle(const char * mangled);
 
-			static const std::string & ToExchangeTypeName(const std::string &);
-			static const std::string & ToModelTypeName(const std::string &);
+		static const std::string & ToExchangeTypeName(const std::string &);
+		static const std::string & ToModelTypeName(const std::string &);
+	};
+
+	template<typename T> class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
+	public:
+		class DLL_PRIVATE HookBase;
+		using HookPtr = std::unique_ptr<HookBase>;
+
+		template<typename MT, typename MP> class DLL_PRIVATE Hook;
+
+		template<typename MT, typename MP> class DLL_PRIVATE HookMetadata;
+
+		void OnEachChild(const ChildHandler & ch) override;
+
+		ChildRef GetAnonChildRef(const HookFilter & flt) override;
+		ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
+
+		const Metadata & GetMetadata() const override;
+
+		virtual T * GetModel() = 0;
+
+	protected:
+		template<typename R> DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
+
+		class DLL_PRIVATE Hooks;
+
+		template<typename H, typename... P> static void addHook(Hooks &, const P &...);
+
+		static const Hooks hooks;
+		static const Metadata metadata;
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
-		public:
-			class DLL_PRIVATE HookBase;
-			using HookPtr = std::unique_ptr<HookBase>;
+	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<std::shared_ptr<T>> {
+	public:
+		using element_type = std::shared_ptr<T>;
 
-			template <typename MT, typename MP>
-			class DLL_PRIVATE Hook;
+		explicit ModelPartForClass(element_type * h);
 
-			template <typename MT, typename MP>
-			class DLL_PRIVATE HookMetadata;
+		void Create() override;
 
-			void OnEachChild(const ChildHandler & ch) override;
+		T * GetModel() override;
 
-			ChildRef GetAnonChildRef(const HookFilter & flt) override;
-			ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
+		ModelPartPtr GetSubclassModelPart(const std::string & name) override;
 
-			const Metadata & GetMetadata() const override;
+		[[nodiscard]] bool HasValue() const override;
 
-			virtual T * GetModel() = 0;
+		[[nodiscard]] TypeId GetTypeId() const override;
+		template<typename dummy = T>
+		const std::string & getTypeId(
+				typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
+		template<typename dummy = T>
+		std::string getTypeId(
+				typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
 
-		protected:
-			template<typename R>
-			DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
+		[[nodiscard]] Ice::optional<std::string> GetTypeIdProperty() const override;
 
-			class DLL_PRIVATE Hooks;
+		static const std::string typeIdProperty;
+		static const std::string * className;
+		static const std::string * typeName;
 
-			template<typename H, typename ... P>
-			static void addHook(Hooks &, const P & ...);
+		static ModelPartPtr CreateModelPart(void *);
 
-			static const Hooks hooks;
-			static const Metadata metadata;
-	};
-
-	template<typename T>
-	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<std::shared_ptr<T> > {
-		public:
-			using element_type = std::shared_ptr<T>;
-
-			ModelPartForClass(element_type * h);
-
-			void Create() override;
-
-			T * GetModel() override;
-
-			ModelPartPtr GetSubclassModelPart(const std::string & name) override;
-
-			[[nodiscard]] bool HasValue() const override;
-
-			[[nodiscard]] TypeId GetTypeId() const override;
-			template<typename dummy = T>
-			const std::string & getTypeId(typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
-			template<typename dummy = T>
-			std::string getTypeId(typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
-
-			[[nodiscard]] Ice::optional<std::string> GetTypeIdProperty() const override;
-
-			static const std::string typeIdProperty;
-			static const std::string * className;
-			static const std::string * typeName;
-
-			static ModelPartPtr CreateModelPart(void *);
-
-		private:
-			static void initClassName();
-			static void deleteClassName();
-			static void registerClass() __attribute__ ((constructor(210)));
-			static void unregisterClass() __attribute__ ((destructor(210)));
+	private:
+		static void initClassName();
+		static void deleteClassName();
+		static void registerClass() __attribute__((constructor(210)));
+		static void unregisterClass() __attribute__((destructor(210)));
 	};
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T>, protected ModelPartModel<T> {
-		public:
-			using element_type = T;
+	public:
+		using element_type = T;
 
-			ModelPartForStruct(T * o);
+		explicit ModelPartForStruct(T * o);
 
-			T * GetModel() override;
+		T * GetModel() override;
 
-			[[nodiscard]] bool HasValue() const override;
+		[[nodiscard]] bool HasValue() const override;
 	};
 
 	class DLL_PUBLIC ModelPartForEnumBase : public ModelPart {
-		public:
-			void OnEachChild(const ChildHandler &) override;
-			ChildRef GetAnonChildRef(const HookFilter &) override;
-			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
-			bool HasValue() const override;
-			ModelPartType GetType() const override;
-			static const ModelPartType type;
+	public:
+		void OnEachChild(const ChildHandler &) override;
+		ChildRef GetAnonChildRef(const HookFilter &) override;
+		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		bool HasValue() const override;
+		ModelPartType GetType() const override;
+		static const ModelPartType type;
 	};
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
-		public:
-			using element_type = T;
-			class DLL_PRIVATE Enumerations;
+	template<typename T> class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
+	public:
+		using element_type = T;
+		class DLL_PRIVATE Enumerations;
 
-			ModelPartForEnum(T * s);
+		explicit ModelPartForEnum(T * s);
 
-			const Metadata & GetMetadata() const override;
+		const Metadata & GetMetadata() const override;
 
-			void SetValue(ValueSource && s) override;
+		void SetValue(ValueSource && s) override;
 
-			bool GetValue(ValueTarget && s) override;
+		bool GetValue(ValueTarget && s) override;
 
-			static const Metadata metadata;
-			static const Enumerations enumerations;
-			DLL_PUBLIC static const std::string & lookup(T);
-			DLL_PUBLIC static T lookup(const std::string_view &);
+		static const Metadata metadata;
+		static const Enumerations enumerations;
+		DLL_PUBLIC static const std::string & lookup(T);
+		DLL_PUBLIC static T lookup(const std::string_view &);
 	};
 
 	class DLL_PUBLIC ModelPartForSequenceBase : public ModelPart {
-		public:
-			bool HasValue() const override;
-			ModelPartType GetType() const override;
-			static const ModelPartType type;
+	public:
+		bool HasValue() const override;
+		ModelPartType GetType() const override;
+		static const ModelPartType type;
 	};
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase, protected ModelPartModel<T> {
-		public:
-			using element_type = T;
+	public:
+		using element_type = T;
 
-			ModelPartForSequence(T * s);
+		explicit ModelPartForSequence(T * s);
 
-			void OnEachChild(const ChildHandler & ch) override;
+		void OnEachChild(const ChildHandler & ch) override;
 
-			ChildRef GetAnonChildRef(const HookFilter &) override;
+		ChildRef GetAnonChildRef(const HookFilter &) override;
 
-			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 
-			const Metadata & GetMetadata() const override;
+		const Metadata & GetMetadata() const override;
 
-			ModelPartPtr GetContainedModelPart() override;
+		ModelPartPtr GetContainedModelPart() override;
 
-			static const Metadata metadata;
-			static const std::string elementName;
+		static const Metadata metadata;
+		static const std::string elementName;
 
-		private:
-			ModelPartPtr elementModelPart(typename T::value_type &) const;
+	private:
+		ModelPartPtr elementModelPart(typename T::value_type &) const;
 	};
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
-		public:
-			ModelPartForDictionaryElementInserter(T * d);
+	public:
+		explicit ModelPartForDictionaryElementInserter(T * d);
 
-			void Complete() override;
+		void Complete() override;
 
-			// NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
-			typename T::value_type value;
+		typename T::value_type value;
 
-		private:
-			T * dictionary;
+	private:
+		T * dictionary;
 	};
 
 	class DLL_PUBLIC ModelPartForDictionaryBase : public ModelPart {
-		public:
-			bool HasValue() const override;
-			ModelPartType GetType() const override;
-			static const ModelPartType type;
+	public:
+		bool HasValue() const override;
+		ModelPartType GetType() const override;
+		static const ModelPartType type;
 	};
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase, protected ModelPartModel<T> {
-		public:
-			using element_type = T;
+	public:
+		using element_type = T;
 
-			ModelPartForDictionary(T * d);
+		explicit ModelPartForDictionary(T * d);
 
-			void OnEachChild(const ChildHandler & ch) override;
+		void OnEachChild(const ChildHandler & ch) override;
 
-			ChildRef GetAnonChildRef(const HookFilter &) override;
+		ChildRef GetAnonChildRef(const HookFilter &) override;
 
-			ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
 
-			const Metadata & GetMetadata() const override;
+		const Metadata & GetMetadata() const override;
 
-			ModelPartPtr GetContainedModelPart() override;
+		ModelPartPtr GetContainedModelPart() override;
 
-			static const Metadata metadata;
-			static const std::string pairName;
+		static const Metadata metadata;
+		static const std::string pairName;
 	};
 
-	template<typename T>
-	class DLL_PUBLIC Stream {
-		public:
-			using Consumer = std::function<void(const T &)>;
-			using element_type = T;
+	template<typename T> class DLL_PUBLIC Stream {
+	public:
+		using Consumer = std::function<void(const T &)>;
+		using element_type = T;
 
-			virtual void Produce(const Consumer & c) = 0;
+		virtual void Produce(const Consumer & c) = 0;
 	};
 
 	class DLL_PUBLIC ModelPartForStreamBase : public ModelPart {
-		public:
-			ModelPartType GetType() const override;
-			bool HasValue() const override;
-			ChildRef GetAnonChildRef(const HookFilter &) override;
-			ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+	public:
+		ModelPartType GetType() const override;
+		bool HasValue() const override;
+		ChildRef GetAnonChildRef(const HookFilter &) override;
+		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
 
-			ModelPartPtr GetContainedModelPart() override = 0;
-			void OnEachChild(const ChildHandler & ch) override = 0;
+		ModelPartPtr GetContainedModelPart() override = 0;
+		void OnEachChild(const ChildHandler & ch) override = 0;
 	};
 
 	template<typename T>
 	class DLL_PUBLIC ModelPartForStream : public ModelPartForStreamBase, ModelPartModel<Stream<T>> {
-		public:
-			ModelPartForStream(Stream<T> * s);
+	public:
+		explicit ModelPartForStream(Stream<T> * s);
 
-			ModelPartPtr GetContainedModelPart() override;
-			void OnEachChild(const ChildHandler & ch) override;
+		ModelPartPtr GetContainedModelPart() override;
+		void OnEachChild(const ChildHandler & ch) override;
 	};
 
 	class DLL_PUBLIC ModelPartForStreamRootBase : public ModelPartForRootBase {
-		public:
-			ModelPartForStreamRootBase(const ModelPartPtr & mp);
+	public:
+		explicit ModelPartForStreamRootBase(const ModelPartPtr & mp);
 
-			void Write(Ice::OutputStream&) const override;
-			void Read(Ice::InputStream&) override;
-			bool HasValue() const override;
-			void OnEachChild(const ChildHandler & ch) override;
-			const std::string & GetRootName() const override = 0;
+		void Write(Ice::OutputStream &) const override;
+		void Read(Ice::InputStream &) override;
+		bool HasValue() const override;
+		void OnEachChild(const ChildHandler & ch) override;
+		const std::string & GetRootName() const override = 0;
 	};
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForStreamRoot : public ModelPartForStreamRootBase {
-		public:
-			ModelPartForStreamRoot(Stream<T> * s);
+	template<typename T> class DLL_PUBLIC ModelPartForStreamRoot : public ModelPartForStreamRootBase {
+	public:
+		explicit ModelPartForStreamRoot(Stream<T> * s);
 
-			const std::string & GetRootName() const override;
+		const std::string & GetRootName() const override;
 
-		private:
-			Stream<T> * stream;
+	private:
+		Stream<T> * stream;
 	};
 }
 
 #endif
-
-

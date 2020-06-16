@@ -1,8 +1,8 @@
 #ifndef SLICER_DB_SQLCOMMON_H
 #define SLICER_DB_SQLCOMMON_H
 
-#include <string>
 #include <modelParts.h>
+#include <string>
 
 namespace Slicer {
 	bool isPKey(const HookCommon *);
@@ -13,4 +13,3 @@ namespace Slicer {
 }
 
 #endif
-

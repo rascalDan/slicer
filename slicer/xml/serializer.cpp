@@ -1,13 +1,13 @@
 #include "serializer.h"
-#include <xmlExceptions.h>
-#include <slicer/metadata.h>
+#include <boost/lexical_cast.hpp>
+#include <compileTimeFormatter.h>
+#include <functional>
+#include <glibmm/ustring.h>
 #include <libxml++/document.h>
 #include <libxml++/parsers/domparser.h>
-#include <boost/lexical_cast.hpp>
-#include <functional>
+#include <slicer/metadata.h>
 #include <stdexcept>
-#include <glibmm/ustring.h>
-#include <compileTimeFormatter.h>
+#include <xmlExceptions.h>
 
 NAMEDFACTORY(".xml", Slicer::XmlFileSerializer, Slicer::FileSerializerFactory);
 NAMEDFACTORY(".xml", Slicer::XmlFileDeserializer, Slicer::FileDeserializerFactory);
@@ -24,169 +24,180 @@ namespace Slicer {
 	const std::string md_elements = "xml:elements";
 	const std::string keyName = "key";
 	const std::string valueName = "value";
-	using ElementCreatorF = xmlpp::Element * (xmlpp::Element::*) (const Glib::ustring &, const Glib::ustring &);
-	const auto defaultElementCreator = std::bind((ElementCreatorF)&xmlpp::Element::add_child_element, _1, _2, Glib::ustring());
+	using ElementCreatorF = xmlpp::Element * (xmlpp::Element::*)(const Glib::ustring &, const Glib::ustring &);
+	const auto defaultElementCreator = [](auto && element, auto && name) {
+		return element->add_child_element(name);
+	};
 
 	static const Glib::ustring TrueText("true");
 	static const Glib::ustring FalseText("false");
 
 	class XmlValueSource : public ValueSource {
-		public:
-			explicit XmlValueSource(Glib::ustring s) :
-				value(std::move(s))
-			{
-			}
+	public:
+		explicit XmlValueSource(Glib::ustring s) : value(std::move(s)) { }
 
-			void set(bool & v) const override
-			{
-				if (value == TrueText) { v = true; return; }
-				if (value == FalseText) { v = false; return; }
-				throw BadBooleanValue(value);
+		void
+		set(bool & v) const override
+		{
+			if (value == TrueText) {
+				v = true;
+				return;
 			}
-
-			void set(Ice::Byte & v) const override
-			{
-				v = boost::numeric_cast<Ice::Byte>(boost::lexical_cast<int>(value));
+			if (value == FalseText) {
+				v = false;
+				return;
 			}
+			throw BadBooleanValue(value);
+		}
 
-			void set(Ice::Short & v) const override
-			{
-				v = boost::lexical_cast<Ice::Short>(value);
-			}
+		void
+		set(Ice::Byte & v) const override
+		{
+			v = boost::numeric_cast<Ice::Byte>(boost::lexical_cast<int>(value));
+		}
 
-			void set(Ice::Int & v) const override
-			{
-				v = boost::lexical_cast<Ice::Int>(value);
-			}
+		void
+		set(Ice::Short & v) const override
+		{
+			v = boost::lexical_cast<Ice::Short>(value);
+		}
 
-			void set(Ice::Long & v) const override
-			{
-				v = boost::lexical_cast<Ice::Long>(value);
-			}
+		void
+		set(Ice::Int & v) const override
+		{
+			v = boost::lexical_cast<Ice::Int>(value);
+		}
 
-			void set(Ice::Float & v) const override
-			{
-				v = boost::lexical_cast<Ice::Float>(value);
-			}
+		void
+		set(Ice::Long & v) const override
+		{
+			v = boost::lexical_cast<Ice::Long>(value);
+		}
 
-			void set(Ice::Double & v) const override
-			{
-				v = boost::lexical_cast<Ice::Double>(value);
-			}
+		void
+		set(Ice::Float & v) const override
+		{
+			v = boost::lexical_cast<Ice::Float>(value);
+		}
 
-			void set(std::string & v) const override
-			{
-				v = value.raw();
-			}
+		void
+		set(Ice::Double & v) const override
+		{
+			v = boost::lexical_cast<Ice::Double>(value);
+		}
 
-		private:
-			const Glib::ustring value;
+		void
+		set(std::string & v) const override
+		{
+			v = value.raw();
+		}
+
+	private:
+		const Glib::ustring value;
 	};
 
 	class XmlContentValueSource : public XmlValueSource {
-		public:
-			explicit XmlContentValueSource() :
-				XmlValueSource(Glib::ustring())
-			{
-			}
-			explicit XmlContentValueSource(const xmlpp::ContentNode * c) :
-				XmlValueSource(c->get_content())
-			{
-			}
+	public:
+		explicit XmlContentValueSource() : XmlValueSource(Glib::ustring()) { }
+		explicit XmlContentValueSource(const xmlpp::ContentNode * c) : XmlValueSource(c->get_content()) { }
 	};
 
 	class XmlAttributeValueSource : public XmlValueSource {
-		public:
-			explicit XmlAttributeValueSource(const xmlpp::Attribute * a) :
-				XmlValueSource(a->get_value())
-			{
-			}
+	public:
+		explicit XmlAttributeValueSource(const xmlpp::Attribute * a) : XmlValueSource(a->get_value()) { }
 	};
 
 	class XmlValueTarget : public ValueTarget {
-		public:
-			explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) :
-				apply(std::move(a))
-			{
-			}
+	public:
+		explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) : apply(std::move(a)) { }
 
-			void get(const bool & value) const override
-			{
-				if (value) {
-					apply(TrueText);
-				}
-				else {
-					apply(FalseText);
-				}
+		void
+		get(const bool & value) const override
+		{
+			if (value) {
+				apply(TrueText);
 			}
-
-			void get(const Ice::Byte & value) const override
-			{
-				apply(boost::lexical_cast<Glib::ustring>((int)value));
+			else {
+				apply(FalseText);
 			}
+		}
 
-			void get(const Ice::Short & value) const override
-			{
-				apply(boost::lexical_cast<Glib::ustring>(value));
-			}
+		void
+		get(const Ice::Byte & value) const override
+		{
+			apply(boost::lexical_cast<Glib::ustring>((int)value));
+		}
 
-			void get(const Ice::Int & value) const override
-			{
-				apply(boost::lexical_cast<Glib::ustring>(value));
-			}
+		void
+		get(const Ice::Short & value) const override
+		{
+			apply(boost::lexical_cast<Glib::ustring>(value));
+		}
 
-			void get(const Ice::Long & value) const override
-			{
-				apply(boost::lexical_cast<Glib::ustring>(value));
-			}
+		void
+		get(const Ice::Int & value) const override
+		{
+			apply(boost::lexical_cast<Glib::ustring>(value));
+		}
 
-			void get(const Ice::Float & value) const override
-			{
-				apply(boost::lexical_cast<Glib::ustring>(value));
-			}
+		void
+		get(const Ice::Long & value) const override
+		{
+			apply(boost::lexical_cast<Glib::ustring>(value));
+		}
 
-			void get(const Ice::Double & value) const override
-			{
-				apply(boost::lexical_cast<Glib::ustring>(value));
-			}
+		void
+		get(const Ice::Float & value) const override
+		{
+			apply(boost::lexical_cast<Glib::ustring>(value));
+		}
 
-			void get(const std::string & value) const override
-			{
-				apply(value);
-			}
+		void
+		get(const Ice::Double & value) const override
+		{
+			apply(boost::lexical_cast<Glib::ustring>(value));
+		}
 
-		private:
-			const std::function<void(const Glib::ustring &)> apply;
+		void
+		get(const std::string & value) const override
+		{
+			apply(value);
+		}
+
+	private:
+		const std::function<void(const Glib::ustring &)> apply;
 	};
 
-
 	class XmlAttributeValueTarget : public XmlValueTarget {
-		public:
-			explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
-				XmlValueTarget([p, n](auto && PH1) {
-					p->set_attribute(n, PH1);
-				})
-			{
-			}
+	public:
+		explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
+			XmlValueTarget([p, n](auto && PH1) {
+				p->set_attribute(n, PH1);
+			})
+		{
+		}
 	};
 
 	class XmlContentValueTarget : public XmlValueTarget {
-		public:
-			explicit XmlContentValueTarget(xmlpp::Element * p) :
-				XmlValueTarget([p](auto && PH1) {
-					p->set_first_child_text(PH1);
-				})
-			{
-			}
+	public:
+		explicit XmlContentValueTarget(xmlpp::Element * p) :
+			XmlValueTarget([p](auto && PH1) {
+				p->set_first_child_text(PH1);
+			})
+		{
+		}
 
-			explicit XmlContentValueTarget(const CurrentElementCreator & cec) :
-				XmlValueTarget(std::bind(&xmlpp::Element::set_first_child_text, std::bind(&CurrentElementCreator::deref, &cec), _1))
-			{
-			}
+		explicit XmlContentValueTarget(const CurrentElementCreator & cec) :
+			XmlValueTarget([&](auto && PH1) {
+				cec->set_first_child_text(PH1);
+			})
+		{
+		}
 	};
 
 	void
-	XmlDeserializer::DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, const ModelPartPtr & dict)
+	XmlDeserializer::DocumentTreeIterateDictAttrs(
+			const xmlpp::Element::const_AttributeList & attrs, const ModelPartPtr & dict)
 	{
 		for (const auto & attr : attrs) {
 			auto emp = dict->GetAnonChild();
@@ -307,7 +318,8 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, const ModelPartPtr & mp, const HookCommon * hp, const ElementCreator & ec)
+	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, const ModelPartPtr & mp,
+			const HookCommon * hp, const ElementCreator & ec)
 	{
 		if (name.empty()) {
 			return;
@@ -331,7 +343,9 @@ namespace Slicer {
 				});
 			}
 			else {
-				CurrentElementCreator cec([ec, n, name] { return ec(n, name); });
+				CurrentElementCreator cec([ec, n, name] {
+					return ec(n, name);
+				});
 				ModelTreeProcessElement(cec, mp, defaultElementCreator);
 			}
 		}
@@ -342,7 +356,7 @@ namespace Slicer {
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
-				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp,element](const auto & name) {
+				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
 					mp->GetChild(valueName)->GetValue(XmlAttributeValueTarget(element, name));
 				}));
 			}
@@ -354,8 +368,10 @@ namespace Slicer {
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
-				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp,element](const auto & name) {
-					CurrentElementCreator cec([&element, &name]() { return element->add_child_element(name); });
+				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
+					CurrentElementCreator cec([&element, &name]() {
+						return element->add_child_element(name);
+					});
 					ModelTreeProcessElement(cec, mp->GetChild(valueName), defaultElementCreator);
 				}));
 			}
@@ -363,9 +379,10 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeProcessElement(const CurrentElementCreator & cec, ModelPartPtr mp, const ElementCreator & ec)
+	XmlSerializer::ModelTreeProcessElement(
+			const CurrentElementCreator & cec, ModelPartPtr mp, const ElementCreator & ec)
 	{
-		if (mp->GetType() == mpt_Simple) {
+		if (mp->GetType() == ModelPartType::Simple) {
 			mp->GetValue(XmlContentValueTarget(cec));
 		}
 		else if (mp->HasValue()) {
@@ -388,15 +405,9 @@ namespace Slicer {
 		ModelTreeProcessElement(doc->create_root_node(name), mp, defaultElementCreator);
 	}
 
-	XmlStreamSerializer::XmlStreamSerializer(std::ostream & s) :
-		strm(s)
-	{
-	}
+	XmlStreamSerializer::XmlStreamSerializer(std::ostream & s) : strm(s) { }
 
-	XmlStreamDeserializer::XmlStreamDeserializer(std::istream & s) :
-		strm(s)
-	{
-	}
+	XmlStreamDeserializer::XmlStreamDeserializer(std::istream & s) : strm(s) { }
 
 	void
 	XmlStreamDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
@@ -417,15 +428,9 @@ namespace Slicer {
 		doc.write_to_stream(strm);
 	}
 
-	XmlFileSerializer::XmlFileSerializer(std::filesystem::path p) :
-		path(std::move(p))
-	{
-	}
+	XmlFileSerializer::XmlFileSerializer(std::filesystem::path p) : path(std::move(p)) { }
 
-	XmlFileDeserializer::XmlFileDeserializer(std::filesystem::path p) :
-		path(std::move(p))
-	{
-	}
+	XmlFileDeserializer::XmlFileDeserializer(std::filesystem::path p) : path(std::move(p)) { }
 
 	void
 	XmlFileDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
@@ -445,15 +450,9 @@ namespace Slicer {
 		doc.write_to_file_formatted(path);
 	}
 
-	XmlDocumentSerializer::XmlDocumentSerializer(xmlpp::Document * & d) :
-		doc(d)
-	{
-	}
+	XmlDocumentSerializer::XmlDocumentSerializer(xmlpp::Document *& d) : doc(d) { }
 
-	XmlDocumentDeserializer::XmlDocumentDeserializer(const xmlpp::Document * d) :
-		doc(d)
-	{
-	}
+	XmlDocumentDeserializer::XmlDocumentDeserializer(const xmlpp::Document * d) : doc(d) { }
 
 	void
 	XmlDocumentDeserializer::Deserialize(ModelPartForRootPtr modelRoot)
@@ -471,9 +470,9 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(BadBooleanValueMsg, "Bad boolean value [%?]");
-	void BadBooleanValue::ice_print(std::ostream & s) const
+	void
+	BadBooleanValue::ice_print(std::ostream & s) const
 	{
 		BadBooleanValueMsg::write(s, text);
 	}
 }
-

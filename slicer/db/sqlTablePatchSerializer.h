@@ -6,19 +6,18 @@
 
 namespace Slicer {
 	class DLL_PUBLIC SqlTablePatchSerializer : public Slicer::Serializer {
-		public:
-			SqlTablePatchSerializer(DB::Connection * const, DB::TablePatch &);
+	public:
+		SqlTablePatchSerializer(DB::Connection * const, DB::TablePatch &);
 
-			void Serialize(Slicer::ModelPartForRootPtr) override;
+		void Serialize(Slicer::ModelPartForRootPtr) override;
 
-		private:
-			void createTemporaryTable();
-			void dropTemporaryTable();
+	private:
+		void createTemporaryTable();
+		void dropTemporaryTable();
 
-			DB::Connection * const db;
-			DB::TablePatch & tablePatch;
+		DB::Connection * const db;
+		DB::TablePatch & tablePatch;
 	};
 }
 
 #endif
-

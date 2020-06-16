@@ -2,10 +2,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace Slicer {
-	SqlSource::SqlSource(const DB::Column & c) :
-		column(c)
-	{
-	}
+	SqlSource::SqlSource(const DB::Column & c) : column(c) { }
 
 	bool
 	SqlSource::isNull() const
@@ -83,4 +80,3 @@ namespace Slicer {
 		column >> b;
 	}
 }
-

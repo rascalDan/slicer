@@ -2,15 +2,8 @@
 #include <definedDirs.h>
 
 StandardMockDatabase::StandardMockDatabase() :
-DB::PluginMock<PQ::Mock>("pqmock", {
-		rootDir.parent_path() / "db" / "slicer.sql" },
-		"user=postgres dbname=postgres")
+	DB::PluginMock<PQ::Mock>("pqmock", {rootDir.parent_path() / "db" / "slicer.sql"}, "user=postgres dbname=postgres")
 {
 }
 
-ConnectionFixture::ConnectionFixture() :
-	_db(DB::MockDatabase::openConnectionTo("pqmock")),
-	db(_db.get())
-{
-}
-
+ConnectionFixture::ConnectionFixture() : _db(DB::MockDatabase::openConnectionTo("pqmock")), db(_db.get()) { }

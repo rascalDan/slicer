@@ -15,7 +15,6 @@ lib slicer-xml :
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
 	<implicit-dependency>xmlExceptions
-	<toolset>tidy:<xcheckxx>clang-analyzer-optin.cplusplus.VirtualCall
 	: :
 	<library>../..//libxmlpp
 	<implicit-dependency>xmlExceptions

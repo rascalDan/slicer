@@ -6,17 +6,16 @@
 #include <visibility.h>
 
 class DLL_PUBLIC StandardMockDatabase : public DB::PluginMock<PQ::Mock> {
-	public:
-		StandardMockDatabase();
+public:
+	StandardMockDatabase();
 };
 
 class DLL_PUBLIC ConnectionFixture {
-	public:
-		ConnectionFixture();
+public:
+	ConnectionFixture();
 
-		DB::ConnectionPtr _db;
-		DB::Connection * const db;
+	DB::ConnectionPtr _db;
+	DB::Connection * const db;
 };
 
 #endif
-

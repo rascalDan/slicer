@@ -1,6 +1,6 @@
 #include "serializer.h"
-#include "Ice/Initialize.h"
 #include "Ice/Communicator.h"
+#include "Ice/Initialize.h"
 
 NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSerializerFactory);
 NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDeserializerFactory);
@@ -8,19 +8,13 @@ NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDes
 namespace Slicer {
 	Ice::StringSeq empty;
 
-	IceBase::IceBase() :
-		ic(Ice::initialize(empty))
-	{
-	}
+	IceBase::IceBase() : ic(Ice::initialize(empty)) { }
 
 	IceBase::~IceBase()
 	{
 		ic->destroy();
 	}
-	IceBlobSerializer::IceBlobSerializer(Ice::ByteSeq & b) :
-		blob(b)
-	{
-	}
+	IceBlobSerializer::IceBlobSerializer(Ice::ByteSeq & b) : blob(b) { }
 
 	void
 	IceBlobSerializer::Serialize(ModelPartForRootPtr mp)
@@ -30,11 +24,7 @@ namespace Slicer {
 		s.finished(blob);
 	}
 
-	IceStreamSerializer::IceStreamSerializer(std::ostream & os) :
-		IceBlobSerializer(blob),
-		strm(os)
-	{
-	}
+	IceStreamSerializer::IceStreamSerializer(std::ostream & os) : IceBlobSerializer(blob), strm(os) { }
 
 	void
 	IceStreamSerializer::Serialize(ModelPartForRootPtr mp)
@@ -43,10 +33,7 @@ namespace Slicer {
 		strm.write((const char *)&blob.front(), blob.size());
 	}
 
-	IceBlobDeserializer::IceBlobDeserializer(const Ice::ByteSeq & b) :
-		blob(b)
-	{
-	}
+	IceBlobDeserializer::IceBlobDeserializer(const Ice::ByteSeq & b) : blob(b) { }
 
 	void
 	IceBlobDeserializer::Deserialize(ModelPartForRootPtr mp)
@@ -55,11 +42,7 @@ namespace Slicer {
 		mp->Read(s);
 	}
 
-	IceStreamDeserializer::IceStreamDeserializer(std::istream & is) :
-		IceBlobDeserializer(blob),
-		strm(is)
-	{
-	}
+	IceStreamDeserializer::IceStreamDeserializer(std::istream & is) : IceBlobDeserializer(blob), strm(is) { }
 
 	void
 	IceStreamDeserializer::Deserialize(ModelPartForRootPtr mp)
@@ -68,4 +51,3 @@ namespace Slicer {
 		IceBlobDeserializer::Deserialize(mp);
 	}
 }
-

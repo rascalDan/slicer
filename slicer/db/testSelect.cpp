@@ -1,59 +1,58 @@
 #define BOOST_TEST_MODULE db_select
-#include <boost/test/unit_test.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include "testMockCommon.h"
-#include <slicer/slicer.h>
 #include "sqlSelectDeserializer.h"
-#include <types.h>
+#include "testMockCommon.h"
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/test/unit_test.hpp>
 #include <common.h>
-#include <testModels.h>
+#include <slicer/slicer.h>
 #include <sqlExceptions.h>
+#include <testModels.h>
+#include <types.h>
 
 using namespace std::literals;
 
-BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
 BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
-BOOST_AUTO_TEST_CASE( select_simple_int )
+BOOST_AUTO_TEST_CASE(select_simple_int)
 {
 	auto sel = db->select("SELECT MAX(id) FROM test");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::Int>(sel.get());
 	BOOST_REQUIRE_EQUAL(4, bi);
 }
 
-BOOST_AUTO_TEST_CASE( select_simple_double )
+BOOST_AUTO_TEST_CASE(select_simple_double)
 {
 	auto sel = db->select("SELECT MAX(fl) FROM test");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::Double>(sel.get());
 	BOOST_REQUIRE_CLOSE(1234.1234, bi, 0.0001);
 }
 
-BOOST_AUTO_TEST_CASE( select_simple_string )
+BOOST_AUTO_TEST_CASE(select_simple_string)
 {
 	auto sel = db->select("SELECT MAX(string) FROM test");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, std::string>(sel.get());
 	BOOST_REQUIRE_EQUAL("text two", bi);
 }
 
-BOOST_AUTO_TEST_CASE( select_simple_true )
+BOOST_AUTO_TEST_CASE(select_simple_true)
 {
 	auto sel = db->select("SELECT true");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, bool>(sel.get());
 	BOOST_REQUIRE_EQUAL(true, bi);
 }
 
-BOOST_AUTO_TEST_CASE( select_simple_false )
+BOOST_AUTO_TEST_CASE(select_simple_false)
 {
 	auto sel = db->select("SELECT NOT(true)");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, bool>(sel.get());
 	BOOST_REQUIRE_EQUAL(false, bi);
 }
 
-BOOST_AUTO_TEST_CASE( select_single )
+BOOST_AUTO_TEST_CASE(select_single)
 {
-	auto sel = db->select(
-				"SELECT boolean mbool, \
+	auto sel = db->select("SELECT boolean mbool, \
 				id mbyte, id mshort, id mint, id mlong, \
 				fl mdouble, fl mfloat, \
 				string mstring \
@@ -72,10 +71,9 @@ BOOST_AUTO_TEST_CASE( select_single )
 	BOOST_REQUIRE_EQUAL("text one", bi->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_single )
+BOOST_AUTO_TEST_CASE(select_inherit_single)
 {
-	auto sel = db->select(
-				"SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
+	auto sel = db->select("SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
 				FROM test \
 				WHERE id = 2");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BasePtr>(sel.get(), "tc"s);
@@ -86,10 +84,9 @@ BOOST_AUTO_TEST_CASE( select_inherit_single )
 	BOOST_REQUIRE_EQUAL(300, d2->c);
 }
 
-BOOST_AUTO_TEST_CASE( select_simple_sequence )
+BOOST_AUTO_TEST_CASE(select_simple_sequence)
 {
-	auto sel = db->select(
-				"SELECT string \
+	auto sel = db->select("SELECT string \
 				FROM test \
 				ORDER BY id DESC");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::SimpleSeq>(sel.get());
@@ -100,10 +97,9 @@ BOOST_AUTO_TEST_CASE( select_simple_sequence )
 	BOOST_REQUIRE_EQUAL("text one", bi[3]);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_sequence )
+BOOST_AUTO_TEST_CASE(select_inherit_sequence)
 {
-	auto sel = db->select(
-				"SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
+	auto sel = db->select("SELECT id a, '::TestModule::D' || CAST(id AS TEXT) tc, 200 b, 300 c, 400 d \
 				FROM test \
 				WHERE id < 4 \
 				ORDER BY id DESC");
@@ -124,13 +120,13 @@ BOOST_AUTO_TEST_CASE( select_inherit_sequence )
 	BOOST_REQUIRE_EQUAL(200, d1->b);
 }
 
-BOOST_AUTO_TEST_CASE( select_inherit_datetime )
+BOOST_AUTO_TEST_CASE(select_inherit_datetime)
 {
-	auto sel = db->select(
-				"SELECT dt, to_char(dt, 'YYYY-MM-DD') date, ts \
+	auto sel = db->select("SELECT dt, to_char(dt, 'YYYY-MM-DD') date, ts \
 				FROM test \
 				WHERE id = 3");
-	TestDatabase::SpecificTypesPtr bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(sel.get());
+	TestDatabase::SpecificTypesPtr bi
+			= Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(sel.get());
 	BOOST_REQUIRE_EQUAL(2015, bi->dt.year);
 	BOOST_REQUIRE_EQUAL(3, bi->dt.month);
 	BOOST_REQUIRE_EQUAL(27, bi->dt.day);
@@ -146,45 +142,45 @@ BOOST_AUTO_TEST_CASE( select_inherit_datetime )
 	BOOST_REQUIRE_EQUAL(12, bi->ts->seconds);
 }
 
-template <typename T, typename ... P>
+template<typename T, typename... P>
 T
-BoostThrowWrapperHelper(P && ... p)
+BoostThrowWrapperHelper(P &&... p)
 {
 	return Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, T>(p...);
 }
 
-BOOST_AUTO_TEST_CASE( select_unsupportedModel )
+BOOST_AUTO_TEST_CASE(select_unsupportedModel)
 {
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::ClassMap>(sel.get()), Slicer::UnsupportedModelType);
 }
 
-BOOST_AUTO_TEST_CASE( select_tooManyRowsSimple )
+BOOST_AUTO_TEST_CASE(select_tooManyRowsSimple)
 {
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(sel.get()), Slicer::TooManyRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_noRowsSimple )
+BOOST_AUTO_TEST_CASE(select_noRowsSimple)
 {
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(sel.get()), Slicer::NoRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_noRowsSimpleOptional )
+BOOST_AUTO_TEST_CASE(select_noRowsSimpleOptional)
 {
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::optional<Ice::Int>>(sel.get());
 	BOOST_REQUIRE(!v);
 }
 
-BOOST_AUTO_TEST_CASE( select_tooManyRowsSimpleOptional )
+BOOST_AUTO_TEST_CASE(select_tooManyRowsSimpleOptional)
 {
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::optional<Ice::Int>>(sel.get()), Slicer::TooManyRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_simpleOptional )
+BOOST_AUTO_TEST_CASE(select_simpleOptional)
 {
 	auto sel = db->select("SELECT MAX(id) FROM test");
 	auto v = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, Ice::optional<Ice::Int>>(sel.get());
@@ -192,10 +188,9 @@ BOOST_AUTO_TEST_CASE( select_simpleOptional )
 	BOOST_REQUIRE_EQUAL(4, *v);
 }
 
-BOOST_AUTO_TEST_CASE( select_noRowsComplexOptional )
+BOOST_AUTO_TEST_CASE(select_noRowsComplexOptional)
 {
-	auto sel = db->select(
-				"SELECT boolean mbool, \
+	auto sel = db->select("SELECT boolean mbool, \
 				id mbyte, id mshort, id mint, id mlong, \
 				fl mdouble, fl mfloat, \
 				string mstring \
@@ -205,26 +200,26 @@ BOOST_AUTO_TEST_CASE( select_noRowsComplexOptional )
 	BOOST_REQUIRE(!v);
 }
 
-BOOST_AUTO_TEST_CASE( select_tooManyRowsComplex )
+BOOST_AUTO_TEST_CASE(select_tooManyRowsComplex)
 {
 	auto sel = db->select("SELECT id FROM test");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::BuiltInsPtr>(sel.get()), Slicer::TooManyRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_noRowsComplex )
+BOOST_AUTO_TEST_CASE(select_noRowsComplex)
 {
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<TestModule::BuiltInsPtr>(sel.get()), Slicer::NoRowsReturned);
 }
 
-BOOST_AUTO_TEST_CASE( select_emptySequence )
+BOOST_AUTO_TEST_CASE(select_emptySequence)
 {
 	auto sel = db->select("SELECT id FROM test WHERE false");
 	auto bi = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BaseSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(0, bi.size());
 }
 
-BOOST_AUTO_TEST_CASE( select_null )
+BOOST_AUTO_TEST_CASE(select_null)
 {
 	db->execute("INSERT INTO test(id) VALUES(NULL)");
 
@@ -242,12 +237,12 @@ BOOST_AUTO_TEST_CASE( select_null )
 	BOOST_REQUIRE(!v);
 }
 
-BOOST_AUTO_TEST_CASE( bulkSelectTest )
+BOOST_AUTO_TEST_CASE(bulkSelectTest)
 {
-	auto sel = db->select(R"SQL(select s mint, cast(s as numeric(7,1)) mdouble, cast(s as text) mstring, s % 2 = 0 mbool from generate_series(1, 10000) s)SQL");
+	auto sel = db->select(
+			R"SQL(select s mint, cast(s as numeric(7,1)) mdouble, cast(s as text) mstring, s % 2 = 0 mbool from generate_series(1, 10000) s)SQL");
 	auto vec = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE_EQUAL(10000, vec.size());
 }
 
 BOOST_AUTO_TEST_SUITE_END();
-

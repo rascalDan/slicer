@@ -1,13 +1,11 @@
 #include "sqlSelectDeserializer.h"
 #include "sqlSource.h"
-#include <sqlExceptions.h>
 #include <common.h>
+#include <sqlExceptions.h>
 
 namespace Slicer {
 	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, Ice::optional<std::string> tc) :
-		cmd(c),
-		columnCount(0),
-		typeIdColName(std::move(tc))
+		cmd(c), columnCount(0), typeIdColName(std::move(tc))
 	{
 	}
 
@@ -20,13 +18,13 @@ namespace Slicer {
 			typeIdColIdx = cmd->getOrdinal(*typeIdColName);
 		}
 		switch (mp->GetType()) {
-			case Slicer::mpt_Sequence:
+			case Slicer::ModelPartType::Sequence:
 				DeserializeSequence(mp);
 				return;
-			case Slicer::mpt_Complex:
+			case Slicer::ModelPartType::Complex:
 				DeserializeObject(mp);
 				return;
-			case Slicer::mpt_Simple:
+			case Slicer::ModelPartType::Simple:
 				DeserializeSimple(mp);
 				return;
 			default:
@@ -74,7 +72,7 @@ namespace Slicer {
 		}
 		DeserializeRow(mp);
 		if (cmd->fetch()) {
-			while (cmd->fetch()) {}
+			while (cmd->fetch()) { }
 			throw TooManyRowsReturned();
 		}
 	}
@@ -85,43 +83,38 @@ namespace Slicer {
 		auto rmp = mp->GetAnonChild();
 		if (rmp) {
 			switch (rmp->GetType()) {
-				case Slicer::mpt_Complex:
-					{
-						if (typeIdColIdx) {
-							std::string subclass;
-							(*cmd)[*typeIdColIdx] >> subclass;
-							rmp = rmp->GetSubclassModelPart(subclass);
-						}
-						rmp->Create();
-						for (auto col = 0U; col < columnCount; col += 1) {
-							const DB::Column & c = (*cmd)[col];
-							if (!c.isNull()) {
-								auto fmpr = rmp->GetChildRef(c.name, nullptr, false);
-								if (fmpr) {
-									auto fmp = fmpr.Child();
-									fmp->Create();
-									fmp->SetValue(SqlSource(c));
-									fmp->Complete();
-								}
+				case Slicer::ModelPartType::Complex: {
+					if (typeIdColIdx) {
+						std::string subclass;
+						(*cmd)[*typeIdColIdx] >> subclass;
+						rmp = rmp->GetSubclassModelPart(subclass);
+					}
+					rmp->Create();
+					for (auto col = 0U; col < columnCount; col += 1) {
+						const DB::Column & c = (*cmd)[col];
+						if (!c.isNull()) {
+							auto fmpr = rmp->GetChildRef(c.name, nullptr, false);
+							if (fmpr) {
+								auto fmp = fmpr.Child();
+								fmp->Create();
+								fmp->SetValue(SqlSource(c));
+								fmp->Complete();
 							}
 						}
-						rmp->Complete();
 					}
-					break;
-				case Slicer::mpt_Simple:
-					{
-						rmp->Create();
-						const DB::Column & c = (*cmd)[0];
-						if (!c.isNull()) {
-							rmp->SetValue(SqlSource(c));
-						}
-						rmp->Complete();
+					rmp->Complete();
+				} break;
+				case Slicer::ModelPartType::Simple: {
+					rmp->Create();
+					const DB::Column & c = (*cmd)[0];
+					if (!c.isNull()) {
+						rmp->SetValue(SqlSource(c));
 					}
-					break;
+					rmp->Complete();
+				} break;
 				default:
 					throw UnsupportedModelType();
 			}
 		}
 	}
 }
-

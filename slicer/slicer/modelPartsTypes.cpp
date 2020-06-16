@@ -6,25 +6,29 @@
 namespace Slicer {
 	using ClassRefMap = std::map<std::string, ClassRef, std::less<>>;
 	using ClassNamePair = std::pair<std::string, std::string>;
-	using ClassNameMap = boost::multi_index_container<
-		ClassNamePair,
-		boost::multi_index::indexed_by<
-			boost::multi_index::ordered_unique<boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::first>, std::less<>>,
-			boost::multi_index::ordered_unique<boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::second>, std::less<>>
-		>>;
+	using ClassNameMap = boost::multi_index_container<ClassNamePair,
+			boost::multi_index::indexed_by<
+					boost::multi_index::ordered_unique<
+							boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::first>,
+							std::less<>>,
+					boost::multi_index::ordered_unique<
+							boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::second>,
+							std::less<>>>>;
 
 	static void createClassMaps() __attribute__((constructor(208)));
 	static void deleteClassMaps() __attribute__((destructor(208)));
 	static ClassNameMap * names;
 	static ClassRefMap * refs;
 
-	void createClassMaps()
+	void
+	createClassMaps()
 	{
 		names = new ClassNameMap();
 		refs = new ClassRefMap();
 	}
 
-	static void deleteClassMaps()
+	static void
+	deleteClassMaps()
 	{
 		delete names;
 		delete refs;
@@ -100,10 +104,7 @@ namespace Slicer {
 	}
 
 	// ModelPartForRootBase
-	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) :
-		mp(std::move(m))
-	{
-	}
+	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) : mp(std::move(m)) { }
 
 	ChildRef
 	ModelPartForRootBase::GetAnonChildRef(const HookFilter &)
@@ -121,7 +122,8 @@ namespace Slicer {
 		return GetAnonChildRef(hf);
 	}
 
-	void ModelPartForRootBase::OnEachChild(const ChildHandler & ch)
+	void
+	ModelPartForRootBase::OnEachChild(const ChildHandler & ch)
 	{
 		ch(GetRootName(), mp, nullptr);
 	}
@@ -144,37 +146,83 @@ namespace Slicer {
 		return mp->GetContainedModelPart();
 	}
 
-	void ModelPartForSimpleBase::OnEachChild(const ChildHandler &) { }
-	ChildRef ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &) { return ChildRef(); }
-	ChildRef ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &, bool) { return ChildRef(); }
-	bool ModelPartForSimpleBase::HasValue() const { return true; }
-	ModelPartType ModelPartForSimpleBase::GetType() const { return type; }
-	const ModelPartType ModelPartForSimpleBase::type = mpt_Simple;
-
-	void ModelPartForConvertedBase::OnEachChild(const ChildHandler &) { }
-	ChildRef ModelPartForConvertedBase::GetAnonChildRef(const HookFilter &) { return ChildRef(); }
-	ChildRef ModelPartForConvertedBase::GetChildRef(const std::string &, const HookFilter &, bool) { return ChildRef(); }
-	bool ModelPartForConvertedBase::HasValue() const { return true; }
-	ModelPartType ModelPartForConvertedBase::GetType() const { return type; }
-	const ModelPartType ModelPartForConvertedBase::type = mpt_Simple;
-
-	ModelPartType ModelPartForComplexBase::GetType() const { return type; }
-	const ModelPartType ModelPartForComplexBase::type = mpt_Complex;
-	void ModelPartForComplexBase::registerClass(const std::string & className, const std::string * typeName, const ClassRef & cr)
+	void
+	ModelPartForSimpleBase::OnEachChild(const ChildHandler &)
 	{
-		Slicer::classRefMap()->insert({ className, cr });
+	}
+	ChildRef
+	ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &)
+	{
+		return ChildRef();
+	}
+	ChildRef
+	ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &, bool)
+	{
+		return ChildRef();
+	}
+	bool
+	ModelPartForSimpleBase::HasValue() const
+	{
+		return true;
+	}
+	ModelPartType
+	ModelPartForSimpleBase::GetType() const
+	{
+		return type;
+	}
+	const ModelPartType ModelPartForSimpleBase::type = ModelPartType::Simple;
+
+	void
+	ModelPartForConvertedBase::OnEachChild(const ChildHandler &)
+	{
+	}
+	ChildRef
+	ModelPartForConvertedBase::GetAnonChildRef(const HookFilter &)
+	{
+		return ChildRef();
+	}
+	ChildRef
+	ModelPartForConvertedBase::GetChildRef(const std::string &, const HookFilter &, bool)
+	{
+		return ChildRef();
+	}
+	bool
+	ModelPartForConvertedBase::HasValue() const
+	{
+		return true;
+	}
+	ModelPartType
+	ModelPartForConvertedBase::GetType() const
+	{
+		return type;
+	}
+	const ModelPartType ModelPartForConvertedBase::type = ModelPartType::Simple;
+
+	ModelPartType
+	ModelPartForComplexBase::GetType() const
+	{
+		return type;
+	}
+	const ModelPartType ModelPartForComplexBase::type = ModelPartType::Complex;
+	void
+	ModelPartForComplexBase::registerClass(
+			const std::string & className, const std::string * typeName, const ClassRef & cr)
+	{
+		Slicer::classRefMap()->insert({className, cr});
 		if (typeName) {
-			Slicer::classNameMap()->insert({ className, *typeName });
+			Slicer::classNameMap()->insert({className, *typeName});
 		}
 	}
-	void ModelPartForComplexBase::unregisterClass(const std::string & className, const std::string * typeName)
+	void
+	ModelPartForComplexBase::unregisterClass(const std::string & className, const std::string * typeName)
 	{
 		Slicer::classRefMap()->erase(className);
 		if (typeName) {
 			classNameMap()->get<0>().erase(className);
 		}
 	}
-	ModelPartPtr ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
+	ModelPartPtr
+	ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
 	{
 		auto ref = classRefMap()->find(ToModelTypeName(name));
 		if (ref == classRefMap()->end()) {
@@ -182,32 +230,38 @@ namespace Slicer {
 		}
 		return ref->second(m);
 	}
-	TypeId ModelPartForComplexBase::GetTypeId(const std::string & id, const std::string & className)
+	TypeId
+	ModelPartForComplexBase::GetTypeId(const std::string & id, const std::string & className)
 	{
 		return (id == className) ? TypeId() : ToExchangeTypeName(id);
 	}
 
-	std::string ModelPartForComplexBase::demangle(const char * mangled)
+	std::string
+	ModelPartForComplexBase::demangle(const char * mangled)
 	{
-		auto buf = std::unique_ptr<char, decltype(free)*>(abi::__cxa_demangle(mangled, nullptr, nullptr, nullptr), std::free);
+		auto buf = std::unique_ptr<char, decltype(free) *>(
+				abi::__cxa_demangle(mangled, nullptr, nullptr, nullptr), std::free);
 		return "::" + std::string(buf.get());
 	}
 
-	void ModelPartForOptionalBase::OnEachChild(const ChildHandler & ch)
+	void
+	ModelPartForOptionalBase::OnEachChild(const ChildHandler & ch)
 	{
 		if (this->hasModel()) {
 			modelPart->OnEachChild(ch);
 		}
 	}
 
-	void ModelPartForOptionalBase::Complete()
+	void
+	ModelPartForOptionalBase::Complete()
 	{
 		if (this->hasModel()) {
 			modelPart->Complete();
 		}
 	}
 
-	ChildRef ModelPartForOptionalBase::GetAnonChildRef(const HookFilter & flt)
+	ChildRef
+	ModelPartForOptionalBase::GetAnonChildRef(const HookFilter & flt)
 	{
 		if (this->hasModel()) {
 			return modelPart->GetAnonChildRef(flt);
@@ -215,7 +269,8 @@ namespace Slicer {
 		return ChildRef();
 	}
 
-	ChildRef ModelPartForOptionalBase::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
+	ChildRef
+	ModelPartForOptionalBase::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
 	{
 		if (this->hasModel()) {
 			return modelPart->GetChildRef(name, flt, matchCase);
@@ -223,57 +278,127 @@ namespace Slicer {
 		return ChildRef();
 	}
 
-	void ModelPartForOptionalBase::SetValue(ValueSource && s)
+	void
+	ModelPartForOptionalBase::SetValue(ValueSource && s)
 	{
 		if (this->hasModel()) {
 			modelPart->SetValue(std::move(s));
 		}
 	}
 
-	bool ModelPartForOptionalBase::HasValue() const
+	bool
+	ModelPartForOptionalBase::HasValue() const
 	{
 		return this->hasModel() && modelPart->HasValue();
 	}
 
-	bool ModelPartForOptionalBase::IsOptional() const
+	bool
+	ModelPartForOptionalBase::IsOptional() const
 	{
 		return true;
 	};
 
-	const Metadata & ModelPartForOptionalBase::GetMetadata() const
+	const Metadata &
+	ModelPartForOptionalBase::GetMetadata() const
 	{
 		return modelPart->GetMetadata();
 	}
 
-	void ModelPartForEnumBase::OnEachChild(const ChildHandler &) { }
-	ChildRef ModelPartForEnumBase::GetAnonChildRef(const HookFilter &) { return ChildRef(); }
-	ChildRef ModelPartForEnumBase::GetChildRef(const std::string &, const HookFilter &, bool) { return ChildRef(); }
-	bool ModelPartForEnumBase::HasValue() const { return true; }
-	ModelPartType ModelPartForEnumBase::GetType() const { return type; }
-	const ModelPartType ModelPartForEnumBase::type = mpt_Simple;
+	void
+	ModelPartForEnumBase::OnEachChild(const ChildHandler &)
+	{
+	}
+	ChildRef
+	ModelPartForEnumBase::GetAnonChildRef(const HookFilter &)
+	{
+		return ChildRef();
+	}
+	ChildRef
+	ModelPartForEnumBase::GetChildRef(const std::string &, const HookFilter &, bool)
+	{
+		return ChildRef();
+	}
+	bool
+	ModelPartForEnumBase::HasValue() const
+	{
+		return true;
+	}
+	ModelPartType
+	ModelPartForEnumBase::GetType() const
+	{
+		return type;
+	}
+	const ModelPartType ModelPartForEnumBase::type = ModelPartType::Simple;
 
-	bool ModelPartForSequenceBase::HasValue() const { return true; }
-	ModelPartType ModelPartForSequenceBase::GetType() const { return type; }
-	const ModelPartType ModelPartForSequenceBase::type = mpt_Sequence;
+	bool
+	ModelPartForSequenceBase::HasValue() const
+	{
+		return true;
+	}
+	ModelPartType
+	ModelPartForSequenceBase::GetType() const
+	{
+		return type;
+	}
+	const ModelPartType ModelPartForSequenceBase::type = ModelPartType::Sequence;
 
-	bool ModelPartForDictionaryBase::HasValue() const { return true; }
-	ModelPartType ModelPartForDictionaryBase::GetType() const { return type; }
-	const ModelPartType ModelPartForDictionaryBase::type = mpt_Dictionary;
+	bool
+	ModelPartForDictionaryBase::HasValue() const
+	{
+		return true;
+	}
+	ModelPartType
+	ModelPartForDictionaryBase::GetType() const
+	{
+		return type;
+	}
+	const ModelPartType ModelPartForDictionaryBase::type = ModelPartType::Dictionary;
 
 	// Streams
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
-	ChildRef ModelPartForStreamBase::GetAnonChildRef(const Slicer::HookFilter &) { throw InvalidStreamOperation(__FUNCTION__); }
+	ChildRef
+	ModelPartForStreamBase::GetAnonChildRef(const Slicer::HookFilter &)
+	{
+		throw InvalidStreamOperation(__FUNCTION__);
+	}
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
-	ChildRef ModelPartForStreamBase::GetChildRef(const std::string &, const Slicer::HookFilter &, bool) { throw InvalidStreamOperation(__FUNCTION__); }
-	ModelPartType ModelPartForStreamBase::GetType() const { return mpt_Sequence; }
-	bool ModelPartForStreamBase::HasValue() const { return true; }
+	ChildRef
+	ModelPartForStreamBase::GetChildRef(const std::string &, const Slicer::HookFilter &, bool)
+	{
+		throw InvalidStreamOperation(__FUNCTION__);
+	}
+	ModelPartType
+	ModelPartForStreamBase::GetType() const
+	{
+		return ModelPartType::Sequence;
+	}
+	bool
+	ModelPartForStreamBase::HasValue() const
+	{
+		return true;
+	}
 	// Stream Roots
 	ModelPartForStreamRootBase::ModelPartForStreamRootBase(const ModelPartPtr & mp) : ModelPartForRootBase(mp) { }
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
-	void ModelPartForStreamRootBase::Write(Ice::OutputStream&) const { throw InvalidStreamOperation(__FUNCTION__); }
+	void
+	ModelPartForStreamRootBase::Write(Ice::OutputStream &) const
+	{
+		throw InvalidStreamOperation(__FUNCTION__);
+	}
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
-	void ModelPartForStreamRootBase::Read(Ice::InputStream&) { throw InvalidStreamOperation(__FUNCTION__); }
-	bool ModelPartForStreamRootBase::HasValue() const { return mp->HasValue(); }
-	void ModelPartForStreamRootBase::OnEachChild(const ChildHandler & ch) { ch(GetRootName(), mp, NULL); }
+	void
+	ModelPartForStreamRootBase::Read(Ice::InputStream &)
+	{
+		throw InvalidStreamOperation(__FUNCTION__);
+	}
+	bool
+	ModelPartForStreamRootBase::HasValue() const
+	{
+		return mp->HasValue();
+	}
+	void
+	ModelPartForStreamRootBase::OnEachChild(const ChildHandler & ch)
+	{
+		ch(GetRootName(), mp, NULL);
+	}
 }
-

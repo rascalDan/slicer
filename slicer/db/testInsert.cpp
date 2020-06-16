@@ -1,13 +1,13 @@
 #define BOOST_TEST_MODULE db_insert
-#include <boost/test/unit_test.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include "testMockCommon.h"
-#include <slicer/slicer.h>
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
-#include <types.h>
+#include "testMockCommon.h"
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/test/unit_test.hpp>
 #include <common.h>
+#include <slicer/slicer.h>
 #include <testModels.h>
+#include <types.h>
 
 using namespace std::literals;
 
@@ -19,16 +19,18 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
 
 namespace std {
 	template<typename T>
-	ostream & operator<<(ostream & s, const Ice::optional<T> &) {
+	ostream &
+	operator<<(ostream & s, const Ice::optional<T> &)
+	{
 		return s;
 	}
 }
 
-BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
 BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
-BOOST_AUTO_TEST_CASE( insert_builtins )
+BOOST_AUTO_TEST_CASE(insert_builtins)
 {
 	TestModule::BuiltInsPtr bi = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text");
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bi, db, "builtins");
@@ -44,12 +46,10 @@ BOOST_AUTO_TEST_CASE( insert_builtins )
 	BOOST_REQUIRE_EQUAL(bi->mstring, bi2->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( insert_seq_builtins )
+BOOST_AUTO_TEST_CASE(insert_seq_builtins)
 {
-	TestModule::BuiltInSeq bis = {
-		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 65, 129, 2.3, 4.5, "more text"),
-		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 66, 130, 3.4, 5.6, "even more text")
-	};
+	TestModule::BuiltInSeq bis = {std::make_shared<TestModule::BuiltIns>(true, 5, 17, 65, 129, 2.3, 4.5, "more text"),
+			std::make_shared<TestModule::BuiltIns>(true, 6, 18, 66, 130, 3.4, 5.6, "even more text")};
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
@@ -64,12 +64,10 @@ BOOST_AUTO_TEST_CASE( insert_seq_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
+BOOST_AUTO_TEST_CASE(autoinsert_seq_builtins)
 {
-	TestModule::BuiltInSeq bis = {
-		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
-		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
-	};
+	TestModule::BuiltInSeq bis = {std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
+			std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")};
 	Slicer::SerializeAny<Slicer::SqlAutoIdInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins WHERE mint IN (1, 2) ORDER BY mint");
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
@@ -87,12 +85,10 @@ BOOST_AUTO_TEST_CASE( autoinsert_seq_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
+BOOST_AUTO_TEST_CASE(fetchinsert_seq_builtins)
 {
-	TestModule::BuiltInSeq bis = {
-		std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
-		std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")
-	};
+	TestModule::BuiltInSeq bis = {std::make_shared<TestModule::BuiltIns>(true, 5, 17, 0, 129, 2.3, 4.5, "more text"),
+			std::make_shared<TestModule::BuiltIns>(true, 6, 18, 0, 130, 3.4, 5.6, "even more text")};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins WHERE mint IN (3, 4) ORDER BY mint");
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestModule::BuiltInSeq>(sel.get());
@@ -110,12 +106,11 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
+BOOST_AUTO_TEST_CASE(fetchinsert_seq_builtinsWithNulls)
 {
 	TestDatabase::BuiltInSeq bis = {
-		std::make_shared<TestDatabase::BuiltIns>(true, IceUtil::None, 17, 0, 129, 2.3, 4.5, "more text"s),
-		std::make_shared<TestDatabase::BuiltIns>(true, 6, 18, 0, 130, 3.4, IceUtil::None, "even more text"s)
-	};
+			std::make_shared<TestDatabase::BuiltIns>(true, IceUtil::None, 17, 0, 129, 2.3, 4.5, "more text"s),
+			std::make_shared<TestDatabase::BuiltIns>(true, 6, 18, 0, 130, 3.4, IceUtil::None, "even more text"s)};
 	Slicer::SerializeAny<Slicer::SqlFetchIdInsertSerializer>(bis, db, "builtins");
 	auto sel = db->select("SELECT * FROM builtins WHERE mint IN (5, 6) ORDER BY mint");
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
@@ -133,13 +128,11 @@ BOOST_AUTO_TEST_CASE( fetchinsert_seq_builtinsWithNulls )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bis2.back()->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( insert_converted )
+BOOST_AUTO_TEST_CASE(insert_converted)
 {
-	TestDatabase::SpecificTypesPtr st = std::make_shared<TestDatabase::SpecificTypes>(
-		TestModule::DateTime {2015, 10, 16, 19, 12, 34},
-		TestModule::IsoDate {2015, 10, 16},
-		std::make_shared<TestDatabase::Timespan>(1, 2, 3, 4)
-	);
+	TestDatabase::SpecificTypesPtr st
+			= std::make_shared<TestDatabase::SpecificTypes>(TestModule::DateTime {2015, 10, 16, 19, 12, 34},
+					TestModule::IsoDate {2015, 10, 16}, std::make_shared<TestDatabase::Timespan>(1, 2, 3, 4));
 	Slicer::SerializeAny<Slicer::SqlInsertSerializer>(st, db, "converted");
 	auto sel = db->select("SELECT * FROM converted");
 	auto st2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::SpecificTypesPtr>(sel.get());
@@ -151,11 +144,11 @@ BOOST_AUTO_TEST_CASE( insert_converted )
 	BOOST_REQUIRE_EQUAL(st->ts->seconds, st2->ts->seconds);
 }
 
-BOOST_AUTO_TEST_CASE( insert_unsupportedModel )
+BOOST_AUTO_TEST_CASE(insert_unsupportedModel)
 {
 	TestModule::ClassMap cm;
-	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlInsertSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
+	BOOST_REQUIRE_THROW(
+			Slicer::SerializeAny<Slicer::SqlInsertSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
-

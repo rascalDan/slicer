@@ -1,15 +1,16 @@
 #define BOOST_TEST_MODULE streams
 #include <boost/test/unit_test.hpp>
 
-#include <xml/serializer.h>
-#include <json/serializer.h>
-#include <slicer.h>
-#include <collections.h>
-#include <definedDirs.h>
 #include "helpers.h"
 #include "streams.h"
+#include <collections.h>
+#include <definedDirs.h>
+#include <json/serializer.h>
+#include <slicer.h>
+#include <xml/serializer.h>
 
-void TestStream::Produce(const Consumer & c)
+void
+TestStream::Produce(const Consumer & c)
 {
 	for (int x = 0; x < 10; x += 1) {
 		auto str = std::to_string(x);
@@ -17,9 +18,9 @@ void TestStream::Produce(const Consumer & c)
 	}
 }
 
-BOOST_FIXTURE_TEST_SUITE( stream, TestStream );
+BOOST_FIXTURE_TEST_SUITE(stream, TestStream);
 
-BOOST_AUTO_TEST_CASE( streamToXml )
+BOOST_AUTO_TEST_CASE(streamToXml)
 {
 	const auto outputXml = binDir / "streamOut.xml";
 	Slicer::SerializeAny<Slicer::XmlFileSerializer, const TestStream>(*this, outputXml);
@@ -30,7 +31,7 @@ BOOST_AUTO_TEST_CASE( streamToXml )
 	BOOST_REQUIRE_EQUAL("9", seq.back());
 }
 
-BOOST_AUTO_TEST_CASE( streamToJson )
+BOOST_AUTO_TEST_CASE(streamToJson)
 {
 	const auto outputJson = binDir / "streamOut.json";
 	Slicer::SerializeAny<Slicer::JsonFileSerializer, const TestStream>(*this, outputJson);
@@ -42,4 +43,3 @@ BOOST_AUTO_TEST_CASE( streamToJson )
 }
 
 BOOST_AUTO_TEST_SUITE_END();
-

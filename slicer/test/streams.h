@@ -4,9 +4,8 @@
 #include <slicer/modelPartsTypes.h>
 
 class TestStream : public Slicer::Stream<std::string> {
-	public:
-		void Produce(const Consumer & c) override;
+public:
+	void Produce(const Consumer & c) override;
 };
 
 #endif
-

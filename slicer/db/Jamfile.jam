@@ -39,7 +39,6 @@ lib testCommon :
 	:
 	<dependency>../tool//slicer
 	<slicer>pure
-	<slicerbin>../tool//slicer
 	<implicit-dependency>../test//types
 	<library>../test//types
 	<library>../test//common
@@ -48,6 +47,12 @@ lib testCommon :
 	<library>..//adhocutil
 	<library>dbicetypes
 	<implicit-dependency>dbicetypes
+	<toolset>gcc:<dependency>../tool//slicer/<toolset>gcc
+	<toolset>clang:<dependency>../tool//slicer/<toolset>clang
+	<toolset>tidy:<dependency>../tool//slicer/<toolset>gcc
+	<toolset>gcc:<slicerbin>../tool//slicer/<toolset>gcc
+	<toolset>clang:<slicerbin>../tool//slicer/<toolset>clang
+	<toolset>tidy:<slicerbin>../tool//slicer/<toolset>gcc
 	: :
 	<library>..//adhocutil
 	<library>dbicetypes

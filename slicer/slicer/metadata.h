@@ -1,10 +1,10 @@
 #ifndef SLICER_METADATA_H
 #define SLICER_METADATA_H
 
-#include <string>
 #include <list>
-#include <vector>
 #include <optional>
+#include <string>
+#include <vector>
 
 namespace Slicer {
 #pragma GCC visibility push(default)
@@ -19,4 +19,3 @@ namespace Slicer {
 }
 
 #endif
-

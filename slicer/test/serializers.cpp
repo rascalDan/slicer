@@ -1,126 +1,127 @@
 #define BOOST_TEST_MODULE execute_serializers
 #include <boost/test/unit_test.hpp>
 
-#include <tool/parser.h>
-#include <common.h>
-#include <slicer.h>
-#include <modelParts.h>
-#include <xml/serializer.h>
-#include <libxml2/libxml/parser.h>
-#include <json/serializer.h>
-#include <boost/format.hpp>
-#include <functional>
-#include <types.h>
-#include <json.h>
-#include <xml.h>
-#include <locals.h>
-#include <fstream>
-#include "helpers.h"
-#include <definedDirs.h>
 #include "conversions.h"
+#include "helpers.h"
+#include <boost/format.hpp>
+#include <common.h>
+#include <definedDirs.h>
+#include <fstream>
+#include <functional>
+#include <json.h>
+#include <json/serializer.h>
+#include <libxml2/libxml/parser.h>
+#include <locals.h>
+#include <modelParts.h>
+#include <slicer.h>
+#include <tool/parser.h>
+#include <types.h>
+#include <xml.h>
+#include <xml/serializer.h>
 
 #ifdef SLICER_MODELPARTSTYPES_IMPL_H
-#error Client code should NOT need to pull in implementation header
+#	error Client code should NOT need to pull in implementation header
 #endif
 
 namespace fs = std::filesystem;
 
 // LCOV_EXCL_START
-BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::ClassMap::iterator )
-BOOST_TEST_DONT_PRINT_LOG_VALUE ( TestModule::SomeNumbers )
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::ClassMap::iterator)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::SomeNumbers)
 namespace std {
 	template<typename T>
-	ostream & operator<<(ostream & s, const Ice::optional<T> &) {
+	ostream &
+	operator<<(ostream & s, const Ice::optional<T> &)
+	{
 		return s;
 	}
 }
 // LCOV_EXCL_STOP
 
 class FileBased {
-	public:
-		template<typename T, typename DeserializerIn>
-		void
-		verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = nullptr)
-		{
-			verifyByFile<T, DeserializerIn>(infile, infile, check);
+public:
+	template<typename T, typename DeserializerIn>
+	void
+	verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = nullptr)
+	{
+		verifyByFile<T, DeserializerIn>(infile, infile, check);
+	}
+
+	template<typename T, typename DeserializerIn>
+	void
+	verifyByFile(const fs::path & infile, const fs::path & expOutFile,
+			const std::function<void(const T &)> & check = nullptr)
+	{
+		const fs::path input = rootDir / "initial" / infile;
+		const fs::path expected = rootDir / "initial" / expOutFile;
+		const fs::path tmpf = binDir / "byFile";
+		fs::create_directory(tmpf);
+		const fs::path output = tmpf / infile;
+		const fs::path outputJson = tmpf / fs::path(infile).replace_extension("json");
+		const fs::path outputXml = tmpf / fs::path(infile).replace_extension("xml");
+
+		BOOST_TEST_CHECKPOINT("Deserialize: " << input);
+		T p = Slicer::DeserializeAny<DeserializerIn, T>(input);
+
+		if (check) {
+			BOOST_TEST_CHECKPOINT("Check1: " << input);
+			check(p);
 		}
 
-		template<typename T, typename DeserializerIn>
-		void
-		verifyByFile(const fs::path & infile, const fs::path & expOutFile, const std::function<void(const T &)> & check = nullptr)
-		{
-			const fs::path input = rootDir / "initial" / infile;
-			const fs::path expected = rootDir / "initial" / expOutFile;
-			const fs::path tmpf = binDir / "byFile";
-			fs::create_directory(tmpf);
-			const fs::path output = tmpf / infile;
-			const fs::path outputJson = tmpf / fs::path(infile).replace_extension("json");
-			const fs::path outputXml = tmpf / fs::path(infile).replace_extension("xml");
+		BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputJson);
+		Slicer::SerializeAny<Slicer::JsonFileSerializer>(p, outputJson);
 
-			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-			T p = Slicer::DeserializeAny<DeserializerIn, T>(input);
+		BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputXml);
+		Slicer::SerializeAny<Slicer::XmlFileSerializer>(p, outputXml);
 
-			if (check) {
-				BOOST_TEST_CHECKPOINT("Check1: " << input);
-				check(p);
-			}
-
-			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputJson);
-			Slicer::SerializeAny<Slicer::JsonFileSerializer>(p, outputJson);
-
-			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputXml);
-			Slicer::SerializeAny<Slicer::XmlFileSerializer>(p, outputXml);
-
-			if (check) {
-				BOOST_TEST_CHECKPOINT("Check2: " << input);
-				check(p);
-			}
-
-			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-			diff(expected, output);
+		if (check) {
+			BOOST_TEST_CHECKPOINT("Check2: " << input);
+			check(p);
 		}
 
-		template<typename T, typename Deserializer, typename Serializer, typename Internal>
-		void
-		verifyByHelper(const fs::path & infile,
-				const std::function<Internal(const fs::path &)> & in,
-				const std::function<void(const Internal &, const fs::path &)> & out,
-				const std::function<void(Internal &)> & ifree,
-				const std::function<void(const T &)> & check = nullptr)
-		{
-			const fs::path input = rootDir / "initial" / infile;
-			const fs::path tmph = binDir / "byHandler";
-			fs::create_directory(tmph);
-			const fs::path output = tmph / infile;
+		BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
+		diff(expected, output);
+	}
 
-			BOOST_TEST_CHECKPOINT("Read: " << input);
-			Internal docRead = in(input);
+	template<typename T, typename Deserializer, typename Serializer, typename Internal>
+	void
+	verifyByHelper(const fs::path & infile, const std::function<Internal(const fs::path &)> & in,
+			const std::function<void(const Internal &, const fs::path &)> & out,
+			const std::function<void(Internal &)> & ifree, const std::function<void(const T &)> & check = nullptr)
+	{
+		const fs::path input = rootDir / "initial" / infile;
+		const fs::path tmph = binDir / "byHandler";
+		fs::create_directory(tmph);
+		const fs::path output = tmph / infile;
 
-			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-			T p = Slicer::DeserializeAny<Deserializer, T>(docRead);
-			ifree(docRead);
+		BOOST_TEST_CHECKPOINT("Read: " << input);
+		Internal docRead = in(input);
 
-			if (check) {
-				BOOST_TEST_CHECKPOINT("Check1: " << input);
-				check(p);
-			}
+		BOOST_TEST_CHECKPOINT("Deserialize: " << input);
+		T p = Slicer::DeserializeAny<Deserializer, T>(docRead);
+		ifree(docRead);
 
-			BOOST_TEST_CHECKPOINT("Serialize: " << input);
-			Internal docWrite;
-			Slicer::SerializeAny<Serializer>(p, docWrite);
-
-			if (check) {
-				BOOST_TEST_CHECKPOINT("Check2: " << input);
-				check(p);
-			}
-
-			BOOST_TEST_CHECKPOINT("Write: " << output);
-			out(docWrite, output);
-			ifree(docWrite);
-
-			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-			diff(input, output);
+		if (check) {
+			BOOST_TEST_CHECKPOINT("Check1: " << input);
+			check(p);
 		}
+
+		BOOST_TEST_CHECKPOINT("Serialize: " << input);
+		Internal docWrite;
+		Slicer::SerializeAny<Serializer>(p, docWrite);
+
+		if (check) {
+			BOOST_TEST_CHECKPOINT("Check2: " << input);
+			check(p);
+		}
+
+		BOOST_TEST_CHECKPOINT("Write: " << output);
+		out(docWrite, output);
+		ifree(docWrite);
+
+		BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
+		diff(input, output);
+	}
 };
 
 void
@@ -326,7 +327,7 @@ writeXml(xmlpp::Document * const & doc, const fs::path & path)
 }
 
 void
-freeXml(xmlpp::Document * & doc)
+freeXml(xmlpp::Document *& doc)
 {
 	delete doc;
 }
@@ -354,192 +355,194 @@ freeJson(json::Value &)
 {
 }
 
-BOOST_FIXTURE_TEST_SUITE ( byFile, FileBased );
+BOOST_FIXTURE_TEST_SUITE(byFile, FileBased);
 
-BOOST_AUTO_TEST_CASE( builtins_xml )
+BOOST_AUTO_TEST_CASE(builtins_xml)
 {
 	verifyByFile<TestModule::BuiltInsPtr, Slicer::XmlFileDeserializer>("builtins.xml", checkBuiltIns_valuesCorrect);
 }
 
-BOOST_AUTO_TEST_CASE( structtype_xml )
+BOOST_AUTO_TEST_CASE(structtype_xml)
 {
 	verifyByFile<TestModule::StructType, Slicer::XmlFileDeserializer>("struct.xml", checkStruct);
 }
 
-BOOST_AUTO_TEST_CASE( structtype_json )
+BOOST_AUTO_TEST_CASE(structtype_json)
 {
 	verifyByFile<TestModule::StructType, Slicer::JsonFileDeserializer>("struct2.json", checkStruct);
 }
 
-BOOST_AUTO_TEST_CASE( simplestring_xml )
+BOOST_AUTO_TEST_CASE(simplestring_xml)
 {
 	verifyByFile<std::string, Slicer::XmlFileDeserializer>("string.xml", [](const auto & s) {
 		BOOST_REQUIRE_EQUAL("test string", s);
 	});
 }
 
-BOOST_AUTO_TEST_CASE( simpleint_xml )
+BOOST_AUTO_TEST_CASE(simpleint_xml)
 {
 	verifyByFile<Ice::Int, Slicer::XmlFileDeserializer>("int.xml", [](const auto & i) {
 		BOOST_REQUIRE_EQUAL(27, i);
 	});
 }
 
-BOOST_AUTO_TEST_CASE( simplestring_json )
+BOOST_AUTO_TEST_CASE(simplestring_json)
 {
 	verifyByFile<std::string, Slicer::JsonFileDeserializer>("string2.json", [](const auto & s) {
 		BOOST_REQUIRE_EQUAL("test string", s);
 	});
 }
 
-BOOST_AUTO_TEST_CASE( simpleint_json )
+BOOST_AUTO_TEST_CASE(simpleint_json)
 {
 	verifyByFile<Ice::Int, Slicer::JsonFileDeserializer>("int2.json", [](const auto & i) {
 		BOOST_REQUIRE_EQUAL(27, i);
 	});
 }
 
-BOOST_AUTO_TEST_CASE( complexClass_xmlattrAndText )
+BOOST_AUTO_TEST_CASE(complexClass_xmlattrAndText)
 {
 	verifyByFile<TestXml::EntityRef, Slicer::XmlFileDeserializer>("entityref.xml", checkEntityRef);
 }
 
-BOOST_AUTO_TEST_CASE( sequenceOfClass_xml )
+BOOST_AUTO_TEST_CASE(sequenceOfClass_xml)
 {
 	verifyByFile<TestModule::Classes, Slicer::XmlFileDeserializer>("seqOfClass.xml", checkSeqOfClass);
 }
 
-BOOST_AUTO_TEST_CASE( sequenceOfClass_json )
+BOOST_AUTO_TEST_CASE(sequenceOfClass_json)
 {
 	verifyByFile<TestModule::Classes, Slicer::JsonFileDeserializer>("seqOfClass2.json", checkSeqOfClass);
 }
 
-BOOST_AUTO_TEST_CASE( optionals_notset_xml )
+BOOST_AUTO_TEST_CASE(optionals_notset_xml)
 {
 	verifyByFile<TestModule::OptionalsPtr, Slicer::XmlFileDeserializer>("optionals-notset.xml", checkOptionals_notset);
 }
 
-BOOST_AUTO_TEST_CASE( optionals_areset_xml )
+BOOST_AUTO_TEST_CASE(optionals_areset_xml)
 {
 	verifyByFile<TestModule::OptionalsPtr, Slicer::XmlFileDeserializer>("optionals-areset.xml", checkOptionals_areset);
 }
 
-BOOST_AUTO_TEST_CASE( inherit_a_xml )
+BOOST_AUTO_TEST_CASE(inherit_a_xml)
 {
 	verifyByFile<TestModule::InheritanceContPtr, Slicer::XmlFileDeserializer>("inherit-a.xml");
 }
 
-BOOST_AUTO_TEST_CASE( inherit_b_xml )
+BOOST_AUTO_TEST_CASE(inherit_b_xml)
 {
 	verifyByFile<TestModule::InheritanceContPtr, Slicer::XmlFileDeserializer>("inherit-b.xml", checkInherits_types);
 }
 
-BOOST_AUTO_TEST_CASE( conv_datetime_xml )
+BOOST_AUTO_TEST_CASE(conv_datetime_xml)
 {
 	verifyByFile<TestModule::DateTimeContainerPtr, Slicer::XmlFileDeserializer>("conv-datetime.xml");
 }
 
-BOOST_AUTO_TEST_CASE( builtins2_json )
+BOOST_AUTO_TEST_CASE(builtins2_json)
 {
 	verifyByFile<TestModule::BuiltInsPtr, Slicer::JsonFileDeserializer>("builtins2.json", checkBuiltIns_valuesCorrect);
 }
 
-BOOST_AUTO_TEST_CASE( builtins3_json )
+BOOST_AUTO_TEST_CASE(builtins3_json)
 {
 	verifyByFile<TestModule::BuiltInsPtr, Slicer::JsonFileDeserializer>("builtins3.json", checkBuiltIns3_valuesCorrect);
 }
 
-BOOST_AUTO_TEST_CASE( optionals_areset2_json )
+BOOST_AUTO_TEST_CASE(optionals_areset2_json)
 {
-	verifyByFile<TestModule::OptionalsPtr, Slicer::JsonFileDeserializer>("optionals-areset2.json", checkOptionals_areset);
+	verifyByFile<TestModule::OptionalsPtr, Slicer::JsonFileDeserializer>(
+			"optionals-areset2.json", checkOptionals_areset);
 }
 
-BOOST_AUTO_TEST_CASE( inherit_c_json )
+BOOST_AUTO_TEST_CASE(inherit_c_json)
 {
 	verifyByFile<TestModule::InheritanceContPtr, Slicer::JsonFileDeserializer>("inherit-c.json", checkInherits_types);
 }
 
-BOOST_AUTO_TEST_CASE( inherit_d_json )
+BOOST_AUTO_TEST_CASE(inherit_d_json)
 {
 	verifyByFile<TestModule::InheritanceCont2Ptr, Slicer::JsonFileDeserializer>("inherit-d.json");
 }
 
-BOOST_AUTO_TEST_CASE( inherit_mapped_json )
+BOOST_AUTO_TEST_CASE(inherit_mapped_json)
 {
 	verifyByFile<TestModule::InheritanceContMappedPtr, Slicer::JsonFileDeserializer>("inherit-mapped.json");
 }
 
-BOOST_AUTO_TEST_CASE( xml_attribute_xml )
+BOOST_AUTO_TEST_CASE(xml_attribute_xml)
 {
 	verifyByFile<TestModule::ClassClassPtr, Slicer::XmlFileDeserializer>("xmlattr.xml");
 }
 
-BOOST_AUTO_TEST_CASE( xml_barecontainers_xml )
+BOOST_AUTO_TEST_CASE(xml_barecontainers_xml)
 {
 	verifyByFile<TestXml::BareContainers, Slicer::XmlFileDeserializer>("bare.xml", checkBare);
 }
 
-BOOST_AUTO_TEST_CASE( xml_classOfEnums_xml )
+BOOST_AUTO_TEST_CASE(xml_classOfEnums_xml)
 {
 	verifyByFile<TestModule::SomeEnumsPtr, Slicer::XmlFileDeserializer>("someenums.xml", checkSomeEnums);
 }
 
-BOOST_AUTO_TEST_CASE( xml_rootEnums_xml )
+BOOST_AUTO_TEST_CASE(xml_rootEnums_xml)
 {
 	verifyByFile<TestModule::SomeNumbers, Slicer::XmlFileDeserializer>("enum.xml", checkSomeNumbers);
 }
 
-BOOST_AUTO_TEST_CASE( xml_attributemap_xml )
+BOOST_AUTO_TEST_CASE(xml_attributemap_xml)
 {
 	verifyByFile<TestXml::Maps, Slicer::XmlFileDeserializer>("attributemap.xml", attributeMap);
 }
 
-BOOST_AUTO_TEST_CASE( xml_elementmap_xml )
+BOOST_AUTO_TEST_CASE(xml_elementmap_xml)
 {
 	verifyByFile<TestXml::Maps, Slicer::XmlFileDeserializer>("elementmap.xml", elementMap);
 }
 
-BOOST_AUTO_TEST_CASE( json_rootEnums_json )
+BOOST_AUTO_TEST_CASE(json_rootEnums_json)
 {
 	verifyByFile<TestModule::SomeNumbers, Slicer::JsonFileDeserializer>("enum2.json", checkSomeNumbers);
 }
 
-BOOST_AUTO_TEST_CASE( json_objectmap )
+BOOST_AUTO_TEST_CASE(json_objectmap)
 {
 	verifyByFile<TestJson::Properties, Slicer::JsonFileDeserializer>("objectmap.json", checkObjectMap);
 }
 
-BOOST_AUTO_TEST_CASE( json_objectmapMember )
+BOOST_AUTO_TEST_CASE(json_objectmapMember)
 {
-	verifyByFile<TestJson::HasProperitiesPtr, Slicer::JsonFileDeserializer>("objectmapMember.json", checkObjectMapMember);
+	verifyByFile<TestJson::HasProperitiesPtr, Slicer::JsonFileDeserializer>(
+			"objectmapMember.json", checkObjectMapMember);
 }
 
-BOOST_AUTO_TEST_CASE( json_localClass )
+BOOST_AUTO_TEST_CASE(json_localClass)
 {
 	verifyByFile<Locals::LocalClassPtr, Slicer::JsonFileDeserializer>("localClass.json");
 }
 
-BOOST_AUTO_TEST_CASE( json_localSub2Class )
+BOOST_AUTO_TEST_CASE(json_localSub2Class)
 {
 	verifyByFile<Locals::LocalClassPtr, Slicer::JsonFileDeserializer>("localSub2Class.json");
 }
 
-BOOST_AUTO_TEST_CASE( json_localSubClass )
+BOOST_AUTO_TEST_CASE(json_localSubClass)
 {
 	verifyByFile<Locals::LocalSubClassPtr, Slicer::JsonFileDeserializer>("localSub2Class.json");
 }
 
-BOOST_AUTO_TEST_CASE( json_simpleArray )
+BOOST_AUTO_TEST_CASE(json_simpleArray)
 {
 	verifyByFile<TestModule::SimpleSeq, Slicer::JsonFileDeserializer>("simpleArray1.json");
 }
 
-BOOST_AUTO_TEST_CASE( xml_simpleArray )
+BOOST_AUTO_TEST_CASE(xml_simpleArray)
 {
 	verifyByFile<TestModule::SimpleSeq, Slicer::XmlFileDeserializer>("simpleArray2.xml");
 }
 
-BOOST_AUTO_TEST_CASE( json_emptyToNull )
+BOOST_AUTO_TEST_CASE(json_emptyToNull)
 {
 	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>("optionals2.json", [](const auto & o) {
 		BOOST_REQUIRE(o);
@@ -548,7 +551,7 @@ BOOST_AUTO_TEST_CASE( json_emptyToNull )
 	});
 }
 
-BOOST_AUTO_TEST_CASE( json_emptyToNull_withValue )
+BOOST_AUTO_TEST_CASE(json_emptyToNull_withValue)
 {
 	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>("optionals3.json", [](const auto & o) {
 		BOOST_REQUIRE(o);
@@ -558,16 +561,17 @@ BOOST_AUTO_TEST_CASE( json_emptyToNull_withValue )
 	});
 }
 
-BOOST_AUTO_TEST_CASE( json_emptyToNull_omitted )
+BOOST_AUTO_TEST_CASE(json_emptyToNull_omitted)
 {
-	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>("optionals5.json", "optionals2.json", [](const auto & o) {
-		BOOST_REQUIRE(o);
-		BOOST_REQUIRE(!o->optConverted);
-		BOOST_REQUIRE_EQUAL(o->nonOptConverted, 4);
-	});
+	verifyByFile<TestModule::Optionals2Ptr, Slicer::JsonFileDeserializer>(
+			"optionals5.json", "optionals2.json", [](const auto & o) {
+				BOOST_REQUIRE(o);
+				BOOST_REQUIRE(!o->optConverted);
+				BOOST_REQUIRE_EQUAL(o->nonOptConverted, 4);
+			});
 }
 
-BOOST_AUTO_TEST_CASE( json_streams )
+BOOST_AUTO_TEST_CASE(json_streams)
 {
 	const auto tmpf = binDir / "byStream";
 	const auto inFile = rootDir / "initial" / "inherit-c.json";
@@ -583,7 +587,7 @@ BOOST_AUTO_TEST_CASE( json_streams )
 	diff(inFile, outFile);
 }
 
-BOOST_AUTO_TEST_CASE( xml_streams )
+BOOST_AUTO_TEST_CASE(xml_streams)
 {
 	const auto tmpf = binDir / "byStream";
 	const auto inFile = rootDir / "initial" / "inherit-b.xml";
@@ -599,50 +603,51 @@ BOOST_AUTO_TEST_CASE( xml_streams )
 	diff(inFile, outFile);
 }
 
-BOOST_AUTO_TEST_CASE( invalid_enum )
+BOOST_AUTO_TEST_CASE(invalid_enum)
 {
 	auto jdeserializer = std::make_shared<Slicer::JsonFileDeserializer>(rootDir / "initial" / "invalidEnum.json");
-	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
+	BOOST_REQUIRE_THROW(
+			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
 
 	auto xdeserializer = std::make_shared<Slicer::XmlFileDeserializer>(rootDir / "initial" / "invalidEnum.xml");
-	BOOST_REQUIRE_THROW(Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
+	BOOST_REQUIRE_THROW(
+			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
 
+BOOST_FIXTURE_TEST_SUITE(byHandler, FileBased);
 
-BOOST_FIXTURE_TEST_SUITE ( byHandler, FileBased );
-
-BOOST_AUTO_TEST_CASE( optionals_areset2_json )
+BOOST_AUTO_TEST_CASE(optionals_areset2_json)
 {
-	verifyByHelper<TestModule::OptionalsPtr, Slicer::JsonValueDeserializer, Slicer::JsonValueSerializer, json::Value>("optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
+	verifyByHelper<TestModule::OptionalsPtr, Slicer::JsonValueDeserializer, Slicer::JsonValueSerializer, json::Value>(
+			"optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
 }
 
-BOOST_AUTO_TEST_CASE( optionals_areset_xml )
+BOOST_AUTO_TEST_CASE(optionals_areset_xml)
 {
-	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
+	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer,
+			xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
 }
 
-BOOST_AUTO_TEST_CASE( simple_complete_validator )
+BOOST_AUTO_TEST_CASE(simple_complete_validator)
 {
-	verifyByHelper<TestModule::IsoDate, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer, xmlpp::Document *>("isodate.xml", readXml, writeXml, freeXml);
+	verifyByHelper<TestModule::IsoDate, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer,
+			xmlpp::Document *>("isodate.xml", readXml, writeXml, freeXml);
 }
 
-BOOST_AUTO_TEST_CASE( missingConversion )
+BOOST_AUTO_TEST_CASE(missingConversion)
 {
 	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
-	BOOST_REQUIRE_THROW((
-		Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)
-	), Slicer::NoConversionFound);
+	BOOST_REQUIRE_THROW((Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)),
+			Slicer::NoConversionFound);
 
 	auto obj = std::make_shared<TestModule2::MissingConv>("2016-06-30 12:34:56");
 	json::Value v;
-	BOOST_REQUIRE_THROW(
-		Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v),
-		Slicer::NoConversionFound);
+	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v), Slicer::NoConversionFound);
 }
 
-BOOST_AUTO_TEST_CASE( conversion )
+BOOST_AUTO_TEST_CASE(conversion)
 {
 	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
 	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::ConvPtr>(in);
@@ -650,13 +655,12 @@ BOOST_AUTO_TEST_CASE( conversion )
 
 	json::Value v;
 	Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v);
-	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56",
-			std::get<json::String>(std::get<json::Object>(v)["conv"]));
+	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", std::get<json::String>(std::get<json::Object>(v)["conv"]));
 }
 
 BOOST_AUTO_TEST_SUITE_END();
 
-BOOST_AUTO_TEST_CASE( customerModelPartCounters )
+BOOST_AUTO_TEST_CASE(customerModelPartCounters)
 {
 	BOOST_REQUIRE_EQUAL(21, TestModule::completions);
 }
@@ -666,7 +670,7 @@ BOOST_FIXTURE_TEST_SUITE(l, Slicer::case_less);
 BOOST_AUTO_TEST_CASE(case_less_test)
 {
 	using namespace std::literals;
-	const auto & lc { *this };
+	const auto & lc {*this};
 	BOOST_CHECK(!lc(""sv, ""sv));
 	BOOST_CHECK(lc("a"sv, "b"sv));
 	BOOST_CHECK(lc("A"sv, "b"sv));
@@ -686,4 +690,3 @@ BOOST_AUTO_TEST_CASE(enum_lookups)
 	BOOST_CHECK_EQUAL("One", Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup(TestModule::SomeNumbers::One));
 	BOOST_CHECK_EQUAL(TestModule::SomeNumbers::One, Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup("One"));
 }
-

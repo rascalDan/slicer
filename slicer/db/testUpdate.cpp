@@ -1,29 +1,29 @@
 #define BOOST_TEST_MODULE db_update
-#include <boost/test/unit_test.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include "testMockCommon.h"
-#include <slicer/slicer.h>
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include "sqlUpdateSerializer.h"
-#include <types.h>
+#include "testMockCommon.h"
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/test/unit_test.hpp>
 #include <common.h>
-#include <testModels.h>
+#include <slicer/slicer.h>
 #include <sqlExceptions.h>
+#include <testModels.h>
+#include <types.h>
 
 using namespace std::literals;
 
-BOOST_GLOBAL_FIXTURE( StandardMockDatabase );
+BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
 BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
 
-BOOST_AUTO_TEST_CASE( update_builtinsNotFound )
+BOOST_AUTO_TEST_CASE(update_builtinsNotFound)
 {
 	TestModule::BuiltInsPtr ubi = std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 129, -1.2, -1.4, "string");
 	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubi, db, "builtins"), Slicer::NoRowsFound);
 }
 
-BOOST_AUTO_TEST_CASE( update_builtins )
+BOOST_AUTO_TEST_CASE(update_builtins)
 {
 	TestModule::BuiltInsPtr bi1 = std::make_shared<TestModule::BuiltIns>(true, 4, 16, 64, 128, 1.2, 3.4, "text1");
 	TestModule::BuiltInsPtr bi2 = std::make_shared<TestModule::BuiltIns>(true, 3, 15, 63, 127, 5.2, 5.4, "text2");
@@ -54,12 +54,10 @@ BOOST_AUTO_TEST_CASE( update_builtins )
 	BOOST_REQUIRE_EQUAL(bis.back()->mstring, bi2->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( update_builtins_seq )
+BOOST_AUTO_TEST_CASE(update_builtins_seq)
 {
-	TestModule::BuiltInSeq ubis {
-		TestModule::BuiltInsPtr(std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 128, -1.2, -1.4, "string")),
-		TestModule::BuiltInsPtr(std::make_shared<TestModule::BuiltIns>(false, 5, 21, 63, 127, -4.2, -5.4, "string updated"))
-	};
+	TestModule::BuiltInSeq ubis {std::make_shared<TestModule::BuiltIns>(false, 5, 17, 64, 128, -1.2, -1.4, "string"),
+			std::make_shared<TestModule::BuiltIns>(false, 5, 21, 63, 127, -4.2, -5.4, "string updated")};
 	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(ubis, db, "builtins");
 
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
@@ -83,7 +81,7 @@ BOOST_AUTO_TEST_CASE( update_builtins_seq )
 	BOOST_REQUIRE_EQUAL(ubis.back()->mstring, ubis2.front()->mstring);
 }
 
-BOOST_AUTO_TEST_CASE( update_withNulls )
+BOOST_AUTO_TEST_CASE(update_withNulls)
 {
 	auto sel = db->select("SELECT * FROM builtins ORDER BY mint");
 	auto bis = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
@@ -107,11 +105,11 @@ BOOST_AUTO_TEST_CASE( update_withNulls )
 	BOOST_REQUIRE(bis2[1]->mfloat);
 }
 
-BOOST_AUTO_TEST_CASE( update_unsupportedModel )
+BOOST_AUTO_TEST_CASE(update_unsupportedModel)
 {
 	TestModule::ClassMap cm;
-	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
+	BOOST_REQUIRE_THROW(
+			Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
-

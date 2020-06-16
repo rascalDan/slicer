@@ -1,20 +1,20 @@
-#include "sqlInsertSerializer.h"
-#include <common.h>
-#include <sqlExceptions.h>
 #include "sqlBinder.h"
 #include "sqlCommon.h"
+#include "sqlInsertSerializer.h"
+#include <boost/numeric/conversion/cast.hpp>
+#include <common.h>
 #include <compileTimeFormatter.h>
+#include <functional>
 #include <modifycommand.h>
 #include <slicer/metadata.h>
-#include <boost/numeric/conversion/cast.hpp>
-#include <functional>
+#include <sqlExceptions.h>
+#include <type_traits>
 
 namespace Slicer {
 	using namespace std::placeholders;
 
 	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, std::string t) :
-		connection(c),
-		tableName(std::move(t))
+		connection(c), tableName(std::move(t))
 	{
 	}
 
@@ -22,11 +22,15 @@ namespace Slicer {
 	SqlInsertSerializer::Serialize(Slicer::ModelPartForRootPtr mp)
 	{
 		switch (mp->GetType()) {
-			case Slicer::mpt_Sequence:
-				mp->OnEachChild(std::bind(&SqlInsertSerializer::SerializeSequence, this, _2));
+			case Slicer::ModelPartType::Sequence:
+				mp->OnEachChild([this](auto &&, auto && PH2, auto &&) {
+					SerializeSequence(PH2);
+				});
 				return;
-			case Slicer::mpt_Complex:
-				mp->OnEachChild(std::bind(&SqlInsertSerializer::SerializeObject, this, _2));
+			case Slicer::ModelPartType::Complex:
+				mp->OnEachChild([this](auto &&, auto && PH2, auto &&) {
+					SerializeObject(PH2);
+				});
 				return;
 			default:
 				throw UnsupportedModelType();
@@ -45,45 +49,52 @@ namespace Slicer {
 	{
 		auto ins = createInsert(mp->GetContainedModelPart());
 		mp->OnEachChild([&ins, this](const std::string &, const ModelPartPtr & cmp, const HookCommon *) {
-				bindObjectAndExecute(cmp, ins.get());
-			});
+			bindObjectAndExecute(cmp, ins.get());
+		});
 	}
 
 	void
 	SqlInsertSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * ins) const
 	{
 		int paramNo = 0;
-		cmp->OnEachChild(std::bind(&SqlInsertSerializer::bindObjectAndExecuteField, this, std::ref(paramNo), ins, _2, _3));
+		cmp->OnEachChild([this, &paramNo, ins](auto &&, auto && PH2, auto && PH3) {
+			bindObjectAndExecuteField(paramNo, ins, PH2, PH3);
+		});
 		ins->execute();
 	}
 
 	class IdSave : public Slicer::ValueSource {
-		public:
-			explicit IdSave(DB::Connection * const c) :
-				connection(c)
-			{
-			}
-
-#define NonNumType(T) \
-			/* NOLINTNEXTLINE(bugprone-macro-parentheses) */ \
-			void set(T &) const override { throw UnsuitableIdFieldType(#T); }
+	public:
+		explicit IdSave(DB::Connection * const c) : connection(c) { }
 
 #define NumType(T) \
-			/* NOLINTNEXTLINE(bugprone-macro-parentheses) */ \
-			void set(T & v) const override { v = boost::numeric_cast<T>(connection->insertId()); }
+	void set(T & v) const override \
+	{ \
+		doSet(v, #T); \
+	}
 
-			NonNumType(bool);
-			NonNumType(std::string);
+		NumType(bool);
+		NumType(std::string);
+		NumType(Ice::Byte);
+		NumType(Ice::Short);
+		NumType(Ice::Int);
+		NumType(Ice::Long);
+		NumType(Ice::Float);
+		NumType(Ice::Double);
 
-			NumType(Ice::Byte);
-			NumType(Ice::Short);
-			NumType(Ice::Int);
-			NumType(Ice::Long);
-			NumType(Ice::Float);
-			NumType(Ice::Double);
-
-		private:
-			DB::Connection * const connection;
+	private:
+		DB::Connection * const connection;
+		template<typename T>
+		inline void
+		doSet([[maybe_unused]] T & v, [[maybe_unused]] const char * Tname) const
+		{
+			if constexpr (std::is_integral_v<T>) {
+				v = boost::numeric_cast<T>(connection->insertId());
+			}
+			else {
+				throw UnsuitableIdFieldType(Tname);
+			}
+		}
 	};
 
 	void
@@ -98,7 +109,8 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, const Slicer::ModelPartPtr & cmp, const HookCommon * h) const
+	SqlInsertSerializer::bindObjectAndExecuteField(
+			int & paramNo, DB::ModifyCommand * ins, const Slicer::ModelPartPtr & cmp, const HookCommon * h) const
 	{
 		if (isBind(h)) {
 			if (!cmp->GetValue(SqlBinder(*ins, paramNo))) {
@@ -109,7 +121,8 @@ namespace Slicer {
 	}
 
 	void
-	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(int & paramNo, DB::ModifyCommand * ins, const Slicer::ModelPartPtr & cmp, const HookCommon * h) const
+	SqlAutoIdInsertSerializer::bindObjectAndExecuteField(
+			int & paramNo, DB::ModifyCommand * ins, const Slicer::ModelPartPtr & cmp, const HookCommon * h) const
 	{
 		if (isNotAuto(h)) {
 			SqlInsertSerializer::bindObjectAndExecuteField(paramNo, ins, cmp, h);
@@ -123,7 +136,9 @@ namespace Slicer {
 		std::stringstream insert;
 		"INSERT INTO %?("_fmt(insert, tableName);
 		int fieldNo = 0;
-		mp->OnEachChild(std::bind(&SqlInsertSerializer::createInsertField, this, std::ref(fieldNo), std::ref(insert), _1, _3));
+		mp->OnEachChild([this, &fieldNo, &insert](auto && PH1, auto &&, auto && PH3) {
+			createInsertField(fieldNo, insert, PH1, PH3);
+		});
 		insert << ") VALUES (";
 		for (; fieldNo > 1; --fieldNo) {
 			insert << "?, ";
@@ -133,7 +148,8 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::createInsertField(int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const
+	SqlInsertSerializer::createInsertField(
+			int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const
 	{
 		if (isBind(h)) {
 			if (fieldNo++) {
@@ -144,7 +160,8 @@ namespace Slicer {
 	}
 
 	void
-	SqlAutoIdInsertSerializer::createInsertField(int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const
+	SqlAutoIdInsertSerializer::createInsertField(
+			int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const
 	{
 		if (isNotAuto(h)) {
 			if (fieldNo++) {
@@ -154,4 +171,3 @@ namespace Slicer {
 		}
 	}
 }
-

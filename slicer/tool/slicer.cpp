@@ -1,5 +1,5 @@
-#include <tool/parser.h>
 #include <boost/program_options.hpp>
+#include <tool/parser.h>
 
 namespace po = boost::program_options;
 
@@ -9,6 +9,7 @@ main(int argc, char ** argv)
 	Slicer::Slicer slicer;
 
 	po::options_description opts("Slicer options");
+	// clang-format off
 	opts.add_options()
 		("help,h", "Show this help message")
 		("include,I", po::value(&slicer.includes), "Add include directory to search path")
@@ -16,6 +17,7 @@ main(int argc, char ** argv)
 		("headerPrefix", po::value(&slicer.headerPrefix)->default_value(slicer.headerPrefix), "Prefix path for Slicer C++ #includes")
 		("slice,i", po::value(&slicer.slicePath), "Input ICE Slice file")
 		("cpp,o", po::value(&slicer.cppPath), "Output C++ file");
+	// clang-format on
 
 	po::positional_options_description p;
 	p.add("slice", 1);
@@ -35,4 +37,3 @@ main(int argc, char ** argv)
 
 	return 0;
 }
-

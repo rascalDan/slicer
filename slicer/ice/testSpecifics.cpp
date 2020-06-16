@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE ice_specifics
+#include "serializer.h"
 #include <boost/test/unit_test.hpp>
 #include <slicer.h>
-#include "serializer.h"
 #include <types.h>
 
 // LCOV_EXCL_START
@@ -30,7 +30,7 @@ testCompare(const X & x, const std::function<bool(const X &, const X &)> & cmp)
 	BOOST_REQUIRE(cmp(x, x2));
 }
 
-BOOST_AUTO_TEST_CASE( builtins )
+BOOST_AUTO_TEST_CASE(builtins)
 {
 	testCompare<std::string>("some string value");
 	testCompare<bool>(true);
@@ -65,7 +65,7 @@ testCompareOptional(const X & d)
 	BOOST_REQUIRE_EQUAL(d, *x3);
 }
 
-BOOST_AUTO_TEST_CASE( optionalBuiltins )
+BOOST_AUTO_TEST_CASE(optionalBuiltins)
 {
 	testCompareOptional<std::string>("some string value");
 	testCompareOptional<bool>(true);
@@ -84,9 +84,7 @@ BOOST_AUTO_TEST_CASE( optionalBuiltins )
 	testCompareOptional<Ice::Double>(3.14159);
 }
 
-
-
-BOOST_AUTO_TEST_CASE( classes )
+BOOST_AUTO_TEST_CASE(classes)
 {
 	TestModule::BuiltInsPtr x = std::make_shared<TestModule::BuiltIns>();
 	x->mbool = true;
@@ -98,21 +96,15 @@ BOOST_AUTO_TEST_CASE( classes )
 	x->mdouble = 3423423423.42342342343;
 	x->mstring = "sdfsf432423";
 	testCompare<TestModule::BuiltInsPtr>(x, [](const auto & a, const auto & b) {
-		return a->mbool == b->mbool
-			&& a->mbyte == b->mbyte
-			&& a->mshort == b->mshort
-			&& a->mint == b->mint
-			&& a->mlong == b->mlong
-			&& a->mfloat == b->mfloat
-			&& a->mdouble == b->mdouble
-			&& a->mstring == b->mstring;
+		return a->mbool == b->mbool && a->mbyte == b->mbyte && a->mshort == b->mshort && a->mint == b->mint
+				&& a->mlong == b->mlong && a->mfloat == b->mfloat && a->mdouble == b->mdouble
+				&& a->mstring == b->mstring;
 	});
 }
 
-BOOST_AUTO_TEST_CASE( structes )
+BOOST_AUTO_TEST_CASE(structes)
 {
-	TestModule::IsoDate date({ 2016, 10, 3 });
+	TestModule::IsoDate date({2016, 10, 3});
 	testCompare(date);
 	testCompareOptional(date);
 }
-

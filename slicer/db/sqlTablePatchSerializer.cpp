@@ -1,16 +1,15 @@
-#include "sqlTablePatchSerializer.h"
-#include "sqlInsertSerializer.h"
 #include "sqlCommon.h"
-#include <slicer/metadata.h>
+#include "sqlInsertSerializer.h"
+#include "sqlTablePatchSerializer.h"
 #include <compileTimeFormatter.h>
-#include <scopeExit.h>
 #include <functional>
+#include <scopeExit.h>
+#include <slicer/metadata.h>
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");
 	SqlTablePatchSerializer::SqlTablePatchSerializer(DB::Connection * const db, DB::TablePatch & tp) :
-		db(db),
-		tablePatch(tp)
+		db(db), tablePatch(tp)
 	{
 		tablePatch.src = ttname::get(this);
 	}
@@ -22,7 +21,9 @@ namespace Slicer {
 		tablePatch.cols.clear();
 
 		createTemporaryTable();
-		AdHoc::ScopeExit tidy(std::bind(&SqlTablePatchSerializer::dropTemporaryTable, this));
+		AdHoc::ScopeExit tidy([this] {
+			dropTemporaryTable();
+		});
 
 		SqlInsertSerializer ins(db, tablePatch.src);
 		ins.Serialize(mpr);
@@ -56,4 +57,3 @@ namespace Slicer {
 		db->execute(dropTmpTable::get(tablePatch.src));
 	}
 }
-

@@ -23,26 +23,33 @@ project
 			<variant>coverage:<coverage>on
 			<toolset>tidy:<checkxx>boost-*
 			<toolset>tidy:<checkxx>bugprone-*
+			<toolset>tidy:<xcheckxx>bugprone-macro-parentheses
 			<toolset>tidy:<checkxx>clang-*
+			<toolset>tidy:<xcheckxx>clang-analyzer-cplusplus.NewDeleteLeaks
 			<toolset>tidy:<checkxx>misc-*
+			<toolset>tidy:<xcheckxx>misc-non-private-member-variables-in-classes
 			<toolset>tidy:<checkxx>modernize-*
 			<toolset>tidy:<xcheckxx>modernize-use-trailing-return-type
 			<toolset>tidy:<checkxx>hicpp-*
+			<toolset>tidy:<xcheckxx>hicpp-no-array-decay
+			<toolset>tidy:<xcheckxx>hicpp-vararg
 			<toolset>tidy:<checkxx>performance-*
-			<toolset>tidy:<exclude>test/bin/tidy/debug/classes.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/classtype.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/collections.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/enums.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/inheritance.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/interfaces.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/json.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/locals.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/optionals.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/structs.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/types.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/xml.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/classes.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/classtype.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/collections.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/enums.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/inheritance.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/interfaces.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/json.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/locals.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/optionals.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/structs.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/types.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/cxxstd-17-iso/xml.h
 			<toolset>tidy:<exclude>slicer/bin/common.h
 			<toolset>tidy:<exclude>xml/bin/tidy/debug/cxxstd-17-iso/xmlExceptions.h
+			<toolset>tidy:<exclude>db/bin/tidy/debug/cxxstd-17-iso/sqlExceptions.h
+			<toolset>tidy:<exclude>db/bin/tidy/debug/cxxstd-17-iso/testModels.h
 			;
 
 build-project slicer ;
