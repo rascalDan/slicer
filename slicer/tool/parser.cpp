@@ -595,9 +595,9 @@ namespace Slicer {
 			cpp = cppfile.get();
 			Slicer::Slicer::Args args;
 			// Copy includes to args
-			for (const auto & include : includes) {
-				args.push_back("-I" + include.string());
-			}
+			std::transform(includes.begin(), includes.end(), std::back_inserter(args), [](auto && include) {
+				return "-I" + include.string();
+			});
 
 			Slice::PreprocessorPtr icecpp = Slice::Preprocessor::create("slicer", slicePath, args);
 			FILE * cppHandle = icecpp->preprocess(false);
@@ -618,7 +618,7 @@ namespace Slicer {
 				throw CompilerError("unit parse failed");
 			}
 
-			unsigned int initial = Components();
+			unsigned int initial = components;
 
 			u->visit(this, false);
 
@@ -628,7 +628,7 @@ namespace Slicer {
 				cpp = nullptr;
 			}
 
-			return Components() - initial;
+			return components - initial;
 		}
 		catch (...) {
 			if (!cppPath.empty()) {

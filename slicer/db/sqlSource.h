@@ -11,7 +11,7 @@ namespace Slicer {
 		public Slicer::TValueSource<boost::posix_time::time_duration>,
 		public Slicer::TValueSource<boost::posix_time::ptime> {
 	public:
-		SqlSource(const DB::Column & c);
+		explicit SqlSource(const DB::Column & c);
 
 		bool isNull() const;
 		void set(boost::posix_time::ptime & b) const override;

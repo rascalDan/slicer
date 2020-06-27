@@ -447,11 +447,13 @@ namespace Slicer {
 	ChildRef
 	ModelPartForComplex<T>::GetChildRefFromRange(const R & range, const HookFilter & flt)
 	{
-		auto model = GetModel();
-		for (const auto & h : range) {
-			if (h->filter(flt)) {
-				return ChildRef(h->Get(model), h->GetMetadata());
-			}
+		const auto itr = std::find_if(boost::begin(range), boost::end(range), [&flt](auto && h) {
+			return h->filter(flt);
+		});
+		if (itr != boost::end(range)) {
+			const auto & h = *itr;
+			auto model = GetModel();
+			return ChildRef(h->Get(model), h->GetMetadata());
 		}
 		return ChildRef();
 	}
@@ -526,17 +528,18 @@ namespace Slicer {
 	class DLL_PRIVATE ModelPartForComplex<T>::HookMetadata : public ModelPartForComplex<T>::template Hook<MT, MP> {
 	public:
 		HookMetadata(MT T::*member, const std::string & n, Metadata md) :
-			Hook<MT, MP>(member, n), metadata(std::move(md))
+			Hook<MT, MP>(member, n), hookMetadata(std::move(md))
 		{
 		}
 
 		[[nodiscard]] const Metadata &
 		GetMetadata() const override
 		{
-			return metadata;
+			return hookMetadata;
 		}
 
-		const Metadata metadata;
+	private:
+		const Metadata hookMetadata;
 	};
 
 	// ModelPartForClass

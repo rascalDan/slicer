@@ -6,6 +6,7 @@
 #include <buffer.h>
 #include <common.h>
 #include <definedDirs.h>
+#include <numeric>
 #include <tool/parser.h>
 
 using ComponentsCount = std::map<std::string, unsigned int>;
@@ -16,12 +17,12 @@ ComponentsCount COMPONENTS_IN_TEST_ICE = {{"classtype.ice", 1}, {"classes.ice", 
 unsigned int
 total()
 {
-	unsigned int t = 0;
-	for (const auto & c : COMPONENTS_IN_TEST_ICE) {
-		t += c.second;
-	}
+	const auto t = std::accumulate(
+			COMPONENTS_IN_TEST_ICE.begin(), COMPONENTS_IN_TEST_ICE.end(), 0U, [](auto & t, auto && c) {
+				return t += c.second;
+			});
+	BOOST_CHECK_EQUAL(47, t);
 	return t;
-	BOOST_REQUIRE_EQUAL(40, t);
 }
 
 void

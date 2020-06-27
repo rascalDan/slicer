@@ -29,21 +29,22 @@ namespace Slicer {
 
 	class DLL_PUBLIC SqlAutoIdInsertSerializer : public SqlInsertSerializer {
 	public:
-		template<typename... P> SqlAutoIdInsertSerializer(const P &... p) : SqlInsertSerializer(p...) { }
+		template<typename... P> explicit SqlAutoIdInsertSerializer(const P &... p) : SqlInsertSerializer(p...) { }
 
 	protected:
 		virtual void createInsertField(
-				int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
+				int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const override;
 		virtual void bindObjectAndExecuteField(
-				int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
+				int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const override;
 	};
 
 	class DLL_PUBLIC SqlFetchIdInsertSerializer : public SqlAutoIdInsertSerializer {
 	public:
-		template<typename... P> SqlFetchIdInsertSerializer(const P &... p) : SqlAutoIdInsertSerializer(p...) { }
+		template<typename... P>
+		explicit SqlFetchIdInsertSerializer(const P &... p) : SqlAutoIdInsertSerializer(p...) { }
 
 	protected:
-		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
+		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const override;
 	};
 }
 

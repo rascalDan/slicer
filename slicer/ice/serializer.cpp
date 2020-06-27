@@ -14,14 +14,14 @@ namespace Slicer {
 	{
 		ic->destroy();
 	}
-	IceBlobSerializer::IceBlobSerializer(Ice::ByteSeq & b) : blob(b) { }
+	IceBlobSerializer::IceBlobSerializer(Ice::ByteSeq & b) : refblob(b) { }
 
 	void
 	IceBlobSerializer::Serialize(ModelPartForRootPtr mp)
 	{
 		Ice::OutputStream s(ic);
 		mp->Write(s);
-		s.finished(blob);
+		s.finished(refblob);
 	}
 
 	IceStreamSerializer::IceStreamSerializer(std::ostream & os) : IceBlobSerializer(blob), strm(os) { }
@@ -33,12 +33,12 @@ namespace Slicer {
 		strm.write((const char *)&blob.front(), blob.size());
 	}
 
-	IceBlobDeserializer::IceBlobDeserializer(const Ice::ByteSeq & b) : blob(b) { }
+	IceBlobDeserializer::IceBlobDeserializer(const Ice::ByteSeq & b) : refblob(b) { }
 
 	void
 	IceBlobDeserializer::Deserialize(ModelPartForRootPtr mp)
 	{
-		Ice::InputStream s(ic, blob);
+		Ice::InputStream s(ic, refblob);
 		mp->Read(s);
 	}
 

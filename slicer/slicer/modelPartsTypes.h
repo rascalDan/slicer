@@ -361,9 +361,6 @@ namespace Slicer {
 		explicit ModelPartForStreamRoot(Stream<T> * s);
 
 		const std::string & GetRootName() const override;
-
-	private:
-		Stream<T> * stream;
 	};
 }
 

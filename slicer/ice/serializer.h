@@ -19,17 +19,17 @@ namespace Slicer {
 
 	class DLL_PUBLIC IceBlobSerializer : public Serializer, protected IceBase {
 	public:
-		IceBlobSerializer(Ice::ByteSeq &);
+		explicit IceBlobSerializer(Ice::ByteSeq &);
 
 		void Serialize(ModelPartForRootPtr) override;
 
 	private:
-		Ice::ByteSeq & blob;
+		Ice::ByteSeq & refblob;
 	};
 
 	class DLL_PUBLIC IceStreamSerializer : public IceBlobSerializer {
 	public:
-		IceStreamSerializer(std::ostream &);
+		explicit IceStreamSerializer(std::ostream &);
 
 		void Serialize(ModelPartForRootPtr) override;
 
@@ -40,17 +40,17 @@ namespace Slicer {
 
 	class DLL_PUBLIC IceBlobDeserializer : public Deserializer, protected IceBase {
 	public:
-		IceBlobDeserializer(const Ice::ByteSeq &);
+		explicit IceBlobDeserializer(const Ice::ByteSeq &);
 
 		void Deserialize(ModelPartForRootPtr) override;
 
 	protected:
-		const Ice::ByteSeq & blob;
+		const Ice::ByteSeq & refblob;
 	};
 
 	class DLL_PUBLIC IceStreamDeserializer : public IceBlobDeserializer {
 	public:
-		IceStreamDeserializer(std::istream &);
+		explicit IceStreamDeserializer(std::istream &);
 
 		void Deserialize(ModelPartForRootPtr) override;
 
