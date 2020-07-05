@@ -31,6 +31,13 @@ namespace Slicer {
 			return false;
 		};
 
+		bool
+		visitStructStart(const Slice::StructPtr & s) override
+		{
+			fprintbf(cpp, "struct ICE_CLASS(JAM_DLL_PUBLIC) %s;\n", s->name());
+			return false;
+		};
+
 		void
 		visitModuleEnd(const Slice::ModulePtr & m) override
 		{

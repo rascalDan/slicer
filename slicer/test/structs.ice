@@ -29,6 +29,7 @@ module TestModule {
 		StructType str;
 		int simp;
 	};
+	sequence<IsoDate> Dates;
 };
 
 #endif
