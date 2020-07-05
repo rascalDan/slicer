@@ -1,12 +1,35 @@
+#include <boost/algorithm/string/split.hpp>
 #include <boost/program_options.hpp>
+#include <compileTimeFormatter.h>
 #include <tool/parser.h>
+#include <unistd.h>
 
 namespace po = boost::program_options;
+using namespace AdHoc::literals;
+
+static std::string
+defaultPostProcessor()
+{
+	constexpr std::array<const std::pair<std::string_view, std::string_view>, 1> pps {{
+			{"clang-format", "-i"},
+	}};
+	const std::string_view path {getenv("PATH")};
+	const auto pathBegin = make_split_iterator(path, first_finder(":", boost::is_equal()));
+	for (const auto & [cmd, opts] : pps) {
+		for (auto p = pathBegin; p != decltype(pathBegin) {}; ++p) {
+			if (std::filesystem::exists(std::filesystem::path(p->begin(), p->end()) / cmd)) {
+				return "%? %?"_fmt(cmd, opts);
+			}
+		}
+	}
+	return "";
+}
 
 int
 main(int argc, char ** argv)
 {
 	Slicer::Slicer slicer;
+	std::string post;
 
 	po::options_description opts("Slicer options");
 	// clang-format off
@@ -15,6 +38,7 @@ main(int argc, char ** argv)
 		("include,I", po::value(&slicer.includes), "Add include directory to search path")
 		// NOLINTNEXTLINE(clang-analyzer-optin.cplusplus.VirtualCall)
 		("headerPrefix", po::value(&slicer.headerPrefix)->default_value(slicer.headerPrefix), "Prefix path for Slicer C++ #includes")
+		("post,p", po::value(&post)->default_value(defaultPostProcessor()), "Post-process command")
 		("slice,i", po::value(&slicer.slicePath), "Input ICE Slice file")
 		("cpp,o", po::value(&slicer.cppPath), "Output C++ file");
 	// clang-format on
@@ -34,6 +58,10 @@ main(int argc, char ** argv)
 		// LCOV_EXCL_STOP
 	}
 	slicer.Execute();
+
+	if (!post.empty()) {
+		return system("%? %?"_fmt(post, slicer.cppPath).c_str());
+	}
 
 	return 0;
 }
