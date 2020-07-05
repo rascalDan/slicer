@@ -14,6 +14,32 @@
 namespace fs = std::filesystem;
 
 namespace Slicer {
+	class ForwardDeclare : public Slice::ParserVisitor {
+	public:
+		ForwardDeclare(FILE * c) : cpp(c) { }
+		bool
+		visitModuleStart(const Slice::ModulePtr & m) override
+		{
+			fprintbf(cpp, "namespace %s {\n", m->name());
+			return true;
+		}
+
+		bool
+		visitClassDefStart(const Slice::ClassDefPtr & c) override
+		{
+			fprintbf(cpp, "class ICE_CLASS(JAM_DLL_PUBLIC) %s;\n", c->name());
+			return false;
+		};
+
+		void
+		visitModuleEnd(const Slice::ModulePtr & m) override
+		{
+			fprintbf(cpp, "} // %s\n\n", m->name());
+		}
+
+		FILE * cpp;
+	};
+
 	template<typename TPtr>
 	bool
 	ignoreType(const TPtr & t)
@@ -102,6 +128,10 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Begin Slicer code\n\n");
 		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "modelPartsTypes.impl.h").string());
+
+		ForwardDeclare fd {cpp};
+		u->visit(&fd, true);
+
 		fprintbf(cpp, "#include <%s>\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
 		for (const auto & m : u->modules()) {
 			for (const auto & i : metaDataValues("slicer:include:", m->getMetaData())) {

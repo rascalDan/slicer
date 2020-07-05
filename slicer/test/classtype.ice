@@ -8,6 +8,7 @@ module TestModule {
 		int a;
 		int b;
 	};
+	sequence<ClassType> Classes;
 };
 
 #endif

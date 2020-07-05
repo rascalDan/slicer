@@ -690,3 +690,9 @@ BOOST_AUTO_TEST_CASE(enum_lookups)
 	BOOST_CHECK_EQUAL("One", Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup(TestModule::SomeNumbers::One));
 	BOOST_CHECK_EQUAL(TestModule::SomeNumbers::One, Slicer::ModelPartForEnum<TestModule::SomeNumbers>::lookup("One"));
 }
+
+BOOST_AUTO_TEST_CASE(sequence_element_in_same_slice_link_bug)
+{
+	// Link error when sequence element type defined in same slice.
+	Slicer::ModelPartForSequence<TestModule::Classes> mp(nullptr);
+}

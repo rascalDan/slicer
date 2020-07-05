@@ -10,7 +10,7 @@
 #include <tool/parser.h>
 
 using ComponentsCount = std::map<std::string, unsigned int>;
-ComponentsCount COMPONENTS_IN_TEST_ICE = {{"classtype.ice", 1}, {"classes.ice", 3}, {"collections.ice", 6},
+ComponentsCount COMPONENTS_IN_TEST_ICE = {{"classtype.ice", 2}, {"classes.ice", 3}, {"collections.ice", 5},
 		{"enums.ice", 2}, {"inheritance.ice", 12}, {"interfaces.ice", 0}, {"json.ice", 2}, {"locals.ice", 7},
 		{"optionals.ice", 2}, {"structs.ice", 4}, {"types.ice", 3}, {"xml.ice", 5}};
 

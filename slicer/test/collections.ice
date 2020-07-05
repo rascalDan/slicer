@@ -7,7 +7,6 @@
 module TestModule {
 	sequence<string> SimpleSeq;
 	sequence<BuiltIns> BuiltInSeq;
-	sequence<ClassType> Classes;
 	local sequence<StructType> Structs;
 	dictionary<int, ClassType> ClassMap;
 	local dictionary<int, StructType> StructMap;
