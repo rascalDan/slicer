@@ -14,14 +14,57 @@
 namespace fs = std::filesystem;
 
 namespace Slicer {
+	class Count : public Slice::ParserVisitor {
+	public:
+		bool
+		visitClassDefStart(const Slice::ClassDefPtr &) override
+		{
+			classes += 1;
+			return true;
+		}
+		bool
+		visitStructStart(const Slice::StructPtr &) override
+		{
+			structs += 1;
+			return true;
+		}
+		void
+		visitEnum(const Slice::EnumPtr &) override
+		{
+			enums += 1;
+		}
+
+		unsigned int classes {0};
+		unsigned int structs {0};
+		unsigned int enums {0};
+	};
+
 	class ForwardDeclare : public Slice::ParserVisitor {
 	public:
-		ForwardDeclare(FILE * c) : cpp(c) { }
+		ForwardDeclare(FILE * c, const Count & cnt) : cpp(c), count(cnt) { }
+
+		bool
+		visitUnitStart(const Slice::UnitPtr &) override
+		{
+			if (count.enums) {
+				fprintbf(cpp, "#ifdef ICE_CPP11_MAPPING // C++11 mapping\n");
+				fprintbf(
+						cpp, "#define FORWARD_ENUM(name) enum class ICE_CLASS(JAM_DLL_PUBLIC) name : unsigned char;\n");
+				fprintbf(cpp, "#else // C++98 mapping\n");
+				fprintbf(cpp, "#define FORWARD_ENUM(name) enum ICE_CLASS(JAM_DLL_PUBLIC) name;\n");
+				fprintbf(cpp, "#endif\n\n");
+			}
+			return true;
+		}
+
 		bool
 		visitModuleStart(const Slice::ModulePtr & m) override
 		{
-			fprintbf(cpp, "namespace %s {\n", m->name());
-			return true;
+			if (count.classes || count.structs || count.enums) {
+				fprintbf(cpp, "namespace %s {\n", m->name());
+				return true;
+			}
+			return false;
 		}
 
 		bool
@@ -39,12 +82,21 @@ namespace Slicer {
 		};
 
 		void
+		visitEnum(const Slice::EnumPtr & e) override
+		{
+			fprintbf(cpp, "FORWARD_ENUM(%s);\n", e->name());
+		};
+
+		void
 		visitModuleEnd(const Slice::ModulePtr & m) override
 		{
-			fprintbf(cpp, "} // %s\n\n", m->name());
+			if (count.classes || count.structs || count.enums) {
+				fprintbf(cpp, "} // %s\n\n", m->name());
+			}
 		}
 
 		FILE * cpp;
+		const Count & count;
 	};
 
 	template<typename TPtr>
@@ -136,7 +188,9 @@ namespace Slicer {
 		fprintbf(cpp, "// Begin Slicer code\n\n");
 		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "modelPartsTypes.impl.h").string());
 
-		ForwardDeclare fd {cpp};
+		Count count;
+		u->visit(&count, true);
+		ForwardDeclare fd {cpp, count};
 		u->visit(&fd, true);
 
 		fprintbf(cpp, "#include <%s>\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());

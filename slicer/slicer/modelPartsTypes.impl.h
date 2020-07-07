@@ -13,12 +13,6 @@
 #include <boost/multi_index_container.hpp>
 #include <c++11Helpers.h>
 
-#ifdef __clang__
-#	define FINALVISMODELPARTS DLL_PUBLIC
-#else
-#	define FINALVISMODELPARTS
-#endif
-
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor<Type>() \
 	{ \
@@ -56,7 +50,7 @@
 	{ \
 		return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); \
 	} \
-	template class FINALVISMODELPARTS BaseModelPart; \
+	template class BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
 	template class ModelPartForRoot<Ice::optional<Type>>;
 
