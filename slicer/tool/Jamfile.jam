@@ -2,14 +2,13 @@ import package ;
 
 lib po : : <name>boost_program_options ;
 lib stdc++fs ;
-lib mcpp ;
+lib slice-parser ;
 
 lib slicer-compiler :
 	parser.cpp
 	:
-	<library>slice//Slice
+	<library>slice-parser
 	<library>..//Ice++11
-	<library>mcpp
 	<library>stdc++fs
 	<library>..//adhocutil
 	<library>../slicer//slicer
