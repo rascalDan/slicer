@@ -636,6 +636,8 @@ BOOST_AUTO_TEST_CASE(simple_complete_validator)
 			xmlpp::Document *>("isodate.xml", readXml, writeXml, freeXml);
 }
 
+BOOST_AUTO_TEST_SUITE_END();
+
 BOOST_AUTO_TEST_CASE(missingConversion)
 {
 	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
@@ -657,8 +659,6 @@ BOOST_AUTO_TEST_CASE(conversion)
 	Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v);
 	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", std::get<json::String>(std::get<json::Object>(v)["conv"]));
 }
-
-BOOST_AUTO_TEST_SUITE_END();
 
 BOOST_AUTO_TEST_CASE(customerModelPartCounters)
 {
