@@ -544,7 +544,12 @@ namespace Slicer {
 	ModelPartForClass<T>::Create()
 	{
 		BOOST_ASSERT(this->Model);
-		*this->Model = std::make_shared<T>();
+		if constexpr (std::is_abstract_v<T>) {
+			throw AbstractClassException(ModelPartForComplexBase::demangle(typeid(T).name()));
+		}
+		else {
+			*this->Model = std::make_shared<T>();
+		}
 	}
 
 	template<typename T>

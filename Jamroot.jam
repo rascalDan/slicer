@@ -38,6 +38,7 @@ project
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/classtype.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/collections.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/enums.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/functions.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/inheritance.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/interfaces.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/json.h

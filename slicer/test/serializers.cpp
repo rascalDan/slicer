@@ -8,6 +8,7 @@
 #include <definedDirs.h>
 #include <fstream>
 #include <functional>
+#include <functionsImpl.h>
 #include <json.h>
 #include <json/serializer.h>
 #include <libxml2/libxml/parser.h>
@@ -658,6 +659,59 @@ BOOST_AUTO_TEST_CASE(conversion)
 	json::Value v;
 	Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v);
 	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", std::get<json::String>(std::get<json::Object>(v)["conv"]));
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractEmpty)
+{
+	auto in = json::parseValue(R"J({ "obj": null })J");
+	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, Functions::SFuncs>(in);
+	BOOST_REQUIRE(!obj.obj);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractDefault)
+{
+	auto in = json::parseValue(R"J({ "obj": {} })J");
+	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::JsonValueDeserializer, Functions::SFuncs>(in)),
+			Slicer::AbstractClassException);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractImpl)
+{
+	auto in = json::parseValue(R"J({ "obj": {"slicer-typeid": "::Functions::FuncsSub", "testVal": "value"} })J");
+	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, Functions::SFuncs>(in);
+	BOOST_REQUIRE(obj.obj);
+	auto impl = std::dynamic_pointer_cast<Functions::FuncsSub>(obj.obj);
+	BOOST_REQUIRE(impl);
+	BOOST_CHECK_EQUAL("value", impl->testVal);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractEmpty)
+{
+	std::stringstream in("<SFuncs/>");
+	auto obj = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, Functions::SFuncs>(in);
+	BOOST_REQUIRE(!obj.obj);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractDefault)
+{
+	std::stringstream in("<SFuncs><obj/></SFuncs>");
+	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, Functions::SFuncs>(in)),
+			Slicer::AbstractClassException);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractImpl)
+{
+	std::stringstream in(R"X(
+			<SFuncs>
+				<obj slicer-typeid="::Functions::FuncsSub">
+					<testVal>value</testVal>
+				</obj>
+			</SFuncs>)X");
+	auto obj = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, Functions::SFuncs>(in);
+	BOOST_REQUIRE(obj.obj);
+	auto impl = std::dynamic_pointer_cast<Functions::FuncsSub>(obj.obj);
+	BOOST_REQUIRE(impl);
+	BOOST_CHECK_EQUAL("value", impl->testVal);
 }
 
 BOOST_AUTO_TEST_CASE(customerModelPartCounters)

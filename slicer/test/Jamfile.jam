@@ -20,6 +20,7 @@ lib icetypes :
 lib types :
 	[ glob *.ice ]
 	conversions.cpp
+	functionsImpl.cpp
 	:
 	<toolset>gcc:<dependency>../tool//slicer/<toolset>gcc
 	<toolset>clang:<dependency>../tool//slicer/<toolset>clang

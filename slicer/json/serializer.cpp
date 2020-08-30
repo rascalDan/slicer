@@ -181,7 +181,6 @@ namespace Slicer {
 				for (const auto & element : o) {
 					auto emp = modelPart->GetChild(element.first);
 					if (emp) {
-						emp->Create();
 						std::visit(DocumentTreeIterate(emp), element.second);
 						emp->Complete();
 					}

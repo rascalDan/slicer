@@ -309,6 +309,13 @@ namespace Slicer {
 		copyMetadata(c->getMetaData());
 		fprintbf(cpp, ";\n\n");
 
+		if (auto implementation = metaDataValue("slicer:implementation:", c->getMetaData())) {
+			fprintbf(cpp, "\ttemplate<> void ModelPartForClass<%s>::Create() {\n", c->scoped());
+			fprintf(cpp, "\t\tBOOST_ASSERT(this->Model);\n");
+			fprintbf(cpp, "\t\t*this->Model = std::make_shared<%s>();\n}\n\n",
+					boost::algorithm::replace_all_copy(*implementation, ".", "::"));
+		}
+
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", c->getMetaData())) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", Slice::typeToString(decl),
 					getBasicModelPart(decl), c->scoped(), boost::algorithm::replace_all_copy(*cmp, ".", "::"));

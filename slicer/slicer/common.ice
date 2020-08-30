@@ -42,6 +42,10 @@ module Slicer {
 	exception InvalidStreamOperation extends SerializerError {
 		string method;
 	};
+	["cpp:ice_print"]
+	exception AbstractClassException extends DeserializerError {
+		string type;
+	};
 };
 
 #endif

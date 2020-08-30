@@ -104,4 +104,11 @@ namespace Slicer {
 	{
 		InvalidStreamOperationMsg::write(s, method);
 	}
+
+	AdHocFormatter(AbstractClassExceptionMsg, "%? is an abstract class");
+	void
+	AbstractClassException::ice_print(std::ostream & s) const
+	{
+		AbstractClassExceptionMsg::write(s, type);
+	}
 }
