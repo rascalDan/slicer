@@ -1,14 +1,18 @@
 #ifndef SLICER_MODELPARTS_H
 #define SLICER_MODELPARTS_H
 
-#include <Ice/InputStream.h>
-#include <Ice/OutputStream.h>
+#include <Ice/Config.h>
 #include <functional>
 #include <list>
 #include <optional>
 #include <stdexcept>
 #include <vector>
 #include <visibility.h>
+
+namespace Ice {
+	class InputStream;
+	class OutputStream;
+}
 
 namespace Slicer {
 	template<typename T> class TValueTarget {

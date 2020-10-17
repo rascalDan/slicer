@@ -2,6 +2,8 @@
 #define SLICER_MODELPARTSTYPES_H
 
 #include "modelParts.h"
+#include <Ice/ObjectF.h>
+#include <Ice/Optional.h>
 
 namespace Slicer {
 	template<typename T> struct isLocal {
