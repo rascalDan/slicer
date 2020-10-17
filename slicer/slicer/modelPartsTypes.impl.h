@@ -2,6 +2,7 @@
 #define SLICER_MODELPARTSTYPES_IMPL_H
 
 #include "common.h"
+#include "enumMap.h"
 #include "modelPartsTypes.h"
 #include <Ice/StreamHelpers.h>
 #include <IceUtil/Optional.h>
@@ -659,18 +660,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForEnum
-	template<typename T> using EnumPair = std::pair<T, std::string>;
-
-	template<typename T>
-	class ModelPartForEnum<T>::Enumerations :
-		public boost::multi_index_container<EnumPair<T>,
-				boost::multi_index::indexed_by<boost::multi_index::ordered_unique<boost::multi_index::member<
-													   EnumPair<T>, const T, &EnumPair<T>::first>>,
-						boost::multi_index::ordered_unique<
-								boost::multi_index::member<EnumPair<T>, const std::string, &EnumPair<T>::second>,
-								std::less<>>>> {
-	};
-
 	template<typename T> ModelPartForEnum<T>::ModelPartForEnum(T * s) : ModelPartModel<T>(s) { }
 
 	template<typename T>
@@ -680,14 +669,12 @@ namespace Slicer {
 		return metadata;
 	}
 
-	template<int Side, typename Ex, typename ExP, typename T, typename V, typename R>
-	inline const auto &
-	ModelPartForEnumLookup(
-			const typename ModelPartForEnum<T>::Enumerations & enumerations, const V & val, R EnumPair<T>::*rv)
+	template<EnumMapKey Key, typename Ex, typename ExP, typename T, typename V>
+	inline const auto *
+	ModelPartForEnumLookup(const EnumMap<T> & enumerations, const V & val)
 	{
-		const auto & side = enumerations.template get<Side>();
-		if (auto i = side.find(val); i != side.end()) {
-			return (*i).*rv;
+		if (auto i = enumerations.template find<Key>(val)) {
+			return i;
 		}
 		throw Ex(ExP(val), typeid(T).name());
 	}
@@ -696,16 +683,16 @@ namespace Slicer {
 	T
 	ModelPartForEnum<T>::lookup(const std::string_view & val)
 	{
-		return ModelPartForEnumLookup<1, InvalidEnumerationSymbol, std::string, T>(
-				enumerations, val, &EnumPair<T>::first);
+		return ModelPartForEnumLookup<EnumMapKey::Name, InvalidEnumerationSymbol, std::string, T>(enumerations(), val)
+				->value;
 	}
 
 	template<typename T>
 	const std::string &
 	ModelPartForEnum<T>::lookup(T val)
 	{
-		return ModelPartForEnumLookup<0, InvalidEnumerationValue, ::Ice::Int, T>(
-				enumerations, val, &EnumPair<T>::second);
+		return *ModelPartForEnumLookup<EnumMapKey::Value, InvalidEnumerationValue, ::Ice::Int, T>(enumerations(), val)
+						->nameStr;
 	}
 
 	template<typename T>

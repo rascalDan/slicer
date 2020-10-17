@@ -225,11 +225,11 @@ namespace Slicer {
 		ModelPartType GetType() const override;
 		static const ModelPartType type;
 	};
+	template<typename T> class EnumMap;
 
 	template<typename T> class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
 	public:
 		using element_type = T;
-		class DLL_PRIVATE Enumerations;
 
 		explicit ModelPartForEnum(T * s);
 
@@ -240,7 +240,7 @@ namespace Slicer {
 		bool GetValue(ValueTarget && s) override;
 
 		static const Metadata metadata;
-		static const Enumerations enumerations;
+		static constexpr const EnumMap<T> & enumerations();
 		DLL_PUBLIC static const std::string & lookup(T);
 		DLL_PUBLIC static T lookup(const std::string_view &);
 	};

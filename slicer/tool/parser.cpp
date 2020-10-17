@@ -420,15 +420,21 @@ namespace Slicer {
 		copyMetadata(e->getMetaData());
 		fprintbf(cpp, ";\n\n");
 
-		fprintbf(cpp,
-				"template<> DLL_PUBLIC\nconst ModelPartForEnum< %s >::Enumerations\nModelPartForEnum< %s "
-				">::enumerations([]() -> ModelPartForEnum< %s >::Enumerations\n",
-				e->scoped(), e->scoped(), e->scoped());
-		fprintbf(cpp, "{\n\tModelPartForEnum< %s >::Enumerations e;\n", e->scoped());
+		size_t en = 0;
 		for (const auto & ee : e->enumerators()) {
-			fprintbf(cpp, "\te.insert( { %s, \"%s\" } );\n", ee->scoped(), ee->name());
+			fprintbf(cpp, "\tconst std::string estr%d_%d { \"%s\" };\n", components, en++, ee->name());
 		}
-		fprintbf(cpp, "\treturn e;\n}());\n\n");
+		fprintbf(cpp, "constexpr const EnumMapImpl< %s, %d > enumerations%d {{{\n", e->scoped(),
+				e->enumerators().size(), components);
+		en = 0;
+		for (const auto & ee : e->enumerators()) {
+			fprintbf(cpp, "\t {%s, \"%s\", &estr%d_%d},\n", ee->scoped(), ee->name(), components, en++);
+		}
+		fprintbf(cpp, "\t}}};\n");
+		fprintbf(cpp,
+				"\ttemplate<> constexpr const EnumMap< %s > & ModelPartForEnum< %s >::enumerations() { return "
+				"enumerations%d; }\n",
+				e->scoped(), e->scoped(), components);
 
 		auto name = metaDataValue("slicer:root:", e->getMetaData());
 		const Slice::TypePtr t = e;
