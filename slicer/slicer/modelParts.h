@@ -122,16 +122,6 @@ namespace Slicer {
 		const std::string * nameStr;
 	};
 
-	struct case_less {
-		template<typename A, typename B>
-		inline bool
-		operator()(const A & a, const B & b) const
-		{
-			const auto cmp = strncasecmp(a.data(), b.data(), std::min(a.length(), b.length()));
-			return (cmp < 0) || (!cmp && a.length() < b.length());
-		}
-	};
-
 	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
 	public:
 		ModelPart() = default;
