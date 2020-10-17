@@ -577,7 +577,7 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	Ice::optional<std::string>
+	std::optional<std::string>
 	ModelPartForClass<T>::GetTypeIdProperty() const
 	{
 		return typeIdProperty;

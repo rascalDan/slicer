@@ -4,7 +4,7 @@
 #include <sqlExceptions.h>
 
 namespace Slicer {
-	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, Ice::optional<std::string> tc) :
+	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, std::optional<std::string> tc) :
 		cmd(c), columnCount(0), typeIdColName(std::move(tc))
 	{
 	}

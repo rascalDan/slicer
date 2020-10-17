@@ -189,7 +189,7 @@ namespace Slicer {
 		std::string getTypeId(
 				typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
 
-		[[nodiscard]] Ice::optional<std::string> GetTypeIdProperty() const override;
+		[[nodiscard]] std::optional<std::string> GetTypeIdProperty() const override;
 
 		static const std::string typeIdProperty;
 		static const std::string * className;

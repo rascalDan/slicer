@@ -2,10 +2,10 @@
 #define SLICER_MODELPARTS_H
 
 #include <Ice/InputStream.h>
-#include <Ice/Optional.h>
 #include <Ice/OutputStream.h>
 #include <functional>
 #include <list>
+#include <optional>
 #include <stdexcept>
 #include <vector>
 #include <visibility.h>
@@ -66,7 +66,7 @@ namespace Slicer {
 	using ModelPartPtr = std::shared_ptr<ModelPart>;
 	using ModelPartForRootPtr = std::shared_ptr<ModelPartForRootBase>;
 	using HookCommonPtr = std::unique_ptr<HookCommon>;
-	using TypeId = Ice::optional<std::string>;
+	using TypeId = std::optional<std::string>;
 	using ChildHandler = std::function<void(const std::string &, ModelPartPtr, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
@@ -148,7 +148,7 @@ namespace Slicer {
 				= 0;
 		virtual ModelPartPtr GetSubclassModelPart(const std::string &);
 		virtual TypeId GetTypeId() const;
-		virtual Ice::optional<std::string> GetTypeIdProperty() const;
+		virtual std::optional<std::string> GetTypeIdProperty() const;
 		virtual ModelPartType GetType() const = 0;
 		virtual void Create();
 		virtual void Complete();
