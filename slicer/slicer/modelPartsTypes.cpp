@@ -1,6 +1,9 @@
 #include "modelPartsTypes.impl.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index_container.hpp>
 #include <cxxabi.h>
 
 namespace Slicer {

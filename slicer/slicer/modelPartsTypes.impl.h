@@ -3,15 +3,11 @@
 
 #include "common.h"
 #include "enumMap.h"
+#include "hookMap.h"
 #include "modelPartsTypes.h"
 #include <Ice/StreamHelpers.h>
 #include <IceUtil/Optional.h>
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/multi_index/global_fun.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/sequenced_index.hpp>
-#include <boost/multi_index_container.hpp>
+#include <boost/assert.hpp>
 #include <c++11Helpers.h>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
@@ -405,47 +401,23 @@ namespace Slicer {
 
 	// ModelPartForComplex
 	template<typename T>
-	class ModelPartForComplex<T>::Hooks :
-		public boost::multi_index_container<HookPtr,
-				boost::multi_index::indexed_by<boost::multi_index::sequenced<>,
-						boost::multi_index::ordered_non_unique<
-								boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>,
-								std::less<>>,
-						boost::multi_index::ordered_non_unique<
-								boost::multi_index::member<HookCommon, const std::string, &HookCommon::name>,
-								case_less>>> {
-	};
-
-	template<typename T>
 	void
 	ModelPartForComplex<T>::OnEachChild(const ChildHandler & ch)
 	{
-		for (const auto & h : hooks) {
+		for (const auto & h : hooks()) {
 			h->apply(ch, h->Get(GetModel()));
 		}
 	}
 
-	template<typename P>
-	auto
-	begin(const P & p)
-	{
-		return p.first;
-	}
-	template<typename P>
-	auto
-	end(const P & p)
-	{
-		return p.second;
-	}
 	template<typename T>
 	template<typename R>
 	ChildRef
 	ModelPartForComplex<T>::GetChildRefFromRange(const R & range, const HookFilter & flt)
 	{
-		const auto itr = std::find_if(boost::begin(range), boost::end(range), [&flt](auto && h) {
+		const auto itr = std::find_if(range.begin(), range.end(), [&flt](auto && h) {
 			return h->filter(flt);
 		});
-		if (itr != boost::end(range)) {
+		if (itr != range.end()) {
 			const auto & h = *itr;
 			auto model = GetModel();
 			return ChildRef(h->Get(model), h->GetMetadata());
@@ -457,19 +429,14 @@ namespace Slicer {
 	ChildRef
 	ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
 	{
-		return GetChildRefFromRange(hooks.template get<0>(), flt);
+		return GetChildRefFromRange(hooks(), flt);
 	}
 
 	template<typename T>
 	ChildRef
 	ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
 	{
-		if (matchCase) {
-			return GetChildRefFromRange(hooks.template get<1>().equal_range(name), flt);
-		}
-		else {
-			return GetChildRefFromRange(hooks.template get<2>().equal_range(name), flt);
-		}
+		return GetChildRefFromRange(hooks().equal_range(name, matchCase), flt);
 	}
 
 	template<typename T>
@@ -479,19 +446,9 @@ namespace Slicer {
 		return metadata;
 	}
 
-	template<typename T>
-	template<typename H, typename... P>
-	void
-	ModelPartForComplex<T>::addHook(Hooks & h, const P &... p)
-	{
-		h.push_back(std::make_unique<H>(p...));
-	}
-
 	template<typename T> class DLL_PRIVATE ModelPartForComplex<T>::HookBase : public HookCommon {
 	public:
-		explicit HookBase(const std::string & n) : HookCommon(n) { }
-		SPECIAL_MEMBERS_DEFAULT(HookBase);
-		virtual ~HookBase() = default;
+		using HookCommon::HookCommon;
 
 		virtual ModelPartPtr Get(T * t) const = 0;
 		[[nodiscard]] const Metadata &
@@ -505,7 +462,10 @@ namespace Slicer {
 	template<typename MT, typename MP>
 	class DLL_PRIVATE ModelPartForComplex<T>::Hook : public ModelPartForComplex<T>::HookBase {
 	public:
-		Hook(MT T::*m, const std::string & n) : HookBase(n), member(m) { }
+		constexpr Hook(MT T::*m, std::string_view n, std::string_view nl, const std::string * ns) :
+			HookBase(n, nl, ns), member(m)
+		{
+		}
 
 		ModelPartPtr
 		Get(T * t) const override
@@ -522,8 +482,8 @@ namespace Slicer {
 	template<typename MT, typename MP>
 	class DLL_PRIVATE ModelPartForComplex<T>::HookMetadata : public ModelPartForComplex<T>::template Hook<MT, MP> {
 	public:
-		HookMetadata(MT T::*member, const std::string & n, Metadata md) :
-			Hook<MT, MP>(member, n), hookMetadata(std::move(md))
+		HookMetadata(MT T::*member, std::string_view n, std::string_view nl, const std::string * ns, Metadata md) :
+			Hook<MT, MP>(member, n, nl, ns), hookMetadata(std::move(md))
 		{
 		}
 

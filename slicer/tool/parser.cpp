@@ -2,6 +2,7 @@
 #include <Slice/CPlusPlusUtil.h>
 #include <Slice/Parser.h>
 #include <Slice/Preprocessor.h>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -370,36 +371,41 @@ namespace Slicer {
 			externType(dm->type());
 		}
 		fprintbf(cpp, "using C%d = ModelPartForComplex< %s >;\n", components, it->scoped());
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "const C%d::Hooks ", components);
-		fprintbf(cpp, "C%d::hooks ([](){\n", components);
-		fprintbf(cpp, "\t\tC%d::Hooks r;\n", components);
+
+		size_t en = 0;
 		for (const auto & dm : dataMembers) {
+			auto name = metaDataValue("slicer:name:", dm->getMetaData()).value_or(dm->name());
+			fprintbf(cpp, "\tconst std::string hstr%d_%d { \"%s\" };\n", components, en, name);
+
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 			auto t = Slice::TypePtr::dynamicCast(dm->container());
 			if (!t) {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
-			auto name = metaDataValue("slicer:name:", dm->getMetaData()).value_or(dm->name());
-			fprintbf(cpp, "\t\tC%d::addHook<C%d::", components, components);
 			auto type = dm->type();
-			if (hasMetadata(dm->getMetaData())) {
-				fprintbf(cpp, "HookMetadata<");
-			}
-			else {
-				fprintbf(cpp, "Hook<");
-			}
+			fprintbf(cpp, "\t%s C%d::%s<", hasMetadata(dm->getMetaData()) ? "static" : "constexpr", components,
+					hasMetadata(dm->getMetaData()) ? "HookMetadata" : "Hook");
 			fprintbf(cpp, " %s, ", Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, getAllMetadata(dm));
-			fprintbf(cpp, " > >(r, &%s, \"%s\"", dm->scoped(), name);
+			fprintbf(cpp, " > hook%d_%d {&%s, \"%s\", \"%s\", &hstr%d_%d", components, en, dm->scoped(), name,
+					boost::algorithm::to_lower_copy(name), components, en);
 			if (hasMetadata(dm->getMetaData())) {
 				fprintbf(cpp, ", Metadata ");
 				copyMetadata(dm->getMetaData());
 			}
-			fprintbf(cpp, ");\n");
+			fprintbf(cpp, "};\n");
+			en++;
 		}
-		fprintbf(cpp, "\t\treturn r;\n");
-		fprintbf(cpp, "\t}());\n\n");
+
+		en = 0;
+		fprintbf(
+				cpp, "constexpr const HooksImpl< %s, %d > hooks%d {{{\n", it->scoped(), dataMembers.size(), components);
+		for (const auto & dm : dataMembers) {
+			fprintbf(cpp, " &hook%d_%d, // %s\n", components, en++, dm->name());
+		}
+		fprintbf(cpp, "\t}}};\n");
+		fprintbf(cpp, "\ttemplate<> const Hooks< %s > & C%d::hooks() { return hooks%d; }\n", it->scoped(), components,
+				components);
 	}
 
 	void
@@ -513,21 +519,22 @@ namespace Slicer {
 				iname ? *iname : "element");
 
 		fprintbf(cpp, "using C%d = ModelPartForComplex< %s::value_type >;\n", components, d->scoped());
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		fprintbf(cpp, "const C%d::Hooks ", components);
-		fprintbf(cpp, "C%d::hooks ([](){\n", components);
-		fprintbf(cpp, "\t\tC%d::Hooks r;\n", components);
 		auto addHook = [&](const std::string & name, const char * element, const Slice::TypePtr & t) {
-			fprintbf(cpp, "\t\t");
-			fprintbf(cpp, "C%d::addHook< C%d::Hook< const %s, ", components, components, Slice::typeToString(t));
+			fprintbf(cpp, "\tconst std::string hstr%d_%d { \"%s\" };\n", components, element, name);
+			fprintbf(cpp, "\tconstexpr C%d::Hook< const %s, ", components, Slice::typeToString(t));
 			createNewModelPartPtrFor(t);
-			fprintbf(cpp, " > >(r, &%s::value_type::%s, \"%s\");\n", d->scoped(), element, name);
+			fprintbf(cpp, " > hook%d_%s {&%s::value_type::%s, \"%s\", \"%s\", &hstr%d_%s};\n", components, element,
+					d->scoped(), element, name, boost::algorithm::to_lower_copy(name), components, element);
 		};
 		addHook(metaDataValue("slicer:key:", d->getMetaData()).value_or("key"), "first", d->keyType());
 		addHook(metaDataValue("slicer:value:", d->getMetaData()).value_or("value"), "second", d->valueType());
-		fprintbf(cpp, "\t\treturn r;\n");
-		fprintbf(cpp, "\t}());\n");
-		fprintbf(cpp, "\n");
+
+		fprintbf(cpp, "constexpr const HooksImpl< %s::value_type, 2 > hooks%d {{{\n", d->scoped(), components);
+		fprintbf(cpp, " &hook%d_first,\n", components);
+		fprintbf(cpp, " &hook%d_second,\n", components);
+		fprintbf(cpp, "\t}}};\n");
+		fprintbf(cpp, "\ttemplate<> const Hooks< %s::value_type > & C%d::hooks() { return hooks%d; }\n", d->scoped(),
+				components, components);
 
 		auto name = metaDataValue("slicer:root:", d->getMetaData());
 		defineRoot(d->scoped(), name ? *name : d->name(), d);

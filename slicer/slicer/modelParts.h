@@ -69,7 +69,6 @@ namespace Slicer {
 
 	using ModelPartPtr = std::shared_ptr<ModelPart>;
 	using ModelPartForRootPtr = std::shared_ptr<ModelPartForRootBase>;
-	using HookCommonPtr = std::unique_ptr<HookCommon>;
 	using TypeId = std::optional<std::string>;
 	using ChildHandler = std::function<void(const std::string &, ModelPartPtr, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;
@@ -108,14 +107,19 @@ namespace Slicer {
 
 	class DLL_PUBLIC HookCommon {
 	public:
-		explicit HookCommon(std::string);
+		constexpr HookCommon(std::string_view n, std::string_view nl, const std::string * ns) :
+			name(n), nameLower(nl), nameStr(ns)
+		{
+		}
 
-		bool filter(const HookFilter & flt);
-		void apply(const ChildHandler & ch, const ModelPartPtr & modelPart);
+		bool filter(const HookFilter & flt) const;
+		void apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const;
 
 		[[nodiscard]] virtual const Metadata & GetMetadata() const = 0;
 
-		const std::string name;
+		std::string_view name;
+		std::string_view nameLower;
+		const std::string * nameStr;
 	};
 
 	struct case_less {

@@ -139,10 +139,10 @@ namespace Slicer {
 		static const std::string & ToModelTypeName(const std::string &);
 	};
 
+	template<typename T> class Hooks;
 	template<typename T> class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
 	public:
 		class DLL_PRIVATE HookBase;
-		using HookPtr = std::unique_ptr<HookBase>;
 
 		template<typename MT, typename MP> class DLL_PRIVATE Hook;
 
@@ -160,11 +160,7 @@ namespace Slicer {
 	protected:
 		template<typename R> DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
 
-		class DLL_PRIVATE Hooks;
-
-		template<typename H, typename... P> static void addHook(Hooks &, const P &...);
-
-		static const Hooks hooks;
+		static const Hooks<T> & hooks();
 		static const Metadata metadata;
 	};
 
