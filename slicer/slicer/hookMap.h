@@ -15,43 +15,75 @@ namespace Slicer {
 
 		template<typename K> class iter : public std::iterator<std::bidirectional_iterator_tag, HookPtr> {
 		public:
-			iter(const eq<K> * const r, const HookPtr * c) : range(r), cur(c)
+			constexpr inline iter(const eq<K> * const r, const HookPtr * c) : range(r), cur(c)
 			{
-				operator++(); // move to first match
+				moveMatch();
 			}
 
-			HookPtr
+			constexpr inline HookPtr
 			operator*() const
 			{
 				return *cur;
 			}
 
-			void
-			operator++()
+			constexpr inline HookPtr
+			operator->() const
 			{
-				for (; cur != range->e && (*cur)->*(range->name) != range->key; cur++) { }
+				return *cur;
 			}
 
-			bool
+			constexpr inline void
+			operator++()
+			{
+				if (cur++ != range->e) {
+					moveMatch();
+				}
+			}
+
+			constexpr inline iter
+			operator+(std::size_t n) const
+			{
+				auto i {*this};
+				while (n--) {
+					++i;
+				}
+				return i;
+			}
+
+			constexpr inline bool
 			operator!=(const iter & other) const
 			{
 				return cur != other.cur;
 			}
 
+			constexpr inline bool
+			operator==(const iter & other) const
+			{
+				return cur == other.cur;
+			}
+
 		private:
+			constexpr void
+			moveMatch()
+			{
+				while (cur != range->e && (*cur)->*(range->name) != range->key) {
+					cur++;
+				}
+			}
+
 			const eq<K> * const range;
 			const HookPtr * cur;
 		};
 
 		template<typename K> class eq {
 		public:
-			iter<K>
+			constexpr inline iter<K>
 			begin() const
 			{
 				return {this, b};
 			}
 
-			iter<K>
+			constexpr inline iter<K>
 			end() const
 			{
 				return {this, e};
@@ -63,15 +95,39 @@ namespace Slicer {
 		};
 
 		template<typename K>
-		inline eq<K>
-		equal_range(const K & k, bool matchCase) const
+		constexpr inline eq<K>
+		equal_range(K && k) const
 		{
-			return {matchCase ? k : boost::algorithm::to_lower_copy(k),
-					matchCase ? &HookCommon::name : &HookCommon::nameLower, begin(), end()};
+			return {std::move(k), &HookCommon::name, _begin, _end};
 		}
 
-		virtual constexpr const HookPtr * begin() const = 0;
-		virtual constexpr const HookPtr * end() const = 0;
+		template<typename K>
+		constexpr inline eq<K>
+		equal_range_lower(K && k) const
+		{
+			return {std::move(k), &HookCommon::nameLower, _begin, _end};
+		}
+
+		template<typename K>
+		inline eq<K>
+		equal_range_nocase(const K & k) const
+		{
+			return equal_range_lower(boost::algorithm::to_lower_copy(k));
+		}
+
+		constexpr inline auto
+		begin() const
+		{
+			return _begin;
+		}
+		constexpr inline auto
+		end() const
+		{
+			return _end;
+		}
+
+		const HookPtr * _begin {};
+		const HookPtr * _end {};
 	};
 
 	template<typename T, std::size_t N> class HooksImpl : public Hooks<T> {
@@ -79,21 +135,12 @@ namespace Slicer {
 		using HookPtr = typename Hooks<T>::HookPtr;
 		template<std::size_t n> using Arr = std::array<HookPtr, n>;
 
-		inline constexpr HooksImpl(Arr<N> a) : arr(std::move(a)) { }
-
-		constexpr const HookPtr *
-		begin() const override
+		inline constexpr HooksImpl(Arr<N> a) : arr(std::move(a))
 		{
-			return arr.begin();
+			Hooks<T>::_begin = arr.begin();
+			Hooks<T>::_end = arr.end();
 		}
 
-		constexpr const HookPtr *
-		end() const override
-		{
-			return arr.end();
-		}
-
-	private:
 		const Arr<N> arr;
 	};
 }

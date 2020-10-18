@@ -436,7 +436,12 @@ namespace Slicer {
 	ChildRef
 	ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
 	{
-		return GetChildRefFromRange(hooks().equal_range(name, matchCase), flt);
+		if (matchCase) {
+			return GetChildRefFromRange(hooks().equal_range(name), flt);
+		}
+		else {
+			return GetChildRefFromRange(hooks().equal_range_nocase(name), flt);
+		}
 	}
 
 	template<typename T>

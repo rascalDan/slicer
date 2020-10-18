@@ -1,6 +1,10 @@
 #ifndef SLICER_ENUM_MAP_H
 #define SLICER_ENUM_MAP_H
 
+#include <array>
+#include <string>
+#include <string_view>
+
 namespace Slicer {
 	enum class EnumMapKey {
 		Value,
@@ -16,12 +20,10 @@ namespace Slicer {
 		};
 
 		template<EnumMapKey Key, typename T>
-		constexpr inline const Node *
-		find(const T & v) const
+		[[nodiscard]] constexpr inline const Node *
+		find(const T & v) const noexcept
 		{
-			auto b = begin();
-			const auto e = end();
-			while (b != e) {
+			for (auto b = begin; b != end; b++) {
 				if constexpr (Key == EnumMapKey::Value) {
 					if (b->value == v) {
 						return b;
@@ -32,13 +34,12 @@ namespace Slicer {
 						return b;
 					}
 				}
-				++b;
 			}
 			return nullptr;
 		}
 
-		virtual constexpr const Node * begin() const = 0;
-		virtual constexpr const Node * end() const = 0;
+		const Node * begin {};
+		const Node * end {};
 	};
 
 	template<typename E, std::size_t N> class EnumMapImpl : public EnumMap<E> {
@@ -46,19 +47,11 @@ namespace Slicer {
 		using NodeType = typename EnumMap<E>::Node;
 		template<std::size_t n> using Arr = std::array<NodeType, n>;
 
-		constexpr const NodeType *
-		begin() const override
+		inline constexpr EnumMapImpl(Arr<N> a) : arr(std::move(a))
 		{
-			return arr.begin();
+			EnumMap<E>::begin = arr.begin();
+			EnumMap<E>::end = arr.end();
 		}
-
-		constexpr const NodeType *
-		end() const override
-		{
-			return arr.end();
-		}
-
-		inline constexpr EnumMapImpl(Arr<N> a) : arr(std::move(a)) { }
 		const Arr<N> arr;
 	};
 }
