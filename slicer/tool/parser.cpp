@@ -4,7 +4,6 @@
 #include <Slice/Preprocessor.h>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <common.h>
@@ -99,6 +98,23 @@ namespace Slicer {
 		FILE * cpp;
 		const Count & count;
 	};
+
+	SplitString::SplitString(const std::string & in, const char * by)
+	{
+		boost::algorithm::split(*this, in, boost::algorithm::is_any_of(by), boost::algorithm::token_compress_off);
+	}
+
+	static std::ostream &
+	operator<<(std::ostream & o, const CppName & name)
+	{
+		for (const auto & s : name) {
+			if (&s != &name.front()) {
+				o << "::";
+			}
+			o << s;
+		}
+		return o;
+	}
 
 	template<typename TPtr>
 	bool
@@ -313,13 +329,12 @@ namespace Slicer {
 		if (auto implementation = metaDataValue("slicer:implementation:", c->getMetaData())) {
 			fprintbf(cpp, "\ttemplate<> void ModelPartForClass<%s>::Create() {\n", c->scoped());
 			fprintf(cpp, "\t\tBOOST_ASSERT(this->Model);\n");
-			fprintbf(cpp, "\t\t*this->Model = std::make_shared<%s>();\n}\n\n",
-					boost::algorithm::replace_all_copy(*implementation, ".", "::"));
+			fprintbf(cpp, "\t\t*this->Model = std::make_shared<%s>();\n}\n\n", CppName {*implementation});
 		}
 
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", c->getMetaData())) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", Slice::typeToString(decl),
-					getBasicModelPart(decl), c->scoped(), boost::algorithm::replace_all_copy(*cmp, ".", "::"));
+					getBasicModelPart(decl), c->scoped(), CppName {*cmp});
 		}
 		else {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>);\n\n",
@@ -583,7 +598,7 @@ namespace Slicer {
 					type, boost::algorithm::trim_right_copy_if(dm->container()->thisScope(), ispunct), dm);
 		}
 		else if (auto cmp = metaDataValue("slicer:custommodelpart:", md)) {
-			fprintbf(cpp, "%s", boost::algorithm::replace_all_copy(*cmp, ".", "::"));
+			fprintbf(cpp, "%s", CppName {*cmp});
 		}
 		else {
 			if (dm && dm->optional()) {
@@ -664,10 +679,7 @@ namespace Slicer {
 			if (split.size() < 3) {
 				throw CompilerError("conversion needs at least 3 parts type:toModelFunc:toExchangeFunc[:options]");
 			}
-			for (auto & pi : {0, 1, 2}) {
-				boost::algorithm::replace_all(split[pi], ".", "::");
-			}
-			rtn.push_back(ConversionSpec(split));
+			rtn.push_back(ConversionSpec {split[0], split[1], split[2], {&split[3], &split[split.size()]}});
 		}
 		return rtn;
 	}
@@ -677,7 +689,7 @@ namespace Slicer {
 	{
 		if (auto cmp = metaDataValue("slicer:custommodelpart:", metadata)) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", type, getBasicModelPart(stype), type,
-					boost::algorithm::replace_all_copy(*cmp, ".", "::"));
+					CppName {*cmp});
 		}
 		else {
 			fprintbf(cpp, "MODELPARTFOR(%s, %s);\n\n", type, getBasicModelPart(stype));
@@ -746,15 +758,6 @@ namespace Slicer {
 				unlink(cppPath.c_str());
 			}
 			throw;
-		}
-	}
-
-	Slicer::ConversionSpec::ConversionSpec(const Slicer::Args & s) :
-		ExchangeType(s[0]), ConvertToModelFunc(s[1]), ConvertToExchangeFunc(s[2])
-	{
-		if (s.size() >= 4) {
-			boost::algorithm::split(
-					Options, s[3], boost::algorithm::is_any_of(","), boost::algorithm::token_compress_off);
 		}
 	}
 };

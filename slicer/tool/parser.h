@@ -6,18 +6,31 @@
 #include <visibility.h>
 
 namespace Slicer {
+	class SplitString : public std::vector<std::string> {
+	public:
+		SplitString(const std::string & in, const char *);
+		using std::vector<std::string>::vector;
+	};
+
+	struct CppName : public SplitString {
+		inline CppName(const std::string & in) : SplitString(in, ".") { }
+	};
+
 	class DLL_PUBLIC Slicer : public Slice::ParserVisitor {
 	public:
-		typedef std::vector<std::string> Args;
+		struct Args : public SplitString {
+			inline Args(const std::string & in) : SplitString(in, ",") { }
+			using SplitString::SplitString;
+		};
+
 		class ConversionSpec {
 		public:
-			explicit ConversionSpec(const Args &);
-
-			std::string ExchangeType;
-			std::string ConvertToModelFunc;
-			std::string ConvertToExchangeFunc;
+			CppName ExchangeType;
+			CppName ConvertToModelFunc;
+			CppName ConvertToExchangeFunc;
 			Args Options;
 		};
+
 		using Conversions = std::vector<ConversionSpec>;
 
 		Slicer();
