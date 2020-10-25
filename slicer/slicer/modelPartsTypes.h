@@ -144,9 +144,7 @@ namespace Slicer {
 	public:
 		class DLL_PRIVATE HookBase;
 
-		template<typename MT, typename MP> class DLL_PRIVATE Hook;
-
-		template<typename MT, typename MP, std::size_t> class DLL_PRIVATE HookMetadata;
+		template<typename MT, typename MP, std::size_t = 0> class DLL_PRIVATE Hook;
 
 		void OnEachChild(const ChildHandler & ch) override;
 

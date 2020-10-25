@@ -449,20 +449,23 @@ namespace Slicer {
 		using HookCommon::HookCommon;
 
 		virtual ModelPartPtr Get(T * t) const = 0;
-		[[nodiscard]] const Metadata &
-		GetMetadata() const override
-		{
-			return emptyMetadata;
-		}
 	};
 
 	template<typename T>
-	template<typename MT, typename MP>
+	template<typename MT, typename MP, std::size_t N>
 	class DLL_PRIVATE ModelPartForComplex<T>::Hook : public ModelPartForComplex<T>::HookBase {
 	public:
-		constexpr Hook(MT T::*m, std::string_view n, std::string_view nl, const std::string * ns) :
-			HookBase(n, nl, ns), member(m)
+		template<typename... MD>
+		constexpr Hook(MT T::*m, std::string_view n, std::string_view nl, const std::string * ns, MD &&... md) :
+			HookBase(n, nl, ns), member(m), hookMetadata {{std::forward<MD>(md)...}}
 		{
+			static_assert(sizeof...(MD) == N, "Wrong amount of metadata");
+		}
+
+		[[nodiscard]] const Metadata &
+		GetMetadata() const override
+		{
+			return hookMetadata;
 		}
 
 		ModelPartPtr
@@ -474,28 +477,6 @@ namespace Slicer {
 
 	private:
 		const MT T::*member;
-	};
-
-	template<typename T>
-	template<typename MT, typename MP, std::size_t N>
-	class DLL_PRIVATE ModelPartForComplex<T>::HookMetadata : public ModelPartForComplex<T>::template Hook<MT, MP> {
-	public:
-		template<typename... MD>
-		constexpr HookMetadata(
-				MT T::*member, std::string_view n, std::string_view nl, const std::string * ns, MD &&... md) :
-			Hook<MT, MP>(member, n, nl, ns),
-			hookMetadata {{std::forward<MD>(md)...}}
-		{
-			static_assert(sizeof...(MD) == N, "Wrong amount of metadata");
-		}
-
-		[[nodiscard]] const Metadata &
-		GetMetadata() const override
-		{
-			return hookMetadata;
-		}
-
-	private:
 		const MetaDataImpl<N> hookMetadata;
 	};
 

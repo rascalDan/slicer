@@ -13,11 +13,11 @@ struct S {
 const std::string aa {"aa"}, aA {"aA"}, Aa {"Aa"}, AA {"AA"}, b {"b"};
 
 using C = Slicer::ModelPartForComplex<S>;
-constexpr C::Hook<int, Slicer::ModelPartForSimple<int>> haa {&S::aa, "aa", "aa", &aa};
-constexpr C::Hook<int, Slicer::ModelPartForSimple<int>> haA {&S::aA, "aA", "aa", &aA};
-constexpr C::Hook<int, Slicer::ModelPartForSimple<int>> hAa {&S::Aa, "Aa", "aa", &Aa};
+constexpr C::Hook<int, Slicer::ModelPartForSimple<int>, 0> haa {&S::aa, "aa", "aa", &aa};
+constexpr C::Hook<int, Slicer::ModelPartForSimple<int>, 1> haA {&S::aA, "aA", "aa", &aA, "md1"};
+constexpr C::Hook<int, Slicer::ModelPartForSimple<int>, 3> hAa {&S::Aa, "Aa", "aa", &Aa, "md2", "md3", "md4"};
 constexpr C::Hook<int, Slicer::ModelPartForSimple<int>> hAA {&S::AA, "AA", "aa", &AA};
-constexpr C::Hook<std::string, Slicer::ModelPartForSimple<std::string>> hb {&S::b, "b", "b", &b};
+constexpr C::Hook<std::string, Slicer::ModelPartForSimple<std::string>, 0> hb {&S::b, "b", "b", &b};
 constexpr Slicer::HooksImpl<S, 5> h {{{&haa, &haA, &hAa, &hAA, &hb}}};
 
 static_assert(h.arr.size() == 5);

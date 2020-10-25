@@ -407,12 +407,10 @@ namespace Slicer {
 				t = Slice::ClassDefPtr::dynamicCast(dm->container())->declaration();
 			}
 			auto type = dm->type();
-			fprintbf(cpp, "\tconstexpr C%d::%s<", components, md.countSlicerMetaData() ? "HookMetadata" : "Hook");
+			fprintbf(cpp, "\tconstexpr C%d::Hook<", components);
 			fprintbf(cpp, " %s, ", Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, md);
-			if (auto n = md.countSlicerMetaData()) {
-				fprintbf(cpp, ", %d", n);
-			}
+			fprintbf(cpp, ", %d", md.countSlicerMetaData());
 			fprintbf(cpp, " > hook%d_%d {&%s, \"%s\", \"%s\", &hstr%d_%d", components, en, dm->scoped(), name, lname,
 					components, en);
 			if (md.hasSlicerMetaData()) {
@@ -558,7 +556,7 @@ namespace Slicer {
 			fprintbf(cpp, "\tconst std::string hstr%d_%d { \"%s\" };\n", components, element, name);
 			fprintbf(cpp, "\tconstexpr C%d::Hook< const %s, ", components, Slice::typeToString(t));
 			createNewModelPartPtrFor(t);
-			fprintbf(cpp, " > hook%d_%s {&%s::value_type::%s, \"%s\", \"%s\", &hstr%d_%s};\n", components, element,
+			fprintbf(cpp, ", 0 > hook%d_%s {&%s::value_type::%s, \"%s\", \"%s\", &hstr%d_%s};\n", components, element,
 					d->scoped(), element, name, lname, components, element);
 		};
 		addHook(md.value("slicer:key:").value_or("key"), "first", d->keyType());
