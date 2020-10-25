@@ -4,6 +4,7 @@ lib stdc++fs ;
 
 obj enum-test : enum-test.cpp ;
 obj hook-test : hook-test.cpp : <use>..//adhocutil <implicit-dependency>common ;
+obj metadata-test : metadata-test.cpp : <use>..//adhocutil <implicit-dependency>common ;
 
 obj common : common.ice : <toolset>tidy:<checker>none ;
 

@@ -164,7 +164,7 @@ namespace Slicer {
 				}
 			}
 			modelPart->Create();
-			if (metaDataFlagSet(modelPart->GetMetadata(), md_object)) {
+			if (modelPart->GetMetadata().flagSet(md_object)) {
 				for (const auto & element : o) {
 					auto emp = modelPart->GetAnonChild();
 					emp->Create();
@@ -278,7 +278,7 @@ namespace Slicer {
 				break;
 			case ModelPartType::Dictionary:
 				if (mp->HasValue()) {
-					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
+					if (mp->GetMetadata().flagSet(md_object)) {
 						mp->OnEachChild(
 								[capture0 = &std::get<json::Object>(*n).insert({name, json::Object()}).first->second](
 										auto &&, auto && PH2, auto &&) {
@@ -327,7 +327,7 @@ namespace Slicer {
 					});
 					break;
 				case ModelPartType::Dictionary:
-					if (metaDataFlagSet(mp->GetMetadata(), md_object)) {
+					if (mp->GetMetadata().flagSet(md_object)) {
 						*n = json::Object();
 						mp->OnEachChild([n](auto &&, auto && PH2, auto &&) {
 							return JsonSerializer::ModelTreeIterateDictObj(n, PH2);

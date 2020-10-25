@@ -17,11 +17,11 @@ NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDes
 namespace Slicer {
 	using namespace std::placeholders;
 
-	const std::string md_attribute = "xml:attribute";
-	const std::string md_text = "xml:text";
-	const std::string md_bare = "xml:bare";
-	const std::string md_attributes = "xml:attributes";
-	const std::string md_elements = "xml:elements";
+	constexpr std::string_view md_attribute {"xml:attribute"};
+	constexpr std::string_view md_text {"xml:text"};
+	constexpr std::string_view md_bare {"xml:bare"};
+	constexpr std::string_view md_attributes {"xml:attributes"};
+	constexpr std::string_view md_elements {"xml:elements"};
 	const std::string keyName = "key";
 	const std::string valueName = "value";
 	using ElementCreatorF = xmlpp::Element * (xmlpp::Element::*)(const Glib::ustring &, const Glib::ustring &);
@@ -240,13 +240,13 @@ namespace Slicer {
 			}
 		}
 		smp->Create();
-		if (metaDataFlagSet(smpr.ChildMetaData(), md_attributes)) {
+		if (smpr.ChildMetaData().flagSet(md_attributes)) {
 			auto attrs(element->get_attributes());
 			if (!attrs.empty()) {
 				DocumentTreeIterateDictAttrs(attrs, smp);
 			}
 		}
-		else if (metaDataFlagSet(smpr.ChildMetaData(), md_elements)) {
+		else if (smpr.ChildMetaData().flagSet(md_elements)) {
 			DocumentTreeIterateDictElements(element, smp);
 		}
 		else {
@@ -271,11 +271,11 @@ namespace Slicer {
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
 				auto smpr = mp->GetChildRef(element->get_name(), [](const auto & h) {
-					return metaDataFlagNotSet(h->GetMetadata(), md_attribute);
+					return h->GetMetadata().flagNotSet(md_attribute);
 				});
 				if (smpr) {
 					auto smp = smpr.Child();
-					if (metaDataFlagSet(smpr.ChildMetaData(), md_bare)) {
+					if (smpr.ChildMetaData().flagSet(md_bare)) {
 						smp = smp->GetAnonChild();
 					}
 					if (smp) {
@@ -285,7 +285,7 @@ namespace Slicer {
 			}
 			else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
 				auto smp = mp->GetChild(attribute->get_name(), [](const auto & h) {
-					return metaDataFlagSet(h->GetMetadata(), md_attribute);
+					return h->GetMetadata().flagSet(md_attribute);
 				});
 				if (smp) {
 					smp->Create();
@@ -297,7 +297,7 @@ namespace Slicer {
 				ModelPartPtr smp;
 				if (!content->is_white_space()) {
 					smp = mp->GetAnonChild([](const auto & h) {
-						return metaDataFlagSet(h->GetMetadata(), md_text);
+						return h->GetMetadata().flagSet(md_text);
 					});
 				}
 				if (smp) {
@@ -324,20 +324,20 @@ namespace Slicer {
 		if (name.empty()) {
 			return;
 		}
-		if (hp && metaDataFlagSet(hp->GetMetadata(), md_attribute)) {
+		if (hp && hp->GetMetadata().flagSet(md_attribute)) {
 			mp->GetValue(XmlAttributeValueTarget(n, name));
 		}
-		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_text)) {
+		else if (hp && hp->GetMetadata().flagSet(md_text)) {
 			mp->GetValue(XmlContentValueTarget(n));
 		}
-		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_attributes)) {
+		else if (hp && hp->GetMetadata().flagSet(md_attributes)) {
 			ModelTreeIterateDictAttrs(n->add_child_element(name), mp);
 		}
-		else if (hp && metaDataFlagSet(hp->GetMetadata(), md_elements)) {
+		else if (hp && hp->GetMetadata().flagSet(md_elements)) {
 			ModelTreeIterateDictElements(n->add_child_element(name), mp);
 		}
 		else {
-			if (hp && metaDataFlagSet(hp->GetMetadata(), md_bare)) {
+			if (hp && hp->GetMetadata().flagSet(md_bare)) {
 				ModelTreeProcessElement(n, mp, [name](auto && PH1, auto &&) {
 					return PH1->add_child_element(name);
 				});

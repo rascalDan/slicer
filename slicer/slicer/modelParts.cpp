@@ -1,7 +1,6 @@
 #include "modelParts.h"
 
 namespace Slicer {
-	const Metadata emptyMetadata;
 	void
 	ModelPart::Create()
 	{

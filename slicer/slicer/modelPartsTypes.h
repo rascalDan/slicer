@@ -146,7 +146,7 @@ namespace Slicer {
 
 		template<typename MT, typename MP> class DLL_PRIVATE Hook;
 
-		template<typename MT, typename MP> class DLL_PRIVATE HookMetadata;
+		template<typename MT, typename MP, std::size_t> class DLL_PRIVATE HookMetadata;
 
 		void OnEachChild(const ChildHandler & ch) override;
 
@@ -161,7 +161,6 @@ namespace Slicer {
 		template<typename R> DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
 
 		static const Hooks<T> & hooks();
-		static const Metadata metadata;
 	};
 
 	template<typename T>

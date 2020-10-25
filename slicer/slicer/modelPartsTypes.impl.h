@@ -444,13 +444,6 @@ namespace Slicer {
 		}
 	}
 
-	template<typename T>
-	const Metadata &
-	ModelPartForComplex<T>::GetMetadata() const
-	{
-		return metadata;
-	}
-
 	template<typename T> class DLL_PRIVATE ModelPartForComplex<T>::HookBase : public HookCommon {
 	public:
 		using HookCommon::HookCommon;
@@ -484,12 +477,16 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	template<typename MT, typename MP>
+	template<typename MT, typename MP, std::size_t N>
 	class DLL_PRIVATE ModelPartForComplex<T>::HookMetadata : public ModelPartForComplex<T>::template Hook<MT, MP> {
 	public:
-		HookMetadata(MT T::*member, std::string_view n, std::string_view nl, const std::string * ns, Metadata md) :
-			Hook<MT, MP>(member, n, nl, ns), hookMetadata(std::move(md))
+		template<typename... MD>
+		constexpr HookMetadata(
+				MT T::*member, std::string_view n, std::string_view nl, const std::string * ns, MD &&... md) :
+			Hook<MT, MP>(member, n, nl, ns),
+			hookMetadata {{std::forward<MD>(md)...}}
 		{
+			static_assert(sizeof...(MD) == N, "Wrong amount of metadata");
 		}
 
 		[[nodiscard]] const Metadata &
@@ -499,7 +496,7 @@ namespace Slicer {
 		}
 
 	private:
-		const Metadata hookMetadata;
+		const MetaDataImpl<N> hookMetadata;
 	};
 
 	// ModelPartForClass

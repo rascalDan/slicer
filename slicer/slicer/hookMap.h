@@ -126,6 +126,7 @@ namespace Slicer {
 			return _end;
 		}
 
+	protected:
 		const HookPtr * _begin {};
 		const HookPtr * _end {};
 	};

@@ -38,6 +38,7 @@ namespace Slicer {
 			return nullptr;
 		}
 
+	protected:
 		const Node * begin {};
 		const Node * end {};
 	};

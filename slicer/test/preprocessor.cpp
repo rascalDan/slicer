@@ -49,14 +49,34 @@ processAll(Slicer::Slicer & s)
 	BOOST_REQUIRE_EQUAL(total(), s.Components());
 }
 
-BOOST_AUTO_TEST_CASE(slicer_test_counts_path)
+BOOST_AUTO_TEST_CASE(slicer_metadata_split_empty, *boost::unit_test::timeout(5))
+{
+	BOOST_CHECK(Slicer::IceMetaData::split("").empty());
+}
+
+BOOST_AUTO_TEST_CASE(slicer_metadata_split_single, *boost::unit_test::timeout(5))
+{
+	auto md {Slicer::IceMetaData::split("string")};
+	BOOST_REQUIRE_EQUAL(md.size(), 1);
+	BOOST_CHECK_EQUAL(md.front(), "string");
+}
+
+BOOST_AUTO_TEST_CASE(slicer_metadata_split_many, *boost::unit_test::timeout(5))
+{
+	auto md {Slicer::IceMetaData::split("string:and:some:other:values")};
+	BOOST_REQUIRE_EQUAL(md.size(), 5);
+	BOOST_CHECK_EQUAL(md.front(), "string");
+	BOOST_CHECK_EQUAL(md.back(), "values");
+}
+
+BOOST_AUTO_TEST_CASE(slicer_test_counts_path, *boost::unit_test::timeout(5))
 {
 	Slicer::Slicer s;
 	s.cppPath = "/dev/null";
 	processAll(s);
 }
 
-BOOST_AUTO_TEST_CASE(slicer_test_counts_filestar)
+BOOST_AUTO_TEST_CASE(slicer_test_counts_filestar, *boost::unit_test::timeout(5))
 {
 	FILE * file = fopen("/dev/null", "a");
 	BOOST_REQUIRE(file);
@@ -66,7 +86,7 @@ BOOST_AUTO_TEST_CASE(slicer_test_counts_filestar)
 	fclose(file);
 }
 
-BOOST_AUTO_TEST_CASE(slicer_test_counts_nullfilestar)
+BOOST_AUTO_TEST_CASE(slicer_test_counts_nullfilestar, *boost::unit_test::timeout(5))
 {
 	Slicer::Slicer s;
 	processAll(s);

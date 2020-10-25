@@ -4,41 +4,39 @@
 #include <sqlExceptions.h>
 
 namespace Slicer {
-	const std::string md_pkey = "db:pkey";
-	const std::string md_auto = "db:auto";
-	const std::string md_ignore = "db:ignore";
-	const std::string md_global_ignore = "ignore";
+	constexpr std::string_view md_pkey {"db:pkey"};
+	constexpr std::string_view md_auto {"db:auto"};
+	constexpr std::string_view md_ignore {"db:ignore"};
+	constexpr std::string_view md_global_ignore {"ignore"};
 
 	bool
 	isPKey(const HookCommon * h)
 	{
-		return metaDataFlagSet(h->GetMetadata(), md_pkey) && isBind(h);
+		return h->GetMetadata().flagSet(md_pkey) && isBind(h);
 	}
 
 	bool
 	isAuto(const HookCommon * h)
 	{
-		return metaDataFlagSet(h->GetMetadata(), md_auto) && isBind(h);
+		return h->GetMetadata().flagSet(md_auto) && isBind(h);
 	}
 
 	bool
 	isNotAuto(const HookCommon * h)
 	{
-		return metaDataFlagNotSet(h->GetMetadata(), md_auto) && isBind(h);
+		return h->GetMetadata().flagNotSet(md_auto) && isBind(h);
 	}
 
 	bool
 	isBind(const HookCommon * h)
 	{
-		return metaDataFlagNotSet(h->GetMetadata(), md_global_ignore)
-				&& metaDataFlagNotSet(h->GetMetadata(), md_ignore);
+		return h->GetMetadata().flagNotSet(md_global_ignore) && h->GetMetadata().flagNotSet(md_ignore);
 	}
 
 	bool
 	isValue(const HookCommon * h)
 	{
-		return metaDataFlagNotSet(h->GetMetadata(), md_auto) && metaDataFlagNotSet(h->GetMetadata(), md_pkey)
-				&& isBind(h);
+		return h->GetMetadata().flagNotSet(md_auto) && h->GetMetadata().flagNotSet(md_pkey) && isBind(h);
 	}
 
 	void

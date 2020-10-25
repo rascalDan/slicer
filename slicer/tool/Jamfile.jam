@@ -5,6 +5,7 @@ lib stdc++fs ;
 lib slice-parser ;
 
 lib slicer-compiler :
+	icemetadata.cpp
 	parser.cpp
 	:
 	<library>slice-parser

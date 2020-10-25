@@ -1,6 +1,7 @@
 #ifndef SLICER_PARSER_H
 #define SLICER_PARSER_H
 
+#include "icemetadata.h"
 #include <Slice/Parser.h>
 #include <filesystem>
 #include <visibility.h>
@@ -8,18 +9,18 @@
 namespace Slicer {
 	class SplitString : public std::vector<std::string> {
 	public:
-		SplitString(const std::string & in, const char *);
+		SplitString(std::string_view in, std::string_view split);
 		using std::vector<std::string>::vector;
 	};
 
 	struct CppName : public SplitString {
-		inline CppName(const std::string & in) : SplitString(in, ".") { }
+		inline CppName(std::string_view in) : SplitString {in, "."} { }
 	};
 
 	class DLL_PUBLIC Slicer : public Slice::ParserVisitor {
 	public:
 		struct Args : public SplitString {
-			inline Args(const std::string & in) : SplitString(in, ",") { }
+			inline Args(std::string_view in) : SplitString {in, ","} { }
 			using SplitString::SplitString;
 		};
 
@@ -66,23 +67,20 @@ namespace Slicer {
 	private:
 		void createModelPartForConverted(
 				const Slice::TypePtr & type, const std::string & container, const Slice::DataMemberPtr & dm) const;
-		void createNewModelPartPtrFor(const Slice::TypePtr & type,
-				const Slice::DataMemberPtr & dm = Slice::DataMemberPtr(),
-				const Slice::StringList & md = Slice::StringList()) const;
+		void createNewModelPartPtrFor(const Slice::TypePtr & type, const Slice::DataMemberPtr & dm = {},
+				const IceMetaData & md = IceMetaData {}) const;
 		[[nodiscard]] std::string getBasicModelPart(const Slice::TypePtr & type) const;
-		void defineMODELPART(
-				const std::string & type, const Slice::TypePtr & stype, const Slice::StringList & metadata);
+		void defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const IceMetaData & metadata);
 
 		void visitComplexDataMembers(const Slice::ConstructedPtr & t, const Slice::DataMemberList &) const;
 
 		void defineConversions(const Slice::DataMemberPtr & dm) const;
-		void defineRoot(const std::string & type, const std::string & name, const Slice::TypePtr & stype) const;
+		void defineRoot(const std::string & type, std::string_view name, const Slice::TypePtr & stype) const;
 		void externType(const Slice::TypePtr &) const;
 
-		[[nodiscard]] bool hasMetadata(const std::list<std::string> & metadata) const;
-		void copyMetadata(const std::list<std::string> & metadata) const;
-		static Slice::StringList getAllMetadata(const Slice::DataMemberPtr & dm);
-		static Conversions getConversions(const Slice::StringList & metadata);
+		void copyMetadata(const IceMetaData & metadata) const;
+		static IceMetaData getAllMetadata(const Slice::DataMemberPtr & dm);
+		static Conversions getConversions(const IceMetaData & metadata);
 		std::set<std::string> definedTypes;
 #pragma GCC visibility pop
 

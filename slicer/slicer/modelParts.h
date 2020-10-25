@@ -1,9 +1,9 @@
 #ifndef SLICER_MODELPARTS_H
 #define SLICER_MODELPARTS_H
 
+#include "metadata.h"
 #include <Ice/Config.h>
 #include <functional>
-#include <list>
 #include <optional>
 #include <stdexcept>
 #include <vector>
@@ -73,8 +73,8 @@ namespace Slicer {
 	using ChildHandler = std::function<void(const std::string &, ModelPartPtr, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
-	using Metadata = std::list<std::string>;
-	DLL_PUBLIC extern const Metadata emptyMetadata;
+	using Metadata = MetaData<>;
+	constexpr Metadata emptyMetadata;
 
 	enum class ModelPartType {
 		Null,
