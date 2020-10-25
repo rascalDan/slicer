@@ -76,6 +76,8 @@ namespace Slicer {
 
 		void defineConversions(const Slice::DataMemberPtr & dm) const;
 		void defineRoot(const std::string & type, std::string_view name, const Slice::TypePtr & stype) const;
+		void defineGetMetadata(const IceMetaData &, const Slice::ContainedPtr &, std::string_view mpt,
+				std::string_view tsuf = {}) const;
 		void externType(const Slice::TypePtr &) const;
 
 		void copyMetadata(const IceMetaData & metadata) const;

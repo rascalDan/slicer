@@ -268,6 +268,22 @@ namespace Slicer {
 	}
 
 	void
+	Slicer::defineGetMetadata(
+			const IceMetaData & md, const Slice::ContainedPtr & t, std::string_view mpt, std::string_view tsuf) const
+	{
+		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & %s< %s%s >::GetMetadata() const {\n", mpt, t->scoped(),
+				tsuf);
+		if (auto n = md.values("slicer:").size()) {
+			fprintbf(cpp, "\t\tstatic constexpr MetaDataImpl<%d> md {{{", n);
+			copyMetadata(md);
+			fprintbf(cpp, "\t\t}}};\n\t\treturn md;\n}\n\n");
+		}
+		else {
+			fprintbf(cpp, "\t\treturn emptyMetadata;\n}\n\n");
+		}
+	}
+
+	void
 	Slicer::externType(const Slice::TypePtr & type) const
 	{
 		if (definedTypes.count(type->typeId())) {
@@ -323,11 +339,7 @@ namespace Slicer {
 		}
 		fprintbf(cpp, "\n}\n");
 
-		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & ModelPartForComplex< %s >::GetMetadata() const {\n\
-				static constexpr MetaDataImpl<%d> md {{{",
-				c->scoped(), md.values("slicer:").size());
-		copyMetadata(md);
-		fprintbf(cpp, "}}}; return md;}\n\n");
+		defineGetMetadata(md, c, "ModelPartForComplex");
 
 		if (auto implementation = md.value("slicer:implementation:")) {
 			fprintbf(cpp, "\ttemplate<> void ModelPartForClass<%s>::Create() {\n", c->scoped());
@@ -370,11 +382,7 @@ namespace Slicer {
 		auto name = md.value("slicer:root:");
 		defineRoot(c->scoped(), name ? *name : c->name(), c);
 
-		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & ModelPartForComplex< %s >::GetMetadata() const {\n\
-				static constexpr MetaDataImpl<%d> md {{{",
-				c->scoped(), md.values("slicer:").size());
-		copyMetadata(md);
-		fprintbf(cpp, "}}}; return md;}\n\n");
+		defineGetMetadata(md, c, "ModelPartForComplex");
 
 		defineMODELPART(c->scoped(), c, md);
 
@@ -393,13 +401,11 @@ namespace Slicer {
 		}
 		fprintbf(cpp, "using C%d = ModelPartForComplex< %s >;\n", components, it->scoped());
 
-		size_t en = 0;
 		for (const auto & dm : dataMembers) {
 			const IceMetaData md {getAllMetadata(dm)};
 			auto name = std::string {md.value("slicer:name:").value_or(dm->name())};
-			auto lname = std::string {name};
-			boost::algorithm::to_lower(lname);
-			fprintbf(cpp, "\tconst std::string hstr%d_%d { \"%s\" };\n", components, en, name);
+			auto lname = std::string {boost::algorithm::to_lower_copy(name)};
+			fprintbf(cpp, "\tconst std::string hstr_C%d_%s { \"%s\" };\n", components, dm->name(), name);
 
 			auto c = Slice::ContainedPtr::dynamicCast(dm->container());
 			auto t = Slice::TypePtr::dynamicCast(dm->container());
@@ -411,21 +417,19 @@ namespace Slicer {
 			fprintbf(cpp, " %s, ", Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, md);
 			fprintbf(cpp, ", %d", md.countSlicerMetaData());
-			fprintbf(cpp, " > hook%d_%d {&%s, \"%s\", \"%s\", &hstr%d_%d", components, en, dm->scoped(), name, lname,
-					components, en);
+			fprintbf(cpp, " > hook_C%d_%s {&%s, \"%s\", \"%s\", &hstr_C%d_%s", components, name, dm->scoped(), name,
+					lname, components, name);
 			if (md.hasSlicerMetaData()) {
 				fprintbf(cpp, ",");
 				copyMetadata(md);
 			}
 			fprintbf(cpp, "};\n");
-			en++;
 		}
 
-		en = 0;
 		fprintbf(
 				cpp, "constexpr const HooksImpl< %s, %d > hooks%d {{{\n", it->scoped(), dataMembers.size(), components);
 		for (const auto & dm : dataMembers) {
-			fprintbf(cpp, " &hook%d_%d, // %s\n", components, en++, dm->name());
+			fprintbf(cpp, " &hook_C%d_%s,\n", components, dm->name());
 		}
 		fprintbf(cpp, "\t}}};\n");
 		fprintbf(cpp, "\ttemplate<> const Hooks< %s > & C%d::hooks() { return hooks%d; }\n", it->scoped(), components,
@@ -447,21 +451,15 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Enumeration %s\n", e->name());
 		const IceMetaData md {e->getMetaData()};
-		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & ModelPartForEnum< %s >::GetMetadata() const {\n\
-				static constexpr MetaDataImpl<%d> md {{{",
-				e->scoped(), md.values("slicer:").size());
-		copyMetadata(md);
-		fprintbf(cpp, "}}}; return md;}\n\n");
+		defineGetMetadata(md, e, "ModelPartForEnum");
 
-		size_t en = 0;
 		for (const auto & ee : e->enumerators()) {
-			fprintbf(cpp, "\tconst std::string estr%d_%d { \"%s\" };\n", components, en++, ee->name());
+			fprintbf(cpp, "\tconst std::string estr_E%d_%s { \"%s\" };\n", components, ee->name(), ee->name());
 		}
 		fprintbf(cpp, "constexpr const EnumMapImpl< %s, %d > enumerations%d {{{\n", e->scoped(),
 				e->enumerators().size(), components);
-		en = 0;
 		for (const auto & ee : e->enumerators()) {
-			fprintbf(cpp, "\t {%s, \"%s\", &estr%d_%d},\n", ee->scoped(), ee->name(), components, en++);
+			fprintbf(cpp, "\t {%s, \"%s\", &estr_E%d_%s},\n", ee->scoped(), ee->name(), components, ee->name());
 		}
 		fprintbf(cpp, "\t}}};\n");
 		fprintbf(cpp,
@@ -518,11 +516,7 @@ namespace Slicer {
 		auto name = md.value("slicer:root:");
 		defineRoot(s->scoped(), name ? *name : s->name(), s);
 
-		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & ModelPartForSequence< %s >::GetMetadata() const {\n\
-				static constexpr MetaDataImpl<%d> md {{{",
-				s->scoped(), md.values("slicer:").size());
-		copyMetadata(md);
-		fprintbf(cpp, "}}}; return md;}\n\n");
+		defineGetMetadata(md, s, "ModelPartForSequence");
 
 		defineMODELPART(s->scoped(), s, md);
 	}
@@ -553,10 +547,10 @@ namespace Slicer {
 		auto addHook = [&](std::string_view name, const char * element, const Slice::TypePtr & t) {
 			auto lname = std::string {name};
 			boost::algorithm::to_lower(lname);
-			fprintbf(cpp, "\tconst std::string hstr%d_%d { \"%s\" };\n", components, element, name);
+			fprintbf(cpp, "\tconst std::string hstr_C%d_%d { \"%s\" };\n", components, element, name);
 			fprintbf(cpp, "\tconstexpr C%d::Hook< const %s, ", components, Slice::typeToString(t));
 			createNewModelPartPtrFor(t);
-			fprintbf(cpp, ", 0 > hook%d_%s {&%s::value_type::%s, \"%s\", \"%s\", &hstr%d_%s};\n", components, element,
+			fprintbf(cpp, ", 0 > hook%d_%s {&%s::value_type::%s, \"%s\", \"%s\", &hstr_C%d_%s};\n", components, element,
 					d->scoped(), element, name, lname, components, element);
 		};
 		addHook(md.value("slicer:key:").value_or("key"), "first", d->keyType());
@@ -572,18 +566,8 @@ namespace Slicer {
 		auto name = md.value("slicer:root:");
 		defineRoot(d->scoped(), name ? *name : d->name(), d);
 
-		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & ModelPartForDictionary< %s >::GetMetadata() const {\n\
-				static constexpr MetaDataImpl<%d> md {{{",
-				d->scoped(), md.values("slicer:").size());
-		copyMetadata(md);
-		fprintbf(cpp, "}}}; return md;}\n\n");
-
-		fprintbf(cpp,
-				"template<> DLL_PUBLIC\nconst Metadata & ModelPartForComplex< %s::value_type >::GetMetadata() const {\n\
-				static constexpr MetaDataImpl<%d> md {{{",
-				d->scoped(), md.values("slicer:").size());
-		copyMetadata(md);
-		fprintbf(cpp, "}}}; return md;}\n\n");
+		defineGetMetadata(md, d, "ModelPartForDictionary");
+		defineGetMetadata(md, d, "ModelPartForComplex", "::value_type");
 
 		defineMODELPART(d->scoped(), d, md);
 	}
