@@ -54,7 +54,7 @@ namespace Slicer {
 	}
 
 	ModelPartPtr
-	ModelPart::GetChild(const std::string & memberName, const HookFilter & flt)
+	ModelPart::GetChild(std::string_view memberName, const HookFilter & flt)
 	{
 		auto ref = GetChildRef(memberName, flt);
 		return ref ? ref.Child() : ModelPartPtr(nullptr);

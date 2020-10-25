@@ -101,7 +101,7 @@ namespace Slicer {
 	MODELPARTFOR(Ice::Long, ModelPartForSimple);
 
 	bool
-	optionalCaseEq(const std::string & a, const std::string & b, bool matchCase)
+	optionalCaseEq(std::string_view a, std::string_view b, bool matchCase)
 	{
 		return (matchCase ? boost::equals(a, b) : boost::iequals(a, b));
 	}
@@ -117,10 +117,10 @@ namespace Slicer {
 	}
 
 	ChildRef
-	ModelPartForRootBase::GetChildRef(const std::string & name, const HookFilter & hf, bool matchCase)
+	ModelPartForRootBase::GetChildRef(std::string_view name, const HookFilter & hf, bool matchCase)
 	{
 		if (!optionalCaseEq(name, GetRootName(), matchCase)) {
-			throw IncorrectElementName(name);
+			throw IncorrectElementName(std::string {name});
 		}
 		return GetAnonChildRef(hf);
 	}
@@ -159,7 +159,7 @@ namespace Slicer {
 		return ChildRef();
 	}
 	ChildRef
-	ModelPartForSimpleBase::GetChildRef(const std::string &, const HookFilter &, bool)
+	ModelPartForSimpleBase::GetChildRef(std::string_view, const HookFilter &, bool)
 	{
 		return ChildRef();
 	}
@@ -185,7 +185,7 @@ namespace Slicer {
 		return ChildRef();
 	}
 	ChildRef
-	ModelPartForConvertedBase::GetChildRef(const std::string &, const HookFilter &, bool)
+	ModelPartForConvertedBase::GetChildRef(std::string_view, const HookFilter &, bool)
 	{
 		return ChildRef();
 	}
@@ -273,7 +273,7 @@ namespace Slicer {
 	}
 
 	ChildRef
-	ModelPartForOptionalBase::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
+	ModelPartForOptionalBase::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
 	{
 		if (this->hasModel()) {
 			return modelPart->GetChildRef(name, flt, matchCase);
@@ -317,7 +317,7 @@ namespace Slicer {
 		return ChildRef();
 	}
 	ChildRef
-	ModelPartForEnumBase::GetChildRef(const std::string &, const HookFilter &, bool)
+	ModelPartForEnumBase::GetChildRef(std::string_view, const HookFilter &, bool)
 	{
 		return ChildRef();
 	}
@@ -366,7 +366,7 @@ namespace Slicer {
 	}
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	ChildRef
-	ModelPartForStreamBase::GetChildRef(const std::string &, const Slicer::HookFilter &, bool)
+	ModelPartForStreamBase::GetChildRef(std::string_view, const Slicer::HookFilter &, bool)
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}

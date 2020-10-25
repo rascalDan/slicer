@@ -434,7 +434,7 @@ namespace Slicer {
 
 	template<typename T>
 	ChildRef
-	ModelPartForComplex<T>::GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase)
+	ModelPartForComplex<T>::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
 	{
 		if (matchCase) {
 			return GetChildRefFromRange(hooks().equal_range(name), flt);
@@ -737,11 +737,11 @@ namespace Slicer {
 
 	template<typename T>
 	ChildRef
-	ModelPartForDictionary<T>::GetChildRef(const std::string & name, const HookFilter &, bool matchCase)
+	ModelPartForDictionary<T>::GetChildRef(std::string_view name, const HookFilter &, bool matchCase)
 	{
 		BOOST_ASSERT(this->Model);
 		if (!optionalCaseEq(name, pairName, matchCase)) {
-			throw IncorrectElementName(name);
+			throw IncorrectElementName(std::string {name});
 		}
 		return ChildRef(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model));
 	}

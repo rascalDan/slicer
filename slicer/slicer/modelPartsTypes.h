@@ -10,7 +10,7 @@ namespace Slicer {
 		static constexpr bool value = false;
 	};
 
-	DLL_PUBLIC bool optionalCaseEq(const std::string & a, const std::string & b, bool matchCase);
+	DLL_PUBLIC bool optionalCaseEq(std::string_view a, std::string_view b, bool matchCase);
 
 	template<typename T> class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
 	public:
@@ -31,7 +31,7 @@ namespace Slicer {
 	public:
 		void OnEachChild(const ChildHandler &) override;
 		ChildRef GetAnonChildRef(const HookFilter &) override;
-		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
 		bool HasValue() const override;
 		ModelPartType GetType() const override;
 		static const ModelPartType type;
@@ -52,7 +52,7 @@ namespace Slicer {
 	public:
 		void OnEachChild(const ChildHandler &) override;
 		ChildRef GetAnonChildRef(const HookFilter &) override;
-		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
 		bool HasValue() const override;
 		ModelPartType GetType() const override;
 		static const ModelPartType type;
@@ -97,7 +97,7 @@ namespace Slicer {
 		void OnEachChild(const ChildHandler & ch) override;
 		void Complete() override;
 		ChildRef GetAnonChildRef(const HookFilter & flt) override;
-		ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase = true) override;
 		void SetValue(ValueSource && s) override;
 		bool HasValue() const override;
 		bool IsOptional() const override;
@@ -149,7 +149,7 @@ namespace Slicer {
 		void OnEachChild(const ChildHandler & ch) override;
 
 		ChildRef GetAnonChildRef(const HookFilter & flt) override;
-		ChildRef GetChildRef(const std::string & name, const HookFilter & flt, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase = true) override;
 
 		const Metadata & GetMetadata() const override;
 
@@ -215,7 +215,7 @@ namespace Slicer {
 	public:
 		void OnEachChild(const ChildHandler &) override;
 		ChildRef GetAnonChildRef(const HookFilter &) override;
-		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
 		bool HasValue() const override;
 		ModelPartType GetType() const override;
 		static const ModelPartType type;
@@ -258,7 +258,7 @@ namespace Slicer {
 
 		ChildRef GetAnonChildRef(const HookFilter &) override;
 
-		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
 
 		const Metadata & GetMetadata() const override;
 
@@ -302,7 +302,7 @@ namespace Slicer {
 
 		ChildRef GetAnonChildRef(const HookFilter &) override;
 
-		ChildRef GetChildRef(const std::string & name, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view name, const HookFilter &, bool matchCase = true) override;
 
 		const Metadata & GetMetadata() const override;
 
@@ -325,7 +325,7 @@ namespace Slicer {
 		ModelPartType GetType() const override;
 		bool HasValue() const override;
 		ChildRef GetAnonChildRef(const HookFilter &) override;
-		ChildRef GetChildRef(const std::string &, const HookFilter &, bool matchCase = true) override;
+		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
 
 		ModelPartPtr GetContainedModelPart() override = 0;
 		void OnEachChild(const ChildHandler & ch) override = 0;

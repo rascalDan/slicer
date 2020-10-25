@@ -98,21 +98,23 @@ namespace Slicer {
 		constexpr inline eq<K>
 		equal_range(K && k) const
 		{
-			return {std::move(k), &HookCommon::name, _begin, _end};
+			return {std::forward<K>(k), &HookCommon::name, _begin, _end};
 		}
 
 		template<typename K>
 		constexpr inline eq<K>
 		equal_range_lower(K && k) const
 		{
-			return {std::move(k), &HookCommon::nameLower, _begin, _end};
+			return {std::forward<K>(k), &HookCommon::nameLower, _begin, _end};
 		}
 
 		template<typename K>
-		inline eq<K>
+		inline auto
 		equal_range_nocase(const K & k) const
 		{
-			return equal_range_lower(boost::algorithm::to_lower_copy(k));
+			std::string i {k};
+			boost::algorithm::to_lower(i);
+			return equal_range_lower(std::move(i));
 		}
 
 		constexpr inline auto

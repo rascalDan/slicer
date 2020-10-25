@@ -22,8 +22,8 @@ namespace Slicer {
 	constexpr std::string_view md_bare {"xml:bare"};
 	constexpr std::string_view md_attributes {"xml:attributes"};
 	constexpr std::string_view md_elements {"xml:elements"};
-	const std::string keyName = "key";
-	const std::string valueName = "value";
+	constexpr std::string_view keyName {"key"};
+	constexpr std::string_view valueName {"value"};
 	using ElementCreatorF = xmlpp::Element * (xmlpp::Element::*)(const Glib::ustring &, const Glib::ustring &);
 	const auto defaultElementCreator = [](auto && element, auto && name) {
 		return element->add_child_element(name);
@@ -270,7 +270,7 @@ namespace Slicer {
 	{
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
-				auto smpr = mp->GetChildRef(element->get_name(), [](const auto & h) {
+				auto smpr = mp->GetChildRef(element->get_name().raw(), [](const auto & h) {
 					return h->GetMetadata().flagNotSet(md_attribute);
 				});
 				if (smpr) {
@@ -284,7 +284,7 @@ namespace Slicer {
 				}
 			}
 			else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
-				auto smp = mp->GetChild(attribute->get_name(), [](const auto & h) {
+				auto smp = mp->GetChild(attribute->get_name().raw(), [](const auto & h) {
 					return h->GetMetadata().flagSet(md_attribute);
 				});
 				if (smp) {

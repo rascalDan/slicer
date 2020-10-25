@@ -491,7 +491,7 @@ namespace Slicer {
 		externType(s->type());
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp,
-				"ChildRef ModelPartForSequence< %s >::GetChildRef(const std::string & name, const HookFilter & flt, "
+				"ChildRef ModelPartForSequence< %s >::GetChildRef(std::string_view name, const HookFilter & flt, "
 				"bool matchCase)\n{\n",
 				s->scoped());
 		const IceMetaData md {s->getMetaData()};

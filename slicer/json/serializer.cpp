@@ -17,9 +17,9 @@ NAMEDFACTORY("application/json", Slicer::JsonStreamSerializer, Slicer::StreamSer
 NAMEDFACTORY("application/json", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory);
 
 namespace Slicer {
-	const std::string md_object = "json:object";
-	const std::string keyName = "key";
-	const std::string valueName = "value";
+	constexpr std::string_view md_object {"json:object"};
+	constexpr std::string_view keyName {"key"};
+	constexpr std::string_view valueName {"value"};
 
 	using namespace std::placeholders;
 
