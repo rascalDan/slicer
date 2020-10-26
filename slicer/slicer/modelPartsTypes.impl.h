@@ -564,25 +564,16 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		BOOST_ASSERT(className);
-		return ModelPartForComplexBase::GetTypeId(getTypeId(), *className);
-	}
-
-	template<typename T>
-	template<typename dummy>
-	const std::string &
-	ModelPartForClass<T>::getTypeId(typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type *) const
-	{
-		BOOST_ASSERT(this->Model);
-		return (*this->Model)->ice_id();
-	}
-
-	template<typename T>
-	template<typename dummy>
-	std::string
-	ModelPartForClass<T>::getTypeId(typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type *) const
-	{
-		BOOST_ASSERT(this->Model);
-		return ModelPartForComplexBase::demangle(typeid(*this->Model->get()).name());
+		return ModelPartForComplexBase::GetTypeId(
+				[this]() {
+					if constexpr (std::is_base_of_v<Ice::Object, T>) {
+						return (*this->Model)->ice_id();
+					}
+					else {
+						return ModelPartForComplexBase::demangle(typeid(*this->Model->get()).name());
+					}
+				}(),
+				*className);
 	}
 
 	// ModelPartForStruct

@@ -177,12 +177,6 @@ namespace Slicer {
 		[[nodiscard]] bool HasValue() const override;
 
 		[[nodiscard]] TypeId GetTypeId() const override;
-		template<typename dummy = T>
-		const std::string & getTypeId(
-				typename std::enable_if<std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
-		template<typename dummy = T>
-		std::string getTypeId(
-				typename std::enable_if<!std::is_base_of<Ice::Object, dummy>::value>::type * = nullptr) const;
 
 		[[nodiscard]] std::optional<std::string> GetTypeIdProperty() const override;
 
