@@ -15,8 +15,6 @@ NAMEDFACTORY("application/xml", Slicer::XmlStreamSerializer, Slicer::StreamSeria
 NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDeserializerFactory);
 
 namespace Slicer {
-	using namespace std::placeholders;
-
 	constexpr std::string_view md_attribute {"xml:attribute"};
 	constexpr std::string_view md_text {"xml:text"};
 	constexpr std::string_view md_bare {"xml:bare"};
@@ -24,8 +22,8 @@ namespace Slicer {
 	constexpr std::string_view md_elements {"xml:elements"};
 	constexpr std::string_view keyName {"key"};
 	constexpr std::string_view valueName {"value"};
-	using ElementCreatorF = xmlpp::Element * (xmlpp::Element::*)(const Glib::ustring &, const Glib::ustring &);
-	const auto defaultElementCreator = [](auto && element, auto && name) {
+
+	constexpr auto defaultElementCreator = [](auto && element, auto && name) {
 		return element->add_child_element(name);
 	};
 
