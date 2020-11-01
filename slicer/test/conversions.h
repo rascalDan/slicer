@@ -32,6 +32,10 @@ namespace Slicer {
 	Ice::optional<Ice::Int> str2int(const std::string &);
 	DLL_PUBLIC
 	std::string int2str(const Ice::optional<Ice::Int> &);
+	DLL_PUBLIC
+	std::string ptimeToString(const boost::posix_time::ptime &);
+	DLL_PUBLIC
+	boost::posix_time::ptime stringToPtime(const std::string &);
 }
 
 #endif

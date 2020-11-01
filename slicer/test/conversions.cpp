@@ -106,6 +106,20 @@ namespace Slicer {
 		}
 		return std::to_string(*i);
 	}
+
+	DLL_PUBLIC
+	std::string
+	ptimeToString(const boost::posix_time::ptime & pt)
+	{
+		return boost::posix_time::to_iso_extended_string(pt);
+	}
+
+	DLL_PUBLIC
+	boost::posix_time::ptime
+	stringToPtime(const std::string & s)
+	{
+		return boost::posix_time::from_iso_string(s);
+	}
 }
 
 namespace TestModule {

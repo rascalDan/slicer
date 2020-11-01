@@ -30,11 +30,11 @@ module TestModule2 {
 		TestModule::Base base;
 	};
 	class Conv {
-		[ "slicer:conversion:boost.posix_time.ptime:boost.posix_time.to_iso_extended_string:boost.posix_time.time_from_string:nodeclare" ]
+		[ "slicer:conversion:boost.posix_time.ptime:ptimeToString:stringToPtime:nodeclare" ]
 		string conv;
 	};
 	class MissingConv {
-		[ "slicer:conversion:boost.posix_time.ptime:boost.posix_time.to_iso_extended_string:boost.posix_time.time_from_string:nodeclare",
+		[ "slicer:conversion:boost.posix_time.ptime:ptimeToString:stringToPtime:nodeclare",
 			"slicer:nodefaultconversion" ]
 		string conv;
 	};
