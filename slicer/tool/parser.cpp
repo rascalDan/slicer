@@ -163,7 +163,7 @@ namespace Slicer {
 						Slice::typeToString(type));
 			}
 			// Failed to convert
-			fprintbf(cpp, "\tthrow NoConversionFound(\"%s\");\n", Slice::typeToString(type));
+			fprintbf(cpp, "\tconversion_fail(\"%s\");\n", Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
 
 			fprintbf(cpp, "template<> DLL_PUBLIC\nbool\n");
@@ -188,7 +188,7 @@ namespace Slicer {
 						Slice::typeToString(type));
 			}
 			// Failed to convert
-			fprintbf(cpp, "\tthrow NoConversionFound(\"%s\");\n", Slice::typeToString(type));
+			fprintbf(cpp, "\tconversion_fail(\"%s\");\n", Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
 		}
 	}

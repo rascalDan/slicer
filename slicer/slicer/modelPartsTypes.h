@@ -58,6 +58,7 @@ namespace Slicer {
 		static const ModelPartType type;
 
 	protected:
+		[[noreturn]] void conversion_fail(std::string_view typeName);
 		template<typename ET, typename MT, typename Conv>
 		inline static bool tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv);
 		template<typename ET, typename MT> inline static bool tryConvertFrom(ValueSource & vsp, MT * model);

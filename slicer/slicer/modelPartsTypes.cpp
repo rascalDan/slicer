@@ -199,6 +199,11 @@ namespace Slicer {
 	{
 		return type;
 	}
+	void
+	ModelPartForConvertedBase::conversion_fail(std::string_view typeName)
+	{
+		throw NoConversionFound(std::string {typeName});
+	}
 	const ModelPartType ModelPartForConvertedBase::type = ModelPartType::Simple;
 
 	ModelPartType
