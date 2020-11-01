@@ -60,12 +60,12 @@ namespace Slicer {
 	protected:
 		[[noreturn]] void conversion_fail(std::string_view typeName);
 		template<typename ET, typename MT, typename Conv>
-		inline static bool tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv);
-		template<typename ET, typename MT> inline static bool tryConvertFrom(ValueSource & vsp, MT * model);
+		inline static bool tryConvertFrom(const ValueSource & vsp, MT * model, const Conv & conv);
+		template<typename ET, typename MT> inline static bool tryConvertFrom(const ValueSource & vsp, MT * model);
 		template<typename ET, typename MT, typename Conv>
-		inline static TryConvertResult tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv);
+		inline static TryConvertResult tryConvertTo(const ValueTarget & vsp, const MT * model, const Conv & conv);
 		template<typename ET, typename MT>
-		inline static TryConvertResult tryConvertTo(ValueTarget & vsp, const MT * model);
+		inline static TryConvertResult tryConvertTo(const ValueTarget & vsp, const MT * model);
 	};
 
 	template<typename T, typename M, T M::*MV>

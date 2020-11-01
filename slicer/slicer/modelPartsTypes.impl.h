@@ -4,6 +4,7 @@
 #include "common.h"
 #include "enumMap.h"
 #include "hookMap.h"
+#include "modelPartsTraits.h"
 #include "modelPartsTypes.h"
 #include <Ice/StreamHelpers.h>
 #include <IceUtil/Optional.h>
@@ -206,99 +207,16 @@ namespace Slicer {
 		return (bool)*this->Model;
 	}
 
-	// Function traits helpers
-	template<typename R, typename... Args> struct function_traits;
-	template<typename R, typename... Args> struct function_traits<std::function<R(Args...)>> {
-		template<int A> struct arg {
-			using type = typename std::tuple_element<A, std::tuple<Args...>>::type;
-		};
-	};
-	template<typename F>
-	struct callable_traits : public function_traits<std::function<typename std::remove_pointer<F>::type>> {
-	};
-
-	// Converters that remove "optionalness".
-	template<typename X> struct Coerce {
-		using T = typename std::remove_const<typename std::remove_reference<X>::type>::type;
-
-		T &
-		operator()(T & x) const
-		{
-			return x;
-		}
-		const T &
-		operator()(const T & x) const
-		{
-			return x;
-		}
-		template<typename Y>
-		T &
-		operator()(Ice::optional<Y> & x) const
-		{
-			if (!x) {
-				x = Y();
-			}
-			return *x;
-		}
-		template<typename Y>
-		const T &
-		operator()(const Ice::optional<Y> & x) const
-		{
-			return *x;
-		}
-		static bool
-		valueExists(const T &)
-		{
-			return true;
-		}
-		static bool
-		valueExists(const Ice::optional<T> & y)
-		{
-			return y.has_value();
-		}
-	};
-	template<typename X> struct Coerce<Ice::optional<X>> {
-		using T = typename std::remove_const<typename std::remove_reference<X>::type>::type;
-
-		Ice::optional<T> &
-		operator()(Ice::optional<T> & x) const
-		{
-			return x;
-		}
-		const Ice::optional<T> &
-		operator()(const Ice::optional<T> & x) const
-		{
-			return x;
-		}
-		template<typename Y>
-		Ice::optional<T>
-		operator()(Y & y) const
-		{
-			return y;
-		}
-		static bool
-		valueExists(const T &)
-		{
-			return true;
-		}
-		static bool
-		valueExists(const Ice::optional<T> &)
-		{
-			return true;
-		}
-	};
-
 	template<typename ET, typename MT, typename Conv>
 	inline bool
-	ModelPartForConvertedBase::tryConvertFrom(ValueSource & vsp, MT * model, const Conv & conv)
+	ModelPartForConvertedBase::tryConvertFrom(const ValueSource & vsp, MT * model, const Conv & conv)
 	{
-		if (auto vspt = dynamic_cast<TValueSource<ET> *>(&vsp)) {
-			using CA = typename callable_traits<Conv>::template arg<0>::type;
+		if (auto vspt = dynamic_cast<const TValueSource<ET> *>(&vsp)) {
+			using CA = callable_param<Conv, 0>;
 			ET tmp;
 			vspt->set(tmp);
-			auto converted = conv(Coerce<CA>()(tmp));
-			if (Coerce<MT>::valueExists(converted)) {
-				*model = Coerce<MT>()(converted);
+			if (auto converted = conv(Coerce<CA>()(tmp)); Coerce<MT>::valueExists(converted)) {
+				*model = Coerce<MT>()(std::move(converted));
 			}
 			return true;
 		}
@@ -307,9 +225,9 @@ namespace Slicer {
 
 	template<typename ET, typename MT>
 	inline bool
-	ModelPartForConvertedBase::tryConvertFrom(ValueSource & vsp, MT * model)
+	ModelPartForConvertedBase::tryConvertFrom(const ValueSource & vsp, MT * model)
 	{
-		if (auto vspt = dynamic_cast<TValueSource<ET> *>(&vsp)) {
+		if (auto vspt = dynamic_cast<const TValueSource<ET> *>(&vsp)) {
 			if (Coerce<ET>::valueExists(*model)) {
 				vspt->set(Coerce<ET>()(*model));
 			}
@@ -320,15 +238,13 @@ namespace Slicer {
 
 	template<typename ET, typename MT, typename Conv>
 	inline TryConvertResult
-	ModelPartForConvertedBase::tryConvertTo(ValueTarget & vsp, const MT * model, const Conv & conv)
+	ModelPartForConvertedBase::tryConvertTo(const ValueTarget & vsp, const MT * model, const Conv & conv)
 	{
-		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(&vsp)) {
-			using CA = typename callable_traits<Conv>::template arg<0>::type;
-			using CAR = typename std::remove_const<typename std::remove_reference<CA>::type>::type;
-			if (Coerce<CAR>::valueExists(*model)) {
-				auto converted = conv(Coerce<CA>()(*model));
-				if (Coerce<ET>::valueExists(converted)) {
-					vspt->get(Coerce<ET>()(converted));
+		if (auto vspt = dynamic_cast<const TValueTarget<ET> *>(&vsp)) {
+			using CA = callable_param<Conv, 0>;
+			if (Coerce<std::decay_t<CA>>::valueExists(*model)) {
+				if (auto converted = conv(Coerce<CA>()(*model)); Coerce<ET>::valueExists(converted)) {
+					vspt->get(Coerce<ET>()(std::move(converted)));
 					return TryConvertResult::Value;
 				}
 			}
@@ -339,9 +255,9 @@ namespace Slicer {
 
 	template<typename ET, typename MT>
 	inline TryConvertResult
-	ModelPartForConvertedBase::tryConvertTo(ValueTarget & vsp, const MT * model)
+	ModelPartForConvertedBase::tryConvertTo(const ValueTarget & vsp, const MT * model)
 	{
-		if (auto vspt = dynamic_cast<TValueTarget<ET> *>(&vsp)) {
+		if (auto vspt = dynamic_cast<const TValueTarget<ET> *>(&vsp)) {
 			if (Coerce<ET>::valueExists(*model)) {
 				vspt->get(Coerce<ET>()(*model));
 				return TryConvertResult::Value;
