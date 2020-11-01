@@ -28,11 +28,13 @@ project
 			<toolset>tidy:<xcheckxx>clang-analyzer-cplusplus.NewDeleteLeaks
 			<toolset>tidy:<checkxx>misc-*
 			<toolset>tidy:<xcheckxx>misc-non-private-member-variables-in-classes
+			<toolset>tidy:<xcheckxx>misc-no-recursion
 			<toolset>tidy:<checkxx>modernize-*
 			<toolset>tidy:<xcheckxx>modernize-use-trailing-return-type
 			<toolset>tidy:<checkxx>hicpp-*
 			<toolset>tidy:<xcheckxx>hicpp-no-array-decay
 			<toolset>tidy:<xcheckxx>hicpp-vararg
+			<toolset>tidy:<xcheckxx>hicpp-named-parameter
 			<toolset>tidy:<checkxx>performance-*
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/classes.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/classtype.h

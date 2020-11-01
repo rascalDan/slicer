@@ -14,9 +14,9 @@ namespace Slicer {
 	template<typename E> class EnumMap {
 	public:
 		struct Node {
-			E value;
-			std::string_view name;
-			const std::string * nameStr;
+			E value {};
+			std::string_view name {};
+			const std::string * nameStr {};
 		};
 
 		template<EnumMapKey Key, typename T>
@@ -48,7 +48,7 @@ namespace Slicer {
 		using NodeType = typename EnumMap<E>::Node;
 		template<std::size_t n> using Arr = std::array<NodeType, n>;
 
-		inline constexpr EnumMapImpl(Arr<N> a) : arr(std::move(a))
+		inline constexpr explicit EnumMapImpl(Arr<N> a) : arr(std::move(a))
 		{
 			EnumMap<E>::begin = arr.begin();
 			EnumMap<E>::end = arr.end();

@@ -16,20 +16,20 @@ namespace Slicer {
 		constexpr MetaData() = default;
 
 		// Flags
-		constexpr inline bool
+		[[nodiscard]] constexpr inline bool
 		flagSet(std::string_view flag) const
 		{
 			return find(flag) != _end;
 		}
 
-		constexpr inline bool
+		[[nodiscard]] constexpr inline bool
 		flagNotSet(std::string_view flag) const
 		{
 			return find(flag) == _end;
 		}
 
 		// Values
-		constexpr std::optional<std::string_view>
+		[[nodiscard]] constexpr std::optional<std::string_view>
 		value(std::string_view prefix) const
 		{
 			for (auto mditr = _begin; mditr != _end; mditr++) {
@@ -41,7 +41,7 @@ namespace Slicer {
 			return {};
 		}
 
-		std::vector<std::string_view>
+		[[nodiscard]] std::vector<std::string_view>
 		values(std::string_view prefix) const
 		{
 			std::vector<std::string_view> mds;
@@ -54,12 +54,13 @@ namespace Slicer {
 			return mds;
 		}
 
-		constexpr auto
+		[[nodiscard]] constexpr auto
 		begin() const
 		{
 			return _begin;
 		}
-		constexpr auto
+
+		[[nodiscard]] constexpr auto
 		end() const
 		{
 			return _end;
@@ -69,7 +70,7 @@ namespace Slicer {
 		Iter _begin {};
 		Iter _end {};
 
-		constexpr Iter
+		[[nodiscard]] constexpr Iter
 		find(Value v) const
 		{
 			for (auto mdptr = _begin; mdptr != _end; mdptr++) {
@@ -84,7 +85,7 @@ namespace Slicer {
 	template<std::size_t N> class DLL_PUBLIC MetaDataImpl : public MetaData<> {
 	public:
 		using Arr = std::array<Value, N>;
-		constexpr inline MetaDataImpl(Arr a) : arr(std::move(a))
+		constexpr inline explicit MetaDataImpl(Arr a) : arr(std::move(a))
 		{
 			_begin = arr.begin();
 			_end = arr.end();

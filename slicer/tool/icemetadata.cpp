@@ -2,7 +2,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace Slicer {
-	IceMetaData::IceMetaData() { }
 	IceMetaData::IceMetaData(Slice::StringList && a) : arr {std::forward<Slice::StringList>(a)}
 	{
 		_begin = arr.begin();

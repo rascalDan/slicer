@@ -11,22 +11,23 @@ namespace Slicer {
 	public:
 		static constexpr std::string_view slicer_prefix {"slicer:"};
 
-		explicit IceMetaData();
+		explicit IceMetaData() = default;
 		explicit IceMetaData(Slice::StringList && arr);
+		~IceMetaData() = default;
 
 		SPECIAL_MEMBERS_DELETE(IceMetaData);
 
 		[[nodiscard]] static std::vector<std::string_view> split(std::string_view metaData);
 
-		bool hasSlicerMetaData() const;
-		size_t countSlicerMetaData() const;
+		[[nodiscard]] bool hasSlicerMetaData() const;
+		[[nodiscard]] size_t countSlicerMetaData() const;
 
-		constexpr bool static isSlicerMetaData(std::string_view md)
+		[[nodiscard]] constexpr bool static isSlicerMetaData(std::string_view md)
 		{
 			return md.substr(0, slicer_prefix.length()) == slicer_prefix;
 		}
 
-		auto
+		[[nodiscard]] auto
 		getSlicerMetaData() const
 		{
 			return values(slicer_prefix);

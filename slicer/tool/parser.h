@@ -14,18 +14,17 @@ namespace Slicer {
 	};
 
 	struct CppName : public SplitString {
-		inline CppName(std::string_view in) : SplitString {in, "."} { }
+		explicit inline CppName(std::string_view in) : SplitString {in, "."} { }
 	};
 
 	class DLL_PUBLIC Slicer : public Slice::ParserVisitor {
 	public:
 		struct Args : public SplitString {
-			inline Args(std::string_view in) : SplitString {in, ","} { }
+			explicit inline Args(std::string_view in) : SplitString {in, ","} { }
 			using SplitString::SplitString;
 		};
 
-		class ConversionSpec {
-		public:
+		struct ConversionSpec {
 			CppName ExchangeType;
 			CppName ConvertToModelFunc;
 			CppName ConvertToExchangeFunc;

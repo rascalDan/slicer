@@ -417,7 +417,7 @@ namespace Slicer {
 			fprintbf(cpp, " %s, ", Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, md);
 			fprintbf(cpp, ", %d", md.countSlicerMetaData());
-			fprintbf(cpp, " > hook_C%d_%s {&%s, \"%s\", \"%s\", &hstr_C%d_%s", components, name, dm->scoped(), name,
+			fprintbf(cpp, R"( > hook_C%d_%s {&%s, "%s", "%s", &hstr_C%d_%s)", components, name, dm->scoped(), name,
 					lname, components, name);
 			if (md.hasSlicerMetaData()) {
 				fprintbf(cpp, ",");
@@ -669,7 +669,8 @@ namespace Slicer {
 			if (split.size() < 3) {
 				throw CompilerError("conversion needs at least 3 parts type:toModelFunc:toExchangeFunc[:options]");
 			}
-			rtn.push_back(ConversionSpec {split[0], split[1], split[2], {&split[3], &split[split.size()]}});
+			rtn.push_back(ConversionSpec {
+					CppName {split[0]}, CppName {split[1]}, CppName {split[2]}, {split.begin() + 3, split.end()}});
 		}
 		return rtn;
 	}

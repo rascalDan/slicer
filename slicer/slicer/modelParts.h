@@ -112,7 +112,7 @@ namespace Slicer {
 		{
 		}
 
-		bool filter(const HookFilter & flt) const;
+		[[nodiscard]] bool filter(const HookFilter & flt) const;
 		void apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const;
 
 		[[nodiscard]] virtual const Metadata & GetMetadata() const = 0;

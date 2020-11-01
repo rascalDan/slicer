@@ -15,18 +15,18 @@ namespace Slicer {
 
 		template<typename K> class iter : public std::iterator<std::bidirectional_iterator_tag, HookPtr> {
 		public:
-			constexpr inline iter(const eq<K> * const r, const HookPtr * c) : range(r), cur(c)
+			[[nodiscard]] constexpr inline iter(const eq<K> * const r, const HookPtr * c) : range(r), cur(c)
 			{
 				moveMatch();
 			}
 
-			constexpr inline HookPtr
+			[[nodiscard]] constexpr inline HookPtr
 			operator*() const
 			{
 				return *cur;
 			}
 
-			constexpr inline HookPtr
+			[[nodiscard]] constexpr inline HookPtr
 			operator->() const
 			{
 				return *cur;
@@ -40,7 +40,7 @@ namespace Slicer {
 				}
 			}
 
-			constexpr inline iter
+			[[nodiscard]] constexpr inline iter
 			operator+(std::size_t n) const
 			{
 				auto i {*this};
@@ -50,13 +50,13 @@ namespace Slicer {
 				return i;
 			}
 
-			constexpr inline bool
+			[[nodiscard]] constexpr inline bool
 			operator!=(const iter & other) const
 			{
 				return cur != other.cur;
 			}
 
-			constexpr inline bool
+			[[nodiscard]] constexpr inline bool
 			operator==(const iter & other) const
 			{
 				return cur == other.cur;
@@ -77,13 +77,13 @@ namespace Slicer {
 
 		template<typename K> class eq {
 		public:
-			constexpr inline iter<K>
+			[[nodiscard]] constexpr inline iter<K>
 			begin() const
 			{
 				return {this, b};
 			}
 
-			constexpr inline iter<K>
+			[[nodiscard]] constexpr inline iter<K>
 			end() const
 			{
 				return {this, e};
@@ -95,21 +95,21 @@ namespace Slicer {
 		};
 
 		template<typename K>
-		constexpr inline eq<K>
+		[[nodiscard]] constexpr inline eq<K>
 		equal_range(K && k) const
 		{
 			return {std::forward<K>(k), &HookCommon::name, _begin, _end};
 		}
 
 		template<typename K>
-		constexpr inline eq<K>
+		[[nodiscard]] constexpr inline eq<K>
 		equal_range_lower(K && k) const
 		{
 			return {std::forward<K>(k), &HookCommon::nameLower, _begin, _end};
 		}
 
 		template<typename K>
-		inline auto
+		[[nodiscard]] inline auto
 		equal_range_nocase(const K & k) const
 		{
 			std::string i {k};
@@ -117,12 +117,13 @@ namespace Slicer {
 			return equal_range_lower(std::move(i));
 		}
 
-		constexpr inline auto
+		[[nodiscard]] constexpr inline auto
 		begin() const
 		{
 			return _begin;
 		}
-		constexpr inline auto
+
+		[[nodiscard]] constexpr inline auto
 		end() const
 		{
 			return _end;
@@ -138,7 +139,7 @@ namespace Slicer {
 		using HookPtr = typename Hooks<T>::HookPtr;
 		template<std::size_t n> using Arr = std::array<HookPtr, n>;
 
-		inline constexpr HooksImpl(Arr<N> a) : arr(std::move(a))
+		inline constexpr explicit HooksImpl(Arr<N> a) : arr(std::move(a))
 		{
 			Hooks<T>::_begin = arr.begin();
 			Hooks<T>::_end = arr.end();
