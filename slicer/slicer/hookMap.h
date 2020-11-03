@@ -3,9 +3,11 @@
 
 #include "modelParts.h"
 #include <array>
-#include <boost/algorithm/string/case_conv.hpp>
+#include <visibility.h>
 
 namespace Slicer {
+	void DLL_PUBLIC to_lower(std::string s);
+
 	template<typename T> class ModelPartForComplex;
 	template<typename T> class Hooks {
 	public:
@@ -113,7 +115,7 @@ namespace Slicer {
 		equal_range_nocase(const K & k) const
 		{
 			std::string i {k};
-			boost::algorithm::to_lower(i);
+			to_lower(i);
 			return equal_range_lower(std::move(i));
 		}
 
