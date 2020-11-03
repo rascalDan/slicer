@@ -42,7 +42,7 @@ namespace Slicer {
 	public:
 		using element_type = T;
 
-		explicit ModelPartForSimple(T * h);
+		using ModelPartModel<T>::ModelPartModel;
 
 		void SetValue(ValueSource && s) override;
 		bool GetValue(ValueTarget && s) override;
@@ -73,7 +73,7 @@ namespace Slicer {
 	public:
 		using element_type = T;
 
-		explicit ModelPartForConverted(T * h);
+		using ModelPartModel<T>::ModelPartModel;
 
 		void SetValue(ValueSource && s) override;
 		bool GetValue(ValueTarget && s) override;
@@ -86,7 +86,7 @@ namespace Slicer {
 	public:
 		using element_type = Ice::optional<T>;
 
-		explicit ModelPartForConverted(Ice::optional<T> * h);
+		using ModelPartModel<Ice::optional<T>>::ModelPartModel;
 
 		void SetValue(ValueSource && s) override;
 		bool GetValue(ValueTarget && s) override;
@@ -167,7 +167,7 @@ namespace Slicer {
 	public:
 		using element_type = std::shared_ptr<T>;
 
-		explicit ModelPartForClass(element_type * h);
+		using ModelPartModel<element_type>::ModelPartModel;
 
 		void Create() override;
 
@@ -199,7 +199,7 @@ namespace Slicer {
 	public:
 		using element_type = T;
 
-		explicit ModelPartForStruct(T * o);
+		using ModelPartModel<T>::ModelPartModel;
 
 		T * GetModel() override;
 
@@ -221,7 +221,7 @@ namespace Slicer {
 	public:
 		using element_type = T;
 
-		explicit ModelPartForEnum(T * s);
+		using ModelPartModel<T>::ModelPartModel;
 
 		const Metadata & GetMetadata() const override;
 
@@ -247,7 +247,7 @@ namespace Slicer {
 	public:
 		using element_type = T;
 
-		explicit ModelPartForSequence(T * s);
+		using ModelPartModel<T>::ModelPartModel;
 
 		void OnEachChild(const ChildHandler & ch) override;
 
@@ -291,7 +291,7 @@ namespace Slicer {
 	public:
 		using element_type = T;
 
-		explicit ModelPartForDictionary(T * d);
+		using ModelPartModel<T>::ModelPartModel;
 
 		void OnEachChild(const ChildHandler & ch) override;
 
@@ -329,7 +329,7 @@ namespace Slicer {
 	template<typename T>
 	class DLL_PUBLIC ModelPartForStream : public ModelPartForStreamBase, ModelPartModel<Stream<T>> {
 	public:
-		explicit ModelPartForStream(Stream<T> * s);
+		using ModelPartModel<Stream<T>>::ModelPartModel;
 
 		ModelPartPtr GetContainedModelPart() override;
 		void OnEachChild(const ChildHandler & ch) override;

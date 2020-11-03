@@ -168,8 +168,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForSimple
-	template<typename T> ModelPartForSimple<T>::ModelPartForSimple(T * h) : ModelPartModel<T>(h) { }
-
 	template<typename T>
 	void
 	ModelPartForSimple<T>::SetValue(ValueSource && s)
@@ -185,18 +183,6 @@ namespace Slicer {
 		BOOST_ASSERT(this->Model);
 		s.get(*this->Model);
 		return true;
-	}
-
-	// ModelPartForConverted
-	template<typename T, typename M, T M::*MV>
-	ModelPartForConverted<T, M, MV>::ModelPartForConverted(T * h) : ModelPartModel<T>(h)
-	{
-	}
-
-	template<typename T, typename M, Ice::optional<T> M::*MV>
-	ModelPartForConverted<Ice::optional<T>, M, MV>::ModelPartForConverted(Ice::optional<T> * h) :
-		ModelPartModel<Ice::optional<T>>(h)
-	{
 	}
 
 	template<typename T, typename M, Ice::optional<T> M::*MV>
@@ -397,8 +383,6 @@ namespace Slicer {
 	};
 
 	// ModelPartForClass
-	template<typename T> ModelPartForClass<T>::ModelPartForClass(element_type * h) : ModelPartModel<element_type>(h) { }
-
 	template<typename T>
 	void
 	ModelPartForClass<T>::Create()
@@ -493,8 +477,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForStruct
-	template<typename T> ModelPartForStruct<T>::ModelPartForStruct(T * o) : ModelPartModel<T>(o) { }
-
 	template<typename T>
 	T *
 	ModelPartForStruct<T>::GetModel()
@@ -510,8 +492,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForEnum
-	template<typename T> ModelPartForEnum<T>::ModelPartForEnum(T * s) : ModelPartModel<T>(s) { }
-
 	template<typename T>
 	const Metadata &
 	ModelPartForEnum<T>::GetMetadata() const
@@ -565,8 +545,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForSequence
-	template<typename T> ModelPartForSequence<T>::ModelPartForSequence(T * s) : ModelPartModel<T>(s) { }
-
 	template<typename T>
 	void
 	ModelPartForSequence<T>::OnEachChild(const ChildHandler & ch)
@@ -622,8 +600,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForDictionary
-	template<typename T> ModelPartForDictionary<T>::ModelPartForDictionary(T * d) : ModelPartModel<T>(d) { }
-
 	template<typename T>
 	void
 	ModelPartForDictionary<T>::OnEachChild(const ChildHandler & ch)
@@ -668,8 +644,6 @@ namespace Slicer {
 	}
 
 	// ModelPartForStream
-	template<typename T> ModelPartForStream<T>::ModelPartForStream(Stream<T> * s) : ModelPartModel<Stream<T>>(s) { }
-
 	template<typename T>
 	ModelPartPtr
 	ModelPartForStream<T>::GetContainedModelPart()

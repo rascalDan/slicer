@@ -159,9 +159,8 @@ namespace Slicer {
 	};
 
 	template<typename T> class DLL_PUBLIC ModelPartModel {
-	protected:
-		explicit ModelPartModel() : Model(nullptr) { }
-		explicit ModelPartModel(T * m) : Model(m) { }
+	public:
+		explicit ModelPartModel(T * m = nullptr) : Model(m) { }
 		T * Model;
 	};
 
