@@ -12,7 +12,7 @@ namespace Slicer {
 
 	DLL_PUBLIC bool optionalCaseEq(std::string_view a, std::string_view b, bool matchCase);
 
-	template<typename T> class DLL_PUBLIC ModelPartForRoot : public ModelPartForRootBase {
+	template<typename T> class ModelPartForRoot : public ModelPartForRootBase {
 	public:
 		explicit ModelPartForRoot(T * o);
 
@@ -69,7 +69,7 @@ namespace Slicer {
 	};
 
 	template<typename T, typename M, T M::*MV>
-	class DLL_PUBLIC ModelPartForConverted : public ModelPartForConvertedBase, protected ModelPartModel<T> {
+	class ModelPartForConverted : public ModelPartForConvertedBase, protected ModelPartModel<T> {
 	public:
 		using element_type = T;
 
@@ -80,7 +80,7 @@ namespace Slicer {
 	};
 
 	template<typename T, typename M, Ice::optional<T> M::*MV>
-	class DLL_PUBLIC ModelPartForConverted<Ice::optional<T>, M, MV> :
+	class ModelPartForConverted<Ice::optional<T>, M, MV> :
 		public ModelPartForConvertedBase,
 		protected ModelPartModel<Ice::optional<T>> {
 	public:
@@ -110,7 +110,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForOptional :
+	class ModelPartForOptional :
 		public ModelPartForOptionalBase,
 		protected ModelPartModel<Ice::optional<typename T::element_type>> {
 	public:
@@ -141,11 +141,11 @@ namespace Slicer {
 	};
 
 	template<typename T> class Hooks;
-	template<typename T> class DLL_PUBLIC ModelPartForComplex : public ModelPartForComplexBase {
+	template<typename T> class ModelPartForComplex : public ModelPartForComplexBase {
 	public:
-		class DLL_PRIVATE HookBase;
+		class HookBase;
 
-		template<typename MT, typename MP, std::size_t = 0> class DLL_PRIVATE Hook;
+		template<typename MT, typename MP, std::size_t = 0> class Hook;
 
 		void OnEachChild(const ChildHandler & ch) override;
 
@@ -157,13 +157,13 @@ namespace Slicer {
 		virtual T * GetModel() = 0;
 
 	protected:
-		template<typename R> DLL_PRIVATE ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
+		template<typename R> ChildRef GetChildRefFromRange(const R & range, const HookFilter & flt);
 
 		static const Hooks<T> & hooks();
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<std::shared_ptr<T>> {
+	class ModelPartForClass : public ModelPartForComplex<T>, protected ModelPartModel<std::shared_ptr<T>> {
 	public:
 		using element_type = std::shared_ptr<T>;
 
@@ -194,8 +194,7 @@ namespace Slicer {
 		static void unregisterClass() __attribute__((destructor(210)));
 	};
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForStruct : public ModelPartForComplex<T>, protected ModelPartModel<T> {
+	template<typename T> class ModelPartForStruct : public ModelPartForComplex<T>, protected ModelPartModel<T> {
 	public:
 		using element_type = T;
 
@@ -217,7 +216,7 @@ namespace Slicer {
 	};
 	template<typename T> class EnumMap;
 
-	template<typename T> class DLL_PUBLIC ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
+	template<typename T> class ModelPartForEnum : public ModelPartForEnumBase, protected ModelPartModel<T> {
 	public:
 		using element_type = T;
 
@@ -242,8 +241,7 @@ namespace Slicer {
 		static const ModelPartType type;
 	};
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForSequence : public ModelPartForSequenceBase, protected ModelPartModel<T> {
+	template<typename T> class ModelPartForSequence : public ModelPartForSequenceBase, protected ModelPartModel<T> {
 	public:
 		using element_type = T;
 
@@ -267,7 +265,7 @@ namespace Slicer {
 	};
 
 	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
+	class ModelPartForDictionaryElementInserter : public ModelPartForStruct<typename T::value_type> {
 	public:
 		explicit ModelPartForDictionaryElementInserter(T * d);
 
@@ -286,8 +284,7 @@ namespace Slicer {
 		static const ModelPartType type;
 	};
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForDictionary : public ModelPartForDictionaryBase, protected ModelPartModel<T> {
+	template<typename T> class ModelPartForDictionary : public ModelPartForDictionaryBase, protected ModelPartModel<T> {
 	public:
 		using element_type = T;
 
@@ -307,7 +304,7 @@ namespace Slicer {
 		static const std::string pairName;
 	};
 
-	template<typename T> class DLL_PUBLIC Stream {
+	template<typename T> class Stream {
 	public:
 		using Consumer = std::function<void(const T &)>;
 		using element_type = T;
@@ -326,8 +323,7 @@ namespace Slicer {
 		void OnEachChild(const ChildHandler & ch) override = 0;
 	};
 
-	template<typename T>
-	class DLL_PUBLIC ModelPartForStream : public ModelPartForStreamBase, ModelPartModel<Stream<T>> {
+	template<typename T> class ModelPartForStream : public ModelPartForStreamBase, ModelPartModel<Stream<T>> {
 	public:
 		using ModelPartModel<Stream<T>>::ModelPartModel;
 
@@ -346,7 +342,7 @@ namespace Slicer {
 		const std::string & GetRootName() const override = 0;
 	};
 
-	template<typename T> class DLL_PUBLIC ModelPartForStreamRoot : public ModelPartForStreamRootBase {
+	template<typename T> class ModelPartForStreamRoot : public ModelPartForStreamRootBase {
 	public:
 		explicit ModelPartForStreamRoot(Stream<T> * s);
 

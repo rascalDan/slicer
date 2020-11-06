@@ -271,8 +271,7 @@ namespace Slicer {
 	Slicer::defineGetMetadata(
 			const IceMetaData & md, const Slice::ContainedPtr & t, std::string_view mpt, std::string_view tsuf) const
 	{
-		fprintbf(cpp, "template<> DLL_PUBLIC\nconst Metadata & %s< %s%s >::GetMetadata() const {\n", mpt, t->scoped(),
-				tsuf);
+		fprintbf(cpp, "template<>\nconst Metadata & %s< %s%s >::GetMetadata() const {\n", mpt, t->scoped(), tsuf);
 		if (auto n = md.values("slicer:").size()) {
 			fprintbf(cpp, "\t\tstatic constexpr MetaDataImpl<%d> md {{{", n);
 			copyMetadata(md);
@@ -313,7 +312,7 @@ namespace Slicer {
 		fprintbf(cpp, "// Class %s\n", c->name());
 		visitComplexDataMembers(decl.get(), c->allDataMembers());
 
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "template<>\n");
 		const IceMetaData md {c->getMetaData()};
 		auto typeId = md.value("slicer:typeid:");
 		fprintbf(cpp, "const std::string ModelPartForClass< %s >::typeIdProperty(\"%s\");\n\n", decl->typeId(),
@@ -323,9 +322,9 @@ namespace Slicer {
 		defineRoot(typeToString(decl), name ? *name : c->name(), decl);
 
 		auto typeName = md.value("slicer:typename:");
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "template<>\n");
 		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::className = nullptr;\n", decl->typeId());
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "template<>\n");
 		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::typeName = nullptr;\n", decl->typeId());
 		fprintbf(cpp,
 				"template<>\nvoid ModelPartForClass< %s >::initClassName() {\n\tclassName = new "
@@ -489,7 +488,7 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Sequence %s\n", s->name());
 		externType(s->type());
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "template<>\n");
 		fprintbf(cpp,
 				"ChildRef ModelPartForSequence< %s >::GetChildRef(std::string_view name, const HookFilter & flt, "
 				"bool matchCase)\n{\n",
@@ -539,7 +538,7 @@ namespace Slicer {
 		externType(d->valueType());
 		const IceMetaData md {d->getMetaData()};
 		auto iname = md.value("slicer:item:");
-		fprintbf(cpp, "template<> DLL_PUBLIC\n");
+		fprintbf(cpp, "template<>\n");
 		fprintbf(cpp, "const std::string ModelPartForDictionary< %s >::pairName(\"%s\");\n\n", d->scoped(),
 				iname ? *iname : "element");
 
