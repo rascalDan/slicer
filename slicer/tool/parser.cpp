@@ -494,12 +494,12 @@ namespace Slicer {
 				"bool matchCase)\n{\n",
 				s->scoped());
 		const IceMetaData md {s->getMetaData()};
-		auto iname = md.value("slicer:item:");
-		if (iname) {
+		auto ename = md.value("slicer:element:");
+		if (ename) {
 			fprintbf(cpp,
 					"\tif (!name.empty() && !optionalCaseEq(name, \"%s\", matchCase)) { throw "
-					"IncorrectElementName(name); }\n",
-					*iname);
+					"IncorrectElementName(std::string{name}); }\n",
+					*ename);
 		}
 		else {
 			fprintbf(cpp, "\t(void)matchCase;\n");
@@ -508,7 +508,6 @@ namespace Slicer {
 		fprintbf(cpp, "\treturn GetAnonChildRef(flt);\n}\n\n");
 
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
-		auto ename = md.value("slicer:element:");
 		fprintbf(cpp, "const std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n", s->scoped(),
 				ename ? *ename : "element");
 

@@ -10,14 +10,14 @@
     <date>2017-09-07</date>
   </optClass>
   <optSeq>
-    <element>
+    <bis>
       <a>3</a>
       <b>4</b>
-    </element>
-    <element>
+    </bis>
+    <bis>
       <a>5</a>
       <b>6</b>
-    </element>
+    </bis>
   </optSeq>
   <optDict>
     <element>

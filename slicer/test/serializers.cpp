@@ -714,6 +714,16 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractImpl)
 	BOOST_CHECK_EQUAL("value", impl->testVal);
 }
 
+BOOST_AUTO_TEST_CASE(DeserializeXmlIncorrectSeqElementName)
+{
+	std::stringstream in(R"X(
+			<Classes>
+				<obj/>
+			</Classes>)X");
+	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::BuiltInSeq>(in)),
+			Slicer::IncorrectElementName);
+}
+
 BOOST_AUTO_TEST_CASE(customerModelPartCounters)
 {
 	BOOST_REQUIRE_EQUAL(21, TestModule::completions);

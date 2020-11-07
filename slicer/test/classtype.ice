@@ -8,6 +8,7 @@ module TestModule {
 		int a;
 		int b;
 	};
+	["slicer:element:bis"]
 	sequence<ClassType> Classes;
 };
 
