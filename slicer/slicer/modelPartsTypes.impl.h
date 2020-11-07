@@ -572,6 +572,13 @@ namespace Slicer {
 	}
 
 	template<typename T>
+	const std::string &
+	ModelPartForSequence<T>::GetElementName() const
+	{
+		return elementName;
+	}
+
+	template<typename T>
 	ModelPartPtr
 	ModelPartForSequence<T>::elementModelPart(typename T::value_type & e) const
 	{

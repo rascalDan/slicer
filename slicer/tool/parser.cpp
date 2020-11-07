@@ -488,25 +488,8 @@ namespace Slicer {
 
 		fprintbf(cpp, "// Sequence %s\n", s->name());
 		externType(s->type());
-		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp,
-				"ChildRef ModelPartForSequence< %s >::GetChildRef(std::string_view name, const HookFilter & flt, "
-				"bool matchCase)\n{\n",
-				s->scoped());
 		const IceMetaData md {s->getMetaData()};
 		auto ename = md.value("slicer:element:");
-		if (ename) {
-			fprintbf(cpp,
-					"\tif (!name.empty() && !optionalCaseEq(name, \"%s\", matchCase)) { throw "
-					"IncorrectElementName(std::string{name}); }\n",
-					*ename);
-		}
-		else {
-			fprintbf(cpp, "\t(void)matchCase;\n");
-			fprintbf(cpp, "\t(void)name;\n");
-		}
-		fprintbf(cpp, "\treturn GetAnonChildRef(flt);\n}\n\n");
-
 		fprintbf(cpp, "template<> DLL_PUBLIC\n");
 		fprintbf(cpp, "const std::string ModelPartForSequence< %s >::elementName(\"%s\");\n\n", s->scoped(),
 				ename ? *ename : "element");

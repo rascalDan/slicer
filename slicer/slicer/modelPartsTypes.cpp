@@ -348,6 +348,14 @@ namespace Slicer {
 	{
 		return type;
 	}
+	ChildRef
+	ModelPartForSequenceBase::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
+	{
+		if (!name.empty() && !optionalCaseEq(name, GetElementName(), matchCase)) {
+			throw IncorrectElementName(std::string {name});
+		}
+		return GetAnonChildRef(flt);
+	}
 	const ModelPartType ModelPartForSequenceBase::type = ModelPartType::Sequence;
 
 	bool

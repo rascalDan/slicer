@@ -238,6 +238,9 @@ namespace Slicer {
 	public:
 		bool HasValue() const override;
 		ModelPartType GetType() const override;
+		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
+		virtual const std::string & GetElementName() const = 0;
+
 		static const ModelPartType type;
 	};
 
@@ -251,7 +254,7 @@ namespace Slicer {
 
 		ChildRef GetAnonChildRef(const HookFilter &) override;
 
-		ChildRef GetChildRef(std::string_view, const HookFilter &, bool matchCase = true) override;
+		const std::string & GetElementName() const override;
 
 		const Metadata & GetMetadata() const override;
 
