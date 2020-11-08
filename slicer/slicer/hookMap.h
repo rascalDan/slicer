@@ -13,11 +13,11 @@ namespace Slicer {
 	public:
 		using HookPtr = const typename ModelPartForComplex<T>::HookBase *;
 
-		template<typename K> class eq;
+		class eq;
 
-		template<typename K> class iter : public std::iterator<std::bidirectional_iterator_tag, HookPtr> {
+		class iter : public std::iterator<std::bidirectional_iterator_tag, HookPtr> {
 		public:
-			[[nodiscard]] constexpr inline iter(const eq<K> * const r, const HookPtr * c) : range(r), cur(c)
+			[[nodiscard]] constexpr inline iter(const eq * const r, const HookPtr * c) : range(r), cur(c)
 			{
 				moveMatch();
 			}
@@ -73,50 +73,39 @@ namespace Slicer {
 				}
 			}
 
-			const eq<K> * const range;
+			const eq * const range;
 			const HookPtr * cur;
 		};
 
-		template<typename K> class eq {
+		class eq {
 		public:
-			[[nodiscard]] constexpr inline iter<K>
+			[[nodiscard]] constexpr inline iter
 			begin() const
 			{
 				return {this, b};
 			}
 
-			[[nodiscard]] constexpr inline iter<K>
+			[[nodiscard]] constexpr inline iter
 			end() const
 			{
 				return {this, e};
 			}
 
-			K key;
+			std::string_view key;
 			std::string_view HookCommon::*name;
 			const HookPtr *b, *e;
 		};
 
-		template<typename K>
-		[[nodiscard]] constexpr inline eq<K>
-		equal_range(K && k) const
+		[[nodiscard]] constexpr inline eq
+		equal_range(std::string_view k) const
 		{
-			return {std::forward<K>(k), &HookCommon::name, _begin, _end};
+			return {k, &HookCommon::name, _begin, _end};
 		}
 
-		template<typename K>
-		[[nodiscard]] constexpr inline eq<K>
-		equal_range_lower(K && k) const
+		[[nodiscard]] constexpr inline eq
+		equal_range_lower(std::string_view k) const
 		{
-			return {std::forward<K>(k), &HookCommon::nameLower, _begin, _end};
-		}
-
-		template<typename K>
-		[[nodiscard]] inline auto
-		equal_range_nocase(const K & k) const
-		{
-			std::string i {k};
-			to_lower(i);
-			return equal_range_lower(std::move(i));
+			return {k, &HookCommon::nameLower, _begin, _end};
 		}
 
 		[[nodiscard]] constexpr inline auto

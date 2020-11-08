@@ -342,7 +342,9 @@ namespace Slicer {
 			return GetChildRefFromRange(hooks().equal_range(name), flt);
 		}
 		else {
-			return GetChildRefFromRange(hooks().equal_range_nocase(name), flt);
+			std::string i {name};
+			to_lower(i);
+			return GetChildRefFromRange(hooks().equal_range_lower(i), flt);
 		}
 	}
 
