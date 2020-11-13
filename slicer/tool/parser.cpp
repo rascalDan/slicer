@@ -416,8 +416,8 @@ namespace Slicer {
 			fprintbf(cpp, " %s, ", Slice::typeToString(type, dm->optional()));
 			createNewModelPartPtrFor(type, dm, md);
 			fprintbf(cpp, ", %d", md.countSlicerMetaData());
-			fprintbf(cpp, R"( > hook_C%d_%s {&%s, "%s", "%s", &hstr_C%d_%s)", components, name, dm->scoped(), name,
-					lname, components, name);
+			fprintbf(cpp, R"( > hook_C%d_%s {&%s, "%s", "%s", &hstr_C%d_%s)", components, dm->name(), dm->scoped(),
+					name, lname, components, dm->name());
 			if (md.hasSlicerMetaData()) {
 				fprintbf(cpp, ",");
 				copyMetadata(md);

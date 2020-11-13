@@ -8,6 +8,7 @@ module Functions {
 	};
 	["slicer:implementation:Functions.FuncsSubImpl"]
 	local class FuncsSub extends Funcs {
+		["slicer:name:Test-Value"]
 		string testVal;
 	};
 	local struct SFuncs {

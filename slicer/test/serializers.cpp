@@ -677,7 +677,7 @@ BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractDefault)
 
 BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractImpl)
 {
-	auto in = json::parseValue(R"J({ "obj": {"slicer-typeid": "::Functions::FuncsSub", "testVal": "value"} })J");
+	auto in = json::parseValue(R"J({ "obj": {"slicer-typeid": "::Functions::FuncsSub", "Test-Value": "value"} })J");
 	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, Functions::SFuncs>(in);
 	BOOST_REQUIRE(obj.obj);
 	auto impl = std::dynamic_pointer_cast<Functions::FuncsSub>(obj.obj);
@@ -704,7 +704,7 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractImpl)
 	std::stringstream in(R"X(
 			<SFuncs>
 				<obj slicer-typeid="::Functions::FuncsSub">
-					<testVal>value</testVal>
+					<Test-Value>value</Test-Value>
 				</obj>
 			</SFuncs>)X");
 	auto obj = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, Functions::SFuncs>(in);
