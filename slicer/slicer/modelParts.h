@@ -122,6 +122,9 @@ namespace Slicer {
 		const std::string * nameStr;
 	};
 
+	template<typename T> struct DLL_PUBLIC Default {
+	};
+
 	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
 	public:
 		ModelPart() = default;
@@ -133,8 +136,9 @@ namespace Slicer {
 		ModelPart & operator=(const ModelPart &) = delete;
 		ModelPart & operator=(ModelPart &&) = delete;
 
-		template<typename T> static ModelPartPtr CreateFor();
+		template<typename MP> static ModelPartPtr Make(typename MP::element_type * t);
 		template<typename T> static ModelPartPtr CreateFor(T & t);
+		template<typename T> static ModelPartPtr CreateFor(Default<T> &&);
 		template<typename T> static ModelPartForRootPtr CreateRootFor(T & t);
 
 		virtual void OnEachChild(const ChildHandler &) = 0;

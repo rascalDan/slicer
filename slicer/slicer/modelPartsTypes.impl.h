@@ -12,13 +12,27 @@
 #include <c++11Helpers.h>
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor<Type>() \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::Make<ModelPartType>(typename ModelPartType::element_type * t) \
 	{ \
-		return std::make_shared<ModelPartType>(nullptr); \
+		return std::make_shared<ModelPartType>(t); \
+	} \
+	template<> \
+	DLL_PUBLIC ModelPartPtr ModelPart::Make<ModelPartForOptional<ModelPartType>>( \
+			Ice::optional<typename ModelPartType::element_type> * t) \
+	{ \
+		return std::make_shared<ModelPartForOptional<ModelPartType>>(t); \
+	} \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Default<Type> &&) \
+	{ \
+		return Make<ModelPartType>(nullptr); \
+	} \
+	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Default<Ice::optional<Type>> &&) \
+	{ \
+		return Make<ModelPartForOptional<ModelPartType>>(nullptr); \
 	} \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Type & s) \
 	{ \
-		return std::make_shared<ModelPartType>(&s); \
+		return Make<ModelPartType>(&s); \
 	} \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(const Type & s) \
 	{ \
@@ -26,7 +40,7 @@
 	} \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Ice::optional<Type> & s) \
 	{ \
-		return std::make_shared<ModelPartForOptional<ModelPartType>>(&s); \
+		return Make<ModelPartForOptional<ModelPartType>>(&s); \
 	} \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(const Ice::optional<Type> & s) \
 	{ \
@@ -375,12 +389,15 @@ namespace Slicer {
 		ModelPartPtr
 		Get(T * t) const override
 		{
-			return std::make_shared<MP>(
-					t ? const_cast<typename std::remove_const<MT>::type *>(&(t->*member)) : nullptr);
+			if (t) {
+				return Make<MP>(&(t->*member));
+			}
+			return Make<MP>(nullptr);
 		}
 
 	private:
-		const MT T::*member;
+		using MemPtr = MT T::*;
+		const MemPtr member;
 		const MetaDataImpl<N> hookMetadata;
 	};
 
@@ -432,7 +449,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPartForClass<T>::CreateModelPart(void * p)
 	{
-		return std::make_shared<ModelPartForClass<T>>(static_cast<element_type *>(p));
+		return ::Slicer::ModelPart::CreateFor(*static_cast<element_type *>(p));
 	}
 
 	template<typename T>
@@ -591,7 +608,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPartForSequence<T>::GetContainedModelPart()
 	{
-		return ModelPart::CreateFor<typename T::value_type>();
+		return ModelPart::CreateFor(Default<typename T::value_type> {});
 	}
 
 	// ModelPartForDictionaryElementInserter
@@ -615,7 +632,7 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		for (auto & pair : *this->Model) {
-			ch(pairName, std::make_shared<ModelPartForStruct<typename T::value_type>>(&pair), NULL);
+			ch(pairName, std::make_shared<ModelPartForStruct<typename T::value_type>>(&pair), nullptr);
 		}
 	}
 
@@ -657,7 +674,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPartForStream<T>::GetContainedModelPart()
 	{
-		return ModelPart::CreateFor<T>();
+		return ModelPart::CreateFor(Default<T> {});
 	}
 
 	template<typename T>

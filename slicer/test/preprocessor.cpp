@@ -12,7 +12,7 @@
 using ComponentsCount = std::map<std::string, unsigned int>;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {{"classtype.ice", 2}, {"classes.ice", 3}, {"collections.ice", 5},
 		{"enums.ice", 2}, {"inheritance.ice", 12}, {"interfaces.ice", 0}, {"json.ice", 2}, {"locals.ice", 7},
-		{"optionals.ice", 2}, {"structs.ice", 5}, {"types.ice", 3}, {"xml.ice", 5}};
+		{"optionals.ice", 2}, {"structs.ice", 5}, {"types.ice", 4}, {"xml.ice", 5}};
 
 unsigned int
 total()
@@ -21,7 +21,7 @@ total()
 			COMPONENTS_IN_TEST_ICE.begin(), COMPONENTS_IN_TEST_ICE.end(), 0U, [](auto & t, auto && c) {
 				return t += c.second;
 			});
-	BOOST_CHECK_EQUAL(48, t);
+	BOOST_CHECK_EQUAL(49, t);
 	return t;
 }
 

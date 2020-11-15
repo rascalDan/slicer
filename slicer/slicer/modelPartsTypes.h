@@ -114,7 +114,8 @@ namespace Slicer {
 		public ModelPartForOptionalBase,
 		protected ModelPartModel<Ice::optional<typename T::element_type>> {
 	public:
-		explicit ModelPartForOptional(Ice::optional<typename T::element_type> * h);
+		using element_type = Ice::optional<typename T::element_type>;
+		explicit ModelPartForOptional(element_type * h);
 		void Create() override;
 		bool GetValue(ValueTarget && s) override;
 		ModelPartType GetType() const override;

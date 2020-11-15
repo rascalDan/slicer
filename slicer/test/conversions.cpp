@@ -155,3 +155,11 @@ namespace TestModule {
 		completions += 1;
 	}
 }
+namespace Slicer {
+	template<>
+	DLL_PUBLIC ModelPartPtr
+	ModelPart::Make<TestModule::MonthValidator>(::Ice::Short * m)
+	{
+		return std::make_shared<TestModule::MonthValidator>(m);
+	}
+}

@@ -190,6 +190,14 @@ namespace Slicer {
 			// Failed to convert
 			fprintbf(cpp, "\tconversion_fail(\"%s\");\n", Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
+
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<");
+			createModelPartForConverted(type, c->scoped(), dm);
+			fprintbf(cpp, ">(typename ");
+			createModelPartForConverted(type, c->scoped(), dm);
+			fprintbf(cpp, "::element_type * t) { return std::make_shared<");
+			createModelPartForConverted(type, c->scoped(), dm);
+			fprintbf(cpp, ">(t); } \n");
 		}
 	}
 
@@ -288,6 +296,9 @@ namespace Slicer {
 		if (definedTypes.count(type->typeId())) {
 			return;
 		}
+		if (Slice::ClassDeclPtr::dynamicCast(type)) {
+			fprintbf(cpp, "extern template class ModelPartForComplex< %s >;\n", type->typeId());
+		}
 		fprintbf(cpp, "extern template class %s< %s >;\n", getBasicModelPart(type),
 				Slice::ClassDeclPtr::dynamicCast(type) ? type->typeId() : Slice::typeToString(type));
 	}
@@ -349,6 +360,9 @@ namespace Slicer {
 		if (auto cmp = md.value("slicer:custommodelpart:")) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", Slice::typeToString(decl),
 					getBasicModelPart(decl), c->scoped(), CppName {*cmp});
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s<%s> >(%s * t)",
+					getBasicModelPart(decl), c->scoped(), Slice::typeToString(decl));
+			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
 		}
 		else {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>);\n\n",
@@ -529,10 +543,13 @@ namespace Slicer {
 			auto lname = std::string {name};
 			boost::algorithm::to_lower(lname);
 			fprintbf(cpp, "\tconst std::string hstr_C%d_%d { \"%s\" };\n", components, element, name);
-			fprintbf(cpp, "\tconstexpr C%d::Hook< const %s, ", components, Slice::typeToString(t));
+			fprintbf(cpp, "\tconstexpr C%d::Hook< %s, ", components, Slice::typeToString(t));
 			createNewModelPartPtrFor(t);
-			fprintbf(cpp, ", 0 > hook%d_%s {&%s::value_type::%s, \"%s\", \"%s\", &hstr_C%d_%s};\n", components, element,
-					d->scoped(), element, name, lname, components, element);
+			fprintbf(cpp,
+					", 0 > hook%d_%s {const_cast<%s (%s::value_type::*)>(&%s::value_type::%s), \"%s\", \"%s\", "
+					"&hstr_C%d_%s};\n",
+					components, element, Slice::typeToString(t), d->scoped(), d->scoped(), element, name, lname,
+					components, element);
 		};
 		addHook(md.value("slicer:key:").value_or("key"), "first", d->keyType());
 		addHook(md.value("slicer:value:").value_or("value"), "second", d->valueType());
@@ -662,6 +679,9 @@ namespace Slicer {
 		if (auto cmp = metadata.value("slicer:custommodelpart:")) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", type, getBasicModelPart(stype), type,
 					CppName {*cmp});
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s>(%s * t)", getBasicModelPart(stype),
+					type);
+			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
 		}
 		else {
 			fprintbf(cpp, "MODELPARTFOR(%s, %s);\n\n", type, getBasicModelPart(stype));

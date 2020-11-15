@@ -19,6 +19,9 @@ module TestModule {
 		int someFunction();
 		DontCountMe otherFileReference();
 	};
+	class CrossLibrary {
+		DontCountMe otherFileReference;
+	};
 };
 
 module TestModule2 {
