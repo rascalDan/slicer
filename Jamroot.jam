@@ -33,23 +33,23 @@ project
 			<toolset>tidy:<xcheckxx>hicpp-vararg
 			<toolset>tidy:<xcheckxx>hicpp-named-parameter
 			<toolset>tidy:<checkxx>performance-*
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/classes.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/classtype.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/collections.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/enums.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/functions.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/inheritance.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/interfaces.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/json.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/locals.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/optionals.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/structs.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/types.h
-			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/xml.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/classes.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/classtype.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/collections.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/enums.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/functions.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/inheritance.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/interfaces.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/json.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/locals.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/optionals.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/structs.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/types.h
+			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/xml.h
 			<toolset>tidy:<exclude>slicer/bin/common.h
 			<toolset>tidy:<exclude>xml/bin/tidy/debug/checker-none/cxxstd-17-iso/xmlExceptions.h
 			<toolset>tidy:<exclude>db/bin/tidy/debug/checker-none/cxxstd-17-iso/sqlExceptions.h
-			<toolset>tidy:<exclude>db/bin/tidy/debug/checker-none/cxxstd-17-iso/testModels.h
+			<toolset>tidy:<exclude>db/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/testModels.h
 			<toolset>tidy:<exclude>ice/cpp/*
 			<toolset>tidy:<define>ICE_IGNORE_VERSION
 			<toolset>tidy:<define>__x86_64

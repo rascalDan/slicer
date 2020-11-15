@@ -91,9 +91,9 @@ namespace Slicer {
 				return {this, e};
 			}
 
-			std::string_view key;
-			std::string_view HookCommon::*name;
-			const HookPtr *b, *e;
+			std::string_view key {};
+			std::string_view HookCommon::*name {};
+			const HookPtr *b {}, *e {};
 		};
 
 		[[nodiscard]] constexpr inline eq
