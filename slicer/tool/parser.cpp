@@ -679,8 +679,8 @@ namespace Slicer {
 		if (auto cmp = metadata.value("slicer:custommodelpart:")) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", type, getBasicModelPart(stype), type,
 					CppName {*cmp});
-			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s>(%s * t)", getBasicModelPart(stype),
-					type);
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s<%s>>(%s * t)",
+					getBasicModelPart(stype), type, type);
 			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
 		}
 		else {
