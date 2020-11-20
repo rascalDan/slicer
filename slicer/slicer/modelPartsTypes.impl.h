@@ -518,11 +518,11 @@ namespace Slicer {
 		return metadata;
 	}
 
-	template<EnumMapKey Key, typename Ex, typename ExP, typename T, typename V>
+	template<typename Ex, typename ExP, typename T, typename V>
 	inline const auto *
 	ModelPartForEnumLookup(const EnumMap<T> & enumerations, const V & val)
 	{
-		if (auto i = enumerations.template find<Key>(val)) {
+		if (auto i = enumerations.find(val)) {
 			return i;
 		}
 		throw Ex(ExP(val), typeid(T).name());
@@ -530,18 +530,16 @@ namespace Slicer {
 
 	template<typename T>
 	T
-	ModelPartForEnum<T>::lookup(const std::string_view & val)
+	ModelPartForEnum<T>::lookup(std::string_view val)
 	{
-		return ModelPartForEnumLookup<EnumMapKey::Name, InvalidEnumerationSymbol, std::string, T>(enumerations(), val)
-				->value;
+		return ModelPartForEnumLookup<InvalidEnumerationSymbol, std::string, T>(enumerations(), val)->value;
 	}
 
 	template<typename T>
 	const std::string &
 	ModelPartForEnum<T>::lookup(T val)
 	{
-		return *ModelPartForEnumLookup<EnumMapKey::Value, InvalidEnumerationValue, ::Ice::Int, T>(enumerations(), val)
-						->nameStr;
+		return *ModelPartForEnumLookup<InvalidEnumerationValue, ::Ice::Int, T>(enumerations(), val)->nameStr;
 	}
 
 	template<typename T>

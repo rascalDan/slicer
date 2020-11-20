@@ -16,9 +16,9 @@ namespace test {
 	static_assert(em.arr[1].nameStr == &two);
 	static_assert(em.arr[2].value == Es::three);
 
-	static_assert(em.find<Slicer::EnumMapKey::Name>("one")->value == Es::one);
-	static_assert(em.find<Slicer::EnumMapKey::Name>("three")->value == Es::three);
-	static_assert(em.find<Slicer::EnumMapKey::Value>(Es::one)->name == "one");
-	static_assert(em.find<Slicer::EnumMapKey::Value>(Es::three)->name == "three");
-	static_assert(!em.find<Slicer::EnumMapKey::Name>("four"));
+	static_assert(em.find("one")->value == Es::one);
+	static_assert(em.find("three")->value == Es::three);
+	static_assert(em.find(Es::one)->name == "one");
+	static_assert(em.find(Es::three)->name == "three");
+	static_assert(!em.find("four"));
 }

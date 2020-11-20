@@ -6,11 +6,6 @@
 #include <string_view>
 
 namespace Slicer {
-	enum class EnumMapKey {
-		Value,
-		Name,
-	};
-
 	template<typename E> class EnumMap {
 	public:
 		struct Node {
@@ -19,20 +14,23 @@ namespace Slicer {
 			const std::string * nameStr {};
 		};
 
-		template<EnumMapKey Key, typename T>
 		[[nodiscard]] constexpr inline const Node *
-		find(const T & v) const noexcept
+		find(std::string_view v) const noexcept
 		{
 			for (auto b = begin; b != end; b++) {
-				if constexpr (Key == EnumMapKey::Value) {
-					if (b->value == v) {
-						return b;
-					}
+				if (b->name == v) {
+					return b;
 				}
-				else if constexpr (Key == EnumMapKey::Name) {
-					if (b->name == v) {
-						return b;
-					}
+			}
+			return nullptr;
+		}
+
+		[[nodiscard]] constexpr inline const Node *
+		find(E v) const noexcept
+		{
+			for (auto b = begin; b != end; b++) {
+				if (b->value == v) {
+					return b;
 				}
 			}
 			return nullptr;

@@ -232,7 +232,7 @@ namespace Slicer {
 		static const Metadata metadata;
 		static constexpr const EnumMap<T> & enumerations();
 		DLL_PUBLIC static const std::string & lookup(T);
-		DLL_PUBLIC static T lookup(const std::string_view &);
+		DLL_PUBLIC static T lookup(std::string_view);
 	};
 
 	class DLL_PUBLIC ModelPartForSequenceBase : public ModelPart {
