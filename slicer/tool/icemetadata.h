@@ -7,9 +7,9 @@
 #include <metadata.h>
 
 namespace Slicer {
-	class DLL_PUBLIC IceMetaData : public MetaData<Slice::StringList::const_iterator> {
+	class DLL_PUBLIC IceMetaData : public MetaData<false, std::string> {
 	public:
-		static constexpr std::string_view slicer_prefix {"slicer:"};
+		static constexpr std::string_view slicer_prefix {"slicer"};
 
 		explicit IceMetaData() = default;
 		explicit IceMetaData(Slice::StringList && arr);
@@ -22,9 +22,9 @@ namespace Slicer {
 		[[nodiscard]] bool hasSlicerMetaData() const;
 		[[nodiscard]] size_t countSlicerMetaData() const;
 
-		[[nodiscard]] constexpr bool static isSlicerMetaData(std::string_view md)
+		[[nodiscard]] constexpr bool static isSlicerMetaData(PairView md)
 		{
-			return md.substr(0, slicer_prefix.length()) == slicer_prefix;
+			return in_scope(md.first, slicer_prefix);
 		}
 
 		[[nodiscard]] auto
@@ -34,7 +34,7 @@ namespace Slicer {
 		}
 
 	private:
-		Slice::StringList arr;
+		ContainerBase<> arr;
 	};
 }
 

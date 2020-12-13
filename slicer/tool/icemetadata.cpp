@@ -2,8 +2,13 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace Slicer {
-	IceMetaData::IceMetaData(Slice::StringList && a) : arr {std::forward<Slice::StringList>(a)}
+	IceMetaData::IceMetaData(Slice::StringList && a)
 	{
+		arr.reserve(a.size());
+		std::transform(a.begin(), a.end(), std::back_inserter(arr), [](auto a) {
+			auto prefix = std::string_view(a).substr(0, a.rfind(':'));
+			return std::make_pair(std::move(a), prefix);
+		});
 		_begin = arr.begin();
 		_end = arr.end();
 	}
