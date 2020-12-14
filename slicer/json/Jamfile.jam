@@ -26,6 +26,7 @@ run testSpecifics.cpp
 	<library>stdc++fs
 	<library>..//boost_utf
 	<library>../test//types
+	<implicit-dependency>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
 	<include>..
