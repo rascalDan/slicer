@@ -726,10 +726,12 @@ namespace Slicer {
 			int parseStatus = u->parse(slicePath, cppHandle, false);
 
 			if (!icecpp->close()) {
+				u->destroy();
 				throw CompilerError("preprocess close failed");
 			}
 
 			if (parseStatus == EXIT_FAILURE) {
+				u->destroy();
 				throw CompilerError("unit parse failed");
 			}
 
