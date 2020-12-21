@@ -78,6 +78,12 @@
 		} \
 	}
 
+#ifdef ICE_CPP11_MAPPING // C++11 mapping
+#	define FORWARD_ENUM(name) enum class ICE_CLASS(JAM_DLL_PUBLIC) name : unsigned char;
+#else // C++98 mapping
+#	define FORWARD_ENUM(name) enum ICE_CLASS(JAM_DLL_PUBLIC) name;
+#endif
+
 #ifdef __clang__
 #	pragma clang diagnostic push
 #	pragma clang diagnostic ignored "-Wundefined-var-template"

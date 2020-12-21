@@ -43,20 +43,6 @@ namespace Slicer {
 		ForwardDeclare(FILE * c, const Count & cnt) : cpp(c), count(cnt) { }
 
 		bool
-		visitUnitStart(const Slice::UnitPtr &) override
-		{
-			if (count.enums) {
-				fprintbf(cpp, "#ifdef ICE_CPP11_MAPPING // C++11 mapping\n");
-				fprintbf(
-						cpp, "#define FORWARD_ENUM(name) enum class ICE_CLASS(JAM_DLL_PUBLIC) name : unsigned char;\n");
-				fprintbf(cpp, "#else // C++98 mapping\n");
-				fprintbf(cpp, "#define FORWARD_ENUM(name) enum ICE_CLASS(JAM_DLL_PUBLIC) name;\n");
-				fprintbf(cpp, "#endif\n\n");
-			}
-			return true;
-		}
-
-		bool
 		visitModuleStart(const Slice::ModulePtr & m) override
 		{
 			if (count.classes || count.structs || count.enums) {
