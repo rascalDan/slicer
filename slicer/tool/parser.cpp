@@ -46,6 +46,7 @@ namespace Slicer {
 		visitModuleStart(const Slice::ModulePtr & m) override
 		{
 			if (count.classes || count.structs || count.enums) {
+				fprintbf(cpp, "// NOLINTNEXTLINE(modernize-concat-nested-namespaces)\n");
 				fprintbf(cpp, "namespace %s {\n", m->name());
 				return true;
 			}
