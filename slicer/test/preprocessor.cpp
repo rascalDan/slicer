@@ -18,8 +18,8 @@ unsigned int
 total()
 {
 	const auto t = std::accumulate(
-			COMPONENTS_IN_TEST_ICE.begin(), COMPONENTS_IN_TEST_ICE.end(), 0U, [](auto & t, auto && c) {
-				return t += c.second;
+			COMPONENTS_IN_TEST_ICE.begin(), COMPONENTS_IN_TEST_ICE.end(), 0U, [](const auto & t, const auto & c) {
+				return t + c.second;
 			});
 	BOOST_CHECK_EQUAL(49, t);
 	return t;
