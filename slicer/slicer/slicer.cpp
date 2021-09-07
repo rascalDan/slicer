@@ -17,7 +17,7 @@ namespace Slicer {
 
 	Slicer::ChildRef::operator bool() const
 	{
-		return (bool)mpp;
+		return !!mpp;
 	}
 
 	const Metadata &

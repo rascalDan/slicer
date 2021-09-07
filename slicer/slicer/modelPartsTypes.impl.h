@@ -210,7 +210,7 @@ namespace Slicer {
 	ModelPartForConverted<Ice::optional<T>, M, MV>::HasValue() const
 	{
 		BOOST_ASSERT(this->Model);
-		return (bool)*this->Model;
+		return !!*this->Model;
 	}
 
 	template<typename ET, typename MT, typename Conv>
@@ -288,7 +288,7 @@ namespace Slicer {
 	ModelPartForOptional<T>::hasModel() const
 	{
 		BOOST_ASSERT(this->Model);
-		return (bool)*this->Model;
+		return !!*this->Model;
 	}
 
 	template<typename T>
@@ -442,7 +442,7 @@ namespace Slicer {
 	ModelPartForClass<T>::HasValue() const
 	{
 		BOOST_ASSERT(this->Model);
-		return (bool)*this->Model;
+		return !!*this->Model;
 	}
 
 	template<typename T>

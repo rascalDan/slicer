@@ -123,7 +123,7 @@ namespace Slicer {
 		void
 		get(const Ice::Byte & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring>((int)value));
+			apply(boost::lexical_cast<Glib::ustring, int>(value));
 		}
 
 		void
