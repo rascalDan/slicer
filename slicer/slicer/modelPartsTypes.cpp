@@ -239,7 +239,7 @@ namespace Slicer {
 		return ref->second(m);
 	}
 	TypeId
-	ModelPartForComplexBase::GetTypeId(const std::string & id, const std::string & className)
+	ModelPartForComplexBase::getTypeId(const std::string & id, const std::string & className)
 	{
 		return (id == className) ? TypeId() : ToExchangeTypeName(id);
 	}

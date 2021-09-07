@@ -134,7 +134,7 @@ namespace Slicer {
 
 		static void registerClass(const std::string & className, const std::string * typeName, const ClassRef &);
 		static void unregisterClass(const std::string & className, const std::string * typeName);
-		static TypeId GetTypeId(const std::string & id, const std::string & className);
+		static TypeId getTypeId(const std::string & id, const std::string & className);
 		static std::string demangle(const char * mangled);
 
 		static const std::string & ToExchangeTypeName(const std::string &);
