@@ -17,6 +17,7 @@ namespace Ice {
 namespace Slicer {
 	template<typename T> class TValueTarget {
 	public:
+		virtual ~TValueTarget() = default;
 		virtual void get(const T &) const = 0;
 	};
 	class ValueTarget :
@@ -41,6 +42,7 @@ namespace Slicer {
 
 	template<typename T> class TValueSource {
 	public:
+		virtual ~TValueSource() = default;
 		virtual void set(T &) const = 0;
 	};
 	class ValueSource :
@@ -111,6 +113,7 @@ namespace Slicer {
 			name(n), nameLower(nl), nameStr(ns)
 		{
 		}
+		virtual ~HookCommon() = default;
 
 		[[nodiscard]] bool filter(const HookFilter & flt) const;
 		void apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const;

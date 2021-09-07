@@ -313,6 +313,8 @@ namespace Slicer {
 		using Consumer = std::function<void(const T &)>;
 		using element_type = T;
 
+		virtual ~Stream() = default;
+
 		virtual void Produce(const Consumer & c) = 0;
 	};
 
