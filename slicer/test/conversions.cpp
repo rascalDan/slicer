@@ -2,13 +2,18 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #define SHORT(x) boost::numeric_cast<::Ice::Short, int64_t>(x)
+inline auto
+USHORT(std::integral auto x)
+{
+	return boost::numeric_cast<unsigned short int>(x);
+}
 
 namespace Slicer {
 	DLL_PUBLIC
 	boost::posix_time::ptime
 	dateTimeToPTime(const ::TestModule::DateTime & dt)
 	{
-		return boost::posix_time::ptime(boost::gregorian::date(dt.year, dt.month, dt.day),
+		return boost::posix_time::ptime(boost::gregorian::date(USHORT(dt.year), USHORT(dt.month), USHORT(dt.day)),
 				boost::posix_time::time_duration(dt.hour, dt.minute, dt.second));
 	}
 

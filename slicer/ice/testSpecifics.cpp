@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(builtins)
 	testCompare<Ice::Int>(3434090);
 	testCompare<Ice::Long>(-4000033);
 	testCompare<Ice::Long>(343409898900);
-	testCompare<Ice::Float>(-3.14);
-	testCompare<Ice::Float>(3.14);
+	testCompare<Ice::Float>(-3.14F);
+	testCompare<Ice::Float>(3.14F);
 	testCompare<Ice::Double>(-3.14159);
 	testCompare<Ice::Double>(3.14159);
 }
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE(optionalBuiltins)
 	testCompareOptional<Ice::Int>(3434090);
 	testCompareOptional<Ice::Long>(-4000033);
 	testCompareOptional<Ice::Long>(343409898900);
-	testCompareOptional<Ice::Float>(-3.14);
-	testCompareOptional<Ice::Float>(3.14);
+	testCompareOptional<Ice::Float>(-3.14F);
+	testCompareOptional<Ice::Float>(3.14F);
 	testCompareOptional<Ice::Double>(-3.14159);
 	testCompareOptional<Ice::Double>(3.14159);
 }
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(classes)
 	x->mshort = 31434;
 	x->mint = 324324234;
 	x->mlong = 343242342343243;
-	x->mfloat = 3434.32432;
+	x->mfloat = 3434.32432F;
 	x->mdouble = 3423423423.42342342343;
 	x->mstring = "sdfsf432423";
 	testCompare<TestModule::BuiltInsPtr>(x, [](const auto & a, const auto & b) {

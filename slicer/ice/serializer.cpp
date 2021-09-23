@@ -30,7 +30,7 @@ namespace Slicer {
 	IceStreamSerializer::Serialize(ModelPartForRootPtr mp)
 	{
 		IceBlobSerializer::Serialize(mp);
-		strm.write(reinterpret_cast<const char *>(blob.data()), blob.size());
+		strm.write(reinterpret_cast<const char *>(blob.data()), static_cast<std::streamsize>(blob.size()));
 	}
 
 	IceBlobDeserializer::IceBlobDeserializer(const Ice::ByteSeq & b) : refblob(b) { }

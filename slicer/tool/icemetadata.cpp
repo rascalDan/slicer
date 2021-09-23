@@ -38,7 +38,7 @@ namespace Slicer {
 	size_t
 	IceMetaData::countSlicerMetaData() const
 	{
-		return std::count_if(_begin, _end, isSlicerMetaData);
+		return static_cast<size_t>(std::count_if(_begin, _end, isSlicerMetaData));
 	}
 
 	bool

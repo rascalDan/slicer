@@ -18,10 +18,10 @@ namespace Slicer {
 		void SerializeSequence(const Slicer::ModelPartPtr &) const;
 		DB::ModifyCommandPtr createInsert(const Slicer::ModelPartPtr &) const;
 		virtual void createInsertField(
-				int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
+				unsigned int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
 		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
 		virtual void bindObjectAndExecuteField(
-				int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
+				unsigned int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
 
 		DB::Connection * const connection;
 		const std::string tableName;
@@ -32,10 +32,10 @@ namespace Slicer {
 		template<typename... P> explicit SqlAutoIdInsertSerializer(const P &... p) : SqlInsertSerializer(p...) { }
 
 	protected:
-		virtual void createInsertField(
-				int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const override;
-		virtual void bindObjectAndExecuteField(
-				int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const override;
+		virtual void createInsertField(unsigned int & fieldNo, std::ostream & insert, const std::string & name,
+				const HookCommon * h) const override;
+		virtual void bindObjectAndExecuteField(unsigned int & paramNo, DB::ModifyCommand *,
+				const Slicer::ModelPartPtr &, const HookCommon *) const override;
 	};
 
 	class DLL_PUBLIC SqlFetchIdInsertSerializer : public SqlAutoIdInsertSerializer {

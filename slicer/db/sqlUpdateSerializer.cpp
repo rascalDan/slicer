@@ -1,6 +1,6 @@
+#include "sqlUpdateSerializer.h"
 #include "sqlBinder.h"
 #include "sqlCommon.h"
-#include "sqlUpdateSerializer.h"
 #include <common.h>
 #include <compileTimeFormatter.h>
 #include <functional>
@@ -54,7 +54,7 @@ namespace Slicer {
 	void
 	SqlUpdateSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * upd)
 	{
-		int paramNo = 0;
+		unsigned int paramNo = 0;
 		cmp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isValue(h)) {
 				if (!cmp->GetValue(SqlBinder(*upd, paramNo))) {
