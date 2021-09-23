@@ -19,6 +19,7 @@ project
 			<variant>debug:<warnings-as-errors>on
 			<variant>debug:<cflags>-Wnon-virtual-dtor
 			<variant>debug:<cflags>-Woverloaded-virtual
+			<toolset>gcc,<variant>debug:<cflags>-Wuseless-cast
 			<variant>coverage:<coverage>on
 			<toolset>tidy:<checkxx>boost-*
 			<toolset>tidy:<checkxx>bugprone-*

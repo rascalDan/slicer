@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE(int_values)
 
 BOOST_AUTO_TEST_CASE(factories)
 {
-	BOOST_REQUIRE(Slicer::SerializerPtr(Slicer::FileSerializerFactory::createNew(".xml", "/some.xml")));
-	BOOST_REQUIRE(Slicer::DeserializerPtr(Slicer::FileDeserializerFactory::createNew(".xml", "/some.xml")));
-	BOOST_REQUIRE(Slicer::SerializerPtr(Slicer::StreamSerializerFactory::createNew("application/xml", std::cout)));
-	BOOST_REQUIRE(Slicer::DeserializerPtr(Slicer::StreamDeserializerFactory::createNew("application/xml", std::cin)));
+	BOOST_REQUIRE(Slicer::FileSerializerFactory::createNew(".xml", "/some.xml"));
+	BOOST_REQUIRE(Slicer::FileDeserializerFactory::createNew(".xml", "/some.xml"));
+	BOOST_REQUIRE(Slicer::StreamSerializerFactory::createNew("application/xml", std::cout));
+	BOOST_REQUIRE(Slicer::StreamDeserializerFactory::createNew("application/xml", std::cin));
 }

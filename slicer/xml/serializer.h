@@ -2,8 +2,15 @@
 #define SLICER_XML_H
 
 #include <lazyPointer.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#ifndef __clang__
+#	pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 #include <libxml++/document.h>
 #include <libxml++/nodes/element.h>
+#pragma GCC diagnostic pop
 #include <slicer/serializer.h>
 #include <visibility.h>
 

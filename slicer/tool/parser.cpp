@@ -204,7 +204,7 @@ namespace Slicer {
 		ForwardDeclare fd {cpp, count};
 		u->visit(&fd, true);
 
-		fprintbf(cpp, "#include <%s>\n", fs::path(topLevelFile.filename()).replace_extension(".h").string());
+		fprintbf(cpp, "#include <%s>\n", fs::path {topLevelFile.filename()}.replace_extension(".h").string());
 		for (const auto & m : u->modules()) {
 			IceMetaData md {m->getMetaData()};
 			for (const auto & i : md.values("slicer:include:")) {
@@ -526,20 +526,21 @@ namespace Slicer {
 				iname ? *iname : "element");
 
 		fprintbf(cpp, "using C%d = ModelPartForComplex< %s::value_type >;\n", components, d->scoped());
-		auto addHook = [&](std::string_view name, const char * element, const Slice::TypePtr & t) {
+		auto addHook = [&](std::string_view name, const char * element, const Slice::TypePtr & t, bool cc) {
 			auto lname = std::string {name};
 			boost::algorithm::to_lower(lname);
 			fprintbf(cpp, "\tconst std::string hstr_C%d_%d { \"%s\" };\n", components, element, name);
 			fprintbf(cpp, "\tconstexpr C%d::Hook< %s, ", components, Slice::typeToString(t));
 			createNewModelPartPtrFor(t);
-			fprintbf(cpp,
-					", 0 > hook%d_%s {const_cast<%s (%s::value_type::*)>(&%s::value_type::%s), \"%s\", \"%s\", "
-					"&hstr_C%d_%s};\n",
-					components, element, Slice::typeToString(t), d->scoped(), d->scoped(), element, name, lname,
+			fprintbf(cpp, ", 0 > hook%d_%s {", components, element);
+			if (cc) {
+				fprintbf(cpp, "const_cast<%s (%s::value_type::*)>", Slice::typeToString(t), d->scoped());
+			}
+			fprintbf(cpp, "(&%s::value_type::%s), \"%s\", \"%s\", &hstr_C%d_%s};\n", d->scoped(), element, name, lname,
 					components, element);
 		};
-		addHook(md.value("slicer:key:").value_or("key"), "first", d->keyType());
-		addHook(md.value("slicer:value:").value_or("value"), "second", d->valueType());
+		addHook(md.value("slicer:key:").value_or("key"), "first", d->keyType(), true);
+		addHook(md.value("slicer:value:").value_or("value"), "second", d->valueType(), false);
 
 		fprintbf(cpp, "constexpr const HooksImpl< %s::value_type, 2 > hooks%d {{{\n", d->scoped(), components);
 		fprintbf(cpp, " &hook%d_first,\n", components);

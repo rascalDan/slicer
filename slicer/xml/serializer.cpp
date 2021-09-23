@@ -2,7 +2,14 @@
 #include <boost/lexical_cast.hpp>
 #include <compileTimeFormatter.h>
 #include <functional>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#ifndef __clang__
+#	pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 #include <glibmm/ustring.h>
+#pragma GCC diagnostic pop
 #include <libxml++/document.h>
 #include <libxml++/parsers/domparser.h>
 #include <slicer/metadata.h>
