@@ -1,6 +1,7 @@
 #ifndef SLICER_DB_SQLTABLEPATCHSERIALIZER_H
 #define SLICER_DB_SQLTABLEPATCHSERIALIZER_H
 
+#include <connection.h>
 #include <slicer/serializer.h>
 #include <tablepatch.h>
 

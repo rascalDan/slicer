@@ -5,6 +5,7 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/test/unit_test.hpp>
 #include <common.h>
+#include <connection.h>
 #include <slicer/slicer.h>
 #include <testModels.h>
 #include <types.h>
