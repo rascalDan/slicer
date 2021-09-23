@@ -70,7 +70,7 @@ namespace Slicer {
 		void
 		visitEnum(const Slice::EnumPtr & e) override
 		{
-			fprintbf(cpp, "FORWARD_ENUM(%s);\n", e->name());
+			fprintbf(cpp, "FORWARD_ENUM(%s)\n", e->name());
 		};
 
 		void
@@ -345,14 +345,14 @@ namespace Slicer {
 		}
 
 		if (auto cmp = md.value("slicer:custommodelpart:")) {
-			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", Slice::typeToString(decl),
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s)\n\n", Slice::typeToString(decl),
 					getBasicModelPart(decl), c->scoped(), CppName {*cmp});
 			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s<%s> >(%s * t)",
 					getBasicModelPart(decl), c->scoped(), Slice::typeToString(decl));
 			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
 		}
 		else {
-			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>);\n\n",
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>)\n\n",
 					Slice::typeToString(decl), c->scoped(), c->scoped());
 		}
 		definedTypes.insert(decl->typeId());
@@ -665,14 +665,14 @@ namespace Slicer {
 	Slicer::defineMODELPART(const std::string & type, const Slice::TypePtr & stype, const IceMetaData & metadata)
 	{
 		if (auto cmp = metadata.value("slicer:custommodelpart:")) {
-			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s);\n\n", type, getBasicModelPart(stype), type,
+			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s)\n\n", type, getBasicModelPart(stype), type,
 					CppName {*cmp});
 			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s<%s>>(%s * t)",
 					getBasicModelPart(stype), type, type);
 			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
 		}
 		else {
-			fprintbf(cpp, "MODELPARTFOR(%s, %s);\n\n", type, getBasicModelPart(stype));
+			fprintbf(cpp, "MODELPARTFOR(%s, %s)\n\n", type, getBasicModelPart(stype));
 		}
 		definedTypes.insert(stype->typeId());
 	}
@@ -742,4 +742,4 @@ namespace Slicer {
 			throw;
 		}
 	}
-};
+}

@@ -91,14 +91,14 @@ namespace Slicer {
 	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Int>>::rootName = "OptionalInt";
 	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Long>>::rootName = "OptionalLong";
 
-	MODELPARTFOR(std::string, ModelPartForSimple);
-	MODELPARTFOR(bool, ModelPartForSimple);
-	MODELPARTFOR(Ice::Float, ModelPartForSimple);
-	MODELPARTFOR(Ice::Double, ModelPartForSimple);
-	MODELPARTFOR(Ice::Byte, ModelPartForSimple);
-	MODELPARTFOR(Ice::Short, ModelPartForSimple);
-	MODELPARTFOR(Ice::Int, ModelPartForSimple);
-	MODELPARTFOR(Ice::Long, ModelPartForSimple);
+	MODELPARTFOR(std::string, ModelPartForSimple)
+	MODELPARTFOR(bool, ModelPartForSimple)
+	MODELPARTFOR(Ice::Float, ModelPartForSimple)
+	MODELPARTFOR(Ice::Double, ModelPartForSimple)
+	MODELPARTFOR(Ice::Byte, ModelPartForSimple)
+	MODELPARTFOR(Ice::Short, ModelPartForSimple)
+	MODELPARTFOR(Ice::Int, ModelPartForSimple)
+	MODELPARTFOR(Ice::Long, ModelPartForSimple)
 
 	bool
 	optionalCaseEq(std::string_view a, std::string_view b, bool matchCase)
@@ -304,7 +304,7 @@ namespace Slicer {
 	ModelPartForOptionalBase::IsOptional() const
 	{
 		return true;
-	};
+	}
 
 	const Metadata &
 	ModelPartForOptionalBase::GetMetadata() const

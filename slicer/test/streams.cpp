@@ -18,7 +18,7 @@ TestStream::Produce(const Consumer & c)
 	}
 }
 
-BOOST_FIXTURE_TEST_SUITE(stream, TestStream);
+BOOST_FIXTURE_TEST_SUITE(stream, TestStream)
 
 BOOST_AUTO_TEST_CASE(streamToXml)
 {
@@ -42,4 +42,4 @@ BOOST_AUTO_TEST_CASE(streamToJson)
 	BOOST_REQUIRE_EQUAL("9", seq.back());
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()

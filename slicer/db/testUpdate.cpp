@@ -15,7 +15,7 @@ using namespace std::literals;
 
 BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
-BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture)
 
 BOOST_AUTO_TEST_CASE(update_builtinsNotFound)
 {
@@ -112,4 +112,4 @@ BOOST_AUTO_TEST_CASE(update_unsupportedModel)
 			Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()

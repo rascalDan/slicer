@@ -2,8 +2,8 @@
 #include "Ice/Communicator.h"
 #include "Ice/Initialize.h"
 
-NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSerializerFactory);
-NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDeserializerFactory);
+NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSerializerFactory)
+NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDeserializerFactory)
 
 namespace Slicer {
 	Ice::StringSeq empty;

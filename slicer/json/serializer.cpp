@@ -7,14 +7,14 @@
 #include <slicer/metadata.h>
 #include <stdexcept>
 
-NAMEDFACTORY(".js", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory);
-NAMEDFACTORY(".js", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory);
-NAMEDFACTORY(".json", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory);
-NAMEDFACTORY(".json", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory);
-NAMEDFACTORY("application/javascript", Slicer::JsonStreamSerializer, Slicer::StreamSerializerFactory);
-NAMEDFACTORY("application/javascript", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory);
-NAMEDFACTORY("application/json", Slicer::JsonStreamSerializer, Slicer::StreamSerializerFactory);
-NAMEDFACTORY("application/json", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory);
+NAMEDFACTORY(".js", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory)
+NAMEDFACTORY(".js", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory)
+NAMEDFACTORY(".json", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory)
+NAMEDFACTORY(".json", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory)
+NAMEDFACTORY("application/javascript", Slicer::JsonStreamSerializer, Slicer::StreamSerializerFactory)
+NAMEDFACTORY("application/javascript", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory)
+NAMEDFACTORY("application/json", Slicer::JsonStreamSerializer, Slicer::StreamSerializerFactory)
+NAMEDFACTORY("application/json", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory)
 
 namespace Slicer {
 	constexpr std::string_view md_object {"json:object"};

@@ -12,9 +12,9 @@
 using namespace std::literals;
 
 // LCOV_EXCL_START
-BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime);
-BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
-BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan)
 // LCOV_EXCL_STOP
 
 namespace std {
@@ -28,7 +28,7 @@ namespace std {
 
 BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
-BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture)
 
 BOOST_AUTO_TEST_CASE(insert_builtins)
 {
@@ -151,4 +151,4 @@ BOOST_AUTO_TEST_CASE(insert_unsupportedModel)
 			Slicer::SerializeAny<Slicer::SqlInsertSerializer>(cm, db, "converted"), Slicer::UnsupportedModelType);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()

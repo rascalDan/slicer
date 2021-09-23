@@ -7,8 +7,8 @@
 #include <types.h>
 
 // LCOV_EXCL_START
-BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info);
-BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 // LCOV_EXCL_STOP
 
 #define TypeTest(Var, Expr, Explicit, Expected) \

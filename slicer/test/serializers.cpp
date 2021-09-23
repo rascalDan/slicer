@@ -356,7 +356,7 @@ freeJson(json::Value &)
 {
 }
 
-BOOST_FIXTURE_TEST_SUITE(byFile, FileBased);
+BOOST_FIXTURE_TEST_SUITE(byFile, FileBased)
 
 BOOST_AUTO_TEST_CASE(builtins_xml)
 {
@@ -615,9 +615,9 @@ BOOST_AUTO_TEST_CASE(invalid_enum)
 			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_FIXTURE_TEST_SUITE(byHandler, FileBased);
+BOOST_FIXTURE_TEST_SUITE(byHandler, FileBased)
 
 BOOST_AUTO_TEST_CASE(optionals_areset2_json)
 {
@@ -637,7 +637,7 @@ BOOST_AUTO_TEST_CASE(simple_complete_validator)
 			xmlpp::Document *>("isodate.xml", readXml, writeXml, freeXml);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(missingConversion)
 {

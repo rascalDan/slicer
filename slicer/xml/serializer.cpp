@@ -16,10 +16,10 @@
 #include <stdexcept>
 #include <xmlExceptions.h>
 
-NAMEDFACTORY(".xml", Slicer::XmlFileSerializer, Slicer::FileSerializerFactory);
-NAMEDFACTORY(".xml", Slicer::XmlFileDeserializer, Slicer::FileDeserializerFactory);
-NAMEDFACTORY("application/xml", Slicer::XmlStreamSerializer, Slicer::StreamSerializerFactory);
-NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDeserializerFactory);
+NAMEDFACTORY(".xml", Slicer::XmlFileSerializer, Slicer::FileSerializerFactory)
+NAMEDFACTORY(".xml", Slicer::XmlFileDeserializer, Slicer::FileDeserializerFactory)
+NAMEDFACTORY("application/xml", Slicer::XmlStreamSerializer, Slicer::StreamSerializerFactory)
+NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDeserializerFactory)
 
 namespace Slicer {
 	constexpr std::string_view md_attribute {"xml:attribute"};

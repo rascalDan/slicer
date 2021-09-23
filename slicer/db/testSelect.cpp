@@ -14,7 +14,7 @@ using namespace std::literals;
 
 BOOST_GLOBAL_FIXTURE(StandardMockDatabase);
 
-BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture);
+BOOST_FIXTURE_TEST_SUITE(db, ConnectionFixture)
 
 BOOST_AUTO_TEST_CASE(select_simple_int)
 {
@@ -246,4 +246,4 @@ BOOST_AUTO_TEST_CASE(bulkSelectTest)
 	BOOST_REQUIRE_EQUAL(10000, vec.size());
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()

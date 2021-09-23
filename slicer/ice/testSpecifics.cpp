@@ -5,7 +5,7 @@
 #include <types.h>
 
 // LCOV_EXCL_START
-BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate);
+BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate)
 // LCOV_EXCL_STOP
 
 template<typename X>
