@@ -4,9 +4,10 @@
 #include "metadata.h"
 #include <Ice/Config.h>
 #include <functional>
+#include <memory>
 #include <optional>
-#include <stdexcept>
-#include <vector>
+#include <string>
+#include <string_view>
 #include <visibility.h>
 
 namespace Ice {

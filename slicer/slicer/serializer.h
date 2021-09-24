@@ -4,6 +4,8 @@
 #include <c++11Helpers.h>
 #include <factory.h>
 #include <filesystem>
+#include <iosfwd>
+#include <memory>
 #include <slicer/modelParts.h>
 #include <visibility.h>
 

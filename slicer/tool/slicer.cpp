@@ -1,8 +1,24 @@
-#include <boost/algorithm/string/split.hpp>
+#include "parser.h"
+#include <array>
+#include <boost/algorithm/string/find_iterator.hpp>
+#include <boost/algorithm/string/finder.hpp>
 #include <boost/program_options.hpp>
 #include <compileTimeFormatter.h>
-#include <tool/parser.h>
-#include <unistd.h>
+#include <cstdlib>
+#include <filesystem>
+#include <iostream>
+#include <string>
+#include <string_view>
+// IWYU pragma: no_include <utility>
+// IWYU pragma: no_include <boost/algorithm/string/compare.hpp>
+// IWYU pragma: no_include <boost/core/addressof.hpp>
+// IWYU pragma: no_include <boost/detail/basic_pointerbuf.hpp>
+// IWYU pragma: no_include <boost/function/function_base.hpp>
+// IWYU pragma: no_include <boost/iterator/iterator_facade.hpp>
+// IWYU pragma: no_include <boost/lexical_cast.hpp>
+// IWYU pragma: no_include <boost/range/const_iterator.hpp>
+// IWYU pragma: no_include <boost/range/iterator_range_core.hpp>
+// IWYU pragma: no_include <boost/type_index/type_index_facade.hpp>
 
 namespace po = boost::program_options;
 using namespace AdHoc::literals;

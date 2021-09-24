@@ -1,5 +1,7 @@
 #include "icemetadata.h"
-#include <boost/algorithm/string/predicate.hpp>
+#include "metadata.h"
+#include <algorithm>
+// IWYU pragma: no_include <list>
 
 namespace Slicer {
 	IceMetaData::IceMetaData(Slice::StringList && a)

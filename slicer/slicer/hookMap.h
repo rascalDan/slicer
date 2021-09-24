@@ -3,12 +3,16 @@
 
 #include "modelParts.h"
 #include <array>
+#include <cstddef>
+#include <iterator>
+#include <string>
+#include <string_view>
 #include <visibility.h>
 
 namespace Slicer {
 	void DLL_PUBLIC to_lower(std::string s);
 
-	template<typename T> class ModelPartForComplex;
+	template<typename T> class ModelPartForComplex; // IWYU pragma: keep
 	template<typename T> class Hooks {
 	public:
 		using HookPtr = const typename ModelPartForComplex<T>::HookBase *;

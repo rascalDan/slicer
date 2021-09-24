@@ -71,6 +71,7 @@ project
 			<toolset>tidy:<define>__x86_64
 			<toolset>tidy:<librarydef>boost
 			<toolset>tidy:<librarydef>std
+			<toolset>tidy:<mapping>iwyu.json
 			;
 
 build-project slicer ;

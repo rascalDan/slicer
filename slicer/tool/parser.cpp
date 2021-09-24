@@ -1,14 +1,40 @@
 #include "parser.h"
+#include "icemetadata.h"
+#include <IceUtil/Handle.h>
 #include <Slice/CPlusPlusUtil.h>
 #include <Slice/Parser.h>
 #include <Slice/Preprocessor.h>
+#include <algorithm>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/constants.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/format.hpp>
+#include <cctype>
 #include <common.h>
+#include <cstdio>
+#include <cstdlib>
+#include <filesystem>
 #include <fprintbf.h>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <optional>
+#include <ostream>
 #include <safeMapFind.h>
+#include <set>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+// IWYU pragma: no_include <boost/algorithm/string/detail/classification.hpp>
+// IWYU pragma: no_include <boost/function/function_base.hpp>
+// IWYU pragma: no_include <boost/iterator/iterator_facade.hpp>
+// IWYU pragma: no_include <boost/iterator/iterator_traits.hpp>
+// IWYU pragma: no_include <boost/range/begin.hpp>
+// IWYU pragma: no_include <boost/range/end.hpp>
+// IWYU pragma: no_include <boost/type_index/type_index_facade.hpp>
 
 namespace fs = std::filesystem;
 
@@ -737,7 +763,7 @@ namespace Slicer {
 		}
 		catch (...) {
 			if (!cppPath.empty()) {
-				unlink(cppPath.c_str());
+				std::filesystem::remove(cppPath);
 			}
 			throw;
 		}

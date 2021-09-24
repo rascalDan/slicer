@@ -3,8 +3,14 @@
 
 #include "icemetadata.h"
 #include <Slice/Parser.h>
+#include <cstdio>
 #include <filesystem>
+#include <set>
+#include <string>
+#include <string_view>
+#include <vector>
 #include <visibility.h>
+// IWYU pragma: no_include <boost/iterator/transform_iterator.hpp>
 
 namespace Slicer {
 	class SplitString : public std::vector<std::string> {

@@ -1,10 +1,29 @@
+#include "modelPartsTypes.h"
+#include "common.h"
+#include "modelParts.h"
 #include "modelPartsTypes.impl.h"
-#include <boost/algorithm/string/case_conv.hpp>
+#include <Ice/Config.h>
+#include <Ice/Optional.h>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/multi_index/indexed_by.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index_container.hpp>
+#include <cstdlib>
 #include <cxxabi.h>
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+// IWYU pragma: no_forward_declare boost::multi_index::member
+// IWYU pragma: no_include <boost/operators.hpp>
+
+namespace Ice {
+	class InputStream;
+	class OutputStream;
+}
 
 namespace Slicer {
 	using ClassRefMap = std::map<std::string, ClassRef, std::less<>>;

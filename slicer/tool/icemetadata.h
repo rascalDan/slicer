@@ -3,8 +3,13 @@
 
 #include <Slice/Parser.h>
 #include <c++11Helpers.h>
-#include <list>
+#include <cstddef>
 #include <metadata.h>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+#include <visibility.h>
 
 namespace Slicer {
 	class DLL_PUBLIC IceMetaData : public MetaData<false, std::string> {

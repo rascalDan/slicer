@@ -1,6 +1,7 @@
 #ifndef SLICER_H
 #define SLICER_H
 
+#include <memory>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 

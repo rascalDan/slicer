@@ -2,8 +2,19 @@
 #define SLICER_MODELPARTSTYPES_H
 
 #include "modelParts.h"
-#include <Ice/ObjectF.h>
 #include <Ice/Optional.h>
+#include <cstddef>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <visibility.h>
+
+namespace Ice {
+	class InputStream;
+	class OutputStream;
+}
 
 namespace Slicer {
 	template<typename T> struct isLocal {
