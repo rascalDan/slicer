@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE json_specifics
-#include "serializer.h"
 #include <boost/test/unit_test.hpp>
+
+#include "serializer.h"
 #include <slicer/slicer.h>
 #include <types.h>
 

@@ -1,10 +1,12 @@
 #define BOOST_TEST_MODULE ice_specifics
-#include "serializer.h"
 #include <boost/test/unit_test.hpp>
+
+#include "serializer.h"
 #include <slicer.h>
 #include <types.h>
 
 // LCOV_EXCL_START
+// cppcheck-suppress unknownMacro
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate)
 // LCOV_EXCL_STOP
 

@@ -67,7 +67,10 @@ project
 			<toolset>tidy:<exclude>db/bin/tidy/debug/checker-none/cxxstd-17-iso/visibility-hidden/testModels.h
 			<toolset>tidy:<exclude>ice/cpp/*
 			<toolset>tidy:<define>ICE_IGNORE_VERSION
+			<toolset>tidy:<define>ICE_MEMBER
 			<toolset>tidy:<define>__x86_64
+			<toolset>tidy:<librarydef>boost
+			<toolset>tidy:<librarydef>std
 			;
 
 build-project slicer ;

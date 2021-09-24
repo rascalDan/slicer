@@ -28,11 +28,9 @@ total()
 void
 process(Slicer::Slicer & s, const ComponentsCount::value_type & c)
 {
-#if BOOST_VERSION / 100 >= 1060
-	BOOST_TEST_CONTEXT(c.first)
-#endif
-	{
+	BOOST_TEST_CONTEXT(c.first) {
 		s.slicePath = rootDir / c.first;
+		// cppcheck-suppress assertWithSideEffect
 		BOOST_REQUIRE_EQUAL(c.second, s.Execute());
 	}
 }

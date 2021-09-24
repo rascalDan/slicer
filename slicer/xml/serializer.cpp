@@ -222,14 +222,14 @@ namespace Slicer {
 	{
 		auto node = element->get_first_child();
 		while (node) {
-			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
+			if (auto childElement = dynamic_cast<const xmlpp::Element *>(node)) {
 				auto emp = dict->GetAnonChild();
 				emp->Create();
 				auto key = emp->GetChild(keyName);
 				auto value = emp->GetChildRef(valueName);
-				key->SetValue(XmlValueSource(element->get_name()));
+				key->SetValue(XmlValueSource(childElement->get_name()));
 				key->Complete();
-				DocumentTreeIterateElement(element, value.Child(), value);
+				DocumentTreeIterateElement(childElement, value.Child(), value);
 				emp->Complete();
 			}
 			node = node->get_next_sibling();

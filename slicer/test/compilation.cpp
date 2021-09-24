@@ -7,7 +7,9 @@
 #include <types.h>
 
 // LCOV_EXCL_START
+// cppcheck-suppress unknownMacro
 BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info)
+// cppcheck-suppress unknownMacro
 BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 // LCOV_EXCL_STOP
 
