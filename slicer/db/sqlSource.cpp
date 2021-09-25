@@ -1,5 +1,8 @@
 #include "sqlSource.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <column.h>
+#include <cstdint>
 
 namespace Slicer {
 	SqlSource::SqlSource(const DB::Column & c) : column(c) { }

@@ -385,7 +385,8 @@ namespace Slicer {
 		{
 			static_assert(sizeof...(MD) == N, "Wrong amount of metadata");
 		}
-		~Hook() = default;
+		~Hook() override = default;
+		SPECIAL_MEMBERS_DEFAULT(Hook);
 
 		[[nodiscard]] const Metadata &
 		GetMetadata() const override

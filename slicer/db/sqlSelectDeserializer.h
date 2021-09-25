@@ -1,9 +1,14 @@
 #ifndef SLICER_DB_SQLSELECTDESERIALIZER_H
 #define SLICER_DB_SQLSELECTDESERIALIZER_H
 
-#include <selectcommand.h>
-#include <slicer/serializer.h>
+#include "modelParts.h"
+#include "slicer/serializer.h"
+#include <optional>
+#include <string>
 #include <visibility.h>
+namespace DB {
+	class SelectCommand;
+}
 
 namespace Slicer {
 	class DLL_PUBLIC SqlSelectDeserializer : public Slicer::Deserializer {

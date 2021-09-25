@@ -2,12 +2,16 @@
 #include <boost/test/unit_test.hpp>
 
 #include "helpers.h"
+#include "modelPartsTypes.h"
 #include "streams.h"
+#include "xml/serializer.h"
+#include "json/serializer.h"
 #include <collections.h>
 #include <definedDirs.h>
-#include <json/serializer.h>
+#include <filesystem>
 #include <slicer.h>
-#include <xml/serializer.h>
+#include <string>
+#include <vector>
 
 void
 TestStream::Produce(const Consumer & c)

@@ -1,13 +1,16 @@
 #define BOOST_TEST_MODULE preprocess
 #include <boost/test/unit_test.hpp>
 
-#include "helpers.h"
-#include <boost/format.hpp>
-#include <buffer.h>
-#include <common.h>
+#include "tool/icemetadata.h"
+#include "tool/parser.h"
+#include <cstdio>
 #include <definedDirs.h>
+#include <filesystem>
+#include <map>
 #include <numeric>
-#include <tool/parser.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 using ComponentsCount = std::map<std::string, unsigned int>;
 ComponentsCount COMPONENTS_IN_TEST_ICE = {{"classtype.ice", 2}, {"classes.ice", 3}, {"collections.ice", 5},
@@ -41,8 +44,9 @@ processAll(Slicer::Slicer & s)
 	s.includes.push_back(rootDir / "included");
 	s.includes.push_back(rootDir);
 	for (const auto & c : COMPONENTS_IN_TEST_ICE) {
-		BOOST_TEST_CHECKPOINT(c.first);
-		process(s, c);
+		BOOST_TEST_CONTEXT(c.first) {
+			process(s, c);
+		}
 	}
 	BOOST_REQUIRE_EQUAL(total(), s.Components());
 }

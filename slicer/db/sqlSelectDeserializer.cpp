@@ -1,7 +1,11 @@
 #include "sqlSelectDeserializer.h"
+#include "common.h"
+#include "sqlExceptions.h"
 #include "sqlSource.h"
-#include <common.h>
-#include <sqlExceptions.h>
+#include <column.h>
+#include <memory>
+#include <selectcommand.h>
+#include <utility>
 
 namespace Slicer {
 	SqlSelectDeserializer::SqlSelectDeserializer(DB::SelectCommand * c, std::optional<std::string> tc) :

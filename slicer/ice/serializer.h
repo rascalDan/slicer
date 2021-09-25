@@ -1,8 +1,10 @@
 #ifndef SLICER_ICE_H
 #define SLICER_ICE_H
 
+#include "modelParts.h"
 #include <Ice/BuiltinSequences.h>
 #include <Ice/CommunicatorF.h>
+#include <iosfwd>
 #include <slicer/serializer.h>
 #include <visibility.h>
 

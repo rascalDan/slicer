@@ -17,6 +17,14 @@
 	},
 	{
 		"symbol": [
+			"tm",
+			"private",
+			"<ctime>",
+			"public"
+		]
+	},
+	{
+		"symbol": [
 			"boost::posix_time::time_duration",
 			"private",
 			"<boost/date_time/posix_time/posix_time.hpp>",

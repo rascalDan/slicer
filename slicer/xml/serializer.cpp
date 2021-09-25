@@ -9,12 +9,25 @@
 #	pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 #include <glibmm/ustring.h>
+#include <libxml++/attribute.h>
+#include <libxml++/nodes/contentnode.h>
+#include <libxml++/nodes/element.h>
+#include <libxml++/nodes/node.h>
 #pragma GCC diagnostic pop
+#include <Ice/Config.h>
+#include <boost/numeric/conversion/cast.hpp>
+#include <factory.h>
+#include <lazyPointer.h>
 #include <libxml++/document.h>
 #include <libxml++/parsers/domparser.h>
+#include <list>
+#include <memory>
+#include <optional>
 #include <slicer/metadata.h>
-#include <stdexcept>
+#include <string_view>
+#include <utility>
 #include <xmlExceptions.h>
+// IWYU pragma: no_include <boost/detail/basic_pointerbuf.hpp>
 
 NAMEDFACTORY(".xml", Slicer::XmlFileSerializer, Slicer::FileSerializerFactory)
 NAMEDFACTORY(".xml", Slicer::XmlFileDeserializer, Slicer::FileDeserializerFactory)

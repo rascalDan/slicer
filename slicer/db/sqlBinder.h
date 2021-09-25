@@ -1,9 +1,14 @@
 #ifndef SLICER_DB_SQLBINDER_H
 #define SLICER_DB_SQLBINDER_H
 
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <command.h>
+#include <Ice/Config.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <memory>
 #include <slicer/modelParts.h>
+#include <string>
+namespace DB {
+	class Command;
+}
 
 namespace Slicer {
 	class SqlBinder :

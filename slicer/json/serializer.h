@@ -1,8 +1,12 @@
 #ifndef SLICER_JSON_H
 #define SLICER_JSON_H
 
+#include "modelParts.h"
+#include "slicer/serializer.h"
+#include <filesystem>
+#include <iosfwd>
 #include <jsonpp.h>
-#include <slicer/serializer.h>
+#include <string>
 #include <visibility.h>
 
 namespace Slicer {

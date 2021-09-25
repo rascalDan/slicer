@@ -1,7 +1,8 @@
 #include "sqlCommon.h"
 #include <compileTimeFormatter.h>
-#include <metadata.h>
+#include <modelParts.h>
 #include <sqlExceptions.h>
+#include <string_view>
 
 namespace Slicer {
 	constexpr std::string_view md_pkey {"db:pkey"};

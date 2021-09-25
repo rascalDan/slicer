@@ -1,12 +1,15 @@
 #include "sqlUpdateSerializer.h"
 #include "sqlBinder.h"
 #include "sqlCommon.h"
+#include <command_fwd.h>
 #include <common.h>
 #include <compileTimeFormatter.h>
+#include <connection.h>
 #include <functional>
+#include <memory>
 #include <modifycommand.h>
-#include <slicer/metadata.h>
 #include <sqlExceptions.h>
+#include <utility>
 
 namespace Slicer {
 	using namespace std::placeholders;

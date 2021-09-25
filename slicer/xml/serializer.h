@@ -8,11 +8,22 @@
 #ifndef __clang__
 #	pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
-#include <libxml++/document.h>
 #include <libxml++/nodes/element.h>
 #pragma GCC diagnostic pop
+#include "modelParts.h"
+#include <filesystem>
+#include <functional>
+#include <iosfwd>
 #include <slicer/serializer.h>
+#include <string>
 #include <visibility.h>
+namespace Glib {
+	class ustring;
+}
+namespace xmlpp {
+	class Document;
+	class Node;
+}
 
 namespace Slicer {
 	using CurrentElementCreator = ::AdHoc::LazyPointer<xmlpp::Element, xmlpp::Element *>;
@@ -57,6 +68,7 @@ namespace Slicer {
 		void Serialize(ModelPartForRootPtr) override;
 
 	protected:
+		// cppcheck-suppress unsafeClassCanLeak
 		xmlpp::Document *& doc;
 	};
 

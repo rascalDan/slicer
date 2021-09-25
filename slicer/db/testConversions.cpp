@@ -1,5 +1,8 @@
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <Ice/Config.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <cstdint>
+#include <memory>
 #include <testModels.h>
 #include <visibility.h>
 

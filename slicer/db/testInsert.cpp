@@ -1,13 +1,23 @@
 #define BOOST_TEST_MODULE db_insert
+#include <boost/test/unit_test.hpp>
+
+#include "classes.h"
+#include "collections.h"
+#include "common.h"
+#include "slicer/slicer.h"
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
+#include "structs.h"
 #include "testMockCommon.h"
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <boost/test/unit_test.hpp>
-#include <common.h>
-#include <slicer/slicer.h>
-#include <testModels.h>
-#include <types.h>
+#include "testModels.h"
+#include <Ice/Optional.h>
+#include <connection.h>
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
+// IWYU pragma: no_forward_declare Slicer::UnsupportedModelType
 
 using namespace std::literals;
 

@@ -1,9 +1,13 @@
 #ifndef SLICER_DB_SQLTABLEPATCHSERIALIZER_H
 #define SLICER_DB_SQLTABLEPATCHSERIALIZER_H
 
-#include <connection.h>
+#include "modelParts.h"
 #include <slicer/serializer.h>
-#include <tablepatch.h>
+#include <visibility.h>
+namespace DB {
+	class Connection;
+	class TablePatch;
+}
 
 namespace Slicer {
 	class DLL_PUBLIC SqlTablePatchSerializer : public Slicer::Serializer {

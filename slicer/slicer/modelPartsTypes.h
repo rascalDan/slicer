@@ -3,6 +3,7 @@
 
 #include "modelParts.h"
 #include <Ice/Optional.h>
+#include <c++11Helpers.h>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -324,7 +325,9 @@ namespace Slicer {
 		using Consumer = std::function<void(const T &)>;
 		using element_type = T;
 
+		constexpr Stream() = default;
 		virtual ~Stream() = default;
+		SPECIAL_MEMBERS_DEFAULT(Stream);
 
 		virtual void Produce(const Consumer & c) = 0;
 	};

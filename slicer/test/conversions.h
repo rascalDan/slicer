@@ -1,9 +1,14 @@
 #ifndef SLICER_TEST_CONVERSIONS_H
 #define SLICER_TEST_CONVERSIONS_H
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include "classtype.h"
+#include "structs.h"
+#include <Ice/Config.h>
+#include <Ice/Optional.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <optional>
 #include <slicer/modelPartsTypes.h>
-#include <types.h>
+#include <string>
 #include <visibility.h>
 
 namespace TestModule {

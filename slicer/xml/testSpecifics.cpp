@@ -2,10 +2,13 @@
 #include <boost/test/unit_test.hpp>
 
 #include "serializer.h"
+#include <Ice/Config.h>
+#include <iostream>
 #include <libxml++/parsers/domparser.h>
 #include <slicer/slicer.h>
-#include <types.h>
+#include <typeinfo>
 #include <xmlExceptions.h>
+// IWYU pragma: no_forward_declare Slicer::BadBooleanValue
 
 template<typename T, typename... P>
 T

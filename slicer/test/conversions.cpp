@@ -1,5 +1,16 @@
 #include "conversions.h"
+#include "modelParts.h"
+#include "modelPartsTypes.h"
+#include <boost/date_time/date.hpp>
+#include <boost/date_time/gregorian_calendar.hpp>
+#include <boost/date_time/time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <cstdint>
+#include <cstdio>
+#include <ctime>
+#include <memory>
+#include <stdexcept>
+#include <visibility.h>
 
 #define SHORT(x) boost::numeric_cast<::Ice::Short, int64_t>(x)
 inline auto

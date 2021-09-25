@@ -2,7 +2,6 @@
 #define SLICER_TEST_HELPERS_H
 
 #include <filesystem>
-#include <string>
 #include <visibility.h>
 
 // These are just thin wrappers that throw exceptions

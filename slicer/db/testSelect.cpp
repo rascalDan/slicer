@@ -1,14 +1,27 @@
 #define BOOST_TEST_MODULE db_select
-#include "sqlSelectDeserializer.h"
-#include "testMockCommon.h"
-#include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/test/unit_test.hpp>
-#include <common.h>
+
+#include "classes.h"
+#include "collections.h"
+#include "common.h"
+#include "inheritance.h"
+#include "optionals.h"
+#include "slicer/slicer.h"
+#include "sqlExceptions.h"
+#include "sqlSelectDeserializer.h"
+#include "structs.h"
+#include "testMockCommon.h"
+#include "testModels.h"
+#include <Ice/Config.h>
+#include <Ice/Optional.h>
 #include <connection.h>
-#include <slicer/slicer.h>
-#include <sqlExceptions.h>
-#include <testModels.h>
-#include <types.h>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
+// IWYU pragma: no_forward_declare Slicer::NoRowsReturned
+// IWYU pragma: no_forward_declare Slicer::TooManyRowsReturned
+// IWYU pragma: no_forward_declare Slicer::UnsupportedModelType
 
 using namespace std::literals;
 

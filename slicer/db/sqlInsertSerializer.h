@@ -1,10 +1,16 @@
 #ifndef SLICER_DB_SQLINSERTSERIALIZER_H
 #define SLICER_DB_SQLINSERTSERIALIZER_H
 
-#include <connection.h>
+#include "modelParts.h"
+#include <command_fwd.h>
 #include <ostream>
 #include <slicer/serializer.h>
+#include <string>
 #include <visibility.h>
+namespace DB {
+	class Connection;
+	class ModifyCommand;
+}
 
 namespace Slicer {
 	class DLL_PUBLIC SqlInsertSerializer : public Slicer::Serializer {

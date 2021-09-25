@@ -1,9 +1,19 @@
 #define BOOST_TEST_MODULE ice_specifics
 #include <boost/test/unit_test.hpp>
 
+#include "classes.h"
 #include "serializer.h"
+#include "structs.h"
+#include <Ice/Comparable.h>
+#include <Ice/Config.h>
+#include <Ice/Optional.h>
+#include <functional>
+#include <iosfwd>
+#include <memory>
 #include <slicer.h>
-#include <types.h>
+#include <string>
+#include <typeinfo>
+// IWYU pragma: no_forward_declare Slicer::IceStreamDeserializer
 
 // LCOV_EXCL_START
 // cppcheck-suppress unknownMacro
@@ -14,22 +24,24 @@ template<typename X>
 void
 testCompare(const X & x)
 {
-	BOOST_TEST_CHECKPOINT(typeid(X).name());
-	std::stringstream strm;
-	Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
-	auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, X>(strm);
-	BOOST_REQUIRE_EQUAL(x, x2);
+	BOOST_TEST_CONTEXT(typeid(X).name()) {
+		std::stringstream strm;
+		Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
+		auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, X>(strm);
+		BOOST_REQUIRE_EQUAL(x, x2);
+	}
 }
 
 template<typename X>
 void
 testCompare(const X & x, const std::function<bool(const X &, const X &)> & cmp)
 {
-	BOOST_TEST_CHECKPOINT(typeid(X).name());
-	std::stringstream strm;
-	Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
-	auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, X>(strm);
-	BOOST_REQUIRE(cmp(x, x2));
+	BOOST_TEST_CONTEXT(typeid(X).name()) {
+		std::stringstream strm;
+		Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
+		auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, X>(strm);
+		BOOST_REQUIRE(cmp(x, x2));
+	}
 }
 
 BOOST_AUTO_TEST_CASE(builtins)
@@ -55,16 +67,17 @@ template<typename X>
 void
 testCompareOptional(const X & d)
 {
-	BOOST_TEST_CHECKPOINT(typeid(X).name());
-	std::stringstream strm;
-	Ice::optional<X> x;
-	Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
-	auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, Ice::optional<X>>(strm);
-	BOOST_REQUIRE(!x2);
-	x = d;
-	Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
-	auto x3 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, Ice::optional<X>>(strm);
-	BOOST_REQUIRE_EQUAL(d, *x3);
+	BOOST_TEST_CONTEXT(typeid(X).name()) {
+		std::stringstream strm;
+		Ice::optional<X> x;
+		Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
+		auto x2 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, Ice::optional<X>>(strm);
+		BOOST_REQUIRE(!x2);
+		x = d;
+		Slicer::SerializeAny<Slicer::IceStreamSerializer>(x, strm);
+		auto x3 = Slicer::DeserializeAny<Slicer::IceStreamDeserializer, Ice::optional<X>>(strm);
+		BOOST_REQUIRE_EQUAL(d, *x3);
+	}
 }
 
 BOOST_AUTO_TEST_CASE(optionalBuiltins)

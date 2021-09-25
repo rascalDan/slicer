@@ -1,6 +1,12 @@
 #include "serializer.h"
-#include "Ice/Communicator.h"
-#include "Ice/Initialize.h"
+#include <Ice/Communicator.h>
+#include <Ice/Initialize.h>
+#include <Ice/InputStream.h>
+#include <Ice/OutputStream.h>
+#include <factory.h>
+#include <istream>
+#include <iterator>
+#include <memory>
 
 NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSerializerFactory)
 NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDeserializerFactory)

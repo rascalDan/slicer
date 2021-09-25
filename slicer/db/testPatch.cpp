@@ -1,14 +1,23 @@
 #define BOOST_TEST_MODULE db_patch
+#include <boost/test/unit_test.hpp>
+
+#include "classes.h"
+#include "collections.h"
+#include "slicer/slicer.h"
 #include "sqlSelectDeserializer.h"
 #include "sqlTablePatchSerializer.h"
 #include "testMockCommon.h"
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-#include <boost/test/unit_test.hpp>
-#include <common.h>
 #include <connection.h>
-#include <slicer/slicer.h>
-#include <testModels.h>
-#include <types.h>
+#include <memory>
+#include <string>
+#include <tablepatch.h>
+namespace TestDatabase {
+	class Timespan;
+}
+namespace TestModule {
+	struct DateTime;
+	struct IsoDate;
+}
 
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime)

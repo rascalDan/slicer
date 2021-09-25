@@ -1,10 +1,9 @@
 #ifndef SLICER_DB_SQLCOMMON_H
 #define SLICER_DB_SQLCOMMON_H
 
-#include <modelParts.h>
-#include <string>
-
 namespace Slicer {
+	class HookCommon;
+
 	bool isPKey(const HookCommon *);
 	bool isAuto(const HookCommon *);
 	bool isNotAuto(const HookCommon *);

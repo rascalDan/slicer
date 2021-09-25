@@ -1,11 +1,19 @@
 #include "serializer.h"
+#include <Ice/Config.h>
 #include <boost/numeric/conversion/cast.hpp>
-#include <fstream>
+#include <cmath>
+#include <factory.h>
+#include <fstream> // IWYU pragma: keep
 #include <functional>
 #include <glibmm/ustring.h>
 #include <jsonpp.h>
-#include <slicer/metadata.h>
-#include <stdexcept>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string_view>
+#include <utility>
+#include <variant>
+#include <vector>
 
 NAMEDFACTORY(".js", Slicer::JsonFileSerializer, Slicer::FileSerializerFactory)
 NAMEDFACTORY(".js", Slicer::JsonFileDeserializer, Slicer::FileDeserializerFactory)

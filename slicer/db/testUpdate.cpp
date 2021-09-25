@@ -1,15 +1,24 @@
 #define BOOST_TEST_MODULE db_update
+#include "classes.h"
+#include "collections.h"
+#include "common.h"
+#include "slicer/slicer.h"
+#include "sqlExceptions.h"
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include "sqlUpdateSerializer.h"
 #include "testMockCommon.h"
-#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include "testModels.h"
+#include <Ice/Config.h>
+#include <Ice/Optional.h>
 #include <boost/test/unit_test.hpp>
-#include <common.h>
-#include <slicer/slicer.h>
-#include <sqlExceptions.h>
-#include <testModels.h>
-#include <types.h>
+#include <connection.h>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
+// IWYU pragma: no_forward_declare Slicer::NoRowsFound
+// IWYU pragma: no_forward_declare Slicer::UnsupportedModelType
 
 using namespace std::literals;
 
@@ -94,8 +103,7 @@ BOOST_AUTO_TEST_CASE(update_withNulls)
 	bis[1]->mbyte = Ice::optional<Ice::Byte>();
 	bis[0]->mshort = Ice::optional<Ice::Short>();
 	bis[1]->mdouble = Ice::optional<Ice::Double>();
-	BOOST_TEST_CHECKPOINT("Do update");
-	Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db, "builtins");
+	BOOST_REQUIRE_NO_THROW(Slicer::SerializeAny<Slicer::SqlUpdateSerializer>(bis, db, "builtins"));
 	auto bis2 = Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, TestDatabase::BuiltInSeq>(sel.get());
 	BOOST_REQUIRE(bis2[0]->mstring);
 	BOOST_REQUIRE(!bis2[1]->mstring);

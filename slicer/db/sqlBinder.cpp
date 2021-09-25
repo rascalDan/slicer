@@ -1,4 +1,5 @@
 #include "sqlBinder.h"
+#include <command.h>
 
 namespace Slicer {
 	SqlBinder::SqlBinder(DB::Command & c, unsigned int i) : command(c), idx(i) { }

@@ -1,10 +1,20 @@
 #define BOOST_TEST_MODULE compilation
 #include <boost/test/unit_test.hpp>
 
-#include <locals.h>
-#include <slicer/modelParts.h>
-#include <slicer/modelPartsTypes.h>
-#include <types.h>
+#include "classes.h"
+#include "classtype.h"
+#include "collections.h"
+#include "enums.h"
+#include "inheritance.h"
+#include "locals.h"
+#include "slicer/modelParts.h"
+#include "structs.h"
+#include <Ice/Config.h>
+#include <memory>
+#include <optional>
+#include <string>
+#include <typeinfo>
+#include <vector>
 
 // LCOV_EXCL_START
 // cppcheck-suppress unknownMacro
@@ -22,9 +32,10 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 		auto mppvalue = mpp.get(); \
 		auto amppvalue = mpp.get(); \
 		auto apmppvalue = mpp.get(); \
-		BOOST_TEST_CHECKPOINT(typeid(*mppvalue).name()); \
-		BOOST_REQUIRE_EQUAL(typeid(*mppvalue), typeid(*amppvalue)); \
-		BOOST_REQUIRE_EQUAL(typeid(*mppvalue), typeid(*apmppvalue)); \
+		BOOST_TEST_CONTEXT(typeid(*mppvalue).name()) { \
+			BOOST_REQUIRE_EQUAL(typeid(*mppvalue), typeid(*amppvalue)); \
+			BOOST_REQUIRE_EQUAL(typeid(*mppvalue), typeid(*apmppvalue)); \
+		} \
 	}
 
 #define StackTypeTest(Var, Explicit, Expected) TypeTest(Var, Var(), Explicit, Expected)

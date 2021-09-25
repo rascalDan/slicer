@@ -1,9 +1,17 @@
 #ifndef SLICER_DB_SQLSOURCE_H
 #define SLICER_DB_SQLSOURCE_H
 
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <column.h>
-#include <slicer/modelParts.h>
+#include "slicer/modelParts.h"
+#include <Ice/Config.h>
+#include <memory>
+#include <string>
+namespace DB {
+	class Column;
+}
+namespace boost::posix_time {
+	class ptime;
+	class time_duration;
+}
 
 namespace Slicer {
 	class SqlSource :

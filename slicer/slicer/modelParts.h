@@ -3,6 +3,7 @@
 
 #include "metadata.h"
 #include <Ice/Config.h>
+#include <c++11Helpers.h>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -18,8 +19,10 @@ namespace Ice {
 namespace Slicer {
 	template<typename T> class TValueTarget {
 	public:
+		constexpr TValueTarget() = default;
 		virtual ~TValueTarget() = default;
 		virtual void get(const T &) const = 0;
+		SPECIAL_MEMBERS_DEFAULT(TValueTarget);
 	};
 	class ValueTarget :
 		public TValueTarget<bool>,
@@ -43,8 +46,10 @@ namespace Slicer {
 
 	template<typename T> class TValueSource {
 	public:
+		constexpr TValueSource() = default;
 		virtual ~TValueSource() = default;
 		virtual void set(T &) const = 0;
+		SPECIAL_MEMBERS_DEFAULT(TValueSource);
 	};
 	class ValueSource :
 		public TValueSource<bool>,
@@ -115,6 +120,7 @@ namespace Slicer {
 		{
 		}
 		virtual ~HookCommon() = default;
+		SPECIAL_MEMBERS_DEFAULT(HookCommon);
 
 		[[nodiscard]] bool filter(const HookFilter & flt) const;
 		void apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const;

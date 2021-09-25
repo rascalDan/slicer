@@ -1,14 +1,17 @@
 #include "sqlInsertSerializer.h"
+#include "common.h"
 #include "sqlBinder.h"
 #include "sqlCommon.h"
+#include "sqlExceptions.h"
+#include <Ice/Config.h>
 #include <boost/numeric/conversion/cast.hpp>
-#include <common.h>
+#include <command_fwd.h>
 #include <compileTimeFormatter.h>
+#include <connection.h>
 #include <functional>
+#include <memory>
 #include <modifycommand.h>
-#include <slicer/metadata.h>
-#include <sqlExceptions.h>
-#include <type_traits>
+#include <utility>
 
 namespace Slicer {
 	using namespace std::placeholders;

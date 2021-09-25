@@ -1,10 +1,12 @@
+#include "sqlTablePatchSerializer.h"
 #include "sqlCommon.h"
 #include "sqlInsertSerializer.h"
-#include "sqlTablePatchSerializer.h"
 #include <compileTimeFormatter.h>
-#include <functional>
+#include <connection.h>
+#include <memory>
 #include <scopeExit.h>
-#include <slicer/metadata.h>
+#include <string>
+#include <tablepatch.h>
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");

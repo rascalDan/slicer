@@ -2,8 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "serializer.h"
-#include <slicer/slicer.h>
-#include <types.h>
+#include <iostream>
 
 BOOST_AUTO_TEST_CASE(factories)
 {

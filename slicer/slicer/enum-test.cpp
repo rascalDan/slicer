@@ -1,4 +1,6 @@
 #include "enumMap.h"
+#include <string>
+#include <string_view>
 
 namespace test {
 	enum class Es { one, two, three };

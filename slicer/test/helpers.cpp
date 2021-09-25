@@ -1,6 +1,10 @@
 #include "helpers.h"
-#include <boost/test/test_tools.hpp>
+#include <algorithm>
+#include <boost/test/unit_test.hpp>
+#include <cctype>
 #include <fstream>
+#include <iterator>
+#include <string>
 
 void
 diff(const std::filesystem::path & left, const std::filesystem::path & right)

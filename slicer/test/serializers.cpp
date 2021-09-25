@@ -1,24 +1,45 @@
 #define BOOST_TEST_MODULE execute_serializers
 #include <boost/test/unit_test.hpp>
 
+#include "classes.h"
+#include "classtype.h"
+#include "collections.h"
+#include "common.h"
 #include "conversions.h"
+#include "enums.h"
+#include "functions.h"
 #include "helpers.h"
-#include <boost/format.hpp>
-#include <common.h>
+#include "inheritance.h"
+#include "modelPartsTypes.h"
+#include "optionals.h"
+#include "structs.h"
+#include "xml/serializer.h"
+#include <Ice/Config.h>
+#include <Ice/Optional.h>
+#include <boost/test/unit_test_log.hpp>
 #include <definedDirs.h>
+#include <filesystem>
 #include <fstream>
 #include <functional>
-#include <functionsImpl.h>
+#include <glibmm/ustring.h>
 #include <json.h>
 #include <json/serializer.h>
+#include <jsonpp.h>
+#include <libxml++/document.h>
 #include <libxml2/libxml/parser.h>
 #include <locals.h>
+#include <map>
+#include <memory>
 #include <modelParts.h>
 #include <slicer.h>
-#include <tool/parser.h>
+#include <sstream>
+#include <string>
 #include <types.h>
+#include <utility>
+#include <variant>
+#include <vector>
 #include <xml.h>
-#include <xml/serializer.h>
+// IWYU pragma: no_forward_declare Slicer::InvalidEnumerationSymbol
 
 #ifdef SLICER_MODELPARTSTYPES_IMPL_H
 #	error Client code should NOT need to pull in implementation header
