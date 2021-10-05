@@ -1,9 +1,7 @@
 #ifndef SLICER_TEST_TYPES
 #define SLICER_TEST_TYPES
 
-[["cpp:include:boost/date_time/posix_time/posix_time_types.hpp"]]
-[["cpp:include:boost/date_time/posix_time/time_formatters.hpp"]]
-[["cpp:include:boost/date_time/posix_time/time_parsers.hpp"]]
+[["cpp:include:boost/date_time/posix_time/posix_time.hpp"]]
 
 #include <included.ice>
 #include <enums.ice>

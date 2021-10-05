@@ -2,7 +2,11 @@
 #define SLICER_MODELPARTSTRAITS_H
 
 #include <Ice/Optional.h>
+#include <cstddef>
 #include <functional>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace Slicer {
 	// Function traits helpers

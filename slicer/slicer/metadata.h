@@ -2,9 +2,11 @@
 #define SLICER_METADATA_H
 
 #include <array>
+#include <cstddef>
 #include <optional>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include <visibility.h>
 

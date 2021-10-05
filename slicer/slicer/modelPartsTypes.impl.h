@@ -2,14 +2,34 @@
 #define SLICER_MODELPARTSTYPES_IMPL_H
 
 #include "common.h"
-#include "enumMap.h"
+#include "enumMap.h" // IWYU pragma: keep
 #include "hookMap.h"
+#include "metadata.h"
+#include "modelParts.h"
 #include "modelPartsTraits.h"
 #include "modelPartsTypes.h"
+#include <Ice/Config.h>
+#include <Ice/InputStream.h>
+#include <Ice/Optional.h>
+#include <Ice/OutputStream.h>
 #include <Ice/StreamHelpers.h>
-#include <IceUtil/Optional.h>
+#include <IceUtil/Config.h>
 #include <boost/assert.hpp>
 #include <c++11Helpers.h>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+#include <vector>
+#include <visibility.h>
+// IWYU pragma: no_forward_declare Slicer::EnumMap
+namespace Ice {
+	class Object;
+}
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
 	template<> DLL_PUBLIC ModelPartPtr ModelPart::Make<ModelPartType>(typename ModelPartType::element_type * t) \

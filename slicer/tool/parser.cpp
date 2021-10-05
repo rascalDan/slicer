@@ -39,29 +39,65 @@
 namespace fs = std::filesystem;
 
 namespace Slicer {
+	template<typename TPtr>
+	bool
+	ignoreType(const TPtr & t)
+	{
+		return (!t || t->hasMetaData("slicer:ignore"));
+	}
+
 	class Count : public Slice::ParserVisitor {
 	public:
-		bool
-		visitClassDefStart(const Slice::ClassDefPtr &) override
+		[[nodiscard]] bool
+		visitClassDefStart(const Slice::ClassDefPtr & c) override
 		{
-			classes += 1;
-			return true;
+			return countIfUsed(c, classes, !c->isInterface());
 		}
-		bool
-		visitStructStart(const Slice::StructPtr &) override
+		[[nodiscard]] bool
+		visitStructStart(const Slice::StructPtr & s) override
 		{
-			structs += 1;
-			return true;
+			return countIfUsed(s, structs);
 		}
 		void
-		visitEnum(const Slice::EnumPtr &) override
+		visitSequence(const Slice::SequencePtr & s) override
 		{
-			enums += 1;
+			countIfUsed(s, sequences);
+		}
+		void
+		visitDictionary(const Slice::DictionaryPtr & d) override
+		{
+			countIfUsed(d, dictionaries);
+		}
+		void
+		visitEnum(const Slice::EnumPtr & e) override
+		{
+			countIfUsed(e, enums);
+		}
+		[[nodiscard]] auto
+		complexes() const
+		{
+			return classes + structs;
 		}
 
 		unsigned int classes {0};
 		unsigned int structs {0};
 		unsigned int enums {0};
+		unsigned int sequences {0};
+		unsigned int dictionaries {0};
+		unsigned int total {0};
+
+	private:
+		template<typename TPtr>
+		bool
+		countIfUsed(const TPtr & t, auto & counter, bool condition = true)
+		{
+			if (!condition || ignoreType(t)) {
+				return false;
+			}
+			counter += 1;
+			total += 1;
+			return true;
+		}
 	};
 
 	class ForwardDeclare : public Slice::ParserVisitor {
@@ -82,14 +118,14 @@ namespace Slicer {
 		bool
 		visitClassDefStart(const Slice::ClassDefPtr & c) override
 		{
-			fprintbf(cpp, "class ICE_CLASS(JAM_DLL_PUBLIC) %s;\n", c->name());
+			fprintbf(cpp, "class ICE_CLASS(JAM_DLL_PUBLIC) %s; // IWYU pragma: keep\n", c->name());
 			return false;
 		};
 
 		bool
 		visitStructStart(const Slice::StructPtr & s) override
 		{
-			fprintbf(cpp, "struct ICE_CLASS(JAM_DLL_PUBLIC) %s;\n", s->name());
+			fprintbf(cpp, "struct ICE_CLASS(JAM_DLL_PUBLIC) %s; // IWYU pragma: keep\n", s->name());
 			return false;
 		};
 
@@ -126,13 +162,6 @@ namespace Slicer {
 			o << s;
 		}
 		return o;
-	}
-
-	template<typename TPtr>
-	bool
-	ignoreType(const TPtr & t)
-	{
-		return (!t || t->hasMetaData("slicer:ignore"));
 	}
 
 	Slicer::Slicer() : cpp(nullptr), headerPrefix("slicer"), components(0), classNo(0) { }
@@ -221,20 +250,57 @@ namespace Slicer {
 		if (!cpp) {
 			return true;
 		}
-
-		fprintbf(cpp, "// Begin Slicer code\n\n");
-		fprintbf(cpp, "#include <%s>\n\n", (headerPrefix / "modelPartsTypes.impl.h").string());
+		auto include = [this](const auto & h, bool keep = false) {
+			fprintbf(cpp, "#include <%s>", h);
+			if (keep) {
+				fputs(" // IWYU pragma: keep", cpp);
+			}
+			fputs("\n", cpp);
+		};
 
 		Count count;
 		u->visit(&count, true);
+
+		if (count.total == 0) {
+			return false;
+		}
+
+		fprintbf(cpp, "// Begin Slicer code\n\n");
+		include((headerPrefix / "modelPartsTypes.impl.h").string());
+		include((headerPrefix / "modelPartsTypes.h").string());
+		include((headerPrefix / "modelParts.h").string());
+		include((headerPrefix / "hookMap.h").string());
+		include((headerPrefix / "metadata.h").string(), true);
+
+		include("array");
+		include("optional");
+		include("string");
+		include("string_view");
+		include("visibility.h");
+		if (count.classes) {
+			include("memory", true);
+			include("boost/assert.hpp", true);
+			include("Ice/Config.h", true);
+		}
+		if (count.enums) {
+			include((headerPrefix / "enumMap.h").string());
+		}
+		include("Ice/Optional.h");
+		if (count.complexes() || count.dictionaries) {
+			include("IceUtil/Config.h");
+		}
+		if (count.dictionaries) {
+			include("map", true);
+			include("utility", true);
+		}
 		ForwardDeclare fd {cpp, count};
 		u->visit(&fd, true);
 
-		fprintbf(cpp, "#include <%s>\n", fs::path {topLevelFile.filename()}.replace_extension(".h").string());
+		include(fs::path {topLevelFile.filename()}.replace_extension(".h").string());
 		for (const auto & m : u->modules()) {
 			IceMetaData md {m->getMetaData()};
 			for (const auto & i : md.values("slicer:include:")) {
-				fprintbf(cpp, "#include <%s>\n", i);
+				include(i);
 			}
 		}
 		fprintbf(cpp, "\n");

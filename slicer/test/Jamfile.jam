@@ -29,6 +29,8 @@ lib types :
 	<toolset>gcc:<slicerbin>../tool//slicer/<toolset>gcc
 	<toolset>clang:<slicerbin>../tool//slicer/<toolset>clang
 	<toolset>tidy:<slicerbin>../tool//slicer/<toolset>gcc
+	-<variant>debug\:<warnings-as-errors>on
+	<toolset>tidy:<warnings-as-errors>off
 	<include>.
 	<library>..//adhocutil
 	<library>boost_date_time

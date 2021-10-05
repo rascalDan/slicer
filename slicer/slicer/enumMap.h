@@ -2,6 +2,7 @@
 #define SLICER_ENUM_MAP_H
 
 #include <array>
+#include <cstddef>
 #include <string>
 #include <string_view>
 

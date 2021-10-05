@@ -47,6 +47,8 @@ lib testCommon :
 	<library>..//adhocutil
 	<library>dbicetypes
 	<implicit-dependency>dbicetypes
+	-<variant>debug\:<warnings-as-errors>on
+	<toolset>tidy:<warnings-as-errors>off
 	<toolset>gcc:<dependency>../tool//slicer/<toolset>gcc
 	<toolset>clang:<dependency>../tool//slicer/<toolset>clang
 	<toolset>tidy:<dependency>../tool//slicer/<toolset>gcc
