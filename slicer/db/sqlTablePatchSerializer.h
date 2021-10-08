@@ -1,7 +1,7 @@
 #ifndef SLICER_DB_SQLTABLEPATCHSERIALIZER_H
 #define SLICER_DB_SQLTABLEPATCHSERIALIZER_H
 
-#include "modelParts.h"
+#include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 #include <visibility.h>
 namespace DB {

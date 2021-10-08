@@ -1,8 +1,8 @@
 #ifndef SLICER_DB_SQLUPDATESERIALIZER_H
 #define SLICER_DB_SQLUPDATESERIALIZER_H
 
-#include "modelParts.h"
 #include <command_fwd.h>
+#include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 #include <string>
 #include <visibility.h>

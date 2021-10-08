@@ -4,7 +4,7 @@
 #include <Slice/Parser.h>
 #include <c++11Helpers.h>
 #include <cstddef>
-#include <metadata.h>
+#include <slicer/metadata.h>
 #include <string>
 #include <string_view>
 #include <utility>

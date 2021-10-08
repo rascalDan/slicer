@@ -7,7 +7,6 @@ lib slicer-xml :
 	[ glob *.cpp : test*.cpp ]
 	xmlExceptions
 	:
-	<include>..
 	<library>stdc++fs
 	<library>..//Ice
 	<library>../..//libxmlpp

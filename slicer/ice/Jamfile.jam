@@ -5,7 +5,6 @@ lib stdc++fs ;
 lib slicer-ice :
 	[ glob *.cpp : test*.cpp ]
 	:
-	<include>..
 	<library>stdc++fs
 	<library>..//Ice
 	<library>..//adhocutil
@@ -23,7 +22,6 @@ run testSpecifics.cpp
 	<implicit-dependency>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
-	<include>..
 	:
 	testSpecifics
 	;

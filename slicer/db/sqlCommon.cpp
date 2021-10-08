@@ -1,6 +1,6 @@
 #include "sqlCommon.h"
 #include <compileTimeFormatter.h>
-#include <modelParts.h>
+#include <slicer/modelParts.h>
 #include <sqlExceptions.h>
 #include <string_view>
 

@@ -10,7 +10,7 @@
 #include <functional>
 #include <iosfwd>
 #include <memory>
-#include <slicer.h>
+#include <slicer/slicer.h>
 #include <string>
 #include <typeinfo>
 // IWYU pragma: no_forward_declare Slicer::IceStreamDeserializer

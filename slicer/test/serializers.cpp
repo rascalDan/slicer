@@ -10,7 +10,6 @@
 #include "functions.h"
 #include "helpers.h"
 #include "inheritance.h"
-#include "modelPartsTypes.h"
 #include "optionals.h"
 #include "structs.h"
 #include "xml/serializer.h"
@@ -30,8 +29,9 @@
 #include <locals.h>
 #include <map>
 #include <memory>
-#include <modelParts.h>
-#include <slicer.h>
+#include <slicer/modelParts.h>
+#include <slicer/modelPartsTypes.h>
+#include <slicer/slicer.h>
 #include <sstream>
 #include <string>
 #include <types.h>

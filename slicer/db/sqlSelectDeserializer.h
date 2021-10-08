@@ -1,9 +1,9 @@
 #ifndef SLICER_DB_SQLSELECTDESERIALIZER_H
 #define SLICER_DB_SQLSELECTDESERIALIZER_H
 
-#include "modelParts.h"
-#include "slicer/serializer.h"
 #include <optional>
+#include <slicer/modelParts.h>
+#include <slicer/serializer.h>
 #include <string>
 #include <visibility.h>
 namespace DB {

@@ -1,6 +1,4 @@
 #include "conversions.h"
-#include "modelParts.h"
-#include "modelPartsTypes.h"
 #include <boost/date_time/date.hpp>
 #include <boost/date_time/gregorian_calendar.hpp>
 #include <boost/date_time/time.hpp>
@@ -9,6 +7,8 @@
 #include <cstdio>
 #include <ctime>
 #include <memory>
+#include <slicer/modelParts.h>
+#include <slicer/modelPartsTypes.h>
 #include <stdexcept>
 #include <visibility.h>
 

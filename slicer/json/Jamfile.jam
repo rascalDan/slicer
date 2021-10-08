@@ -9,7 +9,6 @@ lib stdc++fs ;
 lib slicer-json :
 	[ glob *.cpp : test*.cpp ]
 	:
-	<include>..
 	<library>stdc++fs
 	<library>jsonpp
 	<library>../..//glibmm
@@ -29,7 +28,6 @@ run testSpecifics.cpp
 	<implicit-dependency>../test//types
 	<library>../test//common
 	<library>../slicer//slicer
-	<include>..
 	:
 	testSpecifics
 	;

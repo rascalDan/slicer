@@ -10,7 +10,6 @@ lib slicer-db :
 	[ glob *.cpp : test*.cpp ]
 	sqlExceptions
 	:
-	<include>..
 	<library>..//Ice
 	<library>dbppcore
 	<library>../..//glibmm
@@ -141,6 +140,6 @@ alias install : install-lib install-slice ;
 explicit install ;
 explicit install-lib ;
 explicit install-slice ;
-package.install install-lib : <install-header-subdir>slicer/db : : slicer-db : [ glob-tree *.h ] ;
-package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
+package.install install-lib : <install-header-subdir>slicer/db : : slicer-db : [ glob-tree *.h : test*.h ] ;
+package.install-data install-slice : slicer/ice : [ glob *.ice : test*.ice ] ;
 

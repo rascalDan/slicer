@@ -1,6 +1,6 @@
 #include "icemetadata.h"
-#include "metadata.h"
 #include <algorithm>
+#include <slicer/metadata.h>
 // IWYU pragma: no_include <list>
 
 namespace Slicer {

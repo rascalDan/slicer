@@ -4,7 +4,6 @@
 #include "classes.h"
 #include "collections.h"
 #include "common.h"
-#include "slicer/slicer.h"
 #include "sqlInsertSerializer.h"
 #include "sqlSelectDeserializer.h"
 #include "structs.h"
@@ -14,6 +13,7 @@
 #include <connection.h>
 #include <iosfwd>
 #include <memory>
+#include <slicer/slicer.h>
 #include <string>
 #include <string_view>
 #include <vector>

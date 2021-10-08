@@ -10,10 +10,10 @@
 #endif
 #include <libxml++/nodes/element.h>
 #pragma GCC diagnostic pop
-#include "modelParts.h"
 #include <filesystem>
 #include <functional>
 #include <iosfwd>
+#include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 #include <string>
 #include <visibility.h>

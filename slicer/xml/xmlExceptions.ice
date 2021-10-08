@@ -1,7 +1,7 @@
 #ifndef SLICER_XML
 #define SLICER_XML
 
-#include <common.ice>
+#include <slicer/common.ice>
 
 module Slicer {
 	["cpp:ice_print"]
