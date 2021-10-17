@@ -62,6 +62,7 @@ project
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-20-iso/visibility-hidden/types.h
 			<toolset>tidy:<exclude>test/bin/tidy/debug/checker-none/cxxstd-20-iso/visibility-hidden/xml.h
 			<toolset>tidy:<exclude>slicer/bin/common.h
+			<toolset>tidy:<exclude>slicer/bin/include/slicer/common.h
 			<toolset>tidy:<exclude>xml/bin/tidy/debug/checker-none/cxxstd-20-iso/xmlExceptions.h
 			<toolset>tidy:<exclude>db/bin/tidy/debug/checker-none/cxxstd-20-iso/sqlExceptions.h
 			<toolset>tidy:<exclude>db/bin/tidy/debug/checker-none/cxxstd-20-iso/visibility-hidden/testModels.h
