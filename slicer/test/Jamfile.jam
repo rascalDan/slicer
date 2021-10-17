@@ -60,6 +60,8 @@ run preprocessor.cpp
 	<library>..//adhocutil
 	<include>..
 	<library>../tool//slicer-compiler
+	<variant>san:<testing.launcher>LSAN_OPTIONS=suppressions=$(me)/leak.suppressions
+	<variant>san:<dependency>$(me)/leak.suppressions
 	:
 	preprocess
 	;
