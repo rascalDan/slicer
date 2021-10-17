@@ -24,8 +24,8 @@ namespace Slicer {
 	boost::posix_time::ptime
 	dateTimeToPTime(const ::TestModule::DateTime & dt)
 	{
-		return boost::posix_time::ptime(boost::gregorian::date(USHORT(dt.year), USHORT(dt.month), USHORT(dt.day)),
-				boost::posix_time::time_duration(dt.hour, dt.minute, dt.second));
+		return boost::posix_time::ptime {boost::gregorian::date(USHORT(dt.year), USHORT(dt.month), USHORT(dt.day)),
+				boost::posix_time::time_duration(dt.hour, dt.minute, dt.second)};
 	}
 
 	DLL_PUBLIC
@@ -118,7 +118,7 @@ namespace Slicer {
 	int2str(const Ice::optional<Ice::Int> & i)
 	{
 		if (!i) {
-			return std::string();
+			return {};
 		}
 		return std::to_string(*i);
 	}

@@ -21,6 +21,6 @@ namespace Slicer {
 	boost::posix_time::time_duration
 	timespanToTimeduration(const ::TestDatabase::TimespanPtr & ts)
 	{
-		return boost::posix_time::time_duration((ts->days * 24) + ts->hours, ts->minutes, ts->seconds);
+		return boost::posix_time::time_duration {(ts->days * 24) + ts->hours, ts->minutes, ts->seconds};
 	}
 }

@@ -20,7 +20,7 @@ namespace Slicer {
 	TypeId
 	ModelPart::GetTypeId() const
 	{
-		return TypeId();
+		return {};
 	}
 
 	std::optional<std::string>
