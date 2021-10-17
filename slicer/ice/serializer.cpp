@@ -7,6 +7,8 @@
 #include <istream>
 #include <iterator>
 #include <memory>
+#include <slicer/modelParts.h>
+#include <slicer/serializer.h>
 
 NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSerializerFactory)
 NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDeserializerFactory)

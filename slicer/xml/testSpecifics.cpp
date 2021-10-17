@@ -4,11 +4,20 @@
 #include "serializer.h"
 #include <Ice/Config.h>
 #include <iostream>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#ifndef __clang__
+#	pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 #include <libxml++/parsers/domparser.h>
+#pragma GCC diagnostic pop
+#include <slicer/serializer.h>
 #include <slicer/slicer.h>
 #include <typeinfo>
 #include <xmlExceptions.h>
 // IWYU pragma: no_forward_declare Slicer::BadBooleanValue
+// IWYU pragma: no_forward_declare Slicer::XmlDocumentDeserializer
 
 template<typename T, typename... P>
 T

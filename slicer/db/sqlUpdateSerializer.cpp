@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <modifycommand.h>
+#include <slicer/modelParts.h>
 #include <sqlExceptions.h>
 #include <utility>
 

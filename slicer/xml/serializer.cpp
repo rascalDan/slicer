@@ -24,6 +24,8 @@
 #include <memory>
 #include <optional>
 #include <slicer/metadata.h>
+#include <slicer/modelParts.h>
+#include <slicer/serializer.h>
 #include <string_view>
 #include <utility>
 #include <xmlExceptions.h>

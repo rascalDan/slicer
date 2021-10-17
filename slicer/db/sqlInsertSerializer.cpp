@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <modifycommand.h>
+#include <slicer/modelParts.h>
 #include <utility>
 
 namespace Slicer {

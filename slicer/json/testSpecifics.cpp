@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE json_specifics
 #include <boost/test/unit_test.hpp>
 
-#include "serializer.h"
 #include <iostream>
+#include <slicer/serializer.h>
 
 BOOST_AUTO_TEST_CASE(factories)
 {

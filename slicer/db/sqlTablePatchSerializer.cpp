@@ -5,6 +5,7 @@
 #include <connection.h>
 #include <memory>
 #include <scopeExit.h>
+#include <slicer/modelParts.h>
 #include <string>
 #include <tablepatch.h>
 
