@@ -10,7 +10,7 @@ h common : common.ice ;
 
 lib slicer :
 	[ glob *.cpp : *-test.cpp ]
-	[ obj c : common : <implicit-dependency>common ]
+	[ obj c : common : <implicit-dependency>common <toolset>tidy:<checker>none ]
 	:
 	<library>..//Ice
 	<library>..//adhocutil
