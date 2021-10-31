@@ -10,6 +10,7 @@ lib slicer-ice :
 	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
+	<dependency>../slicer//install-headers-local
 	: :
 	;
 
@@ -26,10 +27,8 @@ run testSpecifics.cpp
 	testSpecifics
 	;
 
-alias install : install-lib install-slice ;
+alias install : install-lib ;
 explicit install ;
 explicit install-lib ;
-explicit install-slice ;
 package.install install-lib : <install-header-subdir>slicer/ice : : slicer-ice : [ glob-tree *.h ] ;
-package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
 

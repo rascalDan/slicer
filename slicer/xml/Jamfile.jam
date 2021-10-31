@@ -14,6 +14,7 @@ lib slicer-xml :
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
 	<implicit-dependency>xmlExceptions
+	<dependency>../slicer//install-headers-local
 	: :
 	<library>../..//libxmlpp
 	<implicit-dependency>xmlExceptions
@@ -40,5 +41,5 @@ explicit install ;
 explicit install-lib ;
 explicit install-slice ;
 package.install install-lib : <install-header-subdir>slicer/xml : : slicer-xml : [ glob-tree *.h ] ;
-package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
+package.install-data install-slice : ice/slicer/xml : [ glob *.ice ] ;
 

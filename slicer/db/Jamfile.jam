@@ -17,6 +17,7 @@ lib slicer-db :
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
 	<implicit-dependency>sqlExceptions
+	<dependency>../slicer//install-headers-local
 	: :
 	<library>dbppcore
 	<implicit-dependency>sqlExceptions
@@ -141,5 +142,5 @@ explicit install ;
 explicit install-lib ;
 explicit install-slice ;
 package.install install-lib : <install-header-subdir>slicer/db : : slicer-db : [ glob-tree *.h : test*.h ] ;
-package.install-data install-slice : slicer/ice : [ glob *.ice : test*.ice ] ;
+package.install-data install-slice : ice/slicer/db : [ glob *.ice : test*.ice ] ;
 

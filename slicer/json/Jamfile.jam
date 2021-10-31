@@ -14,6 +14,7 @@ lib slicer-json :
 	<library>../..//glibmm
 	<library>..//adhocutil
 	<library>../slicer//slicer
+	<dependency>../slicer//install-headers-local
 	: :
 	<library>jsonpp
 	;

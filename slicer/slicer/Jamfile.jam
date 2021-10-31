@@ -21,7 +21,6 @@ lib slicer :
 	<implicit-dependency>common
 	<library>stdc++fs
 	<include>bin/include
-	<dependency>../slicer//install-headers-local
 	;
 
 alias install : install-lib install-slice ;
@@ -29,7 +28,7 @@ explicit install ;
 explicit install-lib ;
 explicit install-slice ;
 package.install install-lib : <install-header-subdir>slicer/slicer : : slicer : [ glob-tree-ex . : *.h : include ] ;
-package.install-data install-slice : slicer/ice : [ glob *.ice ] ;
+package.install-data install-slice : ice/slicer/slicer : [ glob *.ice ] ;
 
 explicit install-headers-local ;
 install install-headers-local : common : <location>bin/include/slicer ;
