@@ -2,12 +2,13 @@
 #define SLICER_SERIALIZER_H
 
 #include <c++11Helpers.h>
-#include <factory.h>
+#include <factory.h> // IWYU pragma: keep
 #include <filesystem>
 #include <iosfwd>
 #include <memory>
 #include <slicer/modelParts.h>
 #include <visibility.h>
+// IWYU pragma: no_include "factory.impl.h"
 
 namespace Slicer {
 	class DLL_PUBLIC Serializer {

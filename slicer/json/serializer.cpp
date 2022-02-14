@@ -1,7 +1,6 @@
 #include "serializer.h"
 #include <Ice/Config.h>
 #include <boost/numeric/conversion/cast.hpp>
-#include <cmath>
 #include <factory.h>
 #include <fstream> // IWYU pragma: keep
 #include <functional>
