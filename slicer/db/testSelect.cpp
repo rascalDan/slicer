@@ -160,7 +160,7 @@ template<typename T, typename... P>
 T
 BoostThrowWrapperHelper(P &&... p)
 {
-	return Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, T>(p...);
+	return Slicer::DeserializeAny<Slicer::SqlSelectDeserializer, T>(std::forward<P>(p)...);
 }
 
 BOOST_AUTO_TEST_CASE(select_unsupportedModel)

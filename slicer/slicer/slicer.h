@@ -19,7 +19,7 @@ namespace Slicer {
 	Object
 	DeserializeAny(SerializerParams &&... sp)
 	{
-		return DeserializeAnyWith<Object>(std::make_shared<Deserializer>(sp...));
+		return DeserializeAnyWith<Object>(std::make_shared<Deserializer>(std::forward<SerializerParams>(sp)...));
 	}
 
 	template<typename Object>
@@ -33,7 +33,7 @@ namespace Slicer {
 	void
 	SerializeAny(const Object & object, SerializerParams &&... sp)
 	{
-		SerializeAnyWith(object, std::make_shared<Serializer>(sp...));
+		SerializeAnyWith(object, std::make_shared<Serializer>(std::forward<SerializerParams>(sp)...));
 	}
 }
 

@@ -23,7 +23,7 @@ template<typename T, typename... P>
 T
 BoostThrowWrapperHelper(P &&... p)
 {
-	return Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, T>(p...);
+	return Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, T>(std::forward<P>(p)...);
 }
 
 BOOST_AUTO_TEST_CASE(boolean_values)
