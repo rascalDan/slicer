@@ -148,7 +148,7 @@ namespace Slicer {
 			insert << "?, ";
 		}
 		insert << "?)";
-		return connection->modify(insert.str());
+		return connection->modify(std::move(insert).str());
 	}
 
 	void

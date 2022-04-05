@@ -102,6 +102,6 @@ namespace Slicer {
 				"%? = ?"_fmt(update, name);
 			}
 		});
-		return connection->modify(update.str());
+		return connection->modify(std::move(update).str());
 	}
 }
