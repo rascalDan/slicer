@@ -102,10 +102,10 @@ namespace Slicer {
 	};
 
 	void
-	SqlFetchIdInsertSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * ins) const
+	SqlFetchIdInsertSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & mp, DB::ModifyCommand * ins) const
 	{
-		SqlAutoIdInsertSerializer::bindObjectAndExecute(cmp, ins);
-		cmp->OnEachChild([this](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
+		SqlAutoIdInsertSerializer::bindObjectAndExecute(mp, ins);
+		mp->OnEachChild([this](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isAuto(h)) {
 				cmp->SetValue(IdSave(connection));
 			}

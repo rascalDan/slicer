@@ -56,10 +56,10 @@ namespace Slicer {
 	}
 
 	void
-	SqlUpdateSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & cmp, DB::ModifyCommand * upd)
+	SqlUpdateSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & mp, DB::ModifyCommand * upd)
 	{
 		unsigned int paramNo = 0;
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
+		mp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isValue(h)) {
 				if (!cmp->GetValue(SqlBinder(*upd, paramNo))) {
 					upd->bindNull(paramNo);
@@ -67,7 +67,7 @@ namespace Slicer {
 				paramNo++;
 			}
 		});
-		cmp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
+		mp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
 			if (isPKey(h)) {
 				cmp->GetValue(SqlBinder(*upd, paramNo++));
 			}

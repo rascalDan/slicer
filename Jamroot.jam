@@ -28,6 +28,7 @@ project
 			<variant>debug:<cflags>-Wnull-dereference
 			<variant>debug:<cflags>-Wdouble-promotion
 			<variant>debug:<cflags>-Wformat=2
+			<variant>debug:<cflags>-Wshadow
 			<toolset>gcc,<variant>debug:<cflags>-Wduplicated-cond
 			<toolset>gcc,<variant>debug:<cflags>-Wduplicated-branches
 			<toolset>gcc,<variant>debug:<cflags>-Wlogical-op

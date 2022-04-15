@@ -11,8 +11,8 @@
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");
-	SqlTablePatchSerializer::SqlTablePatchSerializer(DB::Connection * const db, DB::TablePatch & tp) :
-		db(db), tablePatch(tp)
+	SqlTablePatchSerializer::SqlTablePatchSerializer(DB::Connection * const d, DB::TablePatch & tp) :
+		db(d), tablePatch(tp)
 	{
 		tablePatch.src = ttname::get(this);
 	}
