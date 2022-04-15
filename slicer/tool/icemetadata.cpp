@@ -4,10 +4,10 @@
 // IWYU pragma: no_include <list>
 
 namespace Slicer {
-	IceMetaData::IceMetaData(Slice::StringList && a)
+	IceMetaData::IceMetaData(Slice::StringList && as)
 	{
-		arr.reserve(a.size());
-		std::for_each(a.begin(), a.end(), [this](auto && a) {
+		arr.reserve(as.size());
+		std::for_each(as.begin(), as.end(), [this](auto && a) {
 			auto & md = arr.emplace_back(a, std::string_view {});
 			md.second = std::string_view(md.first).substr(0, md.first.rfind(':'));
 		});
