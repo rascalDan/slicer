@@ -8,25 +8,22 @@
 #include <filesystem>
 #include <map>
 #include <numeric>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
 
-using ComponentsCount = std::map<std::string, unsigned int>;
-ComponentsCount COMPONENTS_IN_TEST_ICE = {{"classtype.ice", 2}, {"classes.ice", 3}, {"collections.ice", 5},
-		{"enums.ice", 2}, {"inheritance.ice", 12}, {"interfaces.ice", 0}, {"json.ice", 2}, {"locals.ice", 7},
-		{"optionals.ice", 2}, {"structs.ice", 5}, {"types.ice", 4}, {"xml.ice", 5}};
-
-unsigned int
-total()
-{
-	const auto t = std::accumulate(
-			COMPONENTS_IN_TEST_ICE.begin(), COMPONENTS_IN_TEST_ICE.end(), 0U, [](const auto & t, const auto & c) {
-				return t + c.second;
-			});
-	BOOST_CHECK_EQUAL(49, t);
-	return t;
-}
+constexpr std::array<std::pair<std::string_view, size_t>, 12> COMPONENTS_IN_TEST_ICE_ARRAY {
+		{{"classtype.ice", 2}, {"classes.ice", 3}, {"collections.ice", 5}, {"enums.ice", 2}, {"inheritance.ice", 12},
+				{"interfaces.ice", 0}, {"json.ice", 2}, {"locals.ice", 7}, {"optionals.ice", 2}, {"structs.ice", 5},
+				{"types.ice", 4}, {"xml.ice", 5}}};
+using ComponentsCount = decltype(COMPONENTS_IN_TEST_ICE_ARRAY);
+constexpr std::span<const ComponentsCount::value_type> COMPONENTS_IN_TEST_ICE {COMPONENTS_IN_TEST_ICE_ARRAY};
+constexpr auto COMPONENTS_IN_TEST_ICE_COUNT = std::accumulate(
+		COMPONENTS_IN_TEST_ICE.begin(), COMPONENTS_IN_TEST_ICE.end(), 0U, [](const auto & t, const auto & c) {
+			return t + c.second;
+		});
+static_assert(COMPONENTS_IN_TEST_ICE_COUNT == 49);
 
 void
 process(Slicer::Slicer & s, const ComponentsCount::value_type & c)
@@ -48,7 +45,7 @@ processAll(Slicer::Slicer & s)
 			process(s, c);
 		}
 	}
-	BOOST_REQUIRE_EQUAL(total(), s.Components());
+	BOOST_REQUIRE_EQUAL(COMPONENTS_IN_TEST_ICE_COUNT, s.Components());
 }
 
 BOOST_AUTO_TEST_CASE(slicer_metadata_split_empty, *boost::unit_test::timeout(5))
