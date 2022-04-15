@@ -110,14 +110,11 @@ namespace Slicer {
 		using Arr = ContainerBase<N>;
 		constexpr inline explicit MetaDataImpl(const std::array<std::string_view, N> & a) :
 			arr {[&a]() {
-				Arr arr;
-				auto out = arr.begin();
-				for (const auto & md : a) {
-					out->first = md;
-					out->second = out->first.substr(0, out->first.rfind(':'));
-					out++;
-				}
-				return arr;
+				Arr rtn;
+				std::transform(a.begin(), a.end(), rtn.begin(), [](const auto & md) -> typename Arr::value_type {
+					return {md, md.substr(0, md.rfind(':'))};
+				});
+				return rtn;
 			}()}
 		{
 			_begin = arr.begin();
