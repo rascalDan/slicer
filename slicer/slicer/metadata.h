@@ -1,6 +1,7 @@
 #ifndef SLICER_METADATA_H
 #define SLICER_METADATA_H
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <optional>
