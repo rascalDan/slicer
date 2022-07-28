@@ -19,8 +19,14 @@ namespace Slicer {
 
 		class eq;
 
-		class iter : public std::iterator<std::bidirectional_iterator_tag, HookPtr> {
+		class iter {
 		public:
+			using iterator_category = std::bidirectional_iterator_tag;
+			using value_type = HookPtr;
+			using difference_type = std::ptrdiff_t;
+			using pointer = HookPtr *;
+			using reference = HookPtr &;
+
 			[[nodiscard]] constexpr inline iter(const eq * const r, const HookPtr * c) : range(r), cur(c)
 			{
 				moveMatch();
