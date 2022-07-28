@@ -97,7 +97,7 @@ namespace Slicer {
 		static constexpr inline auto
 		in_scope(std::string_view md, std::string_view scope)
 		{
-			return ((md.length() == scope.length() || (md.length() >= scope.length() && md[scope.length()] == ':'))
+			return ((md.length() == scope.length() || (md.length() > scope.length() && md[scope.length()] == ':'))
 					&& md.compare(0, scope.length(), scope) == 0);
 		}
 
