@@ -368,14 +368,11 @@ namespace Slicer {
 	void
 	JsonStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
-		json::Value doc;
-		modelRoot->OnEachChild([&doc](auto &&, auto && PH2, auto &&) {
-			return JsonSerializer::ModelTreeIterateRoot(&doc, PH2);
-		});
-		json::serializeValue(doc, strm, "utf-8");
+		JsonValueSerializer::Serialize(modelRoot);
+		json::serializeValue(value, strm, "utf-8");
 	}
 
-	JsonFileSerializer::JsonFileSerializer(std::filesystem::path p) : path(std::move(p)) { }
+	JsonFileSerializer::JsonFileSerializer(const std::filesystem::path & p) : JsonStreamSerializer {strm}, strm(p) { }
 
 	JsonFileDeserializer::JsonFileDeserializer(std::filesystem::path p) : path(std::move(p)) { }
 
@@ -387,19 +384,6 @@ namespace Slicer {
 		auto mp = modelRoot->GetAnonChild();
 		std::visit(DocumentTreeIterate(mp), obj);
 	}
-
-	void
-	JsonFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
-	{
-		json::Value doc;
-		modelRoot->OnEachChild([&doc](auto &&, auto && PH2, auto &&) {
-			return JsonSerializer::ModelTreeIterateRoot(&doc, PH2);
-		});
-		std::ofstream outFile(path);
-		json::serializeValue(doc, outFile, "utf-8");
-	}
-
-	JsonValueSerializer::JsonValueSerializer(json::Value & v) : value(v) { }
 
 	JsonValueDeserializer::JsonValueDeserializer(const json::Value & v) : value(v) { }
 

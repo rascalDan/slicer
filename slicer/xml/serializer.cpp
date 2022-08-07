@@ -441,14 +441,11 @@ namespace Slicer {
 	void
 	XmlStreamSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
-		xmlpp::Document doc;
-		modelRoot->OnEachChild([&doc](auto && PH1, auto && PH2, auto &&) {
-			return XmlSerializer::ModelTreeIterateRoot(&doc, PH1, PH2);
-		});
+		XmlDocumentSerializer::Serialize(modelRoot);
 		doc.write_to_stream(strm);
 	}
 
-	XmlFileSerializer::XmlFileSerializer(std::filesystem::path p) : path(std::move(p)) { }
+	XmlFileSerializer::XmlFileSerializer(const std::filesystem::path & p) : XmlStreamSerializer {strm}, strm(p) { }
 
 	XmlFileDeserializer::XmlFileDeserializer(std::filesystem::path p) : path(std::move(p)) { }
 
@@ -459,18 +456,6 @@ namespace Slicer {
 		auto doc = dom.get_document();
 		DocumentTreeIterate(doc, modelRoot);
 	}
-
-	void
-	XmlFileSerializer::Serialize(ModelPartForRootPtr modelRoot)
-	{
-		xmlpp::Document doc;
-		modelRoot->OnEachChild([&doc](auto && PH1, auto && PH2, auto &&) {
-			return XmlSerializer::ModelTreeIterateRoot(&doc, PH1, PH2);
-		});
-		doc.write_to_file_formatted(path);
-	}
-
-	XmlDocumentSerializer::XmlDocumentSerializer(xmlpp::Document *& d) : doc(d) { }
 
 	XmlDocumentDeserializer::XmlDocumentDeserializer(const xmlpp::Document * d) : doc(d) { }
 
@@ -483,9 +468,8 @@ namespace Slicer {
 	void
 	XmlDocumentSerializer::Serialize(ModelPartForRootPtr modelRoot)
 	{
-		doc = new xmlpp::Document();
 		modelRoot->OnEachChild([this](auto && PH1, auto && PH2, auto &&) {
-			return XmlSerializer::ModelTreeIterateRoot(doc, PH1, PH2);
+			return XmlSerializer::ModelTreeIterateRoot(&doc, PH1, PH2);
 		});
 	}
 

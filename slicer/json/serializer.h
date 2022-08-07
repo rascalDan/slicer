@@ -2,6 +2,7 @@
 #define SLICER_JSON_H
 
 #include <filesystem>
+#include <fstream>
 #include <iosfwd>
 #include <jsonpp.h>
 #include <slicer/modelParts.h>
@@ -18,7 +19,15 @@ namespace Slicer {
 		static void ModelTreeIterateRoot(json::Value *, ModelPartPtr mp);
 	};
 
-	class DLL_PUBLIC JsonStreamSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
+	public:
+		void Serialize(ModelPartForRootPtr) override;
+
+	protected:
+		json::Value value;
+	};
+
+	class DLL_PUBLIC JsonStreamSerializer : public JsonValueSerializer {
 	public:
 		explicit JsonStreamSerializer(std::ostream &);
 
@@ -28,24 +37,12 @@ namespace Slicer {
 		std::ostream & strm;
 	};
 
-	class DLL_PUBLIC JsonFileSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonFileSerializer : public JsonStreamSerializer {
 	public:
-		explicit JsonFileSerializer(std::filesystem::path);
-
-		void Serialize(ModelPartForRootPtr) override;
+		explicit JsonFileSerializer(const std::filesystem::path &);
 
 	protected:
-		const std::filesystem::path path;
-	};
-
-	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
-	public:
-		explicit JsonValueSerializer(json::Value &);
-
-		void Serialize(ModelPartForRootPtr) override;
-
-	protected:
-		json::Value & value;
+		std::ofstream strm;
 	};
 
 	class DLL_PUBLIC JsonStreamDeserializer : public Deserializer {

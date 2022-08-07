@@ -104,46 +104,6 @@ public:
 		BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
 		diff(expected, output);
 	}
-
-	template<typename T, typename Deserializer, typename Serializer, typename Internal>
-	void
-	verifyByHelper(const fs::path & infile, const std::function<Internal(const fs::path &)> & in,
-			const std::function<void(const Internal &, const fs::path &)> & out,
-			const std::function<void(Internal &)> & ifree, const std::function<void(const T &)> & check = nullptr)
-	{
-		const fs::path input = rootDir / "initial" / infile;
-		const fs::path tmph = binDir / "byHandler";
-		fs::create_directory(tmph);
-		const fs::path output = tmph / infile;
-
-		BOOST_TEST_CHECKPOINT("Read: " << input);
-		Internal docRead = in(input);
-
-		BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-		T p = Slicer::DeserializeAny<Deserializer, T>(docRead);
-		ifree(docRead);
-
-		if (check) {
-			BOOST_TEST_CHECKPOINT("Check1: " << input);
-			check(p);
-		}
-
-		BOOST_TEST_CHECKPOINT("Serialize: " << input);
-		Internal docWrite;
-		Slicer::SerializeAny<Serializer>(p, docWrite);
-
-		if (check) {
-			BOOST_TEST_CHECKPOINT("Check2: " << input);
-			check(p);
-		}
-
-		BOOST_TEST_CHECKPOINT("Write: " << output);
-		out(docWrite, output);
-		ifree(docWrite);
-
-		BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-		diff(input, output);
-	}
 };
 
 void
@@ -638,28 +598,6 @@ BOOST_AUTO_TEST_CASE(invalid_enum)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_FIXTURE_TEST_SUITE(byHandler, FileBased)
-
-BOOST_AUTO_TEST_CASE(optionals_areset2_json)
-{
-	verifyByHelper<TestModule::OptionalsPtr, Slicer::JsonValueDeserializer, Slicer::JsonValueSerializer, json::Value>(
-			"optionals-areset2.json", readJson, writeJson, freeJson, checkOptionals_areset);
-}
-
-BOOST_AUTO_TEST_CASE(optionals_areset_xml)
-{
-	verifyByHelper<TestModule::OptionalsPtr, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer,
-			xmlpp::Document *>("optionals-areset.xml", readXml, writeXml, freeXml, checkOptionals_areset);
-}
-
-BOOST_AUTO_TEST_CASE(simple_complete_validator)
-{
-	verifyByHelper<TestModule::IsoDate, Slicer::XmlDocumentDeserializer, Slicer::XmlDocumentSerializer,
-			xmlpp::Document *>("isodate.xml", readXml, writeXml, freeXml);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
 BOOST_AUTO_TEST_CASE(missingConversion)
 {
 	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
@@ -667,8 +605,7 @@ BOOST_AUTO_TEST_CASE(missingConversion)
 			Slicer::NoConversionFound);
 
 	auto obj = std::make_shared<TestModule2::MissingConv>("2016-06-30 12:34:56");
-	json::Value v;
-	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v), Slicer::NoConversionFound);
+	BOOST_REQUIRE_THROW(Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj), Slicer::NoConversionFound);
 }
 
 BOOST_AUTO_TEST_CASE(conversion)
@@ -677,9 +614,9 @@ BOOST_AUTO_TEST_CASE(conversion)
 	auto obj = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::ConvPtr>(in);
 	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", obj->conv);
 
-	json::Value v;
-	Slicer::SerializeAny<Slicer::JsonValueSerializer>(obj, v);
-	BOOST_REQUIRE_EQUAL("2016-06-30 12:34:56", std::get<json::String>(std::get<json::Object>(v)["conv"]));
+	std::stringstream out;
+	Slicer::SerializeAny<Slicer::JsonStreamSerializer>(obj, out);
+	BOOST_REQUIRE_EQUAL(R"J({"conv":"2016-06-30 12:34:56"})J", out.view());
 }
 
 BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractEmpty)
@@ -747,7 +684,7 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlIncorrectSeqElementName)
 
 BOOST_AUTO_TEST_CASE(customerModelPartCounters)
 {
-	BOOST_REQUIRE_EQUAL(35, TestModule::completions);
+	BOOST_REQUIRE_EQUAL(22, TestModule::completions);
 }
 
 BOOST_AUTO_TEST_CASE(enum_lookups)

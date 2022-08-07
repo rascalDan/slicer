@@ -8,9 +8,11 @@
 #ifndef __clang__
 #	pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
+#include <libxml++/document.h>
 #include <libxml++/nodes/element.h>
 #pragma GCC diagnostic pop
 #include <filesystem>
+#include <fstream>
 #include <functional>
 #include <iosfwd>
 #include <slicer/modelParts.h>
@@ -19,10 +21,6 @@
 #include <visibility.h>
 namespace Glib {
 	class ustring;
-}
-namespace xmlpp {
-	class Document;
-	class Node;
 }
 
 namespace Slicer {
@@ -41,7 +39,15 @@ namespace Slicer {
 		static void ModelTreeIterateDictElements(xmlpp::Element * element, const ModelPartPtr & dict);
 	};
 
-	class DLL_PUBLIC XmlStreamSerializer : public XmlSerializer {
+	class DLL_PUBLIC XmlDocumentSerializer : public XmlSerializer {
+	public:
+		void Serialize(ModelPartForRootPtr) override;
+
+	protected:
+		xmlpp::Document doc;
+	};
+
+	class DLL_PUBLIC XmlStreamSerializer : public XmlDocumentSerializer {
 	public:
 		explicit XmlStreamSerializer(std::ostream &);
 
@@ -51,25 +57,12 @@ namespace Slicer {
 		std::ostream & strm;
 	};
 
-	class DLL_PUBLIC XmlFileSerializer : public XmlSerializer {
+	class DLL_PUBLIC XmlFileSerializer : public XmlStreamSerializer {
 	public:
-		explicit XmlFileSerializer(std::filesystem::path);
-
-		void Serialize(ModelPartForRootPtr) override;
+		explicit XmlFileSerializer(const std::filesystem::path &);
 
 	protected:
-		const std::filesystem::path path;
-	};
-
-	class DLL_PUBLIC XmlDocumentSerializer : public XmlSerializer {
-	public:
-		explicit XmlDocumentSerializer(xmlpp::Document *&);
-
-		void Serialize(ModelPartForRootPtr) override;
-
-	protected:
-		// cppcheck-suppress unsafeClassCanLeak
-		xmlpp::Document *& doc;
+		std::ofstream strm;
 	};
 
 	class DLL_PUBLIC XmlDeserializer : public Deserializer {
