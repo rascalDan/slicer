@@ -14,9 +14,7 @@ NAMEDFACTORY("application/ice", Slicer::IceStreamSerializer, Slicer::StreamSeria
 NAMEDFACTORY("application/ice", Slicer::IceStreamDeserializer, Slicer::StreamDeserializerFactory)
 
 namespace Slicer {
-	Ice::StringSeq empty;
-
-	IceBase::IceBase() : ic(Ice::initialize(empty)) { }
+	IceBase::IceBase() : ic(Ice::initialize()) { }
 
 	IceBase::~IceBase()
 	{
