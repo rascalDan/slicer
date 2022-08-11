@@ -20,17 +20,16 @@ namespace Slicer {
 	{
 		ic->destroy();
 	}
-	IceBlobSerializer::IceBlobSerializer(Ice::ByteSeq & b) : refblob(b) { }
 
 	void
 	IceBlobSerializer::Serialize(ModelPartForRootPtr mp)
 	{
 		Ice::OutputStream s(ic);
 		mp->Write(s);
-		s.finished(refblob);
+		s.finished(blob);
 	}
 
-	IceStreamSerializer::IceStreamSerializer(std::ostream & os) : IceBlobSerializer(blob), strm(os) { }
+	IceStreamSerializer::IceStreamSerializer(std::ostream & os) : strm(os) { }
 
 	void
 	IceStreamSerializer::Serialize(ModelPartForRootPtr mp)

@@ -21,12 +21,10 @@ namespace Slicer {
 
 	class DLL_PUBLIC IceBlobSerializer : public Serializer, protected IceBase {
 	public:
-		explicit IceBlobSerializer(Ice::ByteSeq &);
-
 		void Serialize(ModelPartForRootPtr) override;
 
-	private:
-		Ice::ByteSeq & refblob;
+	protected:
+		Ice::ByteSeq blob;
 	};
 
 	class DLL_PUBLIC IceStreamSerializer : public IceBlobSerializer {
@@ -37,7 +35,6 @@ namespace Slicer {
 
 	protected:
 		std::ostream & strm;
-		Ice::ByteSeq blob;
 	};
 
 	class DLL_PUBLIC IceBlobDeserializer : public Deserializer, protected IceBase {
