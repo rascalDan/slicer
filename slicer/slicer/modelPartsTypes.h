@@ -154,6 +154,7 @@ namespace Slicer {
 	};
 
 	template<typename T> class Hooks;
+
 	template<typename T> class ModelPartForComplex : public ModelPartForComplexBase {
 	public:
 		class HookBase;

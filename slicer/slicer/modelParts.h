@@ -24,6 +24,7 @@ namespace Slicer {
 		virtual void get(const T &) const = 0;
 		SPECIAL_MEMBERS_DEFAULT(TValueTarget);
 	};
+
 	class ValueTarget :
 		public TValueTarget<bool>,
 		public TValueTarget<Ice::Byte>,
@@ -51,6 +52,7 @@ namespace Slicer {
 		virtual void set(T &) const = 0;
 		SPECIAL_MEMBERS_DEFAULT(TValueSource);
 	};
+
 	class ValueSource :
 		public TValueSource<bool>,
 		public TValueSource<Ice::Byte>,
@@ -119,6 +121,7 @@ namespace Slicer {
 			name(n), nameLower(nl), nameStr(ns)
 		{
 		}
+
 		virtual ~HookCommon() = default;
 		SPECIAL_MEMBERS_DEFAULT(HookCommon);
 
@@ -132,8 +135,7 @@ namespace Slicer {
 		const std::string * nameStr;
 	};
 
-	template<typename T> struct DLL_PUBLIC Default {
-	};
+	template<typename T> struct DLL_PUBLIC Default { };
 
 	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
 	public:
@@ -175,6 +177,7 @@ namespace Slicer {
 	template<typename T> class DLL_PUBLIC ModelPartModel {
 	public:
 		explicit ModelPartModel(T * m = nullptr) : Model(m) { }
+
 		T * Model;
 	};
 

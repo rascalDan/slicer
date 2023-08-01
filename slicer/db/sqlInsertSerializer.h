@@ -7,6 +7,7 @@
 #include <slicer/serializer.h>
 #include <string>
 #include <visibility.h>
+
 namespace DB {
 	class Connection;
 	class ModifyCommand;

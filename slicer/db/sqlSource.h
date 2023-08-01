@@ -5,9 +5,11 @@
 #include <Ice/Config.h>
 #include <memory>
 #include <string>
+
 namespace DB {
 	class Column;
 }
+
 namespace boost::posix_time {
 	class ptime;
 	class time_duration;
@@ -36,6 +38,7 @@ namespace Slicer {
 	private:
 		const DB::Column & column;
 	};
+
 	typedef std::shared_ptr<SqlSource> SqlSourcePtr;
 }
 

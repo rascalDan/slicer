@@ -53,26 +53,31 @@ namespace Slicer {
 		{
 			return countIfUsed(c, classes, !c->isInterface());
 		}
+
 		[[nodiscard]] bool
 		visitStructStart(const Slice::StructPtr & s) override
 		{
 			return countIfUsed(s, structs);
 		}
+
 		void
 		visitSequence(const Slice::SequencePtr & s) override
 		{
 			countIfUsed(s, sequences);
 		}
+
 		void
 		visitDictionary(const Slice::DictionaryPtr & d) override
 		{
 			countIfUsed(d, dictionaries);
 		}
+
 		void
 		visitEnum(const Slice::EnumPtr & e) override
 		{
 			countIfUsed(e, enums);
 		}
+
 		[[nodiscard]] auto
 		complexes() const
 		{

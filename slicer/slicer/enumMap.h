@@ -52,6 +52,7 @@ namespace Slicer {
 			EnumMap<E>::begin = arr.begin();
 			EnumMap<E>::end = arr.end();
 		}
+
 		const Arr<N> arr;
 	};
 }

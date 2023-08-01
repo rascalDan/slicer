@@ -119,6 +119,7 @@ namespace Slicer {
 	class XmlContentValueSource : public XmlValueSource {
 	public:
 		explicit XmlContentValueSource() : XmlValueSource(Glib::ustring()) { }
+
 		explicit XmlContentValueSource(const xmlpp::ContentNode * c) : XmlValueSource(c->get_content()) { }
 	};
 
@@ -474,6 +475,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(BadBooleanValueMsg, "Bad boolean value [%?]");
+
 	void
 	BadBooleanValue::ice_print(std::ostream & s) const
 	{

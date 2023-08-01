@@ -50,6 +50,7 @@ namespace fs = std::filesystem;
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::ClassMap::iterator)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::SomeNumbers)
+
 namespace std {
 	template<typename T>
 	ostream &
@@ -58,6 +59,7 @@ namespace std {
 		return s;
 	}
 }
+
 // LCOV_EXCL_STOP
 
 class FileBased {

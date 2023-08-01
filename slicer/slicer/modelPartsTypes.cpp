@@ -17,6 +17,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+
 // IWYU pragma: no_forward_declare boost::multi_index::member
 // IWYU pragma: no_include <boost/operators.hpp>
 
@@ -172,57 +173,68 @@ namespace Slicer {
 	ModelPartForSimpleBase::OnEachChild(const ChildHandler &)
 	{
 	}
+
 	ChildRef
 	ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &)
 	{
 		return ChildRef();
 	}
+
 	ChildRef
 	ModelPartForSimpleBase::GetChildRef(std::string_view, const HookFilter &, bool)
 	{
 		return ChildRef();
 	}
+
 	bool
 	ModelPartForSimpleBase::HasValue() const
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForSimpleBase::GetType() const
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForSimpleBase::type = ModelPartType::Simple;
 
 	void
 	ModelPartForConvertedBase::OnEachChild(const ChildHandler &)
 	{
 	}
+
 	ChildRef
 	ModelPartForConvertedBase::GetAnonChildRef(const HookFilter &)
 	{
 		return ChildRef();
 	}
+
 	ChildRef
 	ModelPartForConvertedBase::GetChildRef(std::string_view, const HookFilter &, bool)
 	{
 		return ChildRef();
 	}
+
 	bool
 	ModelPartForConvertedBase::HasValue() const
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForConvertedBase::GetType() const
 	{
 		return type;
 	}
+
 	void
 	ModelPartForConvertedBase::conversion_fail(std::string_view typeName)
 	{
 		throw NoConversionFound(std::string {typeName});
 	}
+
 	const ModelPartType ModelPartForConvertedBase::type = ModelPartType::Simple;
 
 	ModelPartType
@@ -230,7 +242,9 @@ namespace Slicer {
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForComplexBase::type = ModelPartType::Complex;
+
 	void
 	ModelPartForComplexBase::registerClass(
 			const std::string & className, const std::string * typeName, const ClassRef & cr)
@@ -240,6 +254,7 @@ namespace Slicer {
 			Slicer::classNameMap()->insert({className, *typeName});
 		}
 	}
+
 	void
 	ModelPartForComplexBase::unregisterClass(const std::string & className, const std::string * typeName)
 	{
@@ -248,6 +263,7 @@ namespace Slicer {
 			classNameMap()->get<0>().erase(className);
 		}
 	}
+
 	ModelPartPtr
 	ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
 	{
@@ -257,6 +273,7 @@ namespace Slicer {
 		}
 		return ref->second(m);
 	}
+
 	TypeId
 	ModelPartForComplexBase::getTypeId(const std::string & id, const std::string & className)
 	{
@@ -335,26 +352,31 @@ namespace Slicer {
 	ModelPartForEnumBase::OnEachChild(const ChildHandler &)
 	{
 	}
+
 	ChildRef
 	ModelPartForEnumBase::GetAnonChildRef(const HookFilter &)
 	{
 		return ChildRef();
 	}
+
 	ChildRef
 	ModelPartForEnumBase::GetChildRef(std::string_view, const HookFilter &, bool)
 	{
 		return ChildRef();
 	}
+
 	bool
 	ModelPartForEnumBase::HasValue() const
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForEnumBase::GetType() const
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForEnumBase::type = ModelPartType::Simple;
 
 	bool
@@ -362,11 +384,13 @@ namespace Slicer {
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForSequenceBase::GetType() const
 	{
 		return type;
 	}
+
 	ChildRef
 	ModelPartForSequenceBase::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
 	{
@@ -375,6 +399,7 @@ namespace Slicer {
 		}
 		return GetAnonChildRef(flt);
 	}
+
 	const ModelPartType ModelPartForSequenceBase::type = ModelPartType::Sequence;
 
 	bool
@@ -382,11 +407,13 @@ namespace Slicer {
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForDictionaryBase::GetType() const
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForDictionaryBase::type = ModelPartType::Dictionary;
 
 	// Streams
@@ -396,41 +423,49 @@ namespace Slicer {
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}
+
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	ChildRef
 	ModelPartForStreamBase::GetChildRef(std::string_view, const Slicer::HookFilter &, bool)
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}
+
 	ModelPartType
 	ModelPartForStreamBase::GetType() const
 	{
 		return ModelPartType::Sequence;
 	}
+
 	bool
 	ModelPartForStreamBase::HasValue() const
 	{
 		return true;
 	}
+
 	// Stream Roots
 	ModelPartForStreamRootBase::ModelPartForStreamRootBase(const ModelPartPtr & m) : ModelPartForRootBase(m) { }
+
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void
 	ModelPartForStreamRootBase::Write(Ice::OutputStream &) const
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}
+
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void
 	ModelPartForStreamRootBase::Read(Ice::InputStream &)
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}
+
 	bool
 	ModelPartForStreamRootBase::HasValue() const
 	{
 		return mp->HasValue();
 	}
+
 	void
 	ModelPartForStreamRootBase::OnEachChild(const ChildHandler & ch)
 	{

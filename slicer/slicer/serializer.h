@@ -8,6 +8,7 @@
 #include <memory>
 #include <slicer/modelParts.h>
 #include <visibility.h>
+
 // IWYU pragma: no_include "factory.impl.h"
 
 namespace Slicer {
@@ -20,6 +21,7 @@ namespace Slicer {
 
 		virtual void Serialize(ModelPartForRootPtr) = 0;
 	};
+
 	using SerializerPtr = std::shared_ptr<Serializer>;
 
 	class DLL_PUBLIC Deserializer {
@@ -31,6 +33,7 @@ namespace Slicer {
 
 		virtual void Deserialize(ModelPartForRootPtr) = 0;
 	};
+
 	using DeserializerPtr = std::shared_ptr<Deserializer>;
 
 	using StreamSerializerFactory = AdHoc::Factory<Serializer, std::ostream &>;

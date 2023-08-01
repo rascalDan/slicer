@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 #include <visibility.h>
+
 // IWYU pragma: no_forward_declare Slicer::EnumMap
 namespace Ice {
 	class Object;
@@ -405,6 +406,7 @@ namespace Slicer {
 		{
 			static_assert(sizeof...(MD) == N, "Wrong amount of metadata");
 		}
+
 		~Hook() override = default;
 		SPECIAL_MEMBERS_DEFAULT(Hook);
 

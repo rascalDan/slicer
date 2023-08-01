@@ -4,6 +4,7 @@
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 #include <visibility.h>
+
 namespace DB {
 	class Connection;
 	class TablePatch;

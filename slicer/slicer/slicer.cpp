@@ -29,6 +29,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(InvalidEnumerationSymbolMsg, "Invalid enumeration symbol [%?] for type [%?]");
+
 	void
 	InvalidEnumerationSymbol::ice_print(std::ostream & s) const
 	{
@@ -36,6 +37,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(InvalidEnumerationValueMsg, "Invalid enumeration symbol [%?] for type [%?]");
+
 	void
 	InvalidEnumerationValue::ice_print(std::ostream & s) const
 	{
@@ -43,6 +45,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(UnknownTypeMsg, "Unknown type [%?]");
+
 	void
 	UnknownType::ice_print(std::ostream & s) const
 	{
@@ -50,6 +53,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(NoConversionFoundMsg, "No conversion found for type [%?]");
+
 	void
 	NoConversionFound::ice_print(std::ostream & s) const
 	{
@@ -69,6 +73,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(IncorrectElementNameMsg, "Incorrect element name [%?]");
+
 	void
 	IncorrectElementName::ice_print(std::ostream & s) const
 	{
@@ -94,6 +99,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(CompilerErrorMsg, "Slicer compiler: %?");
+
 	void
 	CompilerError::ice_print(std::ostream & s) const
 	{
@@ -101,6 +107,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(InvalidStreamOperationMsg, "%? is not valid on streams");
+
 	void
 	InvalidStreamOperation::ice_print(std::ostream & s) const
 	{
@@ -108,6 +115,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(AbstractClassExceptionMsg, "%? is an abstract class");
+
 	void
 	AbstractClassException::ice_print(std::ostream & s) const
 	{

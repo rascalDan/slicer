@@ -150,6 +150,7 @@ namespace Slicer {
 	class DocumentTreeIterate {
 	public:
 		explicit DocumentTreeIterate(ModelPartPtr & mp) : modelPart(mp) { }
+
 		template<typename SimpleT>
 		void
 		operator()(const SimpleT & v) const
@@ -158,11 +159,13 @@ namespace Slicer {
 			modelPart->SetValue(JsonValueSource(v));
 			modelPart->Complete();
 		}
+
 		void
 		operator()(const json::Null &) const
 		{
 			modelPart->Complete();
 		}
+
 		void
 		operator()(const json::Object & o) const
 		{
@@ -197,6 +200,7 @@ namespace Slicer {
 				modelPart->Complete();
 			}
 		}
+
 		void
 		operator()(const json::Array & a) const
 		{

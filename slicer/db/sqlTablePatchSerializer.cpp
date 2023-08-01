@@ -11,6 +11,7 @@
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");
+
 	SqlTablePatchSerializer::SqlTablePatchSerializer(DB::Connection * const d, DB::TablePatch & tp) :
 		db(d), tablePatch(tp)
 	{
@@ -47,6 +48,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(createTmpTable, "CREATE TEMPORARY TABLE %? AS SELECT * FROM %? WHERE 1 = 0");
+
 	void
 	SqlTablePatchSerializer::createTemporaryTable()
 	{
@@ -54,6 +56,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(dropTmpTable, "DROP TABLE %?");
+
 	void
 	SqlTablePatchSerializer::dropTemporaryTable()
 	{

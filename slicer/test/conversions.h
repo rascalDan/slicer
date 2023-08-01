@@ -28,6 +28,7 @@ namespace TestModule {
 		void Complete() override;
 	};
 }
+
 namespace Slicer {
 	DLL_PUBLIC
 	::TestModule::DateTime stringToDateTime(const std::string & in);

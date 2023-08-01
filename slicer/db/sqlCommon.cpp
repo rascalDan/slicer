@@ -59,6 +59,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(UnsuitableIdFieldTypeMsg, "Unsuitable id field type [%?]");
+
 	void
 	UnsuitableIdFieldType::ice_print(std::ostream & s) const
 	{

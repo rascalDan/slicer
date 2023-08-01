@@ -88,6 +88,7 @@ namespace Slicer {
 
 	private:
 		DB::Connection * const connection;
+
 		template<typename T>
 		inline void
 		doSet([[maybe_unused]] T & v, [[maybe_unused]] const char * Tname) const

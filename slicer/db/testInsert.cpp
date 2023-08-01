@@ -25,6 +25,7 @@ using namespace std::literals;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::DateTime)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestDatabase::Timespan)
+
 // LCOV_EXCL_STOP
 
 namespace std {

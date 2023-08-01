@@ -18,6 +18,7 @@
 // LCOV_EXCL_START
 // cppcheck-suppress unknownMacro
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::IsoDate)
+
 // LCOV_EXCL_STOP
 
 template<typename X>

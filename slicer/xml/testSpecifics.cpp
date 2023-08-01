@@ -16,6 +16,7 @@
 #include <slicer/slicer.h>
 #include <typeinfo>
 #include <xmlExceptions.h>
+
 // IWYU pragma: no_forward_declare Slicer::BadBooleanValue
 // IWYU pragma: no_forward_declare Slicer::XmlDocumentDeserializer
 
