@@ -255,35 +255,39 @@ namespace Slicer {
 	void
 	XmlDeserializer::DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr smp, const ChildRef & smpr)
 	{
-		if (auto typeIdPropName = smp->GetTypeIdProperty()) {
-			if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
-				smp = smp->GetSubclassModelPart(typeAttr->get_value());
+		auto oec = [&smpr, element](const auto & lmp) {
+			lmp->Create();
+			if (smpr.ChildMetaData().flagSet(md_attributes)) {
+				auto attrs(element->get_attributes());
+				if (!attrs.empty()) {
+					DocumentTreeIterateDictAttrs(attrs, lmp);
+				}
 			}
-		}
-		smp->Create();
-		if (smpr.ChildMetaData().flagSet(md_attributes)) {
-			auto attrs(element->get_attributes());
-			if (!attrs.empty()) {
-				DocumentTreeIterateDictAttrs(attrs, smp);
-			}
-		}
-		else if (smpr.ChildMetaData().flagSet(md_elements)) {
-			DocumentTreeIterateDictElements(element, smp);
-		}
-		else {
-			auto attrs(element->get_attributes());
-			if (!attrs.empty()) {
-				DocumentTreeIterate(attrs.front(), smp);
-			}
-			auto firstChild = element->get_first_child();
-			if (firstChild) {
-				DocumentTreeIterate(firstChild, smp);
+			else if (smpr.ChildMetaData().flagSet(md_elements)) {
+				DocumentTreeIterateDictElements(element, lmp);
 			}
 			else {
-				smp->SetValue(XmlContentValueSource());
+				auto attrs(element->get_attributes());
+				if (!attrs.empty()) {
+					DocumentTreeIterate(attrs.front(), lmp);
+				}
+				auto firstChild = element->get_first_child();
+				if (firstChild) {
+					DocumentTreeIterate(firstChild, lmp);
+				}
+				else {
+					lmp->SetValue(XmlContentValueSource());
+				}
+			}
+			lmp->Complete();
+		};
+		if (auto typeIdPropName = smp->GetTypeIdProperty()) {
+			if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
+				oec(smp->GetSubclassModelPart(typeAttr->get_value()));
+				return;
 			}
 		}
-		smp->Complete();
+		oec(smp);
 	}
 
 	void
