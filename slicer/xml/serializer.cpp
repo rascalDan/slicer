@@ -407,16 +407,19 @@ namespace Slicer {
 			mp->GetValue(XmlContentValueTarget(cec));
 		}
 		else if (mp->HasValue()) {
-			auto typeIdPropName = mp->GetTypeIdProperty();
-			auto typeId = mp->GetTypeId();
-			auto element = cec.get();
-			if (typeId && typeIdPropName) {
-				element->set_attribute(*typeIdPropName, *typeId);
-				mp = mp->GetSubclassModelPart(*typeId);
+			auto oec = [element = cec.get(), &ec](const auto & lmp) {
+				lmp->OnEachChild([element, &ec](auto && PH1, auto && PH2, auto && PH3) {
+					return XmlSerializer::ModelTreeIterate(element, PH1, PH2, PH3, ec);
+				});
+				return element;
+			};
+			if (auto typeIdPropName = mp->GetTypeIdProperty()) {
+				if (auto typeId = mp->GetTypeId()) {
+					oec(mp->GetSubclassModelPart(*typeId))->set_attribute(*typeIdPropName, *typeId);
+					return;
+				}
 			}
-			mp->OnEachChild([element, ec](auto && PH1, auto && PH2, auto && PH3) {
-				return XmlSerializer::ModelTreeIterate(element, PH1, PH2, PH3, ec);
-			});
+			oec(mp);
 		}
 	}
 
