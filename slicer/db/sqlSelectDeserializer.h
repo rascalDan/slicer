@@ -20,10 +20,10 @@ namespace Slicer {
 		void Deserialize(Slicer::ModelPartForRootPtr) override;
 
 	protected:
-		void DLL_PRIVATE DeserializeSimple(const Slicer::ModelPartPtr &);
-		void DLL_PRIVATE DeserializeObject(const Slicer::ModelPartPtr &);
-		void DLL_PRIVATE DeserializeSequence(const Slicer::ModelPartPtr &);
-		void DLL_PRIVATE DeserializeRow(const Slicer::ModelPartPtr &);
+		void DLL_PRIVATE DeserializeSimple(ModelPartParam);
+		void DLL_PRIVATE DeserializeObject(ModelPartParam);
+		void DLL_PRIVATE DeserializeSequence(ModelPartParam);
+		void DLL_PRIVATE DeserializeRow(ModelPartParam);
 
 		DB::SelectCommand * cmd;
 		unsigned int columnCount;

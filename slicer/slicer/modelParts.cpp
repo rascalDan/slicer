@@ -79,7 +79,7 @@ namespace Slicer {
 	}
 
 	void
-	HookCommon::apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const
+	HookCommon::apply(const ChildHandler & ch, const ModelPartParam & modelPart) const
 	{
 		ch(*this->nameStr, modelPart, this);
 	}

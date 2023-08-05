@@ -21,14 +21,14 @@ namespace Slicer {
 		void Serialize(Slicer::ModelPartForRootPtr) override;
 
 	protected:
-		void SerializeObject(const Slicer::ModelPartPtr &) const;
-		void SerializeSequence(const Slicer::ModelPartPtr &) const;
-		DB::ModifyCommandPtr createInsert(const Slicer::ModelPartPtr &) const;
+		void SerializeObject(ModelPartParam) const;
+		void SerializeSequence(ModelPartParam) const;
+		[[nodiscard]] DB::ModifyCommandPtr createInsert(ModelPartParam) const;
 		virtual void createInsertField(
 				unsigned int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
-		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
+		virtual void bindObjectAndExecute(ModelPartParam, DB::ModifyCommand *) const;
 		virtual void bindObjectAndExecuteField(
-				unsigned int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
+				unsigned int & paramNo, DB::ModifyCommand *, ModelPartParam, const HookCommon *) const;
 
 		DB::Connection * const connection;
 		const std::string tableName;
@@ -42,10 +42,10 @@ namespace Slicer {
 		}
 
 	protected:
-		virtual void createInsertField(unsigned int & fieldNo, std::ostream & insert, const std::string & name,
+		void createInsertField(unsigned int & fieldNo, std::ostream & insert, const std::string & name,
 				const HookCommon * h) const override;
-		virtual void bindObjectAndExecuteField(unsigned int & paramNo, DB::ModifyCommand *,
-				const Slicer::ModelPartPtr &, const HookCommon *) const override;
+		void bindObjectAndExecuteField(
+				unsigned int & paramNo, DB::ModifyCommand *, ModelPartParam, const HookCommon *) const override;
 	};
 
 	class DLL_PUBLIC SqlFetchIdInsertSerializer : public SqlAutoIdInsertSerializer {
@@ -56,7 +56,7 @@ namespace Slicer {
 		}
 
 	protected:
-		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const override;
+		void bindObjectAndExecute(ModelPartParam, DB::ModifyCommand *) const override;
 	};
 }
 

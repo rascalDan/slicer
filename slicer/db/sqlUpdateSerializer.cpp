@@ -40,26 +40,26 @@ namespace Slicer {
 	}
 
 	void
-	SqlUpdateSerializer::SerializeObject(const Slicer::ModelPartPtr & mp) const
+	SqlUpdateSerializer::SerializeObject(ModelPartParam mp) const
 	{
 		auto ins = createUpdate(mp);
 		bindObjectAndExecute(mp, ins.get());
 	}
 
 	void
-	SqlUpdateSerializer::SerializeSequence(const Slicer::ModelPartPtr & mp) const
+	SqlUpdateSerializer::SerializeSequence(ModelPartParam mp) const
 	{
 		auto ins = createUpdate(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins](const std::string &, const ModelPartPtr & cmp, const HookCommon *) {
+		mp->OnEachChild([&ins](auto &&, auto && cmp, auto &&) {
 			bindObjectAndExecute(cmp, ins.get());
 		});
 	}
 
 	void
-	SqlUpdateSerializer::bindObjectAndExecute(const Slicer::ModelPartPtr & mp, DB::ModifyCommand * upd)
+	SqlUpdateSerializer::bindObjectAndExecute(ModelPartParam mp, DB::ModifyCommand * upd)
 	{
 		unsigned int paramNo = 0;
-		mp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
+		mp->OnEachChild([&upd, &paramNo](auto &&, auto && cmp, auto && h) {
 			if (isValue(h)) {
 				if (!cmp->GetValue(SqlBinder(*upd, paramNo))) {
 					upd->bindNull(paramNo);
@@ -67,7 +67,7 @@ namespace Slicer {
 				paramNo++;
 			}
 		});
-		mp->OnEachChild([&upd, &paramNo](const std::string &, const ModelPartPtr & cmp, const HookCommon * h) {
+		mp->OnEachChild([&upd, &paramNo](auto &&, auto && cmp, auto && h) {
 			if (isPKey(h)) {
 				cmp->GetValue(SqlBinder(*upd, paramNo++));
 			}
@@ -78,13 +78,13 @@ namespace Slicer {
 	}
 
 	DB::ModifyCommandPtr
-	SqlUpdateSerializer::createUpdate(const Slicer::ModelPartPtr & mp) const
+	SqlUpdateSerializer::createUpdate(ModelPartParam mp) const
 	{
 		using namespace AdHoc::literals;
 		std::stringstream update;
 		"UPDATE %? SET "_fmt(update, tableName);
 		int fieldNo = 0;
-		mp->OnEachChild([&update, &fieldNo](const std::string & name, const ModelPartPtr &, const HookCommon * h) {
+		mp->OnEachChild([&update, &fieldNo](auto && name, auto &&, auto && h) {
 			if (isValue(h)) {
 				if (fieldNo++) {
 					update << ", ";
@@ -94,7 +94,7 @@ namespace Slicer {
 		});
 		update << " WHERE ";
 		fieldNo = 0;
-		mp->OnEachChild([&update, &fieldNo](const std::string & name, const ModelPartPtr &, const HookCommon * h) {
+		mp->OnEachChild([&update, &fieldNo](auto && name, auto &&, auto && h) {
 			if (isPKey(h)) {
 				if (fieldNo++) {
 					update << " AND ";

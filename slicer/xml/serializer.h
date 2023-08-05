@@ -30,15 +30,14 @@ namespace Slicer {
 	class DLL_PUBLIC XmlSerializer : public Serializer {
 	protected:
 		using ElementCreator = std::function<xmlpp::Element *(xmlpp::Element *, const Glib::ustring &)>;
-		static void ModelTreeIterate(xmlpp::Element *, const std::string &, const ModelPartPtr & mp,
-				const HookCommon * hp, const ElementCreator &);
-		static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, const ModelPartPtr & mp);
+		static void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartParam mp, const HookCommon * hp,
+				const ElementCreator &);
+		static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartParam mp);
 
 	protected:
-		static void ModelTreeProcessElement(
-				const CurrentElementCreator &, const ModelPartPtr & mp, const ElementCreator &);
-		static void ModelTreeIterateDictAttrs(xmlpp::Element * element, const ModelPartPtr & dict);
-		static void ModelTreeIterateDictElements(xmlpp::Element * element, const ModelPartPtr & dict);
+		static void ModelTreeProcessElement(const CurrentElementCreator &, ModelPartParam mp, const ElementCreator &);
+		static void ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartParam dict);
+		static void ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartParam dict);
 	};
 
 	class DLL_PUBLIC XmlDocumentSerializer : public XmlSerializer {
@@ -69,13 +68,12 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlDeserializer : public Deserializer {
 	protected:
-		static void DocumentTreeIterate(const xmlpp::Node * node, const ModelPartPtr & mp);
-		static void DocumentTreeIterateElement(
-				const xmlpp::Element * element, const ModelPartPtr & mp, const ChildRef & c);
-		static void DocumentTreeIterate(const xmlpp::Document * doc, const ModelPartPtr & mp);
+		static void DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp);
+		static void DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam mp, const ChildRef & c);
+		static void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartParam mp);
 		static void DocumentTreeIterateDictAttrs(
-				const xmlpp::Element::const_AttributeList & attrs, const ModelPartPtr & dict);
-		static void DocumentTreeIterateDictElements(const xmlpp::Element * parent, const ModelPartPtr & dict);
+				const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict);
+		static void DocumentTreeIterateDictElements(const xmlpp::Element * parent, ModelPartParam dict);
 	};
 
 	class DLL_PUBLIC XmlStreamDeserializer : public XmlDeserializer {

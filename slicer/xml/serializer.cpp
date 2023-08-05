@@ -228,7 +228,7 @@ namespace Slicer {
 
 	void
 	XmlDeserializer::DocumentTreeIterateDictAttrs(
-			const xmlpp::Element::const_AttributeList & attrs, const ModelPartPtr & dict)
+			const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict)
 	{
 		for (const auto & attr : attrs) {
 			auto emp = dict->GetAnonChild();
@@ -244,7 +244,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlDeserializer::DocumentTreeIterateDictElements(const xmlpp::Element * element, const ModelPartPtr & dict)
+	XmlDeserializer::DocumentTreeIterateDictElements(const xmlpp::Element * element, ModelPartParam dict)
 	{
 		auto node = element->get_first_child();
 		while (node) {
@@ -264,7 +264,7 @@ namespace Slicer {
 
 	void
 	XmlDeserializer::DocumentTreeIterateElement(
-			const xmlpp::Element * element, const ModelPartPtr & smp, const ChildRef & smpr)
+			const xmlpp::Element * element, ModelPartParam smp, const ChildRef & smpr)
 	{
 		auto oec = [&smpr, element](const auto & lmp) {
 			lmp->Create();
@@ -302,7 +302,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlDeserializer::DocumentTreeIterate(const xmlpp::Node * node, const ModelPartPtr & mp)
+	XmlDeserializer::DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp)
 	{
 		while (node) {
 			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
@@ -348,13 +348,13 @@ namespace Slicer {
 	}
 
 	void
-	XmlDeserializer::DocumentTreeIterate(const xmlpp::Document * doc, const ModelPartPtr & mp)
+	XmlDeserializer::DocumentTreeIterate(const xmlpp::Document * doc, ModelPartParam mp)
 	{
 		DocumentTreeIterate(doc->get_root_node(), mp);
 	}
 
 	void
-	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, const ModelPartPtr & mp,
+	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartParam mp,
 			const HookCommon * hp, const ElementCreator & ec)
 	{
 		if (name.empty()) {
@@ -388,7 +388,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeIterateDictAttrs(xmlpp::Element * element, const ModelPartPtr & dict)
+	XmlSerializer::ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartParam dict)
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
@@ -400,7 +400,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeIterateDictElements(xmlpp::Element * element, const ModelPartPtr & dict)
+	XmlSerializer::ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartParam dict)
 	{
 		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 			if (mp->HasValue()) {
@@ -416,7 +416,7 @@ namespace Slicer {
 
 	void
 	XmlSerializer::ModelTreeProcessElement(
-			const CurrentElementCreator & cec, const ModelPartPtr & mp, const ElementCreator & ec)
+			const CurrentElementCreator & cec, ModelPartParam mp, const ElementCreator & ec)
 	{
 		if (mp->GetType() == ModelPartType::Simple) {
 			mp->GetValue(XmlContentValueTarget(cec));
@@ -439,7 +439,7 @@ namespace Slicer {
 	}
 
 	void
-	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, const ModelPartPtr & mp)
+	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartParam mp)
 	{
 		ModelTreeProcessElement(doc->create_root_node(name), mp, defaultElementCreator);
 	}

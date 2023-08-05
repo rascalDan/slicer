@@ -1,6 +1,7 @@
 #ifndef SLICER_MODELPARTS_H
 #define SLICER_MODELPARTS_H
 
+#include "any_ptr.h"
 #include "metadata.h"
 #include <Ice/Config.h>
 #include <c++11Helpers.h>
@@ -79,8 +80,9 @@ namespace Slicer {
 
 	using ModelPartPtr = std::shared_ptr<ModelPart>;
 	using ModelPartForRootPtr = std::shared_ptr<ModelPartForRootBase>;
+	using ModelPartParam = any_ptr<ModelPart>;
 	using TypeId = std::optional<std::string>;
-	using ChildHandler = std::function<void(const std::string &, const ModelPartPtr &, const HookCommon *)>;
+	using ChildHandler = std::function<void(const std::string &, const ModelPartParam &, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
 	using Metadata = MetaData<>;
@@ -126,7 +128,7 @@ namespace Slicer {
 		SPECIAL_MEMBERS_DEFAULT(HookCommon);
 
 		[[nodiscard]] bool filter(const HookFilter & flt) const;
-		void apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const;
+		void apply(const ChildHandler & ch, const ModelPartParam & modelPart) const;
 
 		[[nodiscard]] virtual const Metadata & GetMetadata() const = 0;
 

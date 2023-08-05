@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_class)
 }
 
 static void
-hookHandler(std::vector<std::string> * names, const std::string & name, const Slicer::ModelPartPtr & mpp,
+hookHandler(std::vector<std::string> * names, const std::string & name, Slicer::ModelPartParam mpp,
 		const Slicer::HookCommon * h)
 {
 	names->push_back(name);

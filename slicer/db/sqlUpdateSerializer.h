@@ -20,10 +20,10 @@ namespace Slicer {
 		void Serialize(Slicer::ModelPartForRootPtr) override;
 
 	protected:
-		void SerializeObject(const Slicer::ModelPartPtr &) const;
-		void SerializeSequence(const Slicer::ModelPartPtr &) const;
-		DB::ModifyCommandPtr createUpdate(const Slicer::ModelPartPtr &) const;
-		static void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *);
+		void SerializeObject(ModelPartParam) const;
+		void SerializeSequence(ModelPartParam) const;
+		[[nodiscard]] DB::ModifyCommandPtr createUpdate(ModelPartParam) const;
+		static void bindObjectAndExecute(ModelPartParam, DB::ModifyCommand *);
 
 		DB::Connection * const connection;
 		const std::string tableName;
