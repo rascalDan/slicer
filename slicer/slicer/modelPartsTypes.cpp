@@ -443,9 +443,6 @@ namespace Slicer {
 		return true;
 	}
 
-	// Stream Roots
-	ModelPartForStreamRootBase::ModelPartForStreamRootBase(const ModelPartPtr & m) : ModelPartForRootBase(m) { }
-
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void
 	ModelPartForStreamRootBase::Write(Ice::OutputStream &) const

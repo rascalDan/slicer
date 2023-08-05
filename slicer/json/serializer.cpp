@@ -249,7 +249,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonSerializer::ModelTreeIterate(json::Value * n, const std::string & name, ModelPartPtr mp)
+	JsonSerializer::ModelTreeIterate(json::Value * n, const std::string & name, const ModelPartPtr & mp)
 	{
 		if (name.empty() || !n || !mp) {
 			return;
@@ -314,7 +314,7 @@ namespace Slicer {
 	}
 
 	void
-	JsonSerializer::ModelTreeIterateRoot(json::Value * n, ModelPartPtr mp)
+	JsonSerializer::ModelTreeIterateRoot(json::Value * n, const ModelPartPtr & mp)
 	{
 		if (mp) {
 			switch (mp->GetType()) {

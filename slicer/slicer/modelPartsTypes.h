@@ -354,7 +354,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC ModelPartForStreamRootBase : public ModelPartForRootBase {
 	public:
-		explicit ModelPartForStreamRootBase(const ModelPartPtr & mp);
+		using ModelPartForRootBase::ModelPartForRootBase;
 
 		void Write(Ice::OutputStream &) const override;
 		void Read(Ice::InputStream &) override;

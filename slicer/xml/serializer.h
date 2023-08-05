@@ -35,7 +35,8 @@ namespace Slicer {
 		static void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, const ModelPartPtr & mp);
 
 	protected:
-		static void ModelTreeProcessElement(const CurrentElementCreator &, ModelPartPtr mp, const ElementCreator &);
+		static void ModelTreeProcessElement(
+				const CurrentElementCreator &, const ModelPartPtr & mp, const ElementCreator &);
 		static void ModelTreeIterateDictAttrs(xmlpp::Element * element, const ModelPartPtr & dict);
 		static void ModelTreeIterateDictElements(xmlpp::Element * element, const ModelPartPtr & dict);
 	};
@@ -69,7 +70,8 @@ namespace Slicer {
 	class DLL_PUBLIC XmlDeserializer : public Deserializer {
 	protected:
 		static void DocumentTreeIterate(const xmlpp::Node * node, const ModelPartPtr & mp);
-		static void DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr mp, const ChildRef & c);
+		static void DocumentTreeIterateElement(
+				const xmlpp::Element * element, const ModelPartPtr & mp, const ChildRef & c);
 		static void DocumentTreeIterate(const xmlpp::Document * doc, const ModelPartPtr & mp);
 		static void DocumentTreeIterateDictAttrs(
 				const xmlpp::Element::const_AttributeList & attrs, const ModelPartPtr & dict);

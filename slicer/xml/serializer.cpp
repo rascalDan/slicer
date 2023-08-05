@@ -253,7 +253,8 @@ namespace Slicer {
 	}
 
 	void
-	XmlDeserializer::DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartPtr smp, const ChildRef & smpr)
+	XmlDeserializer::DocumentTreeIterateElement(
+			const xmlpp::Element * element, const ModelPartPtr & smp, const ChildRef & smpr)
 	{
 		auto oec = [&smpr, element](const auto & lmp) {
 			lmp->Create();
@@ -405,7 +406,7 @@ namespace Slicer {
 
 	void
 	XmlSerializer::ModelTreeProcessElement(
-			const CurrentElementCreator & cec, ModelPartPtr mp, const ElementCreator & ec)
+			const CurrentElementCreator & cec, const ModelPartPtr & mp, const ElementCreator & ec)
 	{
 		if (mp->GetType() == ModelPartType::Simple) {
 			mp->GetValue(XmlContentValueTarget(cec));

@@ -9,7 +9,7 @@ namespace Slicer {
 
 	Slicer::ChildRef::ChildRef(ModelPartPtr m) : mpp(std::move(m)), mdr(emptyMetadata) { }
 
-	Slicer::ChildRef::ChildRef(Slicer::ModelPartPtr mp, const Slicer::Metadata & md) : mpp(std::move(mp)), mdr(md) { }
+	Slicer::ChildRef::ChildRef(ModelPartPtr mp, const Slicer::Metadata & md) : mpp(std::move(mp)), mdr(md) { }
 
 	ModelPartPtr
 	Slicer::ChildRef::Child() const
