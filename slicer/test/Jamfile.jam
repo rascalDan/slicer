@@ -3,6 +3,7 @@ import ./slicer.jam ;
 lib dl ;
 lib stdc++fs ;
 lib boost_date_time ;
+lib benchmark ;
 
 lib icetypes :
 	[ glob *.ice ]
@@ -111,3 +112,31 @@ run streams.cpp
 	<library>../json//slicer-json
 	;
 
+run
+	[ obj perf : perf.cpp :
+		<slicer>pure
+		<define>ROOT=\"$(me)\"
+		<use>types
+		<implicit-dependency>types
+		<use>benchmark
+		<use>stdc++fs
+		<use>..//adhocutil
+		<use>common
+		<use>../slicer//slicer
+		<implicit-dependency>../slicer//slicer
+		<use>../xml//slicer-xml
+		<use>../json//slicer-json
+	]
+	: : :
+	<library>benchmark
+	<library>stdc++fs
+	<library>common
+	<library>types
+	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
+	<library>../xml//slicer-xml
+	<library>../json//slicer-json
+	<library>..//adhocutil
+	<variant>profile:<testing.execute>on
+	<testing.execute>off
+	: perf ;
