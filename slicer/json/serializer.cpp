@@ -324,18 +324,23 @@ namespace Slicer {
 				case ModelPartType::Simple:
 					mp->GetValue(JsonValueTarget(*n));
 					break;
-				case ModelPartType::Complex:
-					*n = json::Object();
+				case ModelPartType::Complex: {
+					auto oec = [n](const auto & lmp) {
+						*n = json::Object();
+						lmp->OnEachChild([n](auto && PH1, auto && PH2, auto &&) {
+							return JsonSerializer::ModelTreeIterate(n, PH1, PH2);
+						});
+						return &std::get<json::Object>(*n);
+					};
 					if (auto typeIdName = mp->GetTypeIdProperty()) {
 						if (auto typeId = mp->GetTypeId()) {
-							std::get<json::Object>(*n).insert({*typeIdName, *typeId});
-							mp = mp->GetSubclassModelPart(*typeId);
+							oec(mp->GetSubclassModelPart(*typeId))->emplace(*typeIdName, *typeId);
+							return;
 						}
 					}
-					mp->OnEachChild([n](auto && PH1, auto && PH2, auto &&) {
-						return JsonSerializer::ModelTreeIterate(n, PH1, PH2);
-					});
+					oec(mp);
 					break;
+				}
 				case ModelPartType::Sequence:
 					*n = json::Array();
 					mp->OnEachChild([n](auto &&, auto && PH2, auto &&) {
