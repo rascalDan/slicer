@@ -80,7 +80,7 @@ namespace Slicer {
 	using ModelPartPtr = std::shared_ptr<ModelPart>;
 	using ModelPartForRootPtr = std::shared_ptr<ModelPartForRootBase>;
 	using TypeId = std::optional<std::string>;
-	using ChildHandler = std::function<void(const std::string &, ModelPartPtr, const HookCommon *)>;
+	using ChildHandler = std::function<void(const std::string &, const ModelPartPtr &, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
 	using Metadata = MetaData<>;
