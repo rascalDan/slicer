@@ -1,4 +1,5 @@
 #define BOOST_TEST_MODULE xml_specifics
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "serializer.h"
@@ -20,46 +21,62 @@
 // IWYU pragma: no_forward_declare Slicer::BadBooleanValue
 // IWYU pragma: no_forward_declare Slicer::XmlDocumentDeserializer
 
-template<typename T, typename... P>
-T
-BoostThrowWrapperHelper(P &&... p)
+template<typename T>
+const auto BoostThrowWrapperHelper
+		= Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, T, const xmlpp::Document *>;
+
+template<typename out> using data = std::tuple<const char *, out>;
+BOOST_FIXTURE_TEST_SUITE(doc, xmlpp::DomParser)
+
+BOOST_DATA_TEST_CASE(good_boolean_values,
+		boost::unit_test::data::make<data<bool>>({
+				{"<Boolean>true</Boolean>", true},
+				{"<Boolean>false</Boolean>", false},
+		}),
+		in, exp)
 {
-	return Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, T>(std::forward<P>(p)...);
+	parse_memory(in);
+	BOOST_CHECK_EQUAL(exp, BoostThrowWrapperHelper<bool>(get_document()));
 }
 
-BOOST_AUTO_TEST_CASE(boolean_values)
+BOOST_DATA_TEST_CASE(bad_boolean_values,
+		boost::unit_test::data::make({
+				"<Boolean>nonsense</Boolean>",
+				"<Boolean> </Boolean>",
+				"<Boolean></Boolean>",
+		}),
+		in)
 {
-	xmlpp::DomParser doc;
-	doc.parse_memory("<Boolean>true</Boolean>");
-	BOOST_REQUIRE_EQUAL(true, BoostThrowWrapperHelper<bool>(doc.get_document()));
-	doc.parse_memory("<Boolean>false</Boolean>");
-	BOOST_REQUIRE_EQUAL(false, BoostThrowWrapperHelper<bool>(doc.get_document()));
-	doc.parse_memory("<Boolean>nonsense</Boolean>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<bool>(doc.get_document()), Slicer::BadBooleanValue);
-	doc.parse_memory("<Boolean> </Boolean>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<bool>(doc.get_document()), Slicer::BadBooleanValue);
-	doc.parse_memory("<Boolean></Boolean>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<bool>(doc.get_document()), Slicer::BadBooleanValue);
+	parse_memory(in);
+	BOOST_CHECK_THROW(BoostThrowWrapperHelper<bool>(get_document()), Slicer::BadBooleanValue);
 }
 
-BOOST_AUTO_TEST_CASE(int_values)
+BOOST_DATA_TEST_CASE(good_integer_values,
+		boost::unit_test::data::make<data<Ice::Int>>({
+				{"<Int>13</Int>", 13},
+				{"<Int>84</Int>", 84},
+				{"<Int>0</Int>", 0},
+				{"<Int>-4</Int>", -4},
+		}),
+		in, exp)
 {
-	xmlpp::DomParser doc;
-	doc.parse_memory("<Int>13</Int>");
-	BOOST_REQUIRE_EQUAL(13, BoostThrowWrapperHelper<Ice::Int>(doc.get_document()));
-	doc.parse_memory("<Int>84</Int>");
-	BOOST_REQUIRE_EQUAL(84, BoostThrowWrapperHelper<Ice::Int>(doc.get_document()));
-	doc.parse_memory("<Int>0</Int>");
-	BOOST_REQUIRE_EQUAL(0, BoostThrowWrapperHelper<Ice::Int>(doc.get_document()));
-	doc.parse_memory("<Int>-4</Int>");
-	BOOST_REQUIRE_EQUAL(-4, BoostThrowWrapperHelper<Ice::Int>(doc.get_document()));
-	doc.parse_memory("<Int> </Int>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), Slicer::BadNumericValue);
-	doc.parse_memory("<Int>notanint</Int>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), Slicer::BadNumericValue);
-	doc.parse_memory("<Int></Int>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), Slicer::BadNumericValue);
+	parse_memory(in);
+	BOOST_CHECK_EQUAL(exp, BoostThrowWrapperHelper<Ice::Int>(get_document()));
 }
+
+BOOST_DATA_TEST_CASE(bad_integer_values,
+		boost::unit_test::data::make({
+				"<Int> </Int>",
+				"<Int>notanint</Int>",
+				"<Int></Int>",
+		}),
+		in)
+{
+	parse_memory(in);
+	BOOST_CHECK_THROW(BoostThrowWrapperHelper<Ice::Int>(get_document()), Slicer::BadNumericValue);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(factories)
 {
