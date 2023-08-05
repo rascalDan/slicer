@@ -1,5 +1,6 @@
 #include "serializer.h"
 #include <boost/lexical_cast.hpp>
+#include <charconv>
 #include <compileTimeFormatter.h>
 #include <functional>
 #pragma GCC diagnostic push
@@ -73,37 +74,37 @@ namespace Slicer {
 		void
 		set(Ice::Byte & v) const override
 		{
-			v = boost::numeric_cast<Ice::Byte>(boost::lexical_cast<int>(value));
+			from_chars(v);
 		}
 
 		void
 		set(Ice::Short & v) const override
 		{
-			v = boost::lexical_cast<Ice::Short>(value);
+			from_chars(v);
 		}
 
 		void
 		set(Ice::Int & v) const override
 		{
-			v = boost::lexical_cast<Ice::Int>(value);
+			from_chars(v);
 		}
 
 		void
 		set(Ice::Long & v) const override
 		{
-			v = boost::lexical_cast<Ice::Long>(value);
+			from_chars(v);
 		}
 
 		void
 		set(Ice::Float & v) const override
 		{
-			v = boost::lexical_cast<Ice::Float>(value);
+			from_chars(v);
 		}
 
 		void
 		set(Ice::Double & v) const override
 		{
-			v = boost::lexical_cast<Ice::Double>(value);
+			from_chars(v);
 		}
 
 		void
@@ -113,6 +114,16 @@ namespace Slicer {
 		}
 
 	private:
+		template<typename T>
+		void
+		from_chars(T & v) const
+		{
+			std::string_view raw {value.raw()};
+			if (std::from_chars(raw.begin(), raw.end(), v).ec != std::errc {}) {
+				throw BadNumericValue(value);
+			}
+		}
+
 		const Glib::ustring value;
 	};
 
@@ -488,5 +499,13 @@ namespace Slicer {
 	BadBooleanValue::ice_print(std::ostream & s) const
 	{
 		BadBooleanValueMsg::write(s, text);
+	}
+
+	AdHocFormatter(BadNumericValueMsg, "Bad numeric value [%?]");
+
+	void
+	BadNumericValue::ice_print(std::ostream & s) const
+	{
+		BadNumericValueMsg::write(s, text);
 	}
 }

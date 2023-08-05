@@ -54,11 +54,11 @@ BOOST_AUTO_TEST_CASE(int_values)
 	doc.parse_memory("<Int>-4</Int>");
 	BOOST_REQUIRE_EQUAL(-4, BoostThrowWrapperHelper<Ice::Int>(doc.get_document()));
 	doc.parse_memory("<Int> </Int>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), std::bad_cast);
+	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), Slicer::BadNumericValue);
 	doc.parse_memory("<Int>notanint</Int>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), std::bad_cast);
+	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), Slicer::BadNumericValue);
 	doc.parse_memory("<Int></Int>");
-	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), std::bad_cast);
+	BOOST_REQUIRE_THROW(BoostThrowWrapperHelper<Ice::Int>(doc.get_document()), Slicer::BadNumericValue);
 }
 
 BOOST_AUTO_TEST_CASE(factories)
