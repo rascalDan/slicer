@@ -1,5 +1,4 @@
 #include "serializer.h"
-#include <boost/lexical_cast.hpp>
 #include <charconv>
 #include <compileTimeFormatter.h>
 #include <functional>
@@ -157,37 +156,37 @@ namespace Slicer {
 		void
 		get(const Ice::Byte & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring, int>(value));
+			apply(Glib::ustring::format(value));
 		}
 
 		void
 		get(const Ice::Short & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring>(value));
+			apply(Glib::ustring::format(value));
 		}
 
 		void
 		get(const Ice::Int & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring>(value));
+			apply(Glib::ustring::format(value));
 		}
 
 		void
 		get(const Ice::Long & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring>(value));
+			apply(Glib::ustring::format(value));
 		}
 
 		void
 		get(const Ice::Float & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring>(value));
+			apply(Glib::ustring::format(value));
 		}
 
 		void
 		get(const Ice::Double & value) const override
 		{
-			apply(boost::lexical_cast<Glib::ustring>(value));
+			apply(Glib::ustring::format(value));
 		}
 
 		void
