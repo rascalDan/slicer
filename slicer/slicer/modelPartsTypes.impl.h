@@ -660,7 +660,7 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		for (auto & pair : *this->Model) {
-			ch(pairName, std::make_shared<ModelPartForStruct<typename T::value_type>>(&pair), nullptr);
+			ch(pairName, ModelPartForStruct<typename T::value_type>(&pair), nullptr);
 		}
 	}
 
