@@ -10,7 +10,7 @@
 #include <visibility.h>
 
 namespace Slicer {
-	class IceBase {
+	class DLL_PUBLIC IceBase {
 	public:
 		virtual ~IceBase();
 
