@@ -38,45 +38,26 @@ namespace Slicer {
 							boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::second>,
 							std::less<>>>>;
 
-	static void createClassMaps() __attribute__((constructor(208)));
-	static void deleteClassMaps() __attribute__((destructor(208)));
-	static ClassNameMap * names;
-	static ClassRefMap * refs;
+	namespace {
+		constinit std::unique_ptr<ClassNameMap> names;
+		constinit std::unique_ptr<ClassRefMap> refs;
 
-	void
-	createClassMaps()
-	{
-		names = new ClassNameMap();
-		refs = new ClassRefMap();
-	}
+		void createClassMaps() __attribute__((constructor(208)));
 
-	static void
-	deleteClassMaps()
-	{
-		delete names;
-		delete refs;
-		names = nullptr;
-		refs = nullptr;
-	}
-
-	ClassNameMap *
-	classNameMap()
-	{
-		return names;
-	}
-
-	ClassRefMap *
-	classRefMap()
-	{
-		return refs;
+		void
+		createClassMaps()
+		{
+			names = std::make_unique<ClassNameMap>();
+			refs = std::make_unique<ClassRefMap>();
+		}
 	}
 
 	const std::string &
 	ModelPartForComplexBase::ToModelTypeName(const std::string & name)
 	{
-		auto & right = classNameMap()->get<1>();
-		auto mapped = right.find(name);
-		if (mapped != right.end()) {
+		const auto & right = names->get<1>();
+
+		if (const auto mapped = right.find(name); mapped != right.end()) {
 			return mapped->first;
 		}
 		return name;
@@ -85,9 +66,9 @@ namespace Slicer {
 	const std::string &
 	ModelPartForComplexBase::ToExchangeTypeName(const std::string & name)
 	{
-		auto & left = classNameMap()->get<0>();
-		auto mapped = left.find(name);
-		if (mapped != left.end()) {
+		const auto & left = names->get<0>();
+
+		if (const auto mapped = left.find(name); mapped != left.end()) {
 			return mapped->second;
 		}
 		return name;
@@ -249,29 +230,28 @@ namespace Slicer {
 	ModelPartForComplexBase::registerClass(
 			const std::string & className, const std::string * typeName, const ClassRef & cr)
 	{
-		Slicer::classRefMap()->insert({className, cr});
+		refs->emplace(className, cr);
 		if (typeName) {
-			Slicer::classNameMap()->insert({className, *typeName});
+			names->emplace(className, *typeName);
 		}
 	}
 
 	void
 	ModelPartForComplexBase::unregisterClass(const std::string & className, const std::string * typeName)
 	{
-		Slicer::classRefMap()->erase(className);
+		refs->erase(className);
 		if (typeName) {
-			classNameMap()->get<0>().erase(className);
+			names->get<0>().erase(className);
 		}
 	}
 
 	ModelPartPtr
 	ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
 	{
-		auto ref = classRefMap()->find(ToModelTypeName(name));
-		if (ref == classRefMap()->end()) {
-			throw UnknownType(name);
+		if (const auto ref = refs->find(ToModelTypeName(name)); ref != refs->end()) {
+			return ref->second(m);
 		}
-		return ref->second(m);
+		throw UnknownType(name);
 	}
 
 	TypeId
