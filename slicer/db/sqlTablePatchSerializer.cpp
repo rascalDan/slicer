@@ -19,7 +19,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlTablePatchSerializer::Serialize(Slicer::ModelPartForRootPtr mpr)
+	SqlTablePatchSerializer::Serialize(ModelPartForRootParam mpr)
 	{
 		tablePatch.pk.clear();
 		tablePatch.cols.clear();

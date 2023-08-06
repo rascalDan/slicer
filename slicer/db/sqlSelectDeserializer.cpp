@@ -15,7 +15,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::Deserialize(Slicer::ModelPartForRootPtr mp)
+	SqlSelectDeserializer::Deserialize(ModelPartForRootParam mp)
 	{
 		cmd->execute();
 		columnCount = cmd->columnCount();

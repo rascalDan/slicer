@@ -17,7 +17,7 @@ namespace Slicer {
 	public:
 		SqlUpdateSerializer(DB::Connection * const, std::string tableName);
 
-		void Serialize(Slicer::ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		void SerializeObject(ModelPartParam) const;

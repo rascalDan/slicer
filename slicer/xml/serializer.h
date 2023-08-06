@@ -42,7 +42,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC XmlDocumentSerializer : public XmlSerializer {
 	public:
-		void Serialize(ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		xmlpp::Document doc;
@@ -52,7 +52,7 @@ namespace Slicer {
 	public:
 		explicit XmlStreamSerializer(std::ostream &);
 
-		void Serialize(ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		std::ostream & strm;
@@ -80,7 +80,7 @@ namespace Slicer {
 	public:
 		explicit XmlStreamDeserializer(std::istream &);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		std::istream & strm;
@@ -90,7 +90,7 @@ namespace Slicer {
 	public:
 		explicit XmlFileDeserializer(std::filesystem::path);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		const std::filesystem::path path;
@@ -100,7 +100,7 @@ namespace Slicer {
 	public:
 		explicit XmlDocumentDeserializer(const xmlpp::Document *);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		const xmlpp::Document * doc;

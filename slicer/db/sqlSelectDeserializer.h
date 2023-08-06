@@ -17,7 +17,7 @@ namespace Slicer {
 		explicit SqlSelectDeserializer(
 				DB::SelectCommand *, std::optional<std::string> typeIdCol = std::optional<std::string>());
 
-		void Deserialize(Slicer::ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		void DLL_PRIVATE DeserializeSimple(ModelPartParam);

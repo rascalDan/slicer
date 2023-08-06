@@ -23,7 +23,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlInsertSerializer::Serialize(Slicer::ModelPartForRootPtr mp)
+	SqlInsertSerializer::Serialize(ModelPartForRootParam mp)
 	{
 		switch (mp->GetType()) {
 			case Slicer::ModelPartType::Sequence:

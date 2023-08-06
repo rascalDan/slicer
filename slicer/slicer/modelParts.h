@@ -79,8 +79,9 @@ namespace Slicer {
 	class HookCommon;
 
 	using ModelPartPtr = std::shared_ptr<ModelPart>;
-	using ModelPartForRootPtr = std::shared_ptr<ModelPartForRootBase>;
+	using ModelPartForRootPtr = std::unique_ptr<ModelPartForRootBase>;
 	using ModelPartParam = any_ptr<ModelPart>;
+	using ModelPartForRootParam = any_ptr<ModelPartForRootBase>;
 	using TypeId = std::optional<std::string>;
 	using ChildHandler = std::function<void(const std::string &, const ModelPartParam &, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;

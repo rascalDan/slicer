@@ -21,7 +21,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlUpdateSerializer::Serialize(Slicer::ModelPartForRootPtr mp)
+	SqlUpdateSerializer::Serialize(ModelPartForRootParam mp)
 	{
 		switch (mp->GetType()) {
 			case Slicer::ModelPartType::Sequence:

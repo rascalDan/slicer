@@ -19,7 +19,7 @@ namespace Slicer {
 
 		virtual ~Serializer() = default;
 
-		virtual void Serialize(ModelPartForRootPtr) = 0;
+		virtual void Serialize(ModelPartForRootParam) = 0;
 	};
 
 	using SerializerPtr = std::shared_ptr<Serializer>;
@@ -31,7 +31,7 @@ namespace Slicer {
 
 		virtual ~Deserializer() = default;
 
-		virtual void Deserialize(ModelPartForRootPtr) = 0;
+		virtual void Deserialize(ModelPartForRootParam) = 0;
 	};
 
 	using DeserializerPtr = std::shared_ptr<Deserializer>;

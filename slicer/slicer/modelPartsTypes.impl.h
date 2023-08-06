@@ -69,11 +69,11 @@ namespace Ice {
 	} \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) \
 	{ \
-		return std::make_shared<ModelPartForRoot<Type>>(&s); \
+		return std::make_unique<ModelPartForRoot<Type>>(&s); \
 	} \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) \
 	{ \
-		return std::make_shared<ModelPartForRoot<Ice::optional<Type>>>(&s); \
+		return std::make_unique<ModelPartForRoot<Ice::optional<Type>>>(&s); \
 	} \
 	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) \
 	{ \
@@ -94,7 +94,7 @@ namespace Ice {
 		DLL_PUBLIC ModelPartForRootPtr \
 		ModelPart::CreateRootFor(const StreamImpl & stream) \
 		{ \
-			return std::make_shared<ModelPartForStreamRoot<typename StreamImpl::element_type>>( \
+			return std::make_unique<ModelPartForStreamRoot<typename StreamImpl::element_type>>( \
 					const_cast<StreamImpl *>(&stream)); \
 		} \
 	}
