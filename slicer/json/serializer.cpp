@@ -149,7 +149,11 @@ namespace Slicer {
 
 	class DocumentTreeIterate {
 	public:
-		explicit DocumentTreeIterate(ModelPartPtr & mp) : modelPart(mp) { }
+		static void
+		visit(ModelPartPtr && mp, const json::Value & v)
+		{
+			std::visit(DocumentTreeIterate {std::move(mp)}, v);
+		}
 
 		template<typename SimpleT>
 		void
@@ -181,19 +185,17 @@ namespace Slicer {
 					auto emp = modelPart->GetAnonChild();
 					emp->Create();
 					auto key = emp->GetChild(keyName);
-					auto value = emp->GetChild(valueName);
 					key->Create();
 					key->SetValue(JsonValueSource(element.first));
 					key->Complete();
-					std::visit(DocumentTreeIterate(value), element.second);
+					visit(emp->GetChild(valueName), element.second);
 					emp->Complete();
 				}
 			}
 			else {
 				for (const auto & element : o) {
-					auto emp = modelPart->GetChild(element.first);
-					if (emp) {
-						std::visit(DocumentTreeIterate(emp), element.second);
+					if (auto emp = modelPart->GetChild(element.first)) {
+						visit(std::move(emp), element.second);
 						emp->Complete();
 					}
 				}
@@ -206,18 +208,16 @@ namespace Slicer {
 		{
 			modelPart->Create();
 			for (const auto & element : a) {
-				auto emp = modelPart->GetAnonChild();
-				if (emp) {
+				if (auto emp = modelPart->GetAnonChild()) {
 					emp->Create();
-					std::visit(DocumentTreeIterate(emp), element);
+					visit(std::move(emp), element);
 					emp->Complete();
 				}
 			}
 			modelPart->Complete();
 		}
 
-	private:
-		ModelPartPtr & modelPart;
+		ModelPartPtr && modelPart;
 	};
 
 	void
@@ -372,9 +372,7 @@ namespace Slicer {
 	void
 	JsonStreamDeserializer::Deserialize(ModelPartForRootParam modelRoot)
 	{
-		json::Value obj = json::parseValue(strm);
-		auto mp = modelRoot->GetAnonChild();
-		std::visit(DocumentTreeIterate(mp), obj);
+		DocumentTreeIterate::visit(modelRoot->GetAnonChild(), json::parseValue(strm));
 	}
 
 	void
@@ -392,9 +390,7 @@ namespace Slicer {
 	JsonFileDeserializer::Deserialize(ModelPartForRootParam modelRoot)
 	{
 		std::ifstream inFile(path);
-		json::Value obj = json::parseValue(inFile);
-		auto mp = modelRoot->GetAnonChild();
-		std::visit(DocumentTreeIterate(mp), obj);
+		DocumentTreeIterate::visit(modelRoot->GetAnonChild(), json::parseValue(inFile));
 	}
 
 	JsonValueDeserializer::JsonValueDeserializer(const json::Value & v) : value(v) { }
@@ -402,8 +398,7 @@ namespace Slicer {
 	void
 	JsonValueDeserializer::Deserialize(ModelPartForRootParam modelRoot)
 	{
-		auto mp = modelRoot->GetAnonChild();
-		std::visit(DocumentTreeIterate(mp), value);
+		DocumentTreeIterate::visit(modelRoot->GetAnonChild(), value);
 	}
 
 	void
