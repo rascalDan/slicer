@@ -3,6 +3,7 @@
 
 #include <Ice/BuiltinSequences.h>
 #include <Ice/CommunicatorF.h>
+#include <c++11Helpers.h>
 #include <iosfwd>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
@@ -12,6 +13,8 @@ namespace Slicer {
 	class IceBase {
 	public:
 		virtual ~IceBase();
+
+		SPECIAL_MEMBERS_DELETE(IceBase);
 
 	protected:
 		IceBase();
