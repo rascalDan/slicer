@@ -9,6 +9,14 @@ namespace Slicer {
 		// NOLINTNEXTLINE(hicpp-explicit-conversions)
 		inline constexpr any_ptr(T * p) noexcept : ptr {p} { }
 
+		// cppcheck-suppress noExplicitConstructor
+		// NOLINTNEXTLINE(hicpp-explicit-conversions)
+		inline constexpr any_ptr(T & p) noexcept : ptr {&p} { }
+
+		// cppcheck-suppress noExplicitConstructor
+		// NOLINTNEXTLINE(hicpp-explicit-conversions)
+		inline constexpr any_ptr(T && p) noexcept : ptr {&p} { }
+
 		template<typename S>
 			requires requires(S p) { p.get(); }
 		// cppcheck-suppress noExplicitConstructor
