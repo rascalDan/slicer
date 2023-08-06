@@ -589,11 +589,11 @@ BOOST_AUTO_TEST_CASE(xml_streams)
 
 BOOST_AUTO_TEST_CASE(invalid_enum)
 {
-	auto jdeserializer = std::make_shared<Slicer::JsonFileDeserializer>(rootDir / "initial" / "invalidEnum.json");
+	Slicer::JsonFileDeserializer jdeserializer {rootDir / "initial" / "invalidEnum.json"};
 	BOOST_REQUIRE_THROW(
 			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
 
-	auto xdeserializer = std::make_shared<Slicer::XmlFileDeserializer>(rootDir / "initial" / "invalidEnum.xml");
+	Slicer::XmlFileDeserializer xdeserializer {rootDir / "initial" / "invalidEnum.xml"};
 	BOOST_REQUIRE_THROW(
 			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
