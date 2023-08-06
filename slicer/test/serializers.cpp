@@ -674,6 +674,18 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractImpl)
 	BOOST_CHECK_EQUAL("value", impl->testVal);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeJsonClassMap)
+{
+	TestModule::ClassMap d;
+	d[1] = std::make_shared<TestModule::ClassType>(1, 2);
+	d[2] = std::make_shared<TestModule::ClassType>(3, 4);
+	d[3] = std::make_shared<TestModule::ClassType>(5, 6);
+	std::stringstream out;
+	Slicer::SerializeAnyWith(d, Slicer::JsonStreamSerializer {out});
+	BOOST_CHECK_EQUAL(out.view(),
+			R"([{"key":1,"value":{"a":1,"b":2}},{"key":2,"value":{"a":3,"b":4}},{"key":3,"value":{"a":5,"b":6}}])");
+}
+
 BOOST_AUTO_TEST_CASE(DeserializeXmlIncorrectSeqElementName)
 {
 	std::stringstream in(R"X(

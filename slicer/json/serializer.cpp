@@ -354,8 +354,8 @@ namespace Slicer {
 					}
 					else {
 						*n = json::Array();
-						mp->OnEachChild([n](auto && PH1, auto && PH2, auto &&) {
-							return JsonSerializer::ModelTreeIterate(n, PH1, PH2);
+						mp->OnEachChild([&a = n->emplace<json::Array>()](auto &&, auto && PH2, auto &&) {
+							return JsonSerializer::ModelTreeIterateRoot(&a.emplace_back(), PH2);
 						});
 					}
 					break;
