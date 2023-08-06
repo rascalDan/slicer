@@ -237,15 +237,13 @@ namespace Slicer {
 		if (!mp->HasValue()) {
 			return;
 		}
-		auto obj = std::get_if<json::Object>(n);
 		json::Object::key_type k;
 		json::Value v;
 		json::Value kv;
 		mp->GetChild(keyName)->GetValue(JsonValueTarget(kv));
-		JsonValueSource s(kv);
-		s.set(k);
+		JsonValueSource(kv).set(k);
 		ModelTreeIterateRoot(&v, mp->GetChild(valueName));
-		obj->insert({k, v});
+		std::get_if<json::Object>(n)->emplace(std::move(k), std::move(v));
 	}
 
 	void
@@ -256,12 +254,11 @@ namespace Slicer {
 		}
 		switch (mp->GetType()) {
 			case ModelPartType::Null:
-				std::get<json::Object>(*n).insert({name, json::Null()});
+				std::get<json::Object>(*n).emplace(name, json::Null());
 				return;
 			case ModelPartType::Simple: {
-				json::Value v;
-				if (mp->GetValue(JsonValueTarget(v))) {
-					std::get<json::Object>(*n).insert({name, v});
+				if (json::Value v; mp->GetValue(JsonValueTarget(v))) {
+					std::get<json::Object>(*n).emplace(name, std::move(v));
 				}
 				break;
 			}
@@ -285,25 +282,24 @@ namespace Slicer {
 				break;
 			case ModelPartType::Sequence:
 				if (mp->HasValue()) {
-					mp->OnEachChild(
-							[capture0 = &std::get<json::Object>(*n).insert({name, json::Array()}).first->second](
-									auto &&, auto && PH2, auto &&) {
-								return JsonSerializer::ModelTreeIterateSeq(capture0, PH2);
-							});
+					mp->OnEachChild([capture0 = &std::get<json::Object>(*n).emplace(name, json::Array()).first->second](
+											auto &&, auto && PH2, auto &&) {
+						return JsonSerializer::ModelTreeIterateSeq(capture0, PH2);
+					});
 				}
 				break;
 			case ModelPartType::Dictionary:
 				if (mp->HasValue()) {
 					if (mp->GetMetadata().flagSet(md_object)) {
 						mp->OnEachChild(
-								[capture0 = &std::get<json::Object>(*n).insert({name, json::Object()}).first->second](
+								[capture0 = &std::get<json::Object>(*n).emplace(name, json::Object()).first->second](
 										auto &&, auto && PH2, auto &&) {
 									return JsonSerializer::ModelTreeIterateDictObj(capture0, PH2);
 								});
 					}
 					else {
 						mp->OnEachChild(
-								[capture0 = &std::get<json::Object>(*n).insert({name, json::Array()}).first->second](
+								[capture0 = &std::get<json::Object>(*n).emplace(name, json::Array()).first->second](
 										auto &&, auto && PH2, auto &&) {
 									return JsonSerializer::ModelTreeIterateSeq(capture0, PH2);
 								});
