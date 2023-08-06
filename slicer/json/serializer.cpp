@@ -26,199 +26,201 @@ NAMEDFACTORY("application/json", Slicer::JsonStreamSerializer, Slicer::StreamSer
 NAMEDFACTORY("application/json", Slicer::JsonStreamDeserializer, Slicer::StreamDeserializerFactory)
 
 namespace Slicer {
-	constexpr std::string_view md_object {"json:object"};
-	constexpr std::string_view keyName {"key"};
-	constexpr std::string_view valueName {"value"};
+	namespace {
+		constexpr std::string_view md_object {"json:object"};
+		constexpr std::string_view keyName {"key"};
+		constexpr std::string_view valueName {"value"};
 
-	using namespace std::placeholders;
+		using namespace std::placeholders;
 
-	class JsonValueSource : public ValueSource {
-	public:
-		explicit JsonValueSource(const json::Value & s) : value(s) { }
+		class JsonValueSource : public ValueSource {
+		public:
+			explicit JsonValueSource(const json::Value & s) : value(s) { }
 
-		void
-		set(bool & v) const override
-		{
-			v = std::get<bool>(value);
-		}
+			void
+			set(bool & v) const override
+			{
+				v = std::get<bool>(value);
+			}
 
-		void
-		set(Ice::Byte & v) const override
-		{
-			v = boost::numeric_cast<Ice::Byte>(std::get<json::Number>(value));
-		}
+			void
+			set(Ice::Byte & v) const override
+			{
+				v = boost::numeric_cast<Ice::Byte>(std::get<json::Number>(value));
+			}
 
-		void
-		set(Ice::Short & v) const override
-		{
-			v = boost::numeric_cast<Ice::Short>(std::get<json::Number>(value));
-		}
+			void
+			set(Ice::Short & v) const override
+			{
+				v = boost::numeric_cast<Ice::Short>(std::get<json::Number>(value));
+			}
 
-		void
-		set(Ice::Int & v) const override
-		{
-			v = boost::numeric_cast<Ice::Int>(std::get<json::Number>(value));
-		}
+			void
+			set(Ice::Int & v) const override
+			{
+				v = boost::numeric_cast<Ice::Int>(std::get<json::Number>(value));
+			}
 
-		void
-		set(Ice::Long & v) const override
-		{
-			v = boost::numeric_cast<Ice::Long>(std::get<json::Number>(value));
-		}
+			void
+			set(Ice::Long & v) const override
+			{
+				v = boost::numeric_cast<Ice::Long>(std::get<json::Number>(value));
+			}
 
-		void
-		set(Ice::Float & v) const override
-		{
-			v = boost::numeric_cast<Ice::Float>(std::get<json::Number>(value));
-		}
+			void
+			set(Ice::Float & v) const override
+			{
+				v = boost::numeric_cast<Ice::Float>(std::get<json::Number>(value));
+			}
 
-		void
-		set(Ice::Double & v) const override
-		{
-			v = boost::numeric_cast<Ice::Double>(std::get<json::Number>(value));
-		}
+			void
+			set(Ice::Double & v) const override
+			{
+				v = boost::numeric_cast<Ice::Double>(std::get<json::Number>(value));
+			}
 
-		void
-		set(std::string & v) const override
-		{
-			v = std::get<json::String>(value);
-		}
+			void
+			set(std::string & v) const override
+			{
+				v = std::get<json::String>(value);
+			}
 
-	private:
-		const json::Value & value;
-	};
+		private:
+			const json::Value & value;
+		};
 
-	class JsonValueTarget : public ValueTarget {
-	public:
-		explicit JsonValueTarget(json::Value & t) : target(t)
-		{
-			target = json::Null();
-		}
+		class JsonValueTarget : public ValueTarget {
+		public:
+			explicit JsonValueTarget(json::Value & t) : target(t)
+			{
+				target = json::Null();
+			}
 
-		void
-		get(const bool & value) const override
-		{
-			target = value;
-		}
+			void
+			get(const bool & value) const override
+			{
+				target = value;
+			}
 
-		void
-		get(const Ice::Byte & value) const override
-		{
-			target = boost::numeric_cast<json::Number>(value);
-		}
+			void
+			get(const Ice::Byte & value) const override
+			{
+				target = boost::numeric_cast<json::Number>(value);
+			}
 
-		void
-		get(const Ice::Short & value) const override
-		{
-			target = boost::numeric_cast<json::Number>(value);
-		}
+			void
+			get(const Ice::Short & value) const override
+			{
+				target = boost::numeric_cast<json::Number>(value);
+			}
 
-		void
-		get(const Ice::Int & value) const override
-		{
-			target = boost::numeric_cast<json::Number>(value);
-		}
+			void
+			get(const Ice::Int & value) const override
+			{
+				target = boost::numeric_cast<json::Number>(value);
+			}
 
-		void
-		get(const Ice::Long & value) const override
-		{
-			target = boost::numeric_cast<json::Number>(value);
-		}
+			void
+			get(const Ice::Long & value) const override
+			{
+				target = boost::numeric_cast<json::Number>(value);
+			}
 
-		void
-		get(const Ice::Float & value) const override
-		{
-			target = boost::numeric_cast<json::Number>(value);
-		}
+			void
+			get(const Ice::Float & value) const override
+			{
+				target = boost::numeric_cast<json::Number>(value);
+			}
 
-		void
-		get(const Ice::Double & value) const override
-		{
-			target = boost::numeric_cast<json::Number>(value);
-		}
+			void
+			get(const Ice::Double & value) const override
+			{
+				target = boost::numeric_cast<json::Number>(value);
+			}
 
-		void
-		get(const std::string & value) const override
-		{
-			target = value;
-		}
+			void
+			get(const std::string & value) const override
+			{
+				target = value;
+			}
 
-	private:
-		json::Value & target;
-	};
+		private:
+			json::Value & target;
+		};
 
-	class DocumentTreeIterate {
-	public:
-		static void
-		visit(ModelPartPtr && mp, const json::Value & v)
-		{
-			std::visit(DocumentTreeIterate {std::move(mp)}, v);
-		}
+		class DocumentTreeIterate {
+		public:
+			static void
+			visit(ModelPartPtr && mp, const json::Value & v)
+			{
+				std::visit(DocumentTreeIterate {std::move(mp)}, v);
+			}
 
-		template<typename SimpleT>
-		void
-		operator()(const SimpleT & v) const
-		{
-			modelPart->Create();
-			modelPart->SetValue(JsonValueSource(v));
-			modelPart->Complete();
-		}
+			template<typename SimpleT>
+			void
+			operator()(const SimpleT & v) const
+			{
+				modelPart->Create();
+				modelPart->SetValue(JsonValueSource(v));
+				modelPart->Complete();
+			}
 
-		void
-		operator()(const json::Null &) const
-		{
-			modelPart->Complete();
-		}
+			void
+			operator()(const json::Null &) const
+			{
+				modelPart->Complete();
+			}
 
-		void
-		operator()(const json::Object & o) const
-		{
-			if (auto typeIdName = modelPart->GetTypeIdProperty()) {
-				auto typeAttrItr = o.find(*typeIdName);
-				if (typeAttrItr != o.end() && std::holds_alternative<json::String>(typeAttrItr->second)) {
-					modelPart = modelPart->GetSubclassModelPart(std::get<json::String>(typeAttrItr->second));
+			void
+			operator()(const json::Object & o) const
+			{
+				if (auto typeIdName = modelPart->GetTypeIdProperty()) {
+					auto typeAttrItr = o.find(*typeIdName);
+					if (typeAttrItr != o.end() && std::holds_alternative<json::String>(typeAttrItr->second)) {
+						modelPart = modelPart->GetSubclassModelPart(std::get<json::String>(typeAttrItr->second));
+					}
+				}
+				modelPart->Create();
+				if (modelPart->GetMetadata().flagSet(md_object)) {
+					for (const auto & element : o) {
+						auto emp = modelPart->GetAnonChild();
+						emp->Create();
+						auto key = emp->GetChild(keyName);
+						key->Create();
+						key->SetValue(JsonValueSource(element.first));
+						key->Complete();
+						visit(emp->GetChild(valueName), element.second);
+						emp->Complete();
+					}
+				}
+				else {
+					for (const auto & element : o) {
+						if (auto emp = modelPart->GetChild(element.first)) {
+							visit(std::move(emp), element.second);
+							emp->Complete();
+						}
+					}
+					modelPart->Complete();
 				}
 			}
-			modelPart->Create();
-			if (modelPart->GetMetadata().flagSet(md_object)) {
-				for (const auto & element : o) {
-					auto emp = modelPart->GetAnonChild();
-					emp->Create();
-					auto key = emp->GetChild(keyName);
-					key->Create();
-					key->SetValue(JsonValueSource(element.first));
-					key->Complete();
-					visit(emp->GetChild(valueName), element.second);
-					emp->Complete();
-				}
-			}
-			else {
-				for (const auto & element : o) {
-					if (auto emp = modelPart->GetChild(element.first)) {
-						visit(std::move(emp), element.second);
+
+			void
+			operator()(const json::Array & a) const
+			{
+				modelPart->Create();
+				for (const auto & element : a) {
+					if (auto emp = modelPart->GetAnonChild()) {
+						emp->Create();
+						visit(std::move(emp), element);
 						emp->Complete();
 					}
 				}
 				modelPart->Complete();
 			}
-		}
 
-		void
-		operator()(const json::Array & a) const
-		{
-			modelPart->Create();
-			for (const auto & element : a) {
-				if (auto emp = modelPart->GetAnonChild()) {
-					emp->Create();
-					visit(std::move(emp), element);
-					emp->Complete();
-				}
-			}
-			modelPart->Complete();
-		}
-
-		ModelPartPtr && modelPart;
-	};
+			ModelPartPtr && modelPart;
+		};
+	}
 
 	void
 	JsonSerializer::ModelTreeIterateSeq(json::Value * n, ModelPartParam mp)
