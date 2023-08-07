@@ -16,7 +16,7 @@ namespace Slicer {
 		static void ModelTreeIterate(json::Object &, const std::string &, ModelPartParam mp);
 		static void ModelTreeIterateDictObj(json::Object &, ModelPartParam mp);
 		static void ModelTreeIterateSeq(json::Array &, ModelPartParam mp);
-		static void ModelTreeIterateRoot(json::Value &, ModelPartParam mp);
+		static void ModelTreeIterateTo(const std::function<json::Value &()> &, ModelPartParam mp);
 	};
 
 	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
