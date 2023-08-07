@@ -11,15 +11,7 @@
 #include <visibility.h>
 
 namespace Slicer {
-	class JsonSerializer : public Serializer {
-	protected:
-		static void ModelTreeIterate(json::Object &, const std::string &, ModelPartParam mp);
-		static void ModelTreeIterateDictObj(json::Object &, ModelPartParam mp);
-		static void ModelTreeIterateSeq(json::Array &, ModelPartParam mp);
-		static void ModelTreeIterateTo(const std::function<json::Value &()> &, ModelPartParam mp);
-	};
-
-	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonValueSerializer : public Serializer {
 	public:
 		void Serialize(ModelPartForRootParam) override;
 

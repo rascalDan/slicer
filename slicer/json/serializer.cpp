@@ -220,104 +220,106 @@ namespace Slicer {
 
 			ModelPartPtr && modelPart;
 		};
-	}
 
-	void
-	JsonSerializer::ModelTreeIterateSeq(json::Array & a, ModelPartParam mp)
-	{
-		if (!mp->HasValue()) {
-			return;
+		void ModelTreeIterateTo(const std::function<json::Value &()> &, ModelPartParam mp);
+
+		void
+		ModelTreeIterateSeq(json::Array & a, ModelPartParam mp)
+		{
+			if (!mp->HasValue()) {
+				return;
+			}
+
+			ModelTreeIterateTo(
+					[&a]() -> json::Value & {
+						return a.emplace_back();
+					},
+					mp);
 		}
 
-		ModelTreeIterateTo(
-				[&a]() -> json::Value & {
-					return a.emplace_back();
-				},
-				mp);
-	}
-
-	void
-	JsonSerializer::ModelTreeIterateDictObj(json::Object & d, ModelPartParam mp)
-	{
-		if (!mp->HasValue()) {
-			return;
+		void
+		ModelTreeIterateDictObj(json::Object & d, ModelPartParam mp)
+		{
+			if (!mp->HasValue()) {
+				return;
+			}
+			ModelTreeIterateTo(
+					[&d, mp]() -> json::Value & {
+						json::Object::key_type k;
+						json::Value kv;
+						mp->GetChild(keyName)->GetValue(JsonValueTarget(kv));
+						JsonValueSource(kv).set(k);
+						return d[std::move(k)];
+					},
+					mp->GetChild(valueName));
 		}
-		ModelTreeIterateTo(
-				[&d, mp]() -> json::Value & {
-					json::Object::key_type k;
-					json::Value kv;
-					mp->GetChild(keyName)->GetValue(JsonValueTarget(kv));
-					JsonValueSource(kv).set(k);
-					return d[std::move(k)];
-				},
-				mp->GetChild(valueName));
-	}
 
-	void
-	JsonSerializer::ModelTreeIterate(json::Object & o, const std::string & name, ModelPartParam mp)
-	{
-		if (name.empty()) {
-			return;
+		void
+		ModelTreeIterate(json::Object & o, const std::string & name, ModelPartParam mp)
+		{
+			if (name.empty()) {
+				return;
+			}
+			ModelTreeIterateTo(
+					[&o, &name]() -> json::Value & {
+						return o[name];
+					},
+					mp);
 		}
-		ModelTreeIterateTo(
-				[&o, &name]() -> json::Value & {
-					return o[name];
-				},
-				mp);
-	}
 
-	void
-	JsonSerializer::ModelTreeIterateTo(const std::function<json::Value &()> & n, ModelPartParam mp)
-	{
-		if (mp) {
-			switch (mp->GetType()) {
-				case ModelPartType::Null:
-					n().emplace<json::Null>();
-					break;
-				case ModelPartType::Simple:
-					if (json::Value v; mp->GetValue(JsonValueTarget(v))) {
-						n() = std::move(v);
-					}
-					break;
-				case ModelPartType::Complex:
-					if (mp->HasValue()) {
-						auto oec = [&n](const auto & lmp) {
-							auto & obj = n().emplace<json::Object>();
-							lmp->OnEachChild([&obj](auto && PH1, auto && PH2, auto &&) {
-								return JsonSerializer::ModelTreeIterate(obj, PH1, PH2);
+		void
+		ModelTreeIterateTo(const std::function<json::Value &()> & n, ModelPartParam mp)
+		{
+			if (mp) {
+				switch (mp->GetType()) {
+					case ModelPartType::Null:
+						n().emplace<json::Null>();
+						break;
+					case ModelPartType::Simple:
+						if (json::Value v; mp->GetValue(JsonValueTarget(v))) {
+							n() = std::move(v);
+						}
+						break;
+					case ModelPartType::Complex:
+						if (mp->HasValue()) {
+							auto oec = [&n](const auto & lmp) {
+								auto & obj = n().emplace<json::Object>();
+								lmp->OnEachChild([&obj](auto && PH1, auto && PH2, auto &&) {
+									return ModelTreeIterate(obj, PH1, PH2);
+								});
+								return &obj;
+							};
+							if (auto typeIdName = mp->GetTypeIdProperty()) {
+								if (auto typeId = mp->GetTypeId()) {
+									oec(mp->GetSubclassModelPart(*typeId))->emplace(*typeIdName, *typeId);
+									return;
+								}
+							}
+							oec(mp);
+						}
+						break;
+					case ModelPartType::Sequence:
+						if (mp->HasValue()) {
+							mp->OnEachChild([&arr = n().emplace<json::Array>()](auto &&, auto && PH2, auto &&) {
+								return ModelTreeIterateSeq(arr, PH2);
 							});
-							return &obj;
-						};
-						if (auto typeIdName = mp->GetTypeIdProperty()) {
-							if (auto typeId = mp->GetTypeId()) {
-								oec(mp->GetSubclassModelPart(*typeId))->emplace(*typeIdName, *typeId);
-								return;
+						}
+						break;
+					case ModelPartType::Dictionary:
+						if (mp->HasValue()) {
+							if (mp->GetMetadata().flagSet(md_object)) {
+								mp->OnEachChild([&obj = n().emplace<json::Object>()](auto &&, auto && PH2, auto &&) {
+									return ModelTreeIterateDictObj(obj, PH2);
+								});
+							}
+							else {
+								mp->OnEachChild([&arr = n().emplace<json::Array>()](auto &&, auto && PH2, auto &&) {
+									return ModelTreeIterateSeq(arr, PH2);
+								});
 							}
 						}
-						oec(mp);
-					}
-					break;
-				case ModelPartType::Sequence:
-					if (mp->HasValue()) {
-						mp->OnEachChild([&arr = n().emplace<json::Array>()](auto &&, auto && PH2, auto &&) {
-							return JsonSerializer::ModelTreeIterateSeq(arr, PH2);
-						});
-					}
-					break;
-				case ModelPartType::Dictionary:
-					if (mp->HasValue()) {
-						if (mp->GetMetadata().flagSet(md_object)) {
-							mp->OnEachChild([&obj = n().emplace<json::Object>()](auto &&, auto && PH2, auto &&) {
-								return JsonSerializer::ModelTreeIterateDictObj(obj, PH2);
-							});
-						}
-						else {
-							mp->OnEachChild([&arr = n().emplace<json::Array>()](auto &&, auto && PH2, auto &&) {
-								return JsonSerializer::ModelTreeIterateSeq(arr, PH2);
-							});
-						}
-					}
-					break;
+						break;
+				}
 			}
 		}
 	}
@@ -362,7 +364,7 @@ namespace Slicer {
 	JsonValueSerializer::Serialize(ModelPartForRootParam modelRoot)
 	{
 		modelRoot->OnEachChild([this](auto &&, auto && PH2, auto &&) {
-			return JsonSerializer::ModelTreeIterateTo(
+			return ModelTreeIterateTo(
 					[this]() -> json::Value & {
 						return value;
 					},
