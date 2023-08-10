@@ -58,7 +58,13 @@ namespace Slicer {
 
 		class XmlValueSource : public ValueSource {
 		public:
+			explicit XmlValueSource() = default;
+
 			explicit XmlValueSource(Glib::ustring s) : value(std::move(s)) { }
+
+			explicit XmlValueSource(const xmlpp::ContentNode * c) : value(c->get_content()) { }
+
+			explicit XmlValueSource(const xmlpp::Attribute * a) : value(a->get_value()) { }
 
 			void
 			set(bool & v) const override
@@ -130,21 +136,32 @@ namespace Slicer {
 			const Glib::ustring value;
 		};
 
-		class XmlContentValueSource : public XmlValueSource {
-		public:
-			explicit XmlContentValueSource() : XmlValueSource(Glib::ustring()) { }
-
-			explicit XmlContentValueSource(const xmlpp::ContentNode * c) : XmlValueSource(c->get_content()) { }
-		};
-
-		class XmlAttributeValueSource : public XmlValueSource {
-		public:
-			explicit XmlAttributeValueSource(const xmlpp::Attribute * a) : XmlValueSource(a->get_value()) { }
-		};
-
 		class XmlValueTarget : public ValueTarget {
 		public:
-			explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) : apply(std::move(a)) { }
+			using ApplyFunction = std::function<void(const Glib::ustring &)>;
+
+			explicit XmlValueTarget(ApplyFunction a) : apply(std::move(a)) { }
+
+			explicit XmlValueTarget(xmlpp::Element * p, const std::string & n) :
+				apply([p, n](auto && PH1) {
+					p->set_attribute(n, PH1);
+				})
+			{
+			}
+
+			explicit XmlValueTarget(xmlpp::Element * p) :
+				apply([p](auto && PH1) {
+					p->set_first_child_text(PH1);
+				})
+			{
+			}
+
+			explicit XmlValueTarget(const CurrentElementCreator & cec) :
+				apply([&](auto && PH1) {
+					cec->set_first_child_text(PH1);
+				})
+			{
+			}
 
 			void
 			get(const bool & value) const override
@@ -200,34 +217,7 @@ namespace Slicer {
 			}
 
 		private:
-			const std::function<void(const Glib::ustring &)> apply;
-		};
-
-		class XmlAttributeValueTarget : public XmlValueTarget {
-		public:
-			explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
-				XmlValueTarget([p, n](auto && PH1) {
-					p->set_attribute(n, PH1);
-				})
-			{
-			}
-		};
-
-		class XmlContentValueTarget : public XmlValueTarget {
-		public:
-			explicit XmlContentValueTarget(xmlpp::Element * p) :
-				XmlValueTarget([p](auto && PH1) {
-					p->set_first_child_text(PH1);
-				})
-			{
-			}
-
-			explicit XmlContentValueTarget(const CurrentElementCreator & cec) :
-				XmlValueTarget([&](auto && PH1) {
-					cec->set_first_child_text(PH1);
-				})
-			{
-			}
+			const ApplyFunction apply;
 		};
 
 		void DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp);
@@ -295,7 +285,7 @@ namespace Slicer {
 						DocumentTreeIterate(firstChild, lmp);
 					}
 					else {
-						lmp->SetValue(XmlContentValueSource());
+						lmp->SetValue(XmlValueSource());
 					}
 				}
 				lmp->Complete();
@@ -333,7 +323,7 @@ namespace Slicer {
 					});
 					if (smp) {
 						smp->Create();
-						smp->SetValue(XmlAttributeValueSource(attribute));
+						smp->SetValue(XmlValueSource(attribute));
 						smp->Complete();
 					}
 				}
@@ -345,10 +335,10 @@ namespace Slicer {
 						});
 					}
 					if (smp) {
-						smp->SetValue(XmlContentValueSource(content));
+						smp->SetValue(XmlValueSource(content));
 					}
 					else {
-						mp->SetValue(XmlContentValueSource(content));
+						mp->SetValue(XmlValueSource(content));
 					}
 				}
 				node = node->get_next_sibling();
@@ -376,10 +366,10 @@ namespace Slicer {
 				return;
 			}
 			if (hp && hp->GetMetadata().flagSet(md_attribute)) {
-				mp->GetValue(XmlAttributeValueTarget(n, name));
+				mp->GetValue(XmlValueTarget(n, name));
 			}
 			else if (hp && hp->GetMetadata().flagSet(md_text)) {
-				mp->GetValue(XmlContentValueTarget(n));
+				mp->GetValue(XmlValueTarget(n));
 			}
 			else if (hp && hp->GetMetadata().flagSet(md_attributes)) {
 				ModelTreeIterateDictAttrs(n->add_child_element(name), mp);
@@ -408,7 +398,7 @@ namespace Slicer {
 			dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 				if (mp->HasValue()) {
 					mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
-						mp->GetChild(valueName)->GetValue(XmlAttributeValueTarget(element, name));
+						mp->GetChild(valueName)->GetValue(XmlValueTarget(element, name));
 					}));
 				}
 			});
@@ -433,7 +423,7 @@ namespace Slicer {
 		ModelTreeProcessElement(const CurrentElementCreator & cec, ModelPartParam mp, const ElementCreator & ec)
 		{
 			if (mp->GetType() == ModelPartType::Simple) {
-				mp->GetValue(XmlContentValueTarget(cec));
+				mp->GetValue(XmlValueTarget(cec));
 			}
 			else if (mp->HasValue()) {
 				auto oec = [element = cec.get(), &ec](const auto & lmp) {
