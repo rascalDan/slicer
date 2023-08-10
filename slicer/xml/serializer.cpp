@@ -379,18 +379,16 @@ namespace Slicer {
 			else if (hp && hp->GetMetadata().flagSet(md_elements)) {
 				ModelTreeIterateDictElements(n->add_child_element(name), mp);
 			}
+			else if (hp && hp->GetMetadata().flagSet(md_bare)) {
+				ModelTreeProcessElement(n, mp, [name](auto && PH1, auto &&) {
+					return PH1->add_child_element(name);
+				});
+			}
 			else {
-				if (hp && hp->GetMetadata().flagSet(md_bare)) {
-					ModelTreeProcessElement(n, mp, [name](auto && PH1, auto &&) {
-						return PH1->add_child_element(name);
-					});
-				}
-				else {
-					CurrentElementCreator cec([ec, n, name] {
-						return ec(n, name);
-					});
-					ModelTreeProcessElement(cec, mp, defaultElementCreator);
-				}
+				CurrentElementCreator cec([ec, n, name] {
+					return ec(n, name);
+				});
+				ModelTreeProcessElement(cec, mp, defaultElementCreator);
 			}
 		}
 
