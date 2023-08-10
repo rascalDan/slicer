@@ -10,16 +10,16 @@
 #endif
 #include <glibmm/ustring.h>
 #include <libxml++/attribute.h>
+#include <libxml++/document.h>
 #include <libxml++/nodes/contentnode.h>
 #include <libxml++/nodes/element.h>
 #include <libxml++/nodes/node.h>
+#include <libxml++/parsers/domparser.h>
 #pragma GCC diagnostic pop
 #include <Ice/Config.h>
 #include <boost/numeric/conversion/cast.hpp>
 #include <factory.h>
 #include <lazyPointer.h>
-#include <libxml++/document.h>
-#include <libxml++/parsers/domparser.h>
 #include <list>
 #include <memory>
 #include <optional>
@@ -37,411 +37,426 @@ NAMEDFACTORY("application/xml", Slicer::XmlStreamSerializer, Slicer::StreamSeria
 NAMEDFACTORY("application/xml", Slicer::XmlStreamDeserializer, Slicer::StreamDeserializerFactory)
 
 namespace Slicer {
-	constexpr std::string_view md_attribute {"xml:attribute"};
-	constexpr std::string_view md_text {"xml:text"};
-	constexpr std::string_view md_bare {"xml:bare"};
-	constexpr std::string_view md_attributes {"xml:attributes"};
-	constexpr std::string_view md_elements {"xml:elements"};
-	constexpr std::string_view keyName {"key"};
-	constexpr std::string_view valueName {"value"};
+	namespace {
+		constexpr std::string_view md_attribute {"xml:attribute"};
+		constexpr std::string_view md_text {"xml:text"};
+		constexpr std::string_view md_bare {"xml:bare"};
+		constexpr std::string_view md_attributes {"xml:attributes"};
+		constexpr std::string_view md_elements {"xml:elements"};
+		constexpr std::string_view keyName {"key"};
+		constexpr std::string_view valueName {"value"};
 
-	constexpr auto defaultElementCreator = [](auto && element, auto && name) {
-		return element->add_child_element(name);
-	};
+		using CurrentElementCreator = ::AdHoc::LazyPointer<xmlpp::Element, xmlpp::Element *>;
+		using ElementCreator = std::function<xmlpp::Element *(xmlpp::Element *, const Glib::ustring &)>;
 
-	static const Glib::ustring TrueText("true");
-	static const Glib::ustring FalseText("false");
+		constexpr auto defaultElementCreator = [](auto && element, auto && name) {
+			return element->add_child_element(name);
+		};
 
-	class XmlValueSource : public ValueSource {
-	public:
-		explicit XmlValueSource(Glib::ustring s) : value(std::move(s)) { }
+		const Glib::ustring TrueText("true");
+		const Glib::ustring FalseText("false");
 
-		void
-		set(bool & v) const override
-		{
-			if (value == TrueText) {
-				v = true;
-				return;
+		class XmlValueSource : public ValueSource {
+		public:
+			explicit XmlValueSource(Glib::ustring s) : value(std::move(s)) { }
+
+			void
+			set(bool & v) const override
+			{
+				if (value == TrueText) {
+					v = true;
+					return;
+				}
+				if (value == FalseText) {
+					v = false;
+					return;
+				}
+				throw BadBooleanValue(value);
 			}
-			if (value == FalseText) {
-				v = false;
-				return;
+
+			void
+			set(Ice::Byte & v) const override
+			{
+				from_chars(v);
 			}
-			throw BadBooleanValue(value);
-		}
 
-		void
-		set(Ice::Byte & v) const override
-		{
-			from_chars(v);
-		}
-
-		void
-		set(Ice::Short & v) const override
-		{
-			from_chars(v);
-		}
-
-		void
-		set(Ice::Int & v) const override
-		{
-			from_chars(v);
-		}
-
-		void
-		set(Ice::Long & v) const override
-		{
-			from_chars(v);
-		}
-
-		void
-		set(Ice::Float & v) const override
-		{
-			from_chars(v);
-		}
-
-		void
-		set(Ice::Double & v) const override
-		{
-			from_chars(v);
-		}
-
-		void
-		set(std::string & v) const override
-		{
-			v = value.raw();
-		}
-
-	private:
-		template<typename T>
-		void
-		from_chars(T & v) const
-		{
-			std::string_view raw {value.raw()};
-			if (std::from_chars(raw.begin(), raw.end(), v).ec != std::errc {}) {
-				throw BadNumericValue(value);
+			void
+			set(Ice::Short & v) const override
+			{
+				from_chars(v);
 			}
-		}
 
-		const Glib::ustring value;
-	};
-
-	class XmlContentValueSource : public XmlValueSource {
-	public:
-		explicit XmlContentValueSource() : XmlValueSource(Glib::ustring()) { }
-
-		explicit XmlContentValueSource(const xmlpp::ContentNode * c) : XmlValueSource(c->get_content()) { }
-	};
-
-	class XmlAttributeValueSource : public XmlValueSource {
-	public:
-		explicit XmlAttributeValueSource(const xmlpp::Attribute * a) : XmlValueSource(a->get_value()) { }
-	};
-
-	class XmlValueTarget : public ValueTarget {
-	public:
-		explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) : apply(std::move(a)) { }
-
-		void
-		get(const bool & value) const override
-		{
-			if (value) {
-				apply(TrueText);
+			void
+			set(Ice::Int & v) const override
+			{
+				from_chars(v);
 			}
-			else {
-				apply(FalseText);
+
+			void
+			set(Ice::Long & v) const override
+			{
+				from_chars(v);
 			}
-		}
+
+			void
+			set(Ice::Float & v) const override
+			{
+				from_chars(v);
+			}
+
+			void
+			set(Ice::Double & v) const override
+			{
+				from_chars(v);
+			}
+
+			void
+			set(std::string & v) const override
+			{
+				v = value.raw();
+			}
+
+		private:
+			template<typename T>
+			void
+			from_chars(T & v) const
+			{
+				std::string_view raw {value.raw()};
+				if (std::from_chars(raw.begin(), raw.end(), v).ec != std::errc {}) {
+					throw BadNumericValue(value);
+				}
+			}
+
+			const Glib::ustring value;
+		};
+
+		class XmlContentValueSource : public XmlValueSource {
+		public:
+			explicit XmlContentValueSource() : XmlValueSource(Glib::ustring()) { }
+
+			explicit XmlContentValueSource(const xmlpp::ContentNode * c) : XmlValueSource(c->get_content()) { }
+		};
+
+		class XmlAttributeValueSource : public XmlValueSource {
+		public:
+			explicit XmlAttributeValueSource(const xmlpp::Attribute * a) : XmlValueSource(a->get_value()) { }
+		};
+
+		class XmlValueTarget : public ValueTarget {
+		public:
+			explicit XmlValueTarget(std::function<void(const Glib::ustring &)> a) : apply(std::move(a)) { }
+
+			void
+			get(const bool & value) const override
+			{
+				if (value) {
+					apply(TrueText);
+				}
+				else {
+					apply(FalseText);
+				}
+			}
+
+			void
+			get(const Ice::Byte & value) const override
+			{
+				apply(Glib::ustring::format(value));
+			}
+
+			void
+			get(const Ice::Short & value) const override
+			{
+				apply(Glib::ustring::format(value));
+			}
+
+			void
+			get(const Ice::Int & value) const override
+			{
+				apply(Glib::ustring::format(value));
+			}
+
+			void
+			get(const Ice::Long & value) const override
+			{
+				apply(Glib::ustring::format(value));
+			}
+
+			void
+			get(const Ice::Float & value) const override
+			{
+				apply(Glib::ustring::format(value));
+			}
+
+			void
+			get(const Ice::Double & value) const override
+			{
+				apply(Glib::ustring::format(value));
+			}
+
+			void
+			get(const std::string & value) const override
+			{
+				apply(value);
+			}
+
+		private:
+			const std::function<void(const Glib::ustring &)> apply;
+		};
+
+		class XmlAttributeValueTarget : public XmlValueTarget {
+		public:
+			explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
+				XmlValueTarget([p, n](auto && PH1) {
+					p->set_attribute(n, PH1);
+				})
+			{
+			}
+		};
+
+		class XmlContentValueTarget : public XmlValueTarget {
+		public:
+			explicit XmlContentValueTarget(xmlpp::Element * p) :
+				XmlValueTarget([p](auto && PH1) {
+					p->set_first_child_text(PH1);
+				})
+			{
+			}
+
+			explicit XmlContentValueTarget(const CurrentElementCreator & cec) :
+				XmlValueTarget([&](auto && PH1) {
+					cec->set_first_child_text(PH1);
+				})
+			{
+			}
+		};
+
+		void DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp);
+		void DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam mp, const ChildRef & c);
+		void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartParam mp);
+		void DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict);
+		void DocumentTreeIterateDictElements(const xmlpp::Element * parent, ModelPartParam dict);
 
 		void
-		get(const Ice::Byte & value) const override
+		DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict)
 		{
-			apply(Glib::ustring::format(value));
-		}
-
-		void
-		get(const Ice::Short & value) const override
-		{
-			apply(Glib::ustring::format(value));
-		}
-
-		void
-		get(const Ice::Int & value) const override
-		{
-			apply(Glib::ustring::format(value));
-		}
-
-		void
-		get(const Ice::Long & value) const override
-		{
-			apply(Glib::ustring::format(value));
-		}
-
-		void
-		get(const Ice::Float & value) const override
-		{
-			apply(Glib::ustring::format(value));
-		}
-
-		void
-		get(const Ice::Double & value) const override
-		{
-			apply(Glib::ustring::format(value));
-		}
-
-		void
-		get(const std::string & value) const override
-		{
-			apply(value);
-		}
-
-	private:
-		const std::function<void(const Glib::ustring &)> apply;
-	};
-
-	class XmlAttributeValueTarget : public XmlValueTarget {
-	public:
-		explicit XmlAttributeValueTarget(xmlpp::Element * p, const std::string & n) :
-			XmlValueTarget([p, n](auto && PH1) {
-				p->set_attribute(n, PH1);
-			})
-		{
-		}
-	};
-
-	class XmlContentValueTarget : public XmlValueTarget {
-	public:
-		explicit XmlContentValueTarget(xmlpp::Element * p) :
-			XmlValueTarget([p](auto && PH1) {
-				p->set_first_child_text(PH1);
-			})
-		{
-		}
-
-		explicit XmlContentValueTarget(const CurrentElementCreator & cec) :
-			XmlValueTarget([&](auto && PH1) {
-				cec->set_first_child_text(PH1);
-			})
-		{
-		}
-	};
-
-	void
-	XmlDeserializer::DocumentTreeIterateDictAttrs(
-			const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict)
-	{
-		for (const auto & attr : attrs) {
-			auto emp = dict->GetAnonChild();
-			emp->Create();
-			auto key = emp->GetChild(keyName);
-			auto value = emp->GetChild(valueName);
-			key->SetValue(XmlValueSource(attr->get_name()));
-			key->Complete();
-			value->SetValue(XmlValueSource(attr->get_value()));
-			value->Complete();
-			emp->Complete();
-		}
-	}
-
-	void
-	XmlDeserializer::DocumentTreeIterateDictElements(const xmlpp::Element * element, ModelPartParam dict)
-	{
-		auto node = element->get_first_child();
-		while (node) {
-			if (auto childElement = dynamic_cast<const xmlpp::Element *>(node)) {
+			for (const auto & attr : attrs) {
 				auto emp = dict->GetAnonChild();
 				emp->Create();
 				auto key = emp->GetChild(keyName);
-				auto value = emp->GetChildRef(valueName);
-				key->SetValue(XmlValueSource(childElement->get_name()));
+				auto value = emp->GetChild(valueName);
+				key->SetValue(XmlValueSource(attr->get_name()));
 				key->Complete();
-				DocumentTreeIterateElement(childElement, value.Child(), value);
+				value->SetValue(XmlValueSource(attr->get_value()));
+				value->Complete();
 				emp->Complete();
 			}
-			node = node->get_next_sibling();
 		}
-	}
 
-	void
-	XmlDeserializer::DocumentTreeIterateElement(
-			const xmlpp::Element * element, ModelPartParam smp, const ChildRef & smpr)
-	{
-		auto oec = [&smpr, element](const auto & lmp) {
-			lmp->Create();
-			if (smpr.ChildMetaData().flagSet(md_attributes)) {
-				auto attrs(element->get_attributes());
-				if (!attrs.empty()) {
-					DocumentTreeIterateDictAttrs(attrs, lmp);
+		void
+		DocumentTreeIterateDictElements(const xmlpp::Element * element, ModelPartParam dict)
+		{
+			auto node = element->get_first_child();
+			while (node) {
+				if (auto childElement = dynamic_cast<const xmlpp::Element *>(node)) {
+					auto emp = dict->GetAnonChild();
+					emp->Create();
+					auto key = emp->GetChild(keyName);
+					auto value = emp->GetChildRef(valueName);
+					key->SetValue(XmlValueSource(childElement->get_name()));
+					key->Complete();
+					DocumentTreeIterateElement(childElement, value.Child(), value);
+					emp->Complete();
 				}
-			}
-			else if (smpr.ChildMetaData().flagSet(md_elements)) {
-				DocumentTreeIterateDictElements(element, lmp);
-			}
-			else {
-				auto attrs(element->get_attributes());
-				if (!attrs.empty()) {
-					DocumentTreeIterate(attrs.front(), lmp);
-				}
-				auto firstChild = element->get_first_child();
-				if (firstChild) {
-					DocumentTreeIterate(firstChild, lmp);
-				}
-				else {
-					lmp->SetValue(XmlContentValueSource());
-				}
-			}
-			lmp->Complete();
-		};
-		if (auto typeIdPropName = smp->GetTypeIdProperty()) {
-			if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
-				oec(smp->GetSubclassModelPart(typeAttr->get_value()));
-				return;
+				node = node->get_next_sibling();
 			}
 		}
-		oec(smp);
-	}
 
-	void
-	XmlDeserializer::DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp)
-	{
-		while (node) {
-			if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
-				auto smpr = mp->GetChildRef(element->get_name().raw(), [](const auto & h) {
-					return h->GetMetadata().flagNotSet(md_attribute);
-				});
-				if (smpr) {
-					auto smp = smpr.Child();
-					if (smpr.ChildMetaData().flagSet(md_bare)) {
-						smp = smp->GetAnonChild();
-					}
-					if (smp) {
-						DocumentTreeIterateElement(element, smp, smpr);
+		void
+		DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam smp, const ChildRef & smpr)
+		{
+			auto oec = [&smpr, element](const auto & lmp) {
+				lmp->Create();
+				if (smpr.ChildMetaData().flagSet(md_attributes)) {
+					auto attrs(element->get_attributes());
+					if (!attrs.empty()) {
+						DocumentTreeIterateDictAttrs(attrs, lmp);
 					}
 				}
-			}
-			else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
-				auto smp = mp->GetChild(attribute->get_name().raw(), [](const auto & h) {
-					return h->GetMetadata().flagSet(md_attribute);
-				});
-				if (smp) {
-					smp->Create();
-					smp->SetValue(XmlAttributeValueSource(attribute));
-					smp->Complete();
-				}
-			}
-			else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
-				ModelPartPtr smp;
-				if (!content->is_white_space()) {
-					smp = mp->GetAnonChild([](const auto & h) {
-						return h->GetMetadata().flagSet(md_text);
-					});
-				}
-				if (smp) {
-					smp->SetValue(XmlContentValueSource(content));
+				else if (smpr.ChildMetaData().flagSet(md_elements)) {
+					DocumentTreeIterateDictElements(element, lmp);
 				}
 				else {
-					mp->SetValue(XmlContentValueSource(content));
+					auto attrs(element->get_attributes());
+					if (!attrs.empty()) {
+						DocumentTreeIterate(attrs.front(), lmp);
+					}
+					auto firstChild = element->get_first_child();
+					if (firstChild) {
+						DocumentTreeIterate(firstChild, lmp);
+					}
+					else {
+						lmp->SetValue(XmlContentValueSource());
+					}
 				}
-			}
-			node = node->get_next_sibling();
-		}
-	}
-
-	void
-	XmlDeserializer::DocumentTreeIterate(const xmlpp::Document * doc, ModelPartParam mp)
-	{
-		DocumentTreeIterate(doc->get_root_node(), mp);
-	}
-
-	void
-	XmlSerializer::ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartParam mp,
-			const HookCommon * hp, const ElementCreator & ec)
-	{
-		if (name.empty()) {
-			return;
-		}
-		if (hp && hp->GetMetadata().flagSet(md_attribute)) {
-			mp->GetValue(XmlAttributeValueTarget(n, name));
-		}
-		else if (hp && hp->GetMetadata().flagSet(md_text)) {
-			mp->GetValue(XmlContentValueTarget(n));
-		}
-		else if (hp && hp->GetMetadata().flagSet(md_attributes)) {
-			ModelTreeIterateDictAttrs(n->add_child_element(name), mp);
-		}
-		else if (hp && hp->GetMetadata().flagSet(md_elements)) {
-			ModelTreeIterateDictElements(n->add_child_element(name), mp);
-		}
-		else {
-			if (hp && hp->GetMetadata().flagSet(md_bare)) {
-				ModelTreeProcessElement(n, mp, [name](auto && PH1, auto &&) {
-					return PH1->add_child_element(name);
-				});
-			}
-			else {
-				CurrentElementCreator cec([ec, n, name] {
-					return ec(n, name);
-				});
-				ModelTreeProcessElement(cec, mp, defaultElementCreator);
-			}
-		}
-	}
-
-	void
-	XmlSerializer::ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartParam dict)
-	{
-		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
-			if (mp->HasValue()) {
-				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
-					mp->GetChild(valueName)->GetValue(XmlAttributeValueTarget(element, name));
-				}));
-			}
-		});
-	}
-
-	void
-	XmlSerializer::ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartParam dict)
-	{
-		dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
-			if (mp->HasValue()) {
-				mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
-					CurrentElementCreator cec([&element, &name]() {
-						return element->add_child_element(name);
-					});
-					ModelTreeProcessElement(cec, mp->GetChild(valueName), defaultElementCreator);
-				}));
-			}
-		});
-	}
-
-	void
-	XmlSerializer::ModelTreeProcessElement(
-			const CurrentElementCreator & cec, ModelPartParam mp, const ElementCreator & ec)
-	{
-		if (mp->GetType() == ModelPartType::Simple) {
-			mp->GetValue(XmlContentValueTarget(cec));
-		}
-		else if (mp->HasValue()) {
-			auto oec = [element = cec.get(), &ec](const auto & lmp) {
-				lmp->OnEachChild([element, &ec](auto && PH1, auto && PH2, auto && PH3) {
-					return XmlSerializer::ModelTreeIterate(element, PH1, PH2, PH3, ec);
-				});
-				return element;
+				lmp->Complete();
 			};
-			if (auto typeIdPropName = mp->GetTypeIdProperty()) {
-				if (auto typeId = mp->GetTypeId()) {
-					oec(mp->GetSubclassModelPart(*typeId))->set_attribute(*typeIdPropName, *typeId);
+			if (auto typeIdPropName = smp->GetTypeIdProperty()) {
+				if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
+					oec(smp->GetSubclassModelPart(typeAttr->get_value()));
 					return;
 				}
 			}
-			oec(mp);
+			oec(smp);
 		}
-	}
 
-	void
-	XmlSerializer::ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartParam mp)
-	{
-		ModelTreeProcessElement(doc->create_root_node(name), mp, defaultElementCreator);
+		void
+		DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp)
+		{
+			while (node) {
+				if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
+					auto smpr = mp->GetChildRef(element->get_name().raw(), [](const auto & h) {
+						return h->GetMetadata().flagNotSet(md_attribute);
+					});
+					if (smpr) {
+						auto smp = smpr.Child();
+						if (smpr.ChildMetaData().flagSet(md_bare)) {
+							smp = smp->GetAnonChild();
+						}
+						if (smp) {
+							DocumentTreeIterateElement(element, smp, smpr);
+						}
+					}
+				}
+				else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
+					auto smp = mp->GetChild(attribute->get_name().raw(), [](const auto & h) {
+						return h->GetMetadata().flagSet(md_attribute);
+					});
+					if (smp) {
+						smp->Create();
+						smp->SetValue(XmlAttributeValueSource(attribute));
+						smp->Complete();
+					}
+				}
+				else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
+					ModelPartPtr smp;
+					if (!content->is_white_space()) {
+						smp = mp->GetAnonChild([](const auto & h) {
+							return h->GetMetadata().flagSet(md_text);
+						});
+					}
+					if (smp) {
+						smp->SetValue(XmlContentValueSource(content));
+					}
+					else {
+						mp->SetValue(XmlContentValueSource(content));
+					}
+				}
+				node = node->get_next_sibling();
+			}
+		}
+
+		void
+		DocumentTreeIterate(const xmlpp::Document * doc, ModelPartParam mp)
+		{
+			DocumentTreeIterate(doc->get_root_node(), mp);
+		}
+
+		void ModelTreeIterate(xmlpp::Element *, const std::string &, ModelPartParam mp, const HookCommon * hp,
+				const ElementCreator &);
+		void ModelTreeIterateRoot(xmlpp::Document *, const std::string &, ModelPartParam mp);
+		void ModelTreeProcessElement(const CurrentElementCreator &, ModelPartParam mp, const ElementCreator &);
+		void ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartParam dict);
+		void ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartParam dict);
+
+		void
+		ModelTreeIterate(xmlpp::Element * n, const std::string & name, ModelPartParam mp, const HookCommon * hp,
+				const ElementCreator & ec)
+		{
+			if (name.empty()) {
+				return;
+			}
+			if (hp && hp->GetMetadata().flagSet(md_attribute)) {
+				mp->GetValue(XmlAttributeValueTarget(n, name));
+			}
+			else if (hp && hp->GetMetadata().flagSet(md_text)) {
+				mp->GetValue(XmlContentValueTarget(n));
+			}
+			else if (hp && hp->GetMetadata().flagSet(md_attributes)) {
+				ModelTreeIterateDictAttrs(n->add_child_element(name), mp);
+			}
+			else if (hp && hp->GetMetadata().flagSet(md_elements)) {
+				ModelTreeIterateDictElements(n->add_child_element(name), mp);
+			}
+			else {
+				if (hp && hp->GetMetadata().flagSet(md_bare)) {
+					ModelTreeProcessElement(n, mp, [name](auto && PH1, auto &&) {
+						return PH1->add_child_element(name);
+					});
+				}
+				else {
+					CurrentElementCreator cec([ec, n, name] {
+						return ec(n, name);
+					});
+					ModelTreeProcessElement(cec, mp, defaultElementCreator);
+				}
+			}
+		}
+
+		void
+		ModelTreeIterateDictAttrs(xmlpp::Element * element, ModelPartParam dict)
+		{
+			dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
+				if (mp->HasValue()) {
+					mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
+						mp->GetChild(valueName)->GetValue(XmlAttributeValueTarget(element, name));
+					}));
+				}
+			});
+		}
+
+		void
+		ModelTreeIterateDictElements(xmlpp::Element * element, ModelPartParam dict)
+		{
+			dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
+				if (mp->HasValue()) {
+					mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
+						CurrentElementCreator cec([&element, &name]() {
+							return element->add_child_element(name);
+						});
+						ModelTreeProcessElement(cec, mp->GetChild(valueName), defaultElementCreator);
+					}));
+				}
+			});
+		}
+
+		void
+		ModelTreeProcessElement(const CurrentElementCreator & cec, ModelPartParam mp, const ElementCreator & ec)
+		{
+			if (mp->GetType() == ModelPartType::Simple) {
+				mp->GetValue(XmlContentValueTarget(cec));
+			}
+			else if (mp->HasValue()) {
+				auto oec = [element = cec.get(), &ec](const auto & lmp) {
+					lmp->OnEachChild([element, &ec](auto && PH1, auto && PH2, auto && PH3) {
+						return ModelTreeIterate(element, PH1, PH2, PH3, ec);
+					});
+					return element;
+				};
+				if (auto typeIdPropName = mp->GetTypeIdProperty()) {
+					if (auto typeId = mp->GetTypeId()) {
+						oec(mp->GetSubclassModelPart(*typeId))->set_attribute(*typeIdPropName, *typeId);
+						return;
+					}
+				}
+				oec(mp);
+			}
+		}
+
+		void
+		ModelTreeIterateRoot(xmlpp::Document * doc, const std::string & name, ModelPartParam mp)
+		{
+			ModelTreeProcessElement(doc->create_root_node(name), mp, defaultElementCreator);
+		}
 	}
 
 	XmlStreamSerializer::XmlStreamSerializer(std::ostream & s) : strm(s) { }
@@ -488,7 +503,7 @@ namespace Slicer {
 	XmlDocumentSerializer::Serialize(ModelPartForRootParam modelRoot)
 	{
 		modelRoot->OnEachChild([this](auto && PH1, auto && PH2, auto &&) {
-			return XmlSerializer::ModelTreeIterateRoot(&doc, PH1, PH2);
+			return ModelTreeIterateRoot(&doc, PH1, PH2);
 		});
 	}
 
