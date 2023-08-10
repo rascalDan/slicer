@@ -229,15 +229,17 @@ namespace Slicer {
 		void
 		DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict)
 		{
+			using AttrMember = Glib::ustring (xmlpp::Attribute::*)() const;
 			for (const auto & attr : attrs) {
 				auto emp = dict->GetAnonChild();
 				emp->Create();
-				auto key = emp->GetChild(keyName);
-				auto value = emp->GetChild(valueName);
-				key->SetValue(XmlValueSource(attr->get_name()));
-				key->Complete();
-				value->SetValue(XmlValueSource(attr->get_value()));
-				value->Complete();
+				const auto setChild = [&emp, &attr](const auto & childName, AttrMember attrMember) {
+					auto child = emp->GetChild(childName);
+					child->SetValue(XmlValueSource((attr->*attrMember)()));
+					child->Complete();
+				};
+				setChild(keyName, &xmlpp::Attribute::get_name);
+				setChild(valueName, &xmlpp::Attribute::get_value);
 				emp->Complete();
 			}
 		}
