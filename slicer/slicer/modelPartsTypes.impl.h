@@ -607,8 +607,7 @@ namespace Slicer {
 	ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		this->Model->push_back(typename element_type::value_type());
-		return ChildRef(ModelPart::CreateFor(this->Model->back()));
+		return ChildRef(ModelPart::CreateFor(this->Model->emplace_back()));
 	}
 
 	template<typename T>
