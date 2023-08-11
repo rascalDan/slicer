@@ -4,6 +4,7 @@ import ../test/slicer.jam ;
 lib dbppcore : : : : <include>/usr/include/dbpp ;
 lib dbpp-postgresql : : : : <include>/usr/include/dbpp-postgresql ;
 lib stdc++fs ;
+lib benchmark ;
 
 obj sqlExceptions : sqlExceptions.ice : <use>../slicer//slicer <toolset>tidy:<checker>none ;
 lib slicer-db :
@@ -136,6 +137,40 @@ run testUpdate.cpp
 	:
 	testUpdate
 	;
+
+run
+	[ obj perf : testPerf.cpp :
+		<slicer>pure
+		<use>../test//types
+		<implicit-dependency>../test//types
+		<use>benchmark
+		<use>stdc++fs
+		<use>dbpp-postgresql
+		<use>dbppcore
+		<use>..//adhocutil
+		<use>../test//common
+		<use>../slicer//slicer
+		<implicit-dependency>../slicer//slicer
+		<use>testCommon
+		<implicit-dependency>testCommon
+		<use>slicer-db
+	]
+	: : :
+	<library>benchmark
+	<library>stdc++fs
+	<library>dbpp-postgresql
+	<library>dbppcore
+	<library>../test//common
+	<library>../test//types
+	<library>../slicer//slicer
+	<implicit-dependency>../slicer//slicer
+	<library>slicer-db
+	<library>..//adhocutil
+	<library>testCommon
+	<implicit-dependency>testCommon
+	<variant>profile:<testing.execute>on
+	<testing.execute>off
+	: testPerf ;
 
 alias install : install-lib install-slice ;
 explicit install ;
