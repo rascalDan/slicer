@@ -7,6 +7,17 @@
 namespace Slicer {
 	SqlSource::SqlSource(const DB::Column & c) : column(c) { }
 
+	namespace {
+		template<typename C, typename T>
+		void
+		numericSet(const DB::Column & column, T & b)
+		{
+			C cb {};
+			column >> cb;
+			b = boost::numeric_cast<T>(cb);
+		}
+	}
+
 	bool
 	SqlSource::isNull() const
 	{
@@ -34,47 +45,37 @@ namespace Slicer {
 	void
 	SqlSource::set(Ice::Byte & b) const
 	{
-		int64_t cb;
-		column >> cb;
-		b = boost::numeric_cast<Ice::Byte>(cb);
+		numericSet<int64_t>(column, b);
 	}
 
 	void
 	SqlSource::set(Ice::Short & b) const
 	{
-		int64_t cb;
-		column >> cb;
-		b = boost::numeric_cast<Ice::Short>(cb);
+		numericSet<int64_t>(column, b);
 	}
 
 	void
 	SqlSource::set(Ice::Int & b) const
 	{
-		int64_t cb;
-		column >> cb;
-		b = boost::numeric_cast<Ice::Int>(cb);
+		numericSet<int64_t>(column, b);
 	}
 
 	void
 	SqlSource::set(Ice::Long & b) const
 	{
-		int64_t cb;
-		column >> cb;
-		b = boost::numeric_cast<Ice::Long>(cb);
+		numericSet<int64_t>(column, b);
 	}
 
 	void
 	SqlSource::set(Ice::Float & b) const
 	{
-		double cb;
-		column >> cb;
-		b = boost::numeric_cast<Ice::Float>(cb);
+		numericSet<double>(column, b);
 	}
 
 	void
 	SqlSource::set(Ice::Double & b) const
 	{
-		column >> b;
+		numericSet<double>(column, b);
 	}
 
 	void

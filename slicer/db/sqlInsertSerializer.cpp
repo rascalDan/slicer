@@ -15,8 +15,6 @@
 #include <utility>
 
 namespace Slicer {
-	using namespace std::placeholders;
-
 	SqlInsertSerializer::SqlInsertSerializer(DB::Connection * const c, std::string t) :
 		connection(c), tableName(std::move(t))
 	{

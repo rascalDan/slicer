@@ -34,8 +34,6 @@ namespace Slicer {
 		DB::Command & command;
 		const unsigned int idx;
 	};
-
-	typedef std::shared_ptr<SqlBinder> SqlBinderPtr;
 }
 
 #endif

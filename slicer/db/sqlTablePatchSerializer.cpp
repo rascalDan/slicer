@@ -37,8 +37,6 @@ namespace Slicer {
 			if (isPKey(h)) {
 				tablePatch.pk.insert(name);
 			}
-		});
-		mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
 			if (isBind(h)) {
 				tablePatch.cols.insert(name);
 			}

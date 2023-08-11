@@ -23,7 +23,7 @@ namespace Slicer {
 	public:
 		explicit SqlSource(const DB::Column & c);
 
-		bool isNull() const;
+		[[nodiscard]] bool isNull() const;
 		void set(boost::posix_time::ptime & b) const override;
 		void set(boost::posix_time::time_duration & b) const override;
 		void set(bool & b) const override;
@@ -38,8 +38,6 @@ namespace Slicer {
 	private:
 		const DB::Column & column;
 	};
-
-	typedef std::shared_ptr<SqlSource> SqlSourcePtr;
 }
 
 #endif
