@@ -10,7 +10,7 @@
 #include <visibility.h>
 
 namespace Slicer {
-	void DLL_PUBLIC to_lower(std::string s);
+	void DLL_PUBLIC to_lower(std::string & s);
 
 	template<typename T> class ModelPartForComplex; // IWYU pragma: keep
 
