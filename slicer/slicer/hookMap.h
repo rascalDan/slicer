@@ -28,6 +28,8 @@ namespace Slicer {
 			using pointer = HookPtr *;
 			using reference = HookPtr &;
 
+			[[nodiscard]] constexpr inline explicit iter(const eq * const r) : range(r), cur(r->e) { }
+
 			[[nodiscard]] constexpr inline iter(const eq * const r, const HookPtr * c) : range(r), cur(c)
 			{
 				moveMatch();
@@ -93,13 +95,13 @@ namespace Slicer {
 			[[nodiscard]] constexpr inline iter
 			begin() const
 			{
-				return {this, b};
+				return iter {this, b};
 			}
 
 			[[nodiscard]] constexpr inline iter
 			end() const
 			{
-				return {this, e};
+				return iter {this};
 			}
 
 			std::string_view key {};
