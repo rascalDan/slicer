@@ -83,7 +83,7 @@ namespace Slicer {
 	using ModelPartParam = any_ptr<ModelPart>;
 	using ModelPartForRootParam = any_ptr<ModelPartForRootBase>;
 	using TypeId = std::optional<std::string>;
-	using ChildHandler = std::function<void(const std::string &, const ModelPartParam &, const HookCommon *)>;
+	using ChildHandler = std::function<void(const std::string &, ModelPartParam, const HookCommon *)>;
 	using ClassRef = std::function<ModelPartPtr(void *)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
 	using Metadata = MetaData<>;
@@ -129,7 +129,7 @@ namespace Slicer {
 		SPECIAL_MEMBERS_DEFAULT(HookCommon);
 
 		[[nodiscard]] bool filter(const HookFilter & flt) const;
-		void apply(const ChildHandler & ch, const ModelPartParam & modelPart) const;
+		void apply(const ChildHandler & ch, ModelPartParam modelPart) const;
 
 		[[nodiscard]] virtual const Metadata & GetMetadata() const = 0;
 
