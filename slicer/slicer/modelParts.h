@@ -140,7 +140,7 @@ namespace Slicer {
 
 	template<typename T> struct DLL_PUBLIC Default { };
 
-	class DLL_PUBLIC ModelPart : public std::enable_shared_from_this<ModelPart> {
+	class DLL_PUBLIC ModelPart {
 	public:
 		ModelPart() = default;
 		ModelPart(const ModelPart &) = delete;
