@@ -14,7 +14,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPart::GetSubclassModelPart(const std::string &)
 	{
-		return shared_from_this();
+		throw std::logic_error {"GetSubclassModelPart not supported on this ModelPart"};
 	}
 
 	TypeId
@@ -69,7 +69,7 @@ namespace Slicer {
 	ModelPartPtr
 	ModelPart::GetContainedModelPart()
 	{
-		return shared_from_this();
+		throw std::logic_error {"GetContainedModelPart not supported on this ModelPart"};
 	}
 
 	bool

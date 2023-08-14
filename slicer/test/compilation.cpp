@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_class)
 {
 	TypeTest(TestModule::BuiltInsPtr, std::make_shared<TestModule::BuiltIns>(), ModelPartForClass,
 			ModelPartType::Complex);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 static void
@@ -53,7 +53,7 @@ hookHandler(std::vector<std::string> * names, const std::string & name, Slicer::
 {
 	names->push_back(name);
 	BOOST_REQUIRE(mpp);
-	BOOST_REQUIRE(mpp->GetContainedModelPart());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 	BOOST_REQUIRE(h);
 	BOOST_REQUIRE_EQUAL(h->name, name);
 }
@@ -104,61 +104,61 @@ BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_mapstructs)
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_string)
 {
 	StackTypeTest(std::string, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_bool)
 {
 	StackTypeTest(bool, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_float)
 {
 	StackTypeTest(Ice::Float, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_double)
 {
 	StackTypeTest(Ice::Double, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_byte)
 {
 	StackTypeTest(Ice::Byte, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_short)
 {
 	StackTypeTest(Ice::Short, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_int)
 {
 	StackTypeTest(Ice::Int, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_bi_long)
 {
 	StackTypeTest(Ice::Long, ModelPartForSimple, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_struct)
 {
 	StackTypeTest(TestModule::StructType, ModelPartForStruct, ModelPartType::Complex);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_enum)
 {
 	StackTypeTest(TestModule::SomeNumbers, ModelPartForEnum, ModelPartType::Simple);
-	BOOST_REQUIRE_EQUAL(mpp.get(), mpp->GetContainedModelPart().get());
+	BOOST_CHECK_THROW(mpp->GetContainedModelPart(), std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(normalClassTypeId)
