@@ -113,7 +113,7 @@ namespace Slicer {
 
 	protected:
 		virtual bool hasModel() const = 0;
-		ModelPartPtr modelPart;
+		ModelPartUPtr modelPart;
 	};
 
 	template<typename T>
