@@ -664,7 +664,7 @@ namespace Slicer {
 	ModelPartForDictionary<T>::OnAnonChild(const SubPartHandler & ch, const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		ch(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model), emptyMetadata);
+		ch(ModelPartForDictionaryElementInserter<T>(this->Model), emptyMetadata);
 		return true;
 	}
 
@@ -677,7 +677,7 @@ namespace Slicer {
 		if (!optionalCaseEq(name, pairName, matchCase)) {
 			throw IncorrectElementName(std::string {name});
 		}
-		ch(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model), emptyMetadata);
+		ch(ModelPartForDictionaryElementInserter<T>(this->Model), emptyMetadata);
 		return true;
 	}
 
@@ -692,7 +692,7 @@ namespace Slicer {
 	void
 	ModelPartForDictionary<T>::OnContained(const ModelPartHandler & h)
 	{
-		return h(std::make_shared<ModelPartForStruct<typename T::value_type>>(nullptr));
+		return h(ModelPartForStruct<typename T::value_type>(nullptr));
 	}
 
 	// ModelPartForStream
