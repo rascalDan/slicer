@@ -32,14 +32,15 @@ namespace Slicer {
 		SqlInsertSerializer ins(db, tablePatch.src);
 		ins.Serialize(mpr);
 
-		auto mp = mpr->GetContainedModelPart();
-		mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
-			if (isPKey(h)) {
-				tablePatch.pk.insert(name);
-			}
-			if (isBind(h)) {
-				tablePatch.cols.insert(name);
-			}
+		mpr->OnContained([this](auto && mp) {
+			mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
+				if (isPKey(h)) {
+					tablePatch.pk.insert(name);
+				}
+				if (isBind(h)) {
+					tablePatch.cols.insert(name);
+				}
+			});
 		});
 
 		db->patchTable(&tablePatch);

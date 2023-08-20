@@ -83,10 +83,12 @@ namespace Slicer {
 	using ModelPartParam = any_ptr<ModelPart>;
 	using ModelPartForRootParam = any_ptr<ModelPartForRootBase>;
 	using TypeId = std::optional<std::string>;
-	using ChildHandler = std::function<void(const std::string &, ModelPartParam, const HookCommon *)>;
-	using ClassRef = std::function<ModelPartPtr(void *)>;
-	using HookFilter = std::function<bool(const HookCommon *)>;
 	using Metadata = MetaData<>;
+	using ChildHandler = std::function<void(const std::string &, ModelPartParam, const HookCommon *)>;
+	using ModelPartHandler = std::function<void(ModelPartParam)>;
+	using SubPartHandler = std::function<void(ModelPartParam, const Metadata &)>;
+	using ClassRef = std::function<void(void *, const ModelPartHandler &)>;
+	using HookFilter = std::function<bool(const HookCommon *)>;
 	constexpr Metadata emptyMetadata;
 
 	enum class ModelPartType {
@@ -101,21 +103,6 @@ namespace Slicer {
 		NoAction,
 		NoValue,
 		Value,
-	};
-
-	class DLL_PUBLIC ChildRef {
-	public:
-		explicit ChildRef();
-		explicit ChildRef(ModelPartPtr);
-		explicit ChildRef(ModelPartPtr, const Metadata &);
-
-		[[nodiscard]] ModelPartPtr Child() const;
-		[[nodiscard]] const Metadata & ChildMetaData() const;
-		explicit operator bool() const;
-
-	private:
-		ModelPartPtr mpp;
-		const Metadata & mdr;
 	};
 
 	class DLL_PUBLIC HookCommon {
@@ -156,14 +143,11 @@ namespace Slicer {
 		template<typename T> static ModelPartPtr CreateFor(Default<T> &&);
 		template<typename T> static ModelPartForRootPtr CreateRootFor(T & t);
 
-		virtual void OnEachChild(const ChildHandler &) = 0;
-		ModelPartPtr GetAnonChild(const HookFilter & = HookFilter());
-		ModelPartPtr GetChild(std::string_view memberName, const HookFilter & = HookFilter());
-		virtual ChildRef GetAnonChildRef(const HookFilter & = HookFilter()) = 0;
-		virtual ChildRef GetChildRef(
-				std::string_view memberName, const HookFilter & = HookFilter(), bool matchCase = true)
-				= 0;
-		virtual ModelPartPtr GetSubclassModelPart(const std::string &);
+		virtual void OnEachChild(const ChildHandler &);
+		virtual bool OnAnonChild(const SubPartHandler &, const HookFilter & = HookFilter());
+		virtual bool OnChild(const SubPartHandler &, std::string_view memberName, const HookFilter & = HookFilter(),
+				bool matchCase = true);
+		virtual void OnSubclass(const ModelPartHandler &, const std::string &);
 		virtual TypeId GetTypeId() const;
 		virtual std::optional<std::string> GetTypeIdProperty() const;
 		virtual ModelPartType GetType() const = 0;
@@ -174,7 +158,7 @@ namespace Slicer {
 		virtual bool HasValue() const = 0;
 		virtual const Metadata & GetMetadata() const;
 		virtual bool IsOptional() const;
-		virtual ModelPartPtr GetContainedModelPart();
+		virtual void OnContained(const ModelPartHandler &);
 	};
 
 	template<typename T> class DLL_PUBLIC ModelPartModel {
@@ -189,14 +173,14 @@ namespace Slicer {
 		explicit ModelPartForRootBase(ModelPartPtr mp);
 
 		virtual const std::string & GetRootName() const = 0;
-		ChildRef GetAnonChildRef(const HookFilter &) override;
-		ChildRef GetChildRef(std::string_view name, const HookFilter &, bool matchCase = true) override;
+		bool OnAnonChild(const SubPartHandler &, const HookFilter &) override;
+		bool OnChild(const SubPartHandler &, std::string_view name, const HookFilter &, bool matchCase = true) override;
 		void OnEachChild(const ChildHandler & ch) override;
 		ModelPartType GetType() const override;
 		bool IsOptional() const override;
 		virtual void Write(::Ice::OutputStream &) const = 0;
 		virtual void Read(::Ice::InputStream &) = 0;
-		ModelPartPtr GetContainedModelPart() override;
+		void OnContained(const ModelPartHandler &) override;
 
 		ModelPartPtr mp;
 	};

@@ -151,9 +151,9 @@ namespace Slicer {
 		class DocumentTreeIterate {
 		public:
 			static void
-			visit(ModelPartPtr && mp, const json::Value & v)
+			visit(ModelPartParam mp, const json::Value & v)
 			{
-				std::visit(DocumentTreeIterate {std::move(mp)}, v);
+				std::visit(DocumentTreeIterate {mp}, v);
 			}
 
 			template<typename SimpleT>
@@ -174,34 +174,47 @@ namespace Slicer {
 			void
 			operator()(const json::Object & o) const
 			{
+				auto apply = [&o](auto && objectModelPart) {
+					objectModelPart->Create();
+					if (objectModelPart->GetMetadata().flagSet(md_object)) {
+						for (const auto & element : o) {
+							objectModelPart->OnAnonChild([&element](auto && emp, auto &&) {
+								emp->Create();
+								emp->OnChild(
+										[&element](auto && key, auto &&) {
+											key->Create();
+											key->SetValue(JsonValueSource(element.first));
+											key->Complete();
+										},
+										keyName);
+								emp->OnChild(
+										[&element](auto && value, auto &&) {
+											visit(value, element.second);
+										},
+										valueName);
+								emp->Complete();
+							});
+						}
+					}
+					else {
+						for (const auto & element : o) {
+							objectModelPart->OnChild(
+									[&element](auto && emp, auto &&) {
+										visit(emp, element.second);
+										emp->Complete();
+									},
+									element.first);
+						}
+						objectModelPart->Complete();
+					}
+				};
 				if (auto typeIdName = modelPart->GetTypeIdProperty()) {
 					auto typeAttrItr = o.find(*typeIdName);
 					if (typeAttrItr != o.end() && std::holds_alternative<json::String>(typeAttrItr->second)) {
-						modelPart = modelPart->GetSubclassModelPart(std::get<json::String>(typeAttrItr->second));
+						return modelPart->OnSubclass(apply, std::get<json::String>(typeAttrItr->second));
 					}
 				}
-				modelPart->Create();
-				if (modelPart->GetMetadata().flagSet(md_object)) {
-					for (const auto & element : o) {
-						auto emp = modelPart->GetAnonChild();
-						emp->Create();
-						auto key = emp->GetChild(keyName);
-						key->Create();
-						key->SetValue(JsonValueSource(element.first));
-						key->Complete();
-						visit(emp->GetChild(valueName), element.second);
-						emp->Complete();
-					}
-				}
-				else {
-					for (const auto & element : o) {
-						if (auto emp = modelPart->GetChild(element.first)) {
-							visit(std::move(emp), element.second);
-							emp->Complete();
-						}
-					}
-					modelPart->Complete();
-				}
+				apply(modelPart);
 			}
 
 			void
@@ -209,16 +222,15 @@ namespace Slicer {
 			{
 				modelPart->Create();
 				for (const auto & element : a) {
-					if (auto emp = modelPart->GetAnonChild()) {
-						emp->Create();
-						visit(std::move(emp), element);
+					modelPart->OnAnonChild([&element](auto && emp, auto &&) {
+						visit(emp, element);
 						emp->Complete();
-					}
+					});
 				}
 				modelPart->Complete();
 			}
 
-			ModelPartPtr && modelPart;
+			ModelPartParam modelPart;
 		};
 
 		void ModelTreeIterateTo(const std::function<json::Value &()> &, ModelPartParam mp);
@@ -243,15 +255,23 @@ namespace Slicer {
 			if (!mp->HasValue()) {
 				return;
 			}
-			ModelTreeIterateTo(
-					[&d, mp]() -> json::Value & {
-						json::Object::key_type k;
-						json::Value kv;
-						mp->GetChild(keyName)->GetValue(JsonValueTarget(kv));
-						JsonValueSource(kv).set(k);
-						return d[std::move(k)];
+			mp->OnChild(
+					[&d, mp](auto && cmp, auto &&) {
+						ModelTreeIterateTo(
+								[&d, mp]() -> json::Value & {
+									json::Object::key_type k;
+									json::Value kv;
+									mp->OnChild(
+											[&kv](auto && emp, auto &&) {
+												emp->GetValue(JsonValueTarget(kv));
+											},
+											keyName);
+									JsonValueSource(kv).set(k);
+									return d[std::move(k)];
+								},
+								cmp);
 					},
-					mp->GetChild(valueName));
+					valueName);
 		}
 
 		void
@@ -291,8 +311,11 @@ namespace Slicer {
 							};
 							if (auto typeIdName = mp->GetTypeIdProperty()) {
 								if (auto typeId = mp->GetTypeId()) {
-									oec(mp->GetSubclassModelPart(*typeId))->emplace(*typeIdName, *typeId);
-									return;
+									return mp->OnSubclass(
+											[&oec, &typeIdName, &typeId](auto && lmp) {
+												oec(lmp)->emplace(*typeIdName, *typeId);
+											},
+											*typeId);
 								}
 							}
 							oec(mp);
@@ -331,7 +354,11 @@ namespace Slicer {
 	void
 	JsonStreamDeserializer::Deserialize(ModelPartForRootParam modelRoot)
 	{
-		DocumentTreeIterate::visit(modelRoot->GetAnonChild(), json::parseValue(strm));
+		modelRoot->OnAnonChild(
+				[this](auto && mp, auto &&) {
+					DocumentTreeIterate::visit(mp, json::parseValue(strm));
+				},
+				{});
 	}
 
 	void
@@ -349,7 +376,11 @@ namespace Slicer {
 	JsonFileDeserializer::Deserialize(ModelPartForRootParam modelRoot)
 	{
 		std::ifstream inFile(path);
-		DocumentTreeIterate::visit(modelRoot->GetAnonChild(), json::parseValue(inFile));
+		modelRoot->OnAnonChild(
+				[&inFile](auto && mp, auto &&) {
+					DocumentTreeIterate::visit(mp, json::parseValue(inFile));
+				},
+				{});
 	}
 
 	JsonValueDeserializer::JsonValueDeserializer(const json::Value & v) : value(v) { }
@@ -357,7 +388,11 @@ namespace Slicer {
 	void
 	JsonValueDeserializer::Deserialize(ModelPartForRootParam modelRoot)
 	{
-		DocumentTreeIterate::visit(modelRoot->GetAnonChild(), value);
+		modelRoot->OnAnonChild(
+				[this](auto && mp, auto &&) {
+					DocumentTreeIterate::visit(mp, value);
+				},
+				{});
 	}
 
 	void

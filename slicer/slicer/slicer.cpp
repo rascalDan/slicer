@@ -5,29 +5,6 @@
 #include <utility>
 
 namespace Slicer {
-	Slicer::ChildRef::ChildRef() : mpp(), mdr(emptyMetadata) { }
-
-	Slicer::ChildRef::ChildRef(ModelPartPtr m) : mpp(std::move(m)), mdr(emptyMetadata) { }
-
-	Slicer::ChildRef::ChildRef(ModelPartPtr mp, const Slicer::Metadata & md) : mpp(std::move(mp)), mdr(md) { }
-
-	ModelPartPtr
-	Slicer::ChildRef::Child() const
-	{
-		return mpp;
-	}
-
-	Slicer::ChildRef::operator bool() const
-	{
-		return !!mpp;
-	}
-
-	const Metadata &
-	Slicer::ChildRef::ChildMetaData() const
-	{
-		return mdr;
-	}
-
 	AdHocFormatter(InvalidEnumerationSymbolMsg, "Invalid enumeration symbol [%?] for type [%?]");
 
 	void

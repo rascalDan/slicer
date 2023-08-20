@@ -49,9 +49,10 @@ namespace Slicer {
 	void
 	SqlUpdateSerializer::SerializeSequence(ModelPartParam mp) const
 	{
-		auto ins = createUpdate(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins](auto &&, auto && cmp, auto &&) {
-			bindObjectAndExecute(cmp, ins.get());
+		mp->OnContained([this, mp](auto && cmp) {
+			mp->OnEachChild([upd = createUpdate(cmp)](auto &&, auto && chmp, auto &&) {
+				bindObjectAndExecute(chmp, upd.get());
+			});
 		});
 	}
 

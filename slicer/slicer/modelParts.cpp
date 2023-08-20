@@ -11,10 +11,10 @@ namespace Slicer {
 	{
 	}
 
-	ModelPartPtr
-	ModelPart::GetSubclassModelPart(const std::string &)
+	void
+	ModelPart::OnSubclass(const ModelPartHandler &, const std::string &)
 	{
-		throw std::logic_error {"GetSubclassModelPart not supported on this ModelPart"};
+		throw std::logic_error {"OnSubclass not supported on this ModelPart"};
 	}
 
 	TypeId
@@ -46,30 +46,33 @@ namespace Slicer {
 		return emptyMetadata;
 	}
 
-	ModelPartPtr
-	ModelPart::GetAnonChild(const HookFilter & flt)
-	{
-		auto ref = GetAnonChildRef(flt);
-		return ref ? ref.Child() : ModelPartPtr(nullptr);
-	}
-
-	ModelPartPtr
-	ModelPart::GetChild(std::string_view memberName, const HookFilter & flt)
-	{
-		auto ref = GetChildRef(memberName, flt);
-		return ref ? ref.Child() : ModelPartPtr(nullptr);
-	}
-
 	bool
 	ModelPart::IsOptional() const
 	{
 		return false;
 	}
 
-	ModelPartPtr
-	ModelPart::GetContainedModelPart()
+	void
+	ModelPart::OnEachChild(const ChildHandler &)
 	{
-		throw std::logic_error {"GetContainedModelPart not supported on this ModelPart"};
+	}
+
+	bool
+	ModelPart::OnAnonChild(const SubPartHandler &, const HookFilter &)
+	{
+		return false;
+	}
+
+	bool
+	ModelPart::OnChild(const SubPartHandler &, const std::string_view, const HookFilter &, bool)
+	{
+		return false;
+	}
+
+	void
+	ModelPart::OnContained(const ModelPartHandler &)
+	{
+		throw std::logic_error {"OnContained not supported on this ModelPart"};
 	}
 
 	bool

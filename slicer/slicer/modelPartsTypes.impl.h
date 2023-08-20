@@ -354,8 +354,8 @@ namespace Slicer {
 
 	template<typename T>
 	template<typename R>
-	ChildRef
-	ModelPartForComplex<T>::GetChildRefFromRange(const R & range, const HookFilter & flt)
+	bool
+	ModelPartForComplex<T>::OnChildFromRange(const SubPartHandler & ch, const R & range, const HookFilter & flt)
 	{
 		const auto itr = std::find_if(range.begin(), range.end(), [&flt](auto && h) {
 			return h->filter(flt);
@@ -363,29 +363,31 @@ namespace Slicer {
 		if (itr != range.end()) {
 			const auto & h = *itr;
 			auto model = GetModel();
-			return ChildRef(h->Get(model), h->GetMetadata());
+			ch(h->Get(model), h->GetMetadata());
+			return true;
 		}
-		return ChildRef();
+		return false;
 	}
 
 	template<typename T>
-	ChildRef
-	ModelPartForComplex<T>::GetAnonChildRef(const HookFilter & flt)
+	bool
+	ModelPartForComplex<T>::OnAnonChild(const SubPartHandler & ch, const HookFilter & flt)
 	{
-		return GetChildRefFromRange(hooks(), flt);
+		return OnChildFromRange(ch, hooks(), flt);
 	}
 
 	template<typename T>
-	ChildRef
-	ModelPartForComplex<T>::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
+	bool
+	ModelPartForComplex<T>::OnChild(
+			const SubPartHandler & ch, std::string_view name, const HookFilter & flt, bool matchCase)
 	{
 		if (matchCase) {
-			return GetChildRefFromRange(hooks().equal_range(name), flt);
+			return OnChildFromRange(ch, hooks().equal_range(name), flt);
 		}
 		else {
 			std::string i {name};
 			to_lower(i);
-			return GetChildRefFromRange(hooks().equal_range_lower(i), flt);
+			return OnChildFromRange(ch, hooks().equal_range_lower(i), flt);
 		}
 	}
 
@@ -453,11 +455,11 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartPtr
-	ModelPartForClass<T>::GetSubclassModelPart(const std::string & name)
+	void
+	ModelPartForClass<T>::OnSubclass(const ModelPartHandler & h, const std::string & name)
 	{
 		BOOST_ASSERT(this->Model);
-		return ModelPartForComplexBase::getSubclassModelPart(name, this->Model);
+		return ModelPartForComplexBase::onSubclass(name, this->Model, h);
 	}
 
 	template<typename T>
@@ -476,10 +478,10 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartPtr
-	ModelPartForClass<T>::CreateModelPart(void * p)
+	void
+	ModelPartForClass<T>::CreateModelPart(void * p, const ModelPartHandler & h)
 	{
-		return ::Slicer::ModelPart::CreateFor(*static_cast<element_type *>(p));
+		return h(::Slicer::ModelPart::CreateFor(*static_cast<element_type *>(p)));
 	}
 
 	template<typename T>
@@ -598,16 +600,17 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		for (auto & element : *this->Model) {
-			ch(elementName, elementModelPart(element), NULL);
+			ch(elementName, ModelPart::CreateFor(element), NULL);
 		}
 	}
 
 	template<typename T>
-	ChildRef
-	ModelPartForSequence<T>::GetAnonChildRef(const HookFilter &)
+	bool
+	ModelPartForSequence<T>::OnAnonChild(const SubPartHandler & ch, const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		return ChildRef(ModelPart::CreateFor(this->Model->emplace_back()));
+		ch(ModelPart::CreateFor(this->Model->emplace_back()), emptyMetadata);
+		return true;
 	}
 
 	template<typename T>
@@ -625,17 +628,10 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartPtr
-	ModelPartForSequence<T>::elementModelPart(typename T::value_type & e) const
+	void
+	ModelPartForSequence<T>::OnContained(const ModelPartHandler & h)
 	{
-		return ModelPart::CreateFor(e);
-	}
-
-	template<typename T>
-	ModelPartPtr
-	ModelPartForSequence<T>::GetContainedModelPart()
-	{
-		return ModelPart::CreateFor(Default<typename T::value_type> {});
+		return h(ModelPart::CreateFor(Default<typename T::value_type> {}));
 	}
 
 	// ModelPartForDictionaryElementInserter
@@ -664,22 +660,25 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ChildRef
-	ModelPartForDictionary<T>::GetAnonChildRef(const HookFilter &)
+	bool
+	ModelPartForDictionary<T>::OnAnonChild(const SubPartHandler & ch, const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		return ChildRef(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model));
+		ch(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model), emptyMetadata);
+		return true;
 	}
 
 	template<typename T>
-	ChildRef
-	ModelPartForDictionary<T>::GetChildRef(std::string_view name, const HookFilter &, bool matchCase)
+	bool
+	ModelPartForDictionary<T>::OnChild(
+			const SubPartHandler & ch, std::string_view name, const HookFilter &, bool matchCase)
 	{
 		BOOST_ASSERT(this->Model);
 		if (!optionalCaseEq(name, pairName, matchCase)) {
 			throw IncorrectElementName(std::string {name});
 		}
-		return ChildRef(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model));
+		ch(std::make_shared<ModelPartForDictionaryElementInserter<T>>(this->Model), emptyMetadata);
+		return true;
 	}
 
 	template<typename T>
@@ -690,18 +689,18 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	ModelPartPtr
-	ModelPartForDictionary<T>::GetContainedModelPart()
+	void
+	ModelPartForDictionary<T>::OnContained(const ModelPartHandler & h)
 	{
-		return std::make_shared<ModelPartForStruct<typename T::value_type>>(nullptr);
+		return h(std::make_shared<ModelPartForStruct<typename T::value_type>>(nullptr));
 	}
 
 	// ModelPartForStream
 	template<typename T>
-	ModelPartPtr
-	ModelPartForStream<T>::GetContainedModelPart()
+	void
+	ModelPartForStream<T>::OnContained(const ModelPartHandler & h)
 	{
-		return ModelPart::CreateFor(Default<T> {});
+		return h(ModelPart::CreateFor(Default<T> {}));
 	}
 
 	template<typename T>

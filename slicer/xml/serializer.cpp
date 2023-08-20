@@ -221,7 +221,7 @@ namespace Slicer {
 		};
 
 		void DocumentTreeIterate(const xmlpp::Node * node, ModelPartParam mp);
-		void DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam mp, const ChildRef & c);
+		void DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam mp, const Metadata & md);
 		void DocumentTreeIterate(const xmlpp::Document * doc, ModelPartParam mp);
 		void DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict);
 		void DocumentTreeIterateDictElements(const xmlpp::Element * parent, ModelPartParam dict);
@@ -229,18 +229,23 @@ namespace Slicer {
 		void
 		DocumentTreeIterateDictAttrs(const xmlpp::Element::const_AttributeList & attrs, ModelPartParam dict)
 		{
-			using AttrMember = Glib::ustring (xmlpp::Attribute::*)() const;
 			for (const auto & attr : attrs) {
-				auto emp = dict->GetAnonChild();
-				emp->Create();
-				const auto setChild = [&emp, &attr](const auto & childName, AttrMember attrMember) {
-					auto child = emp->GetChild(childName);
-					child->SetValue(XmlValueSource((attr->*attrMember)()));
-					child->Complete();
-				};
-				setChild(keyName, &xmlpp::Attribute::get_name);
-				setChild(valueName, &xmlpp::Attribute::get_value);
-				emp->Complete();
+				dict->OnAnonChild([&attr](auto && emp, auto &&) {
+					emp->Create();
+					emp->OnChild(
+							[&attr](auto && child, auto &&) {
+								child->SetValue(XmlValueSource(attr->get_name()));
+								child->Complete();
+							},
+							keyName);
+					emp->OnChild(
+							[&attr](auto && value, auto &&) {
+								value->SetValue(XmlValueSource(attr->get_value()));
+								value->Complete();
+							},
+							valueName);
+					emp->Complete();
+				});
 			}
 		}
 
@@ -250,31 +255,38 @@ namespace Slicer {
 			auto node = element->get_first_child();
 			while (node) {
 				if (auto childElement = dynamic_cast<const xmlpp::Element *>(node)) {
-					auto emp = dict->GetAnonChild();
-					emp->Create();
-					auto key = emp->GetChild(keyName);
-					auto value = emp->GetChildRef(valueName);
-					key->SetValue(XmlValueSource(childElement->get_name()));
-					key->Complete();
-					DocumentTreeIterateElement(childElement, value.Child(), value);
-					emp->Complete();
+					dict->OnAnonChild([childElement](auto && emp, auto &&) {
+						emp->Create();
+						emp->OnChild(
+								[childElement](auto && child, auto &&) {
+									child->SetValue(XmlValueSource(childElement->get_name()));
+									child->Complete();
+								},
+								keyName);
+						emp->OnChild(
+								[childElement](auto && value, auto && md) {
+									DocumentTreeIterateElement(childElement, value, md);
+								},
+								valueName);
+						emp->Complete();
+					});
 				}
 				node = node->get_next_sibling();
 			}
 		}
 
 		void
-		DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam smp, const ChildRef & smpr)
+		DocumentTreeIterateElement(const xmlpp::Element * element, ModelPartParam smp, const Metadata & md)
 		{
-			auto oec = [&smpr, element](const auto & lmp) {
+			auto oec = [&md, element](const auto & lmp) {
 				lmp->Create();
-				if (smpr.ChildMetaData().flagSet(md_attributes)) {
+				if (md.flagSet(md_attributes)) {
 					auto attrs(element->get_attributes());
 					if (!attrs.empty()) {
 						DocumentTreeIterateDictAttrs(attrs, lmp);
 					}
 				}
-				else if (smpr.ChildMetaData().flagSet(md_elements)) {
+				else if (md.flagSet(md_elements)) {
 					DocumentTreeIterateDictElements(element, lmp);
 				}
 				else {
@@ -294,8 +306,7 @@ namespace Slicer {
 			};
 			if (auto typeIdPropName = smp->GetTypeIdProperty()) {
 				if (auto typeAttr = element->get_attribute(*typeIdPropName)) {
-					oec(smp->GetSubclassModelPart(typeAttr->get_value()));
-					return;
+					return smp->OnSubclass(oec, typeAttr->get_value());
 				}
 			}
 			oec(smp);
@@ -306,40 +317,45 @@ namespace Slicer {
 		{
 			while (node) {
 				if (auto element = dynamic_cast<const xmlpp::Element *>(node)) {
-					auto smpr = mp->GetChildRef(element->get_name().raw(), [](const auto & h) {
-						return h->GetMetadata().flagNotSet(md_attribute);
-					});
-					if (smpr) {
-						auto smp = smpr.Child();
-						if (smpr.ChildMetaData().flagSet(md_bare)) {
-							smp = smp->GetAnonChild();
-						}
-						if (smp) {
-							DocumentTreeIterateElement(element, smp, smpr);
-						}
-					}
+					mp->OnChild(
+							[element](auto && smp, auto && md) {
+								if (md.flagSet(md_bare)) {
+									smp->OnAnonChild([element](auto && bmp, auto && bmd) {
+										DocumentTreeIterateElement(element, bmp, bmd);
+									});
+									return;
+								}
+								DocumentTreeIterateElement(element, smp, md);
+							},
+							element->get_name().raw(),
+							[](const auto & h) {
+								return h->GetMetadata().flagNotSet(md_attribute);
+							});
 				}
 				else if (auto attribute = dynamic_cast<const xmlpp::Attribute *>(node)) {
-					auto smp = mp->GetChild(attribute->get_name().raw(), [](const auto & h) {
-						return h->GetMetadata().flagSet(md_attribute);
-					});
-					if (smp) {
-						smp->Create();
-						smp->SetValue(XmlValueSource(attribute));
-						smp->Complete();
-					}
+					mp->OnChild(
+							[attribute](auto && smp, auto &&) {
+								smp->Create();
+								smp->SetValue(XmlValueSource(attribute));
+								smp->Complete();
+							},
+							attribute->get_name().raw(),
+							[](const auto & h) {
+								return h->GetMetadata().flagSet(md_attribute);
+							});
 				}
 				else if (auto content = dynamic_cast<const xmlpp::ContentNode *>(node)) {
-					ModelPartPtr smp;
+					bool bare = false;
 					if (!content->is_white_space()) {
-						smp = mp->GetAnonChild([](const auto & h) {
-							return h->GetMetadata().flagSet(md_text);
-						});
+						bare = (mp->OnAnonChild(
+								[content](auto && smp, auto &&) {
+									smp->SetValue(XmlValueSource(content));
+								},
+								[](const auto & h) {
+									return h->GetMetadata().flagSet(md_text);
+								}));
 					}
-					if (smp) {
-						smp->SetValue(XmlValueSource(content));
-					}
-					else {
+					if (!bare) {
 						mp->SetValue(XmlValueSource(content));
 					}
 				}
@@ -397,9 +413,17 @@ namespace Slicer {
 		{
 			dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 				if (mp->HasValue()) {
-					mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
-						mp->GetChild(valueName)->GetValue(XmlValueTarget(element, name));
-					}));
+					mp->OnChild(
+							[mp, element](auto && key, auto &&) {
+								key->GetValue(XmlValueTarget([mp, element](const auto & name) {
+									mp->OnChild(
+											[element, &name](auto && value, auto &&) {
+												value->GetValue(XmlValueTarget(element, name));
+											},
+											valueName);
+								}));
+							},
+							keyName);
 				}
 			});
 		}
@@ -409,12 +433,20 @@ namespace Slicer {
 		{
 			dict->OnEachChild([element](const auto &, const auto & mp, const auto &) {
 				if (mp->HasValue()) {
-					mp->GetChild(keyName)->GetValue(XmlValueTarget([&mp, element](const auto & name) {
-						CurrentElementCreator cec([&element, &name]() {
-							return element->add_child_element(name);
-						});
-						ModelTreeProcessElement(cec, mp->GetChild(valueName), defaultElementCreator);
-					}));
+					mp->OnChild(
+							[mp, element](auto && key, auto &&) {
+								key->GetValue(XmlValueTarget([mp, element](const auto & name) {
+									CurrentElementCreator cec([&element, &name]() {
+										return element->add_child_element(name);
+									});
+									mp->OnChild(
+											[&cec](auto && value, auto &&) {
+												ModelTreeProcessElement(cec, value, defaultElementCreator);
+											},
+											valueName);
+								}));
+							},
+							keyName);
 				}
 			});
 		}
@@ -434,8 +466,11 @@ namespace Slicer {
 				};
 				if (auto typeIdPropName = mp->GetTypeIdProperty()) {
 					if (auto typeId = mp->GetTypeId()) {
-						oec(mp->GetSubclassModelPart(*typeId))->set_attribute(*typeIdPropName, *typeId);
-						return;
+						return mp->OnSubclass(
+								[oec, &typeIdPropName, &typeId](auto && smp) {
+									oec(smp)->set_attribute(*typeIdPropName, *typeId);
+								},
+								*typeId);
 					}
 				}
 				oec(mp);

@@ -47,10 +47,11 @@ namespace Slicer {
 			return;
 		}
 		if (!(*cmd)[0].isNull()) {
-			auto fmp = mp->GetAnonChild();
-			fmp->Create();
-			fmp->SetValue(SqlSource((*cmd)[0]));
-			fmp->Complete();
+			mp->OnAnonChild([this](auto && fmp, auto &&) {
+				fmp->Create();
+				fmp->SetValue(SqlSource((*cmd)[0]));
+				fmp->Complete();
+			});
 		}
 		if (cmd->fetch()) {
 			throw TooManyRowsReturned();
@@ -60,10 +61,11 @@ namespace Slicer {
 	void
 	SqlSelectDeserializer::DeserializeSequence(ModelPartParam omp)
 	{
-		auto mp = omp->GetAnonChild();
-		while (cmd->fetch()) {
-			DeserializeRow(mp);
-		}
+		omp->OnAnonChild([this](auto && mp, auto &&) {
+			while (cmd->fetch()) {
+				DeserializeRow(mp);
+			}
+		});
 	}
 
 	void
@@ -85,29 +87,33 @@ namespace Slicer {
 	void
 	SqlSelectDeserializer::DeserializeRow(ModelPartParam mp)
 	{
-		auto rmp = mp->GetAnonChild();
-		if (rmp) {
+		mp->OnAnonChild([this](auto && rmp, auto &&) {
 			switch (rmp->GetType()) {
 				case Slicer::ModelPartType::Complex: {
+					auto apply = [this](auto && rcmp) {
+						rcmp->Create();
+						for (auto col = 0U; col < columnCount; col += 1) {
+							const DB::Column & c = (*cmd)[col];
+							if (!c.isNull()) {
+								rcmp->OnChild(
+										[&c](auto && fmp, auto &&) {
+											if (fmp) {
+												fmp->Create();
+												fmp->SetValue(SqlSource(c));
+												fmp->Complete();
+											}
+										},
+										c.name, nullptr, false);
+							}
+						}
+						rcmp->Complete();
+					};
 					if (typeIdColIdx) {
 						std::string subclass;
 						(*cmd)[*typeIdColIdx] >> subclass;
-						rmp = rmp->GetSubclassModelPart(subclass);
+						return rmp->OnSubclass(apply, subclass);
 					}
-					rmp->Create();
-					for (auto col = 0U; col < columnCount; col += 1) {
-						const DB::Column & c = (*cmd)[col];
-						if (!c.isNull()) {
-							auto fmpr = rmp->GetChildRef(c.name, nullptr, false);
-							if (fmpr) {
-								auto fmp = fmpr.Child();
-								fmp->Create();
-								fmp->SetValue(SqlSource(c));
-								fmp->Complete();
-							}
-						}
-					}
-					rmp->Complete();
+					apply(rmp);
 				} break;
 				case Slicer::ModelPartType::Simple: {
 					rmp->Create();
@@ -120,6 +126,6 @@ namespace Slicer {
 				default:
 					throw UnsupportedModelType();
 			}
-		}
+		});
 	}
 }

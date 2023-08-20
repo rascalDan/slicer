@@ -49,9 +49,10 @@ namespace Slicer {
 	void
 	SqlInsertSerializer::SerializeSequence(ModelPartParam mp) const
 	{
-		auto ins = createInsert(mp->GetContainedModelPart());
-		mp->OnEachChild([&ins, this](auto &&, auto && cmp, auto &&) {
-			bindObjectAndExecute(cmp, ins.get());
+		mp->OnContained([this, mp](auto && cmp) {
+			mp->OnEachChild([ins = createInsert(cmp), this](auto &&, auto && chmp, auto &&) {
+				bindObjectAndExecute(chmp, ins.get());
+			});
 		});
 	}
 
