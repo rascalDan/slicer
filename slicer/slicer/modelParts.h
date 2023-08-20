@@ -80,13 +80,13 @@ namespace Slicer {
 
 	using ModelPartPtr = std::shared_ptr<ModelPart>;
 	using ModelPartUPtr = std::unique_ptr<ModelPart>;
-	using ModelPartForRootPtr = std::unique_ptr<ModelPartForRootBase>;
 	using ModelPartParam = any_ptr<ModelPart>;
 	using ModelPartForRootParam = any_ptr<ModelPartForRootBase>;
 	using TypeId = std::optional<std::string>;
 	using Metadata = MetaData<>;
 	using ChildHandler = std::function<void(const std::string &, ModelPartParam, const HookCommon *)>;
 	using ModelPartHandler = std::function<void(ModelPartParam)>;
+	using ModelPartRootHandler = std::function<void(ModelPartForRootParam)>;
 	using SubPartHandler = std::function<void(ModelPartParam, const Metadata &)>;
 	using ClassRef = std::function<void(void *, const ModelPartHandler &)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
@@ -142,7 +142,7 @@ namespace Slicer {
 		template<typename MP> static ModelPartPtr Make(typename MP::element_type * t);
 		template<typename T> static ModelPartPtr CreateFor(T & t);
 		template<typename T> static ModelPartPtr CreateFor(Default<T> &&);
-		template<typename T> static ModelPartForRootPtr CreateRootFor(T & t);
+		template<typename T> static void OnRootFor(T & t, const ModelPartRootHandler &);
 
 		virtual void OnEachChild(const ChildHandler &);
 		virtual bool OnAnonChild(const SubPartHandler &, const HookFilter & = HookFilter());

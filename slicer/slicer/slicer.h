@@ -11,7 +11,9 @@ namespace Slicer {
 	DeserializeAnyWith(any_ptr<Deserializer> deserializer)
 	{
 		Object object {};
-		deserializer->Deserialize(ModelPart::CreateRootFor<Object>(object));
+		ModelPart::OnRootFor<Object>(object, [deserializer](auto && mp) {
+			deserializer->Deserialize(mp);
+		});
 		return object;
 	}
 
@@ -26,7 +28,9 @@ namespace Slicer {
 	void
 	SerializeAnyWith(const Object & object, any_ptr<Serializer> serializer)
 	{
-		serializer->Serialize(ModelPart::CreateRootFor<const Object>(object));
+		ModelPart::OnRootFor<const Object>(object, [serializer](auto && mp) {
+			serializer->Serialize(mp);
+		});
 	}
 
 	template<typename Serializer, typename Object, typename... SerializerParams>

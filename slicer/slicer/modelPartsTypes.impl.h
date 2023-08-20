@@ -67,21 +67,21 @@ namespace Ice {
 	{ \
 		return CreateFor(const_cast<Ice::optional<Type> &>(s)); \
 	} \
-	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Type & s) \
+	template<> DLL_PUBLIC void ModelPart::OnRootFor(Type & s, const ModelPartRootHandler & h) \
 	{ \
-		return std::make_unique<ModelPartForRoot<Type>>(&s); \
+		h(ModelPartForRoot<Type>(&s)); \
 	} \
-	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(Ice::optional<Type> & s) \
+	template<> DLL_PUBLIC void ModelPart::OnRootFor(Ice::optional<Type> & s, const ModelPartRootHandler & h) \
 	{ \
-		return std::make_unique<ModelPartForRoot<Ice::optional<Type>>>(&s); \
+		h(ModelPartForRoot<Ice::optional<Type>>(&s)); \
 	} \
-	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Type & s) \
+	template<> DLL_PUBLIC void ModelPart::OnRootFor(const Type & s, const ModelPartRootHandler & h) \
 	{ \
-		return CreateRootFor(const_cast<Type &>(s)); \
+		return OnRootFor(const_cast<Type &>(s), h); \
 	} \
-	template<> DLL_PUBLIC ModelPartForRootPtr ModelPart::CreateRootFor(const Ice::optional<Type> & s) \
+	template<> DLL_PUBLIC void ModelPart::OnRootFor(const Ice::optional<Type> & s, const ModelPartRootHandler & h) \
 	{ \
-		return CreateRootFor(const_cast<Ice::optional<Type> &>(s)); \
+		return OnRootFor(const_cast<Ice::optional<Type> &>(s), h); \
 	} \
 	template class BaseModelPart; \
 	template class ModelPartForRoot<Type>; \
@@ -91,11 +91,10 @@ namespace Ice {
 #define MODELPARTFORSTREAM(StreamImpl) \
 	namespace Slicer { \
 		template<> \
-		DLL_PUBLIC ModelPartForRootPtr \
-		ModelPart::CreateRootFor(const StreamImpl & stream) \
+		DLL_PUBLIC void \
+		ModelPart::OnRootFor(const StreamImpl & stream, const ModelPartRootHandler & h) \
 		{ \
-			return std::make_unique<ModelPartForStreamRoot<typename StreamImpl::element_type>>( \
-					const_cast<StreamImpl *>(&stream)); \
+			h(ModelPartForStreamRoot<typename StreamImpl::element_type>(const_cast<StreamImpl *>(&stream))); \
 		} \
 	}
 
