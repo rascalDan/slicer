@@ -306,7 +306,7 @@ namespace Slicer {
 		ModelPartModel<Ice::optional<typename T::element_type>>(h)
 	{
 		if (this->Model && *this->Model) {
-			modelPart = std::make_unique<T>(&**this->Model);
+			modelPart = &modelPartOwner.emplace(&**this->Model);
 		}
 	}
 
@@ -325,7 +325,7 @@ namespace Slicer {
 		BOOST_ASSERT(this->Model);
 		if (!*this->Model) {
 			*this->Model = typename T::element_type();
-			modelPart = std::make_unique<T>(&**this->Model);
+			modelPart = &modelPartOwner.emplace(&**this->Model);
 			modelPart->Create();
 		}
 	}

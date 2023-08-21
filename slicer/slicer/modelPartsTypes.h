@@ -113,7 +113,7 @@ namespace Slicer {
 
 	protected:
 		virtual bool hasModel() const = 0;
-		ModelPartUPtr modelPart;
+		ModelPart * modelPart;
 	};
 
 	template<typename T>
@@ -129,6 +129,7 @@ namespace Slicer {
 
 	protected:
 		bool hasModel() const override;
+		std::optional<T> modelPartOwner;
 	};
 
 	class DLL_PUBLIC ModelPartForComplexBase : public ModelPart {
