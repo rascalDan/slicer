@@ -108,7 +108,7 @@ namespace Slicer {
 	}
 
 	// ModelPartForRootBase
-	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) : mp(std::move(m)) { }
+	ModelPartForRootBase::ModelPartForRootBase(ModelPartParam m) : mp(m) { }
 
 	bool
 	ModelPartForRootBase::OnAnonChild(const SubPartHandler & h, const HookFilter &)

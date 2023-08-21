@@ -78,7 +78,6 @@ namespace Slicer {
 	class ModelPartForRootBase;
 	class HookCommon;
 
-	using ModelPartPtr = std::shared_ptr<ModelPart>;
 	using ModelPartUPtr = std::unique_ptr<ModelPart>;
 	using ModelPartParam = any_ptr<ModelPart>;
 	using ModelPartForRootParam = any_ptr<ModelPartForRootBase>;
@@ -139,9 +138,9 @@ namespace Slicer {
 		ModelPart & operator=(const ModelPart &) = delete;
 		ModelPart & operator=(ModelPart &&) = delete;
 
-		template<typename MP> static ModelPartPtr Make(typename MP::element_type * t);
-		template<typename T> static ModelPartPtr CreateFor(T & t);
-		template<typename T> static ModelPartPtr CreateFor(Default<T> &&);
+		template<typename MP> static void Make(typename MP::element_type * t, const ModelPartHandler &);
+		template<typename T> static void CreateFor(T & t, const ModelPartHandler &);
+		template<typename T> static void CreateFor(Default<T> &&, const ModelPartHandler &);
 		template<typename T> static void OnRootFor(T & t, const ModelPartRootHandler &);
 
 		virtual void OnEachChild(const ChildHandler &);
@@ -171,7 +170,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC ModelPartForRootBase : public ModelPart {
 	public:
-		explicit ModelPartForRootBase(ModelPartPtr mp);
+		explicit ModelPartForRootBase(ModelPartParam mp);
 
 		virtual const std::string & GetRootName() const = 0;
 		bool OnAnonChild(const SubPartHandler &, const HookFilter &) override;
@@ -183,7 +182,7 @@ namespace Slicer {
 		virtual void Read(::Ice::InputStream &) = 0;
 		void OnContained(const ModelPartHandler &) override;
 
-		ModelPartPtr mp;
+		ModelPartParam mp;
 	};
 }
 

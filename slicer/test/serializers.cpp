@@ -710,6 +710,8 @@ BOOST_AUTO_TEST_CASE(enum_lookups)
 BOOST_AUTO_TEST_CASE(sequence_element_in_same_slice_link_bug)
 {
 	// Link error when sequence element type defined in same slice.
-	BOOST_CHECK(Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr));
-	BOOST_CHECK(Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr));
+	BOOST_CHECK_NO_THROW(
+			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr, [](auto &&) {}));
+	BOOST_CHECK_NO_THROW(
+			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr, [](auto &&) {}));
 }

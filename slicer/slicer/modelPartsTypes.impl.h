@@ -33,47 +33,53 @@ namespace Ice {
 }
 
 #define CUSTOMMODELPARTFOR(Type, BaseModelPart, ModelPartType) \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::Make<ModelPartType>(typename ModelPartType::element_type * t) \
+	template<> \
+	DLL_PUBLIC void ModelPart::Make<ModelPartType>( \
+			typename ModelPartType::element_type * t, const ModelPartHandler & h) \
 	{ \
-		return std::make_shared<ModelPartType>(t); \
+		h(ModelPartType(t)); \
 	} \
 	template<> \
-	DLL_PUBLIC ModelPartPtr ModelPart::Make<ModelPartForOptional<ModelPartType>>( \
-			Ice::optional<typename ModelPartType::element_type> * t) \
+	DLL_PUBLIC void ModelPart::Make<ModelPartForOptional<ModelPartType>>( \
+			Ice::optional<typename ModelPartType::element_type> * t, const ModelPartHandler & h) \
 	{ \
-		return std::make_shared<ModelPartForOptional<ModelPartType>>(t); \
+		h(ModelPartForOptional<ModelPartType>(t)); \
 	} \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Default<Type> &&) \
+	template<> DLL_PUBLIC void ModelPart::CreateFor(Default<Type> &&, const ModelPartHandler & h) \
 	{ \
-		return Make<ModelPartType>(nullptr); \
+		return Make<ModelPartType>(nullptr, h); \
 	} \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Default<Ice::optional<Type>> &&) \
+	template<> DLL_PUBLIC void ModelPart::CreateFor(Default<Ice::optional<Type>> &&, const ModelPartHandler & h) \
 	{ \
-		return Make<ModelPartForOptional<ModelPartType>>(nullptr); \
+		return Make<ModelPartForOptional<ModelPartType>>(nullptr, h); \
 	} \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Type & s) \
+	template<> DLL_PUBLIC void ModelPart::CreateFor(Type & s, const ModelPartHandler & h) \
 	{ \
-		return Make<ModelPartType>(&s); \
+		return Make<ModelPartType>(&s, h); \
 	} \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(const Type & s) \
+	template<> DLL_PUBLIC void ModelPart::CreateFor(const Type & s, const ModelPartHandler & h) \
 	{ \
-		return CreateFor(const_cast<Type &>(s)); \
+		return CreateFor(const_cast<Type &>(s), h); \
 	} \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(Ice::optional<Type> & s) \
+	template<> DLL_PUBLIC void ModelPart::CreateFor(Ice::optional<Type> & s, const ModelPartHandler & h) \
 	{ \
-		return Make<ModelPartForOptional<ModelPartType>>(&s); \
+		return Make<ModelPartForOptional<ModelPartType>>(&s, h); \
 	} \
-	template<> DLL_PUBLIC ModelPartPtr ModelPart::CreateFor(const Ice::optional<Type> & s) \
+	template<> DLL_PUBLIC void ModelPart::CreateFor(const Ice::optional<Type> & s, const ModelPartHandler & h) \
 	{ \
-		return CreateFor(const_cast<Ice::optional<Type> &>(s)); \
+		return CreateFor(const_cast<Ice::optional<Type> &>(s), h); \
 	} \
 	template<> DLL_PUBLIC void ModelPart::OnRootFor(Type & s, const ModelPartRootHandler & h) \
 	{ \
-		h(ModelPartForRoot<Type>(&s)); \
+		return CreateFor(s, [&s, &h](auto && mp) { \
+			h(ModelPartForRoot<Type>(&s, mp)); \
+		}); \
 	} \
 	template<> DLL_PUBLIC void ModelPart::OnRootFor(Ice::optional<Type> & s, const ModelPartRootHandler & h) \
 	{ \
-		h(ModelPartForRoot<Ice::optional<Type>>(&s)); \
+		return CreateFor(s, [&s, &h](auto && mp) { \
+			h(ModelPartForRoot<Ice::optional<Type>>(&s, mp)); \
+		}); \
 	} \
 	template<> DLL_PUBLIC void ModelPart::OnRootFor(const Type & s, const ModelPartRootHandler & h) \
 	{ \
@@ -94,7 +100,8 @@ namespace Ice {
 		DLL_PUBLIC void \
 		ModelPart::OnRootFor(const StreamImpl & stream, const ModelPartRootHandler & h) \
 		{ \
-			h(ModelPartForStreamRoot<typename StreamImpl::element_type>(const_cast<StreamImpl *>(&stream))); \
+			ModelPartForStream<typename StreamImpl::element_type> strm(const_cast<StreamImpl *>(&stream)); \
+			h(ModelPartForStreamRoot<typename StreamImpl::element_type>(strm)); \
 		} \
 	}
 
@@ -111,7 +118,7 @@ namespace Ice {
 namespace Slicer {
 	// ModelPartForRoot
 	template<typename T>
-	ModelPartForRoot<T>::ModelPartForRoot(T * o) : ModelPartForRootBase(ModelPart::CreateFor(*o)), ModelObject(o)
+	ModelPartForRoot<T>::ModelPartForRoot(T * o, ModelPartParam omp) : ModelPartForRootBase(omp), ModelObject(o)
 	{
 	}
 
@@ -347,7 +354,9 @@ namespace Slicer {
 	ModelPartForComplex<T>::OnEachChild(const ChildHandler & ch)
 	{
 		for (const auto & h : hooks()) {
-			h->apply(ch, h->Get(GetModel()));
+			h->On(GetModel(), [h, &ch](auto && mp) {
+				h->apply(ch, mp);
+			});
 		}
 	}
 
@@ -361,8 +370,9 @@ namespace Slicer {
 		});
 		if (itr != range.end()) {
 			const auto & h = *itr;
-			auto model = GetModel();
-			ch(h->Get(model), h->GetMetadata());
+			h->On(GetModel(), [h, &ch](auto && mp) {
+				ch(mp, h->GetMetadata());
+			});
 			return true;
 		}
 		return false;
@@ -394,7 +404,7 @@ namespace Slicer {
 	public:
 		using HookCommon::HookCommon;
 
-		virtual ModelPartPtr Get(T * t) const = 0;
+		virtual void On(T * t, const ModelPartHandler &) const = 0;
 	};
 
 	template<typename T>
@@ -417,13 +427,13 @@ namespace Slicer {
 			return hookMetadata;
 		}
 
-		ModelPartPtr
-		Get(T * t) const override
+		void
+		On(T * t, const ModelPartHandler & h) const override
 		{
 			if (t) {
-				return Make<MP>(&(t->*member));
+				return Make<MP>(&(t->*member), h);
 			}
-			return Make<MP>(nullptr);
+			return Make<MP>(nullptr, h);
 		}
 
 	private:
@@ -480,7 +490,7 @@ namespace Slicer {
 	void
 	ModelPartForClass<T>::CreateModelPart(void * p, const ModelPartHandler & h)
 	{
-		return h(::Slicer::ModelPart::CreateFor(*static_cast<element_type *>(p)));
+		return ::Slicer::ModelPart::CreateFor(*static_cast<element_type *>(p), h);
 	}
 
 	template<typename T>
@@ -599,7 +609,9 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		for (auto & element : *this->Model) {
-			ch(elementName, ModelPart::CreateFor(element), NULL);
+			ModelPart::CreateFor(element, [&ch](auto && mp) {
+				ch(elementName, mp, nullptr);
+			});
 		}
 	}
 
@@ -608,7 +620,9 @@ namespace Slicer {
 	ModelPartForSequence<T>::OnAnonChild(const SubPartHandler & ch, const HookFilter &)
 	{
 		BOOST_ASSERT(this->Model);
-		ch(ModelPart::CreateFor(this->Model->emplace_back()), emptyMetadata);
+		ModelPart::CreateFor(this->Model->emplace_back(), [&ch](auto && mp) {
+			ch(mp, emptyMetadata);
+		});
 		return true;
 	}
 
@@ -630,7 +644,7 @@ namespace Slicer {
 	void
 	ModelPartForSequence<T>::OnContained(const ModelPartHandler & h)
 	{
-		return h(ModelPart::CreateFor(Default<typename T::value_type> {}));
+		return ModelPart::CreateFor(Default<typename T::value_type> {}, h);
 	}
 
 	// ModelPartForDictionaryElementInserter
@@ -699,7 +713,7 @@ namespace Slicer {
 	void
 	ModelPartForStream<T>::OnContained(const ModelPartHandler & h)
 	{
-		return h(ModelPart::CreateFor(Default<T> {}));
+		ModelPart::CreateFor(Default<T> {}, h);
 	}
 
 	template<typename T>
@@ -708,14 +722,10 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		this->Model->Produce([&ch](const T & element) {
-			ch(ModelPartForSequence<std::vector<T>>::elementName, ModelPart::CreateFor(element), NULL);
+			ModelPart::CreateFor(element, [&ch](auto && mp) {
+				ch(ModelPartForSequence<std::vector<T>>::elementName, mp, nullptr);
+			});
 		});
-	}
-
-	template<typename T>
-	ModelPartForStreamRoot<T>::ModelPartForStreamRoot(Stream<T> * s) :
-		ModelPartForStreamRootBase(std::make_shared<ModelPartForStream<T>>(s))
-	{
 	}
 
 	template<typename T>

@@ -175,9 +175,9 @@ namespace TestModule {
 
 namespace Slicer {
 	template<>
-	DLL_PUBLIC ModelPartPtr
-	ModelPart::Make<TestModule::MonthValidator>(::Ice::Short * m)
+	DLL_PUBLIC void
+	ModelPart::Make<TestModule::MonthValidator>(::Ice::Short * m, const ModelPartHandler & h)
 	{
-		return std::make_shared<TestModule::MonthValidator>(m);
+		return h(TestModule::MonthValidator(m));
 	}
 }

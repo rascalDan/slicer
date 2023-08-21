@@ -26,7 +26,7 @@ namespace Slicer {
 
 	template<typename T> class ModelPartForRoot : public ModelPartForRootBase {
 	public:
-		explicit ModelPartForRoot(T * o);
+		explicit ModelPartForRoot(T * o, ModelPartParam mp);
 
 		const std::string & GetRootName() const override;
 		bool HasValue() const override;
@@ -269,9 +269,6 @@ namespace Slicer {
 
 		static const Metadata metadata;
 		static const std::string elementName;
-
-	private:
-		// ModelPartPtr elementModelPart(typename T::value_type &) const;
 	};
 
 	template<typename T>
@@ -356,7 +353,7 @@ namespace Slicer {
 
 	template<typename T> class ModelPartForStreamRoot : public ModelPartForStreamRootBase {
 	public:
-		explicit ModelPartForStreamRoot(Stream<T> * s);
+		using ModelPartForStreamRootBase::ModelPartForStreamRootBase;
 
 		const std::string & GetRootName() const override;
 	};
