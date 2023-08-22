@@ -9,6 +9,7 @@
 
 namespace DB {
 	class SelectCommand;
+	class Column;
 }
 
 namespace Slicer {
@@ -20,15 +21,19 @@ namespace Slicer {
 		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
-		void DLL_PRIVATE DeserializeSimple(ModelPartParam);
-		void DLL_PRIVATE DeserializeObject(ModelPartParam);
-		void DLL_PRIVATE DeserializeSequence(ModelPartParam);
-		void DLL_PRIVATE DeserializeRow(ModelPartParam);
+		DLL_PRIVATE void DeserializeSimple(ModelPartParam);
+		DLL_PRIVATE void DeserializeObject(ModelPartParam);
+		DLL_PRIVATE void DeserializeSequence(ModelPartParam);
+		DLL_PRIVATE void DeserializeRow(ModelPartParam);
+		DLL_PRIVATE void fillLowerColumnNameCache();
+		DLL_PRIVATE inline const DB::Column * searchOrFilleColumnCache(size_t idx, const HookCommon * hook);
 
 		DB::SelectCommand * cmd;
 		unsigned int columnCount;
 		std::optional<std::string> typeIdColName;
 		std::optional<unsigned int> typeIdColIdx;
+		std::vector<std::string> lowerColumnNames;
+		std::vector<const DB::Column *> orderedColumns;
 	};
 }
 
