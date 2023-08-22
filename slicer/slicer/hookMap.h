@@ -11,6 +11,7 @@
 
 namespace Slicer {
 	void DLL_PUBLIC to_lower(std::string & s);
+	[[nodiscard]] std::string DLL_PUBLIC to_lower_copy(const std::string & s);
 
 	template<typename T> class ModelPartForComplex; // IWYU pragma: keep
 

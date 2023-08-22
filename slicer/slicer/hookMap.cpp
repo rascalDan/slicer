@@ -7,4 +7,10 @@ namespace Slicer {
 	{
 		boost::algorithm::to_lower(s);
 	}
+
+	std::string
+	to_lower_copy(const std::string & s)
+	{
+		return boost::algorithm::to_lower_copy(s);
+	}
 }
