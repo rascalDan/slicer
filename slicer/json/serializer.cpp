@@ -395,6 +395,8 @@ namespace Slicer {
 				{});
 	}
 
+	JsonValueSerializer::~JsonValueSerializer() = default;
+
 	void
 	JsonValueSerializer::Serialize(ModelPartForRootParam modelRoot)
 	{

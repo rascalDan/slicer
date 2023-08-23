@@ -13,6 +13,10 @@
 namespace Slicer {
 	class DLL_PUBLIC JsonValueSerializer : public Serializer {
 	public:
+		JsonValueSerializer() = default;
+		~JsonValueSerializer() override;
+		SPECIAL_MEMBERS_DEFAULT(JsonValueSerializer);
+
 		void Serialize(ModelPartForRootParam) override;
 
 	protected:
