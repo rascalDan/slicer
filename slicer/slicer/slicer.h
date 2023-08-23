@@ -8,10 +8,12 @@
 namespace Slicer {
 	template<typename Object>
 	Object
-	DeserializeAnyWith(const DeserializerPtr & deserializer)
+	DeserializeAnyWith(any_ptr<Deserializer> deserializer)
 	{
 		Object object {};
-		deserializer->Deserialize(ModelPart::CreateRootFor<Object>(object));
+		ModelPart::OnRootFor<Object>(object, [deserializer](auto && mp) {
+			deserializer->Deserialize(mp);
+		});
 		return object;
 	}
 
@@ -19,21 +21,23 @@ namespace Slicer {
 	Object
 	DeserializeAny(SerializerParams &&... sp)
 	{
-		return DeserializeAnyWith<Object>(std::make_shared<Deserializer>(std::forward<SerializerParams>(sp)...));
+		return DeserializeAnyWith<Object>(Deserializer(std::forward<SerializerParams>(sp)...));
 	}
 
 	template<typename Object>
 	void
-	SerializeAnyWith(const Object & object, const SerializerPtr & serializer)
+	SerializeAnyWith(const Object & object, any_ptr<Serializer> serializer)
 	{
-		serializer->Serialize(ModelPart::CreateRootFor<const Object>(object));
+		ModelPart::OnRootFor<const Object>(object, [serializer](auto && mp) {
+			serializer->Serialize(mp);
+		});
 	}
 
 	template<typename Serializer, typename Object, typename... SerializerParams>
 	void
 	SerializeAny(const Object & object, SerializerParams &&... sp)
 	{
-		SerializeAnyWith(object, std::make_shared<Serializer>(std::forward<SerializerParams>(sp)...));
+		SerializeAnyWith(object, Serializer(std::forward<SerializerParams>(sp)...));
 	}
 }
 

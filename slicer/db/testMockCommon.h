@@ -5,6 +5,7 @@
 #include <mockDatabase.h>
 #include <pq-mock.h>
 #include <visibility.h>
+
 // IWYU pragma: no_forward_declare PQ::Mock
 namespace DB {
 	class Connection;

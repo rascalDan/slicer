@@ -53,26 +53,31 @@ namespace Slicer {
 		{
 			return countIfUsed(c, classes, !c->isInterface());
 		}
+
 		[[nodiscard]] bool
 		visitStructStart(const Slice::StructPtr & s) override
 		{
 			return countIfUsed(s, structs);
 		}
+
 		void
 		visitSequence(const Slice::SequencePtr & s) override
 		{
 			countIfUsed(s, sequences);
 		}
+
 		void
 		visitDictionary(const Slice::DictionaryPtr & d) override
 		{
 			countIfUsed(d, dictionaries);
 		}
+
 		void
 		visitEnum(const Slice::EnumPtr & e) override
 		{
 			countIfUsed(e, enums);
 		}
+
 		[[nodiscard]] auto
 		complexes() const
 		{
@@ -233,13 +238,13 @@ namespace Slicer {
 			fprintbf(cpp, "\tconversion_fail(\"%s\");\n", Slice::typeToString(type));
 			fprintbf(cpp, "}\n\n");
 
-			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<");
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC void ModelPart::Make<");
 			createModelPartForConverted(type, c->scoped(), dm);
 			fprintbf(cpp, ">(typename ");
 			createModelPartForConverted(type, c->scoped(), dm);
-			fprintbf(cpp, "::element_type * t) { return std::make_shared<");
+			fprintbf(cpp, "::element_type * t, const ModelPartHandler & h) { return h(");
 			createModelPartForConverted(type, c->scoped(), dm);
-			fprintbf(cpp, ">(t); } \n");
+			fprintbf(cpp, "(t)); } \n");
 		}
 	}
 
@@ -439,9 +444,9 @@ namespace Slicer {
 		if (auto cmp = md.value("slicer:custommodelpart:")) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s)\n\n", Slice::typeToString(decl),
 					getBasicModelPart(decl), c->scoped(), CppName {*cmp});
-			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s<%s> >(%s * t)",
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC void ModelPart::Make<%s<%s> >(%s * t, const ModelPartHandler & h)",
 					getBasicModelPart(decl), c->scoped(), Slice::typeToString(decl));
-			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
+			fprintbf(cpp, "{ return h(%s(t)); } \n", CppName {*cmp});
 		}
 		else {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, ModelPartForClass<%s>, ModelPartForClass<%s>)\n\n",
@@ -759,9 +764,9 @@ namespace Slicer {
 		if (auto cmp = metadata.value("slicer:custommodelpart:")) {
 			fprintbf(cpp, "CUSTOMMODELPARTFOR(%s, %s< %s >, %s)\n\n", type, getBasicModelPart(stype), type,
 					CppName {*cmp});
-			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC ModelPartPtr ModelPart::Make<%s<%s>>(%s * t)",
+			fprintbf(cpp, "\ttemplate<> DLL_PUBLIC void ModelPart::Make<%s<%s>>(%s * t, const ModelPartHandler & h)",
 					getBasicModelPart(stype), type, type);
-			fprintbf(cpp, "{ return std::make_shared<%s>(t); } \n", CppName {*cmp});
+			fprintbf(cpp, "{ return h(%s(t)); } \n", CppName {*cmp});
 		}
 		else {
 			fprintbf(cpp, "MODELPARTFOR(%s, %s)\n\n", type, getBasicModelPart(stype));

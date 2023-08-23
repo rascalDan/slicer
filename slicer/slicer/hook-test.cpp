@@ -15,6 +15,7 @@ namespace test {
 		int AA;
 		std::string b;
 	};
+
 	const std::string aa {"aa"}, aA {"aA"}, Aa {"Aa"}, AA {"AA"}, b {"b"};
 
 	using C = Slicer::ModelPartForComplex<S>;

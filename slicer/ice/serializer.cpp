@@ -22,7 +22,7 @@ namespace Slicer {
 	}
 
 	void
-	IceBlobSerializer::Serialize(ModelPartForRootPtr mp)
+	IceBlobSerializer::Serialize(ModelPartForRootParam mp)
 	{
 		Ice::OutputStream s(ic);
 		mp->Write(s);
@@ -32,7 +32,7 @@ namespace Slicer {
 	IceStreamSerializer::IceStreamSerializer(std::ostream & os) : strm(os) { }
 
 	void
-	IceStreamSerializer::Serialize(ModelPartForRootPtr mp)
+	IceStreamSerializer::Serialize(ModelPartForRootParam mp)
 	{
 		IceBlobSerializer::Serialize(mp);
 		strm.write(reinterpret_cast<const char *>(blob.data()), static_cast<std::streamsize>(blob.size()));
@@ -41,7 +41,7 @@ namespace Slicer {
 	IceBlobDeserializer::IceBlobDeserializer(const Ice::ByteSeq & b) : refblob(b) { }
 
 	void
-	IceBlobDeserializer::Deserialize(ModelPartForRootPtr mp)
+	IceBlobDeserializer::Deserialize(ModelPartForRootParam mp)
 	{
 		Ice::InputStream s(ic, refblob);
 		mp->Read(s);
@@ -50,7 +50,7 @@ namespace Slicer {
 	IceStreamDeserializer::IceStreamDeserializer(std::istream & is) : IceBlobDeserializer(blob), strm(is) { }
 
 	void
-	IceStreamDeserializer::Deserialize(ModelPartForRootPtr mp)
+	IceStreamDeserializer::Deserialize(ModelPartForRootParam mp)
 	{
 		blob.assign(std::istreambuf_iterator<char>(strm), std::istreambuf_iterator<char>());
 		IceBlobDeserializer::Deserialize(mp);

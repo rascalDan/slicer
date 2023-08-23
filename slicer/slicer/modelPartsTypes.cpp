@@ -17,6 +17,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+
 // IWYU pragma: no_forward_declare boost::multi_index::member
 // IWYU pragma: no_include <boost/operators.hpp>
 
@@ -37,45 +38,26 @@ namespace Slicer {
 							boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::second>,
 							std::less<>>>>;
 
-	static void createClassMaps() __attribute__((constructor(208)));
-	static void deleteClassMaps() __attribute__((destructor(208)));
-	static ClassNameMap * names;
-	static ClassRefMap * refs;
+	namespace {
+		constinit std::unique_ptr<ClassNameMap> names;
+		constinit std::unique_ptr<ClassRefMap> refs;
 
-	void
-	createClassMaps()
-	{
-		names = new ClassNameMap();
-		refs = new ClassRefMap();
-	}
+		void createClassMaps() __attribute__((constructor(208)));
 
-	static void
-	deleteClassMaps()
-	{
-		delete names;
-		delete refs;
-		names = nullptr;
-		refs = nullptr;
-	}
-
-	ClassNameMap *
-	classNameMap()
-	{
-		return names;
-	}
-
-	ClassRefMap *
-	classRefMap()
-	{
-		return refs;
+		void
+		createClassMaps()
+		{
+			names = std::make_unique<ClassNameMap>();
+			refs = std::make_unique<ClassRefMap>();
+		}
 	}
 
 	const std::string &
 	ModelPartForComplexBase::ToModelTypeName(const std::string & name)
 	{
-		auto & right = classNameMap()->get<1>();
-		auto mapped = right.find(name);
-		if (mapped != right.end()) {
+		const auto & right = names->get<1>();
+
+		if (const auto mapped = right.find(name); mapped != right.end()) {
 			return mapped->first;
 		}
 		return name;
@@ -84,9 +66,9 @@ namespace Slicer {
 	const std::string &
 	ModelPartForComplexBase::ToExchangeTypeName(const std::string & name)
 	{
-		auto & left = classNameMap()->get<0>();
-		auto mapped = left.find(name);
-		if (mapped != left.end()) {
+		const auto & left = names->get<0>();
+
+		if (const auto mapped = left.find(name); mapped != left.end()) {
 			return mapped->second;
 		}
 		return name;
@@ -126,22 +108,24 @@ namespace Slicer {
 	}
 
 	// ModelPartForRootBase
-	ModelPartForRootBase::ModelPartForRootBase(ModelPartPtr m) : mp(std::move(m)) { }
+	ModelPartForRootBase::ModelPartForRootBase(ModelPartParam m) : mp(m) { }
 
-	ChildRef
-	ModelPartForRootBase::GetAnonChildRef(const HookFilter &)
+	bool
+	ModelPartForRootBase::OnAnonChild(const SubPartHandler & h, const HookFilter &)
 	{
 		mp->Create();
-		return ChildRef(mp);
+		h(mp, emptyMetadata);
+		return true;
 	}
 
-	ChildRef
-	ModelPartForRootBase::GetChildRef(std::string_view name, const HookFilter & hf, bool matchCase)
+	bool
+	ModelPartForRootBase::OnChild(
+			const SubPartHandler & h, std::string_view name, const HookFilter & hf, bool matchCase)
 	{
 		if (!optionalCaseEq(name, GetRootName(), matchCase)) {
 			throw IncorrectElementName(std::string {name});
 		}
-		return GetAnonChildRef(hf);
+		return OnAnonChild(h, hf);
 	}
 
 	void
@@ -162,67 +146,44 @@ namespace Slicer {
 		return mp->IsOptional();
 	}
 
-	ModelPartPtr
-	ModelPartForRootBase::GetContainedModelPart()
+	void
+	ModelPartForRootBase::OnContained(const ModelPartHandler & h)
 	{
-		return mp->GetContainedModelPart();
+		return mp->OnContained(h);
 	}
 
-	void
-	ModelPartForSimpleBase::OnEachChild(const ChildHandler &)
-	{
-	}
-	ChildRef
-	ModelPartForSimpleBase::GetAnonChildRef(const HookFilter &)
-	{
-		return ChildRef();
-	}
-	ChildRef
-	ModelPartForSimpleBase::GetChildRef(std::string_view, const HookFilter &, bool)
-	{
-		return ChildRef();
-	}
 	bool
 	ModelPartForSimpleBase::HasValue() const
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForSimpleBase::GetType() const
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForSimpleBase::type = ModelPartType::Simple;
 
-	void
-	ModelPartForConvertedBase::OnEachChild(const ChildHandler &)
-	{
-	}
-	ChildRef
-	ModelPartForConvertedBase::GetAnonChildRef(const HookFilter &)
-	{
-		return ChildRef();
-	}
-	ChildRef
-	ModelPartForConvertedBase::GetChildRef(std::string_view, const HookFilter &, bool)
-	{
-		return ChildRef();
-	}
 	bool
 	ModelPartForConvertedBase::HasValue() const
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForConvertedBase::GetType() const
 	{
 		return type;
 	}
+
 	void
 	ModelPartForConvertedBase::conversion_fail(std::string_view typeName)
 	{
 		throw NoConversionFound(std::string {typeName});
 	}
+
 	const ModelPartType ModelPartForConvertedBase::type = ModelPartType::Simple;
 
 	ModelPartType
@@ -230,33 +191,37 @@ namespace Slicer {
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForComplexBase::type = ModelPartType::Complex;
+
 	void
 	ModelPartForComplexBase::registerClass(
 			const std::string & className, const std::string * typeName, const ClassRef & cr)
 	{
-		Slicer::classRefMap()->insert({className, cr});
+		refs->emplace(className, cr);
 		if (typeName) {
-			Slicer::classNameMap()->insert({className, *typeName});
+			names->emplace(className, *typeName);
 		}
 	}
+
 	void
 	ModelPartForComplexBase::unregisterClass(const std::string & className, const std::string * typeName)
 	{
-		Slicer::classRefMap()->erase(className);
+		refs->erase(className);
 		if (typeName) {
-			classNameMap()->get<0>().erase(className);
+			names->get<0>().erase(className);
 		}
 	}
-	ModelPartPtr
-	ModelPartForComplexBase::getSubclassModelPart(const std::string & name, void * m)
+
+	void
+	ModelPartForComplexBase::onSubclass(const std::string & name, void * m, const ModelPartHandler & h)
 	{
-		auto ref = classRefMap()->find(ToModelTypeName(name));
-		if (ref == classRefMap()->end()) {
-			throw UnknownType(name);
+		if (const auto ref = refs->find(ToModelTypeName(name)); ref != refs->end()) {
+			return ref->second(m, h);
 		}
-		return ref->second(m);
+		throw UnknownType(name);
 	}
+
 	TypeId
 	ModelPartForComplexBase::getTypeId(const std::string & id, const std::string & className)
 	{
@@ -287,22 +252,23 @@ namespace Slicer {
 		}
 	}
 
-	ChildRef
-	ModelPartForOptionalBase::GetAnonChildRef(const HookFilter & flt)
+	bool
+	ModelPartForOptionalBase::OnAnonChild(const SubPartHandler & h, const HookFilter & flt)
 	{
 		if (this->hasModel()) {
-			return modelPart->GetAnonChildRef(flt);
+			return modelPart->OnAnonChild(h, flt);
 		}
-		return ChildRef();
+		return false;
 	}
 
-	ChildRef
-	ModelPartForOptionalBase::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
+	bool
+	ModelPartForOptionalBase::OnChild(
+			const SubPartHandler & h, std::string_view name, const HookFilter & flt, bool matchCase)
 	{
 		if (this->hasModel()) {
-			return modelPart->GetChildRef(name, flt, matchCase);
+			return modelPart->OnChild(h, name, flt, matchCase);
 		}
-		return ChildRef();
+		return false;
 	}
 
 	void
@@ -331,30 +297,18 @@ namespace Slicer {
 		return modelPart->GetMetadata();
 	}
 
-	void
-	ModelPartForEnumBase::OnEachChild(const ChildHandler &)
-	{
-	}
-	ChildRef
-	ModelPartForEnumBase::GetAnonChildRef(const HookFilter &)
-	{
-		return ChildRef();
-	}
-	ChildRef
-	ModelPartForEnumBase::GetChildRef(std::string_view, const HookFilter &, bool)
-	{
-		return ChildRef();
-	}
 	bool
 	ModelPartForEnumBase::HasValue() const
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForEnumBase::GetType() const
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForEnumBase::type = ModelPartType::Simple;
 
 	bool
@@ -362,19 +316,23 @@ namespace Slicer {
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForSequenceBase::GetType() const
 	{
 		return type;
 	}
-	ChildRef
-	ModelPartForSequenceBase::GetChildRef(std::string_view name, const HookFilter & flt, bool matchCase)
+
+	bool
+	ModelPartForSequenceBase::OnChild(
+			const SubPartHandler & h, std::string_view name, const HookFilter & flt, bool matchCase)
 	{
 		if (!name.empty() && !optionalCaseEq(name, GetElementName(), matchCase)) {
 			throw IncorrectElementName(std::string {name});
 		}
-		return GetAnonChildRef(flt);
+		return OnAnonChild(h, flt);
 	}
+
 	const ModelPartType ModelPartForSequenceBase::type = ModelPartType::Sequence;
 
 	bool
@@ -382,55 +340,48 @@ namespace Slicer {
 	{
 		return true;
 	}
+
 	ModelPartType
 	ModelPartForDictionaryBase::GetType() const
 	{
 		return type;
 	}
+
 	const ModelPartType ModelPartForDictionaryBase::type = ModelPartType::Dictionary;
 
 	// Streams
-	// NOLINTNEXTLINE(hicpp-no-array-decay)
-	ChildRef
-	ModelPartForStreamBase::GetAnonChildRef(const Slicer::HookFilter &)
-	{
-		throw InvalidStreamOperation(__FUNCTION__);
-	}
-	// NOLINTNEXTLINE(hicpp-no-array-decay)
-	ChildRef
-	ModelPartForStreamBase::GetChildRef(std::string_view, const Slicer::HookFilter &, bool)
-	{
-		throw InvalidStreamOperation(__FUNCTION__);
-	}
 	ModelPartType
 	ModelPartForStreamBase::GetType() const
 	{
 		return ModelPartType::Sequence;
 	}
+
 	bool
 	ModelPartForStreamBase::HasValue() const
 	{
 		return true;
 	}
-	// Stream Roots
-	ModelPartForStreamRootBase::ModelPartForStreamRootBase(const ModelPartPtr & m) : ModelPartForRootBase(m) { }
+
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void
 	ModelPartForStreamRootBase::Write(Ice::OutputStream &) const
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}
+
 	// NOLINTNEXTLINE(hicpp-no-array-decay)
 	void
 	ModelPartForStreamRootBase::Read(Ice::InputStream &)
 	{
 		throw InvalidStreamOperation(__FUNCTION__);
 	}
+
 	bool
 	ModelPartForStreamRootBase::HasValue() const
 	{
 		return mp->HasValue();
 	}
+
 	void
 	ModelPartForStreamRootBase::OnEachChild(const ChildHandler & ch)
 	{

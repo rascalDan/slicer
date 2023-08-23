@@ -5,6 +5,7 @@
 #include <memory>
 #include <selectcommand.h>
 #include <slicer/common.h>
+#include <slicer/hookMap.h>
 #include <slicer/modelParts.h>
 #include <utility>
 
@@ -15,7 +16,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::Deserialize(Slicer::ModelPartForRootPtr mp)
+	SqlSelectDeserializer::Deserialize(ModelPartForRootParam mp)
 	{
 		cmd->execute();
 		columnCount = cmd->columnCount();
@@ -38,7 +39,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeSimple(const Slicer::ModelPartPtr & mp)
+	SqlSelectDeserializer::DeserializeSimple(ModelPartParam mp)
 	{
 		if (!cmd->fetch()) {
 			if (!mp->IsOptional()) {
@@ -47,10 +48,11 @@ namespace Slicer {
 			return;
 		}
 		if (!(*cmd)[0].isNull()) {
-			auto fmp = mp->GetAnonChild();
-			fmp->Create();
-			fmp->SetValue(SqlSource((*cmd)[0]));
-			fmp->Complete();
+			mp->OnAnonChild([this](auto && fmp, auto &&) {
+				fmp->Create();
+				fmp->SetValue(SqlSource((*cmd)[0]));
+				fmp->Complete();
+			});
 		}
 		if (cmd->fetch()) {
 			throw TooManyRowsReturned();
@@ -58,16 +60,60 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeSequence(const Slicer::ModelPartPtr & omp)
+	SqlSelectDeserializer::fillLowerColumnNameCache()
 	{
-		auto mp = omp->GetAnonChild();
-		while (cmd->fetch()) {
-			DeserializeRow(mp);
+		BOOST_ASSERT(lowerColumnNames.empty());
+		lowerColumnNames.reserve(columnCount);
+		orderedColumns.reserve(columnCount);
+		for (auto col = 0U; col < columnCount; col += 1) {
+			const DB::Column & c = (*cmd)[col];
+			lowerColumnNames.emplace_back(to_lower_copy(c.name));
+		}
+	}
+
+	const DB::Column *
+	SqlSelectDeserializer::searchOrFilleColumnCache(size_t idx, const HookCommon * hook)
+	{
+		if (idx < orderedColumns.size()) {
+			return orderedColumns[idx];
+		}
+		BOOST_ASSERT(idx == orderedColumns.size());
+		if (const auto itr = std::find(lowerColumnNames.begin(), lowerColumnNames.end(), hook->nameLower);
+				itr != lowerColumnNames.end()) {
+			return orderedColumns.emplace_back(&(*cmd)[static_cast<unsigned int>(itr - lowerColumnNames.begin())]);
+		}
+		else {
+			return orderedColumns.emplace_back(nullptr);
+		}
+	}
+
+	namespace {
+		void
+		assignFromColumn(ModelPartParam fmp, const DB::Column & c)
+		{
+			BOOST_ASSERT(fmp);
+			BOOST_ASSERT(!c.isNull());
+			fmp->Create();
+			fmp->SetValue(SqlSource(c));
+			fmp->Complete();
 		}
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeObject(const Slicer::ModelPartPtr & mp)
+	SqlSelectDeserializer::DeserializeSequence(ModelPartParam omp)
+	{
+		omp->OnAnonChild([this](auto && mp, auto &&) {
+			if (!typeIdColIdx && lowerColumnNames.empty()) {
+				fillLowerColumnNameCache();
+			}
+			while (cmd->fetch()) {
+				DeserializeRow(mp);
+			}
+		});
+	}
+
+	void
+	SqlSelectDeserializer::DeserializeObject(ModelPartParam mp)
 	{
 		if (!cmd->fetch()) {
 			if (!mp->IsOptional()) {
@@ -83,43 +129,51 @@ namespace Slicer {
 	}
 
 	void
-	SqlSelectDeserializer::DeserializeRow(const Slicer::ModelPartPtr & mp)
+	SqlSelectDeserializer::DeserializeRow(ModelPartParam mp)
 	{
-		auto rmp = mp->GetAnonChild();
-		if (rmp) {
+		mp->OnAnonChild([this](auto && rmp, auto &&) {
 			switch (rmp->GetType()) {
 				case Slicer::ModelPartType::Complex: {
+					auto apply = [this](auto && rcmp) {
+						rcmp->Create();
+						if (typeIdColIdx || lowerColumnNames.empty()) {
+							for (auto col = 0U; col < columnCount; col += 1) {
+								const DB::Column & c = (*cmd)[col];
+								if (!c.isNull()) {
+									rcmp->OnChild(
+											[&c](auto && fmp, auto &&) {
+												assignFromColumn(fmp, c);
+											},
+											c.name, nullptr, false);
+								}
+							}
+						}
+						else {
+							rcmp->OnEachChild([idx = 0U, this](auto &&, auto && fmp, auto && hook) mutable {
+								if (auto c = searchOrFilleColumnCache(idx, hook); c && !c->isNull()) {
+									assignFromColumn(fmp, *c);
+								}
+								++idx;
+							});
+						}
+						rcmp->Complete();
+					};
 					if (typeIdColIdx) {
 						std::string subclass;
 						(*cmd)[*typeIdColIdx] >> subclass;
-						rmp = rmp->GetSubclassModelPart(subclass);
+						return rmp->OnSubclass(apply, subclass);
 					}
-					rmp->Create();
-					for (auto col = 0U; col < columnCount; col += 1) {
-						const DB::Column & c = (*cmd)[col];
-						if (!c.isNull()) {
-							auto fmpr = rmp->GetChildRef(c.name, nullptr, false);
-							if (fmpr) {
-								auto fmp = fmpr.Child();
-								fmp->Create();
-								fmp->SetValue(SqlSource(c));
-								fmp->Complete();
-							}
-						}
-					}
-					rmp->Complete();
+					apply(rmp);
 				} break;
 				case Slicer::ModelPartType::Simple: {
-					rmp->Create();
 					const DB::Column & c = (*cmd)[0];
 					if (!c.isNull()) {
-						rmp->SetValue(SqlSource(c));
+						assignFromColumn(rmp, c);
 					}
-					rmp->Complete();
 				} break;
 				default:
 					throw UnsupportedModelType();
 			}
-		}
+		});
 	}
 }

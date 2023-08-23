@@ -10,6 +10,7 @@
 #include <string_view>
 #include <vector>
 #include <visibility.h>
+
 // IWYU pragma: no_include <boost/iterator/transform_iterator.hpp>
 
 namespace Slicer {
@@ -27,6 +28,7 @@ namespace Slicer {
 	public:
 		struct Args : public SplitString {
 			explicit inline Args(std::string_view in) : SplitString {in, ","} { }
+
 			using SplitString::SplitString;
 		};
 

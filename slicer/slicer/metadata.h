@@ -109,6 +109,7 @@ namespace Slicer {
 	template<std::size_t N> class DLL_PUBLIC MetaDataImpl : public MetaData<> {
 	public:
 		using Arr = ContainerBase<N>;
+
 		constexpr inline explicit MetaDataImpl(const std::array<std::string_view, N> & a) :
 			arr {[&a]() {
 				Arr rtn;

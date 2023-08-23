@@ -11,31 +11,31 @@ namespace Slicer {
 	constexpr std::string_view md_global_ignore {"ignore"};
 
 	bool
-	isPKey(const HookCommon * h)
+	isPKey(const HookCommon * h) noexcept
 	{
 		return h->GetMetadata().flagSet(md_pkey) && isBind(h);
 	}
 
 	bool
-	isAuto(const HookCommon * h)
+	isAuto(const HookCommon * h) noexcept
 	{
 		return h->GetMetadata().flagSet(md_auto) && isBind(h);
 	}
 
 	bool
-	isNotAuto(const HookCommon * h)
+	isNotAuto(const HookCommon * h) noexcept
 	{
 		return h->GetMetadata().flagNotSet(md_auto) && isBind(h);
 	}
 
 	bool
-	isBind(const HookCommon * h)
+	isBind(const HookCommon * h) noexcept
 	{
 		return h->GetMetadata().flagNotSet(md_global_ignore) && h->GetMetadata().flagNotSet(md_ignore);
 	}
 
 	bool
-	isValue(const HookCommon * h)
+	isValue(const HookCommon * h) noexcept
 	{
 		return h->GetMetadata().flagNotSet(md_auto) && h->GetMetadata().flagNotSet(md_pkey) && isBind(h);
 	}
@@ -59,6 +59,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(UnsuitableIdFieldTypeMsg, "Unsuitable id field type [%?]");
+
 	void
 	UnsuitableIdFieldType::ice_print(std::ostream & s) const
 	{

@@ -13,6 +13,7 @@
 #include <visibility.h>
 
 #define SHORT(x) boost::numeric_cast<::Ice::Short, int64_t>(x)
+
 inline auto
 USHORT(std::integral auto x)
 {
@@ -40,8 +41,8 @@ namespace Slicer {
 	std::string
 	isoDateToString(const ::TestModule::IsoDate & in)
 	{
-		struct tm tm {
-		};
+		struct tm tm { };
+
 		tm.tm_mday = in.day;
 		tm.tm_mon = in.month - 1;
 		tm.tm_year = in.year - 1900;
@@ -56,8 +57,8 @@ namespace Slicer {
 	::TestModule::IsoDate
 	stringToIsoDate(const std::string & in)
 	{
-		struct tm tm {
-		};
+		struct tm tm { };
+
 		auto end = strptime(in.c_str(), "%Y-%m-%d", &tm);
 		if (!end || *end) {
 			// LCOV_EXCL_START
@@ -71,8 +72,8 @@ namespace Slicer {
 	std::string
 	dateTimeToString(const ::TestModule::DateTime & in)
 	{
-		struct tm tm {
-		};
+		struct tm tm { };
+
 		tm.tm_sec = in.second;
 		tm.tm_min = in.minute;
 		tm.tm_hour = in.hour;
@@ -91,8 +92,8 @@ namespace Slicer {
 	::TestModule::DateTime
 	stringToDateTime(const std::string & in)
 	{
-		struct tm tm {
-		};
+		struct tm tm { };
+
 		auto end = strptime(in.c_str(), "%Y-%b-%d %H:%M:%S", &tm);
 		if (!end || *end) {
 			// LCOV_EXCL_START
@@ -171,11 +172,12 @@ namespace TestModule {
 		completions += 1;
 	}
 }
+
 namespace Slicer {
 	template<>
-	DLL_PUBLIC ModelPartPtr
-	ModelPart::Make<TestModule::MonthValidator>(::Ice::Short * m)
+	DLL_PUBLIC void
+	ModelPart::Make<TestModule::MonthValidator>(::Ice::Short * m, const ModelPartHandler & h)
 	{
-		return std::make_shared<TestModule::MonthValidator>(m);
+		return h(TestModule::MonthValidator(m));
 	}
 }

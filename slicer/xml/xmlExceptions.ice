@@ -8,6 +8,10 @@ module Slicer {
 	exception BadBooleanValue extends DeserializerError {
 		string text;
 	};
+	["cpp:ice_print"]
+	exception BadNumericValue extends DeserializerError {
+		string text;
+	};
 };
 
 #endif

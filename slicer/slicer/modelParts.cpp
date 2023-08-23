@@ -11,10 +11,10 @@ namespace Slicer {
 	{
 	}
 
-	ModelPartPtr
-	ModelPart::GetSubclassModelPart(const std::string &)
+	void
+	ModelPart::OnSubclass(const ModelPartHandler &, const std::string &)
 	{
-		return shared_from_this();
+		throw std::logic_error {"OnSubclass not supported on this ModelPart"};
 	}
 
 	TypeId
@@ -46,30 +46,33 @@ namespace Slicer {
 		return emptyMetadata;
 	}
 
-	ModelPartPtr
-	ModelPart::GetAnonChild(const HookFilter & flt)
-	{
-		auto ref = GetAnonChildRef(flt);
-		return ref ? ref.Child() : ModelPartPtr(nullptr);
-	}
-
-	ModelPartPtr
-	ModelPart::GetChild(std::string_view memberName, const HookFilter & flt)
-	{
-		auto ref = GetChildRef(memberName, flt);
-		return ref ? ref.Child() : ModelPartPtr(nullptr);
-	}
-
 	bool
 	ModelPart::IsOptional() const
 	{
 		return false;
 	}
 
-	ModelPartPtr
-	ModelPart::GetContainedModelPart()
+	void
+	ModelPart::OnEachChild(const ChildHandler &)
 	{
-		return shared_from_this();
+	}
+
+	bool
+	ModelPart::OnAnonChild(const SubPartHandler &, const HookFilter &)
+	{
+		return false;
+	}
+
+	bool
+	ModelPart::OnChild(const SubPartHandler &, const std::string_view, const HookFilter &, bool)
+	{
+		return false;
+	}
+
+	void
+	ModelPart::OnContained(const ModelPartHandler &)
+	{
+		throw std::logic_error {"OnContained not supported on this ModelPart"};
 	}
 
 	bool
@@ -79,7 +82,7 @@ namespace Slicer {
 	}
 
 	void
-	HookCommon::apply(const ChildHandler & ch, const ModelPartPtr & modelPart) const
+	HookCommon::apply(const ChildHandler & ch, ModelPartParam modelPart) const
 	{
 		ch(*this->nameStr, modelPart, this);
 	}

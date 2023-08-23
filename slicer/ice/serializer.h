@@ -3,15 +3,18 @@
 
 #include <Ice/BuiltinSequences.h>
 #include <Ice/CommunicatorF.h>
+#include <c++11Helpers.h>
 #include <iosfwd>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 #include <visibility.h>
 
 namespace Slicer {
-	class IceBase {
+	class DLL_PUBLIC IceBase {
 	public:
 		virtual ~IceBase();
+
+		SPECIAL_MEMBERS_DELETE(IceBase);
 
 	protected:
 		IceBase();
@@ -21,7 +24,7 @@ namespace Slicer {
 
 	class DLL_PUBLIC IceBlobSerializer : public Serializer, protected IceBase {
 	public:
-		void Serialize(ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		Ice::ByteSeq blob;
@@ -31,7 +34,7 @@ namespace Slicer {
 	public:
 		explicit IceStreamSerializer(std::ostream &);
 
-		void Serialize(ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		std::ostream & strm;
@@ -41,7 +44,7 @@ namespace Slicer {
 	public:
 		explicit IceBlobDeserializer(const Ice::ByteSeq &);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		const Ice::ByteSeq & refblob;
@@ -51,7 +54,7 @@ namespace Slicer {
 	public:
 		explicit IceStreamDeserializer(std::istream &);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		std::istream & strm;

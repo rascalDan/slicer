@@ -11,9 +11,11 @@
 #include <memory>
 #include <string>
 #include <tablepatch.h>
+
 namespace TestDatabase {
 	class Timespan;
 }
+
 namespace TestModule {
 	struct DateTime;
 	struct IsoDate;

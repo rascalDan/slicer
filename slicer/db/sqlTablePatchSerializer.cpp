@@ -11,6 +11,7 @@
 
 namespace Slicer {
 	AdHocFormatter(ttname, "slicer_tmp_%?");
+
 	SqlTablePatchSerializer::SqlTablePatchSerializer(DB::Connection * const d, DB::TablePatch & tp) :
 		db(d), tablePatch(tp)
 	{
@@ -18,7 +19,7 @@ namespace Slicer {
 	}
 
 	void
-	SqlTablePatchSerializer::Serialize(Slicer::ModelPartForRootPtr mpr)
+	SqlTablePatchSerializer::Serialize(ModelPartForRootParam mpr)
 	{
 		tablePatch.pk.clear();
 		tablePatch.cols.clear();
@@ -31,22 +32,22 @@ namespace Slicer {
 		SqlInsertSerializer ins(db, tablePatch.src);
 		ins.Serialize(mpr);
 
-		auto mp = mpr->GetContainedModelPart();
-		mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
-			if (isPKey(h)) {
-				tablePatch.pk.insert(name);
-			}
-		});
-		mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
-			if (isBind(h)) {
-				tablePatch.cols.insert(name);
-			}
+		mpr->OnContained([this](auto && mp) {
+			mp->OnEachChild([this](const auto & name, const auto &, const auto & h) {
+				if (isPKey(h)) {
+					tablePatch.pk.insert(name);
+				}
+				if (isBind(h)) {
+					tablePatch.cols.insert(name);
+				}
+			});
 		});
 
 		db->patchTable(&tablePatch);
 	}
 
 	AdHocFormatter(createTmpTable, "CREATE TEMPORARY TABLE %? AS SELECT * FROM %? WHERE 1 = 0");
+
 	void
 	SqlTablePatchSerializer::createTemporaryTable()
 	{
@@ -54,6 +55,7 @@ namespace Slicer {
 	}
 
 	AdHocFormatter(dropTmpTable, "DROP TABLE %?");
+
 	void
 	SqlTablePatchSerializer::dropTemporaryTable()
 	{

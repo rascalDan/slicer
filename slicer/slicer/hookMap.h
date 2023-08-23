@@ -10,9 +10,11 @@
 #include <visibility.h>
 
 namespace Slicer {
-	void DLL_PUBLIC to_lower(std::string s);
+	void DLL_PUBLIC to_lower(std::string & s);
+	[[nodiscard]] std::string DLL_PUBLIC to_lower_copy(const std::string & s);
 
 	template<typename T> class ModelPartForComplex; // IWYU pragma: keep
+
 	template<typename T> class Hooks {
 	public:
 		using HookPtr = const typename ModelPartForComplex<T>::HookBase *;
@@ -26,6 +28,8 @@ namespace Slicer {
 			using difference_type = std::ptrdiff_t;
 			using pointer = HookPtr *;
 			using reference = HookPtr &;
+
+			[[nodiscard]] constexpr inline explicit iter(const eq * const r) : range(r), cur(r->e) { }
 
 			[[nodiscard]] constexpr inline iter(const eq * const r, const HookPtr * c) : range(r), cur(c)
 			{
@@ -92,13 +96,13 @@ namespace Slicer {
 			[[nodiscard]] constexpr inline iter
 			begin() const
 			{
-				return {this, b};
+				return iter {this, b};
 			}
 
 			[[nodiscard]] constexpr inline iter
 			end() const
 			{
-				return {this, e};
+				return iter {this};
 			}
 
 			std::string_view key {};

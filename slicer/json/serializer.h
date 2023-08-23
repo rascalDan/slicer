@@ -11,17 +11,13 @@
 #include <visibility.h>
 
 namespace Slicer {
-	class JsonSerializer : public Serializer {
-	protected:
-		static void ModelTreeIterate(json::Value *, const std::string &, ModelPartPtr mp);
-		static void ModelTreeIterateDictObj(json::Value *, const ModelPartPtr & mp);
-		static void ModelTreeIterateSeq(json::Value *, const ModelPartPtr & mp);
-		static void ModelTreeIterateRoot(json::Value *, ModelPartPtr mp);
-	};
-
-	class DLL_PUBLIC JsonValueSerializer : public JsonSerializer {
+	class DLL_PUBLIC JsonValueSerializer : public Serializer {
 	public:
-		void Serialize(ModelPartForRootPtr) override;
+		JsonValueSerializer() = default;
+		~JsonValueSerializer() override;
+		SPECIAL_MEMBERS_DEFAULT(JsonValueSerializer);
+
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		json::Value value;
@@ -31,7 +27,7 @@ namespace Slicer {
 	public:
 		explicit JsonStreamSerializer(std::ostream &);
 
-		void Serialize(ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
 		std::ostream & strm;
@@ -49,7 +45,7 @@ namespace Slicer {
 	public:
 		explicit JsonStreamDeserializer(std::istream &);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		std::istream & strm;
@@ -59,7 +55,7 @@ namespace Slicer {
 	public:
 		explicit JsonFileDeserializer(std::filesystem::path);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		const std::filesystem::path path;
@@ -69,7 +65,7 @@ namespace Slicer {
 	public:
 		explicit JsonValueDeserializer(const json::Value &);
 
-		void Deserialize(ModelPartForRootPtr) override;
+		void Deserialize(ModelPartForRootParam) override;
 
 	protected:
 		const json::Value & value;

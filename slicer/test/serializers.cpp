@@ -50,6 +50,7 @@ namespace fs = std::filesystem;
 // LCOV_EXCL_START
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::ClassMap::iterator)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(TestModule::SomeNumbers)
+
 namespace std {
 	template<typename T>
 	ostream &
@@ -58,6 +59,7 @@ namespace std {
 		return s;
 	}
 }
+
 // LCOV_EXCL_STOP
 
 class FileBased {
@@ -587,11 +589,11 @@ BOOST_AUTO_TEST_CASE(xml_streams)
 
 BOOST_AUTO_TEST_CASE(invalid_enum)
 {
-	auto jdeserializer = std::make_shared<Slicer::JsonFileDeserializer>(rootDir / "initial" / "invalidEnum.json");
+	Slicer::JsonFileDeserializer jdeserializer {rootDir / "initial" / "invalidEnum.json"};
 	BOOST_REQUIRE_THROW(
 			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
 
-	auto xdeserializer = std::make_shared<Slicer::XmlFileDeserializer>(rootDir / "initial" / "invalidEnum.xml");
+	Slicer::XmlFileDeserializer xdeserializer {rootDir / "initial" / "invalidEnum.xml"};
 	BOOST_REQUIRE_THROW(
 			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
 }
@@ -672,6 +674,18 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractImpl)
 	BOOST_CHECK_EQUAL("value", impl->testVal);
 }
 
+BOOST_AUTO_TEST_CASE(SerializeJsonClassMap)
+{
+	TestModule::ClassMap d;
+	d[1] = std::make_shared<TestModule::ClassType>(1, 2);
+	d[2] = std::make_shared<TestModule::ClassType>(3, 4);
+	d[3] = std::make_shared<TestModule::ClassType>(5, 6);
+	std::stringstream out;
+	Slicer::SerializeAnyWith(d, Slicer::JsonStreamSerializer {out});
+	BOOST_CHECK_EQUAL(out.view(),
+			R"([{"key":1,"value":{"a":1,"b":2}},{"key":2,"value":{"a":3,"b":4}},{"key":3,"value":{"a":5,"b":6}}])");
+}
+
 BOOST_AUTO_TEST_CASE(DeserializeXmlIncorrectSeqElementName)
 {
 	std::stringstream in(R"X(
@@ -696,6 +710,8 @@ BOOST_AUTO_TEST_CASE(enum_lookups)
 BOOST_AUTO_TEST_CASE(sequence_element_in_same_slice_link_bug)
 {
 	// Link error when sequence element type defined in same slice.
-	BOOST_CHECK(Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr));
-	BOOST_CHECK(Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr));
+	BOOST_CHECK_NO_THROW(
+			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr, [](auto &&) {}));
+	BOOST_CHECK_NO_THROW(
+			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr, [](auto &&) {}));
 }

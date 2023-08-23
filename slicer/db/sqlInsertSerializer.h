@@ -7,6 +7,7 @@
 #include <slicer/serializer.h>
 #include <string>
 #include <visibility.h>
+
 namespace DB {
 	class Connection;
 	class ModifyCommand;
@@ -17,17 +18,17 @@ namespace Slicer {
 	public:
 		SqlInsertSerializer(DB::Connection * const, std::string tableName);
 
-		void Serialize(Slicer::ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	protected:
-		void SerializeObject(const Slicer::ModelPartPtr &) const;
-		void SerializeSequence(const Slicer::ModelPartPtr &) const;
-		DB::ModifyCommandPtr createInsert(const Slicer::ModelPartPtr &) const;
+		void SerializeObject(ModelPartParam) const;
+		void SerializeSequence(ModelPartParam) const;
+		[[nodiscard]] DB::ModifyCommandPtr createInsert(ModelPartParam) const;
 		virtual void createInsertField(
 				unsigned int & fieldNo, std::ostream & insert, const std::string & name, const HookCommon * h) const;
-		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const;
+		virtual void bindObjectAndExecute(ModelPartParam, DB::ModifyCommand *) const;
 		virtual void bindObjectAndExecuteField(
-				unsigned int & paramNo, DB::ModifyCommand *, const Slicer::ModelPartPtr &, const HookCommon *) const;
+				unsigned int & paramNo, DB::ModifyCommand *, ModelPartParam, const HookCommon *) const;
 
 		DB::Connection * const connection;
 		const std::string tableName;
@@ -35,27 +36,21 @@ namespace Slicer {
 
 	class DLL_PUBLIC SqlAutoIdInsertSerializer : public SqlInsertSerializer {
 	public:
-		template<typename... P>
-		explicit SqlAutoIdInsertSerializer(P &&... p) : SqlInsertSerializer(std::forward<P>(p)...)
-		{
-		}
+		using SqlInsertSerializer::SqlInsertSerializer;
 
 	protected:
-		virtual void createInsertField(unsigned int & fieldNo, std::ostream & insert, const std::string & name,
+		void createInsertField(unsigned int & fieldNo, std::ostream & insert, const std::string & name,
 				const HookCommon * h) const override;
-		virtual void bindObjectAndExecuteField(unsigned int & paramNo, DB::ModifyCommand *,
-				const Slicer::ModelPartPtr &, const HookCommon *) const override;
+		void bindObjectAndExecuteField(
+				unsigned int & paramNo, DB::ModifyCommand *, ModelPartParam, const HookCommon *) const override;
 	};
 
 	class DLL_PUBLIC SqlFetchIdInsertSerializer : public SqlAutoIdInsertSerializer {
 	public:
-		template<typename... P>
-		explicit SqlFetchIdInsertSerializer(P &&... p) : SqlAutoIdInsertSerializer(std::forward<P>(p)...)
-		{
-		}
+		using SqlAutoIdInsertSerializer::SqlAutoIdInsertSerializer;
 
 	protected:
-		virtual void bindObjectAndExecute(const Slicer::ModelPartPtr &, DB::ModifyCommand *) const override;
+		void bindObjectAndExecute(ModelPartParam, DB::ModifyCommand *) const override;
 	};
 }
 

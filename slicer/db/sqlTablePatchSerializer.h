@@ -4,6 +4,7 @@
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 #include <visibility.h>
+
 namespace DB {
 	class Connection;
 	class TablePatch;
@@ -14,7 +15,7 @@ namespace Slicer {
 	public:
 		SqlTablePatchSerializer(DB::Connection * const, DB::TablePatch &);
 
-		void Serialize(Slicer::ModelPartForRootPtr) override;
+		void Serialize(ModelPartForRootParam) override;
 
 	private:
 		void createTemporaryTable();
