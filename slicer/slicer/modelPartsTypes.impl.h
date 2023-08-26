@@ -388,16 +388,24 @@ namespace Slicer {
 	template<typename T>
 	bool
 	ModelPartForComplex<T>::OnChild(
-			const SubPartHandler & ch, std::string_view name, const HookFilter & flt, bool matchCase)
+			const SubPartHandler & ch, std::string_view name, const HookFilter & flt, MatchCase matchCase)
 	{
-		if (matchCase) {
-			return OnChildFromRange(ch, hooks().equal_range(name), flt);
+		switch (matchCase) {
+			case MatchCase::Yes:
+				return OnChildFromRange(ch, hooks().equal_range(name), flt);
+			case MatchCase::No: {
+				std::string i {name};
+				to_lower(i);
+				return OnChildFromRange(ch, hooks().equal_range_lower(i), flt);
+			}
+			case MatchCase::No_Prelowered:
+				return OnChildFromRange(ch, hooks().equal_range_lower(name), flt);
 		}
-		else {
-			std::string i {name};
-			to_lower(i);
-			return OnChildFromRange(ch, hooks().equal_range_lower(i), flt);
-		}
+#ifdef __cpp_lib_unreachable
+		std::unreachable();
+#else
+		__builtin_unreachable();
+#endif
 	}
 
 	template<typename T> class DLL_PRIVATE ModelPartForComplex<T>::HookBase : public HookCommon {
@@ -684,10 +692,10 @@ namespace Slicer {
 	template<typename T>
 	bool
 	ModelPartForDictionary<T>::OnChild(
-			const SubPartHandler & ch, std::string_view name, const HookFilter &, bool matchCase)
+			const SubPartHandler & ch, std::string_view name, const HookFilter &, MatchCase matchCase)
 	{
 		BOOST_ASSERT(this->Model);
-		if (!optionalCaseEq(name, pairName, matchCase)) {
+		if (!optionalCaseEq(name, pairName, matchCase == MatchCase::Yes)) {
 			throw IncorrectElementName(std::string {name});
 		}
 		ch(ModelPartForDictionaryElementInserter<T>(this->Model), emptyMetadata);

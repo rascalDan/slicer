@@ -144,7 +144,7 @@ namespace Slicer {
 											[&c](auto && fmp, auto &&) {
 												assignFromColumn(fmp, c);
 											},
-											c.name, nullptr, false);
+											c.name, nullptr, MatchCase::No);
 								}
 							}
 						}

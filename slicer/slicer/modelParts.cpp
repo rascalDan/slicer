@@ -64,7 +64,7 @@ namespace Slicer {
 	}
 
 	bool
-	ModelPart::OnChild(const SubPartHandler &, const std::string_view, const HookFilter &, bool)
+	ModelPart::OnChild(const SubPartHandler &, const std::string_view, const HookFilter &, MatchCase)
 	{
 		return false;
 	}

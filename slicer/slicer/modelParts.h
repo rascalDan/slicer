@@ -104,6 +104,8 @@ namespace Slicer {
 		Value,
 	};
 
+	enum class MatchCase { Yes, No, No_Prelowered };
+
 	class DLL_PUBLIC HookCommon {
 	public:
 		constexpr HookCommon(std::string_view n, std::string_view nl, const std::string * ns) :
@@ -145,7 +147,7 @@ namespace Slicer {
 		virtual void OnEachChild(const ChildHandler &);
 		virtual bool OnAnonChild(const SubPartHandler &, const HookFilter & = HookFilter());
 		virtual bool OnChild(const SubPartHandler &, std::string_view memberName, const HookFilter & = HookFilter(),
-				bool matchCase = true);
+				MatchCase matchCase = MatchCase::Yes);
 		virtual void OnSubclass(const ModelPartHandler &, const std::string &);
 		virtual TypeId GetTypeId() const;
 		virtual std::optional<std::string> GetTypeIdProperty() const;
@@ -173,7 +175,8 @@ namespace Slicer {
 
 		virtual const std::string & GetRootName() const = 0;
 		bool OnAnonChild(const SubPartHandler &, const HookFilter &) override;
-		bool OnChild(const SubPartHandler &, std::string_view name, const HookFilter &, bool matchCase = true) override;
+		bool OnChild(const SubPartHandler &, std::string_view name, const HookFilter &,
+				MatchCase matchCase = MatchCase::Yes) override;
 		void OnEachChild(const ChildHandler & ch) override;
 		ModelPartType GetType() const override;
 		bool IsOptional() const override;

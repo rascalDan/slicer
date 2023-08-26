@@ -120,9 +120,9 @@ namespace Slicer {
 
 	bool
 	ModelPartForRootBase::OnChild(
-			const SubPartHandler & h, std::string_view name, const HookFilter & hf, bool matchCase)
+			const SubPartHandler & h, std::string_view name, const HookFilter & hf, MatchCase matchCase)
 	{
-		if (!optionalCaseEq(name, GetRootName(), matchCase)) {
+		if (!optionalCaseEq(name, GetRootName(), matchCase == MatchCase::Yes)) {
 			throw IncorrectElementName(std::string {name});
 		}
 		return OnAnonChild(h, hf);
@@ -263,7 +263,7 @@ namespace Slicer {
 
 	bool
 	ModelPartForOptionalBase::OnChild(
-			const SubPartHandler & h, std::string_view name, const HookFilter & flt, bool matchCase)
+			const SubPartHandler & h, std::string_view name, const HookFilter & flt, MatchCase matchCase)
 	{
 		if (this->hasModel()) {
 			return modelPart->OnChild(h, name, flt, matchCase);
@@ -325,9 +325,9 @@ namespace Slicer {
 
 	bool
 	ModelPartForSequenceBase::OnChild(
-			const SubPartHandler & h, std::string_view name, const HookFilter & flt, bool matchCase)
+			const SubPartHandler & h, std::string_view name, const HookFilter & flt, MatchCase matchCase)
 	{
-		if (!name.empty() && !optionalCaseEq(name, GetElementName(), matchCase)) {
+		if (!name.empty() && !optionalCaseEq(name, GetElementName(), matchCase == MatchCase::Yes)) {
 			throw IncorrectElementName(std::string {name});
 		}
 		return OnAnonChild(h, flt);
