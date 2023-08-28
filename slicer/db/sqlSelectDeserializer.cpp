@@ -64,7 +64,9 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(lowerColumnNames.empty());
 		lowerColumnNames.reserve(columnCount);
-		orderedColumns.reserve(columnCount);
+		if (!typeIdColIdx) {
+			orderedColumns.reserve(columnCount);
+		}
 		for (auto col = 0U; col < columnCount; col += 1) {
 			const DB::Column & c = (*cmd)[col];
 			lowerColumnNames.emplace_back(to_lower_copy(c.name));
@@ -103,7 +105,7 @@ namespace Slicer {
 	SqlSelectDeserializer::DeserializeSequence(ModelPartParam omp)
 	{
 		omp->OnAnonChild([this](auto && mp, auto &&) {
-			if (!typeIdColIdx && lowerColumnNames.empty()) {
+			if (lowerColumnNames.empty()) {
 				fillLowerColumnNameCache();
 			}
 			while (cmd->fetch()) {
@@ -121,6 +123,9 @@ namespace Slicer {
 			}
 			return;
 		}
+		if (lowerColumnNames.empty()) {
+			fillLowerColumnNameCache();
+		}
 		DeserializeRow(mp);
 		if (cmd->fetch()) {
 			while (cmd->fetch()) { }
@@ -136,7 +141,8 @@ namespace Slicer {
 				case Slicer::ModelPartType::Complex: {
 					auto apply = [this](auto && rcmp) {
 						rcmp->Create();
-						if (typeIdColIdx || lowerColumnNames.empty()) {
+						BOOST_ASSERT(columnCount == lowerColumnNames.size());
+						if (typeIdColIdx) {
 							for (auto col = 0U; col < columnCount; col += 1) {
 								const DB::Column & c = (*cmd)[col];
 								if (!c.isNull()) {
@@ -144,7 +150,7 @@ namespace Slicer {
 											[&c](auto && fmp, auto &&) {
 												assignFromColumn(fmp, c);
 											},
-											c.name, nullptr, MatchCase::No);
+											lowerColumnNames[col], nullptr, MatchCase::No_Prelowered);
 								}
 							}
 						}
