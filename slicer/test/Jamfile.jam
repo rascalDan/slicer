@@ -13,6 +13,7 @@ lib icetypes :
 	<implicit-dependency>included//included
 	<library>included//included
 	<toolset>tidy:<checker>none
+	<toolset>clang:<cflags>-Wno-error=unused-const-variable
 	: :
 	<include>.
 	<implicit-dependency>included//included
