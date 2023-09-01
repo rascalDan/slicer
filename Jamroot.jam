@@ -22,7 +22,7 @@ project
 			<variant>debug:<cflags>-Wcast-align
 			<variant>debug:<cflags>-Wunused
 			<variant>debug:<cflags>-Woverloaded-virtual
-			<variant>debug:<cflags>-Wpedantic
+			<toolset>gcc,<variant>debug:<cflags>-Wpedantic
 			<variant>debug:<cflags>-Wconversion
 			<variant>debug:<cflags>-Wsign-conversion
 			<variant>debug:<cflags>-Wnull-dereference
