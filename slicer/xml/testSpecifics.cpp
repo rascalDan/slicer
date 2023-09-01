@@ -21,10 +21,6 @@
 // IWYU pragma: no_forward_declare Slicer::BadBooleanValue
 // IWYU pragma: no_forward_declare Slicer::XmlDocumentDeserializer
 
-template<typename T>
-const auto BoostThrowWrapperHelper
-		= Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, T, const xmlpp::Document *>;
-
 template<typename out> using data = std::tuple<const char *, out>;
 BOOST_FIXTURE_TEST_SUITE(doc, xmlpp::DomParser)
 
@@ -36,7 +32,7 @@ BOOST_DATA_TEST_CASE(good_boolean_values,
 		in, exp)
 {
 	parse_memory(in);
-	BOOST_CHECK_EQUAL(exp, BoostThrowWrapperHelper<bool>(get_document()));
+	BOOST_CHECK_EQUAL(exp, (Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, bool>(get_document())));
 }
 
 BOOST_DATA_TEST_CASE(bad_boolean_values,
@@ -48,7 +44,8 @@ BOOST_DATA_TEST_CASE(bad_boolean_values,
 		in)
 {
 	parse_memory(in);
-	BOOST_CHECK_THROW(BoostThrowWrapperHelper<bool>(get_document()), Slicer::BadBooleanValue);
+	BOOST_CHECK_THROW(
+			(Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, bool>(get_document())), Slicer::BadBooleanValue);
 }
 
 BOOST_DATA_TEST_CASE(good_integer_values,
@@ -61,7 +58,7 @@ BOOST_DATA_TEST_CASE(good_integer_values,
 		in, exp)
 {
 	parse_memory(in);
-	BOOST_CHECK_EQUAL(exp, BoostThrowWrapperHelper<Ice::Int>(get_document()));
+	BOOST_CHECK_EQUAL(exp, (Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, Ice::Int>(get_document())));
 }
 
 BOOST_DATA_TEST_CASE(bad_integer_values,
@@ -73,7 +70,8 @@ BOOST_DATA_TEST_CASE(bad_integer_values,
 		in)
 {
 	parse_memory(in);
-	BOOST_CHECK_THROW(BoostThrowWrapperHelper<Ice::Int>(get_document()), Slicer::BadNumericValue);
+	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, Ice::Int>(get_document())),
+			Slicer::BadNumericValue);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
