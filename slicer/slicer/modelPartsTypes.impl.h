@@ -502,27 +502,16 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	ModelPartForClass<T>::deleteClassName()
-	{
-		delete className;
-		delete typeName;
-	}
-
-	template<typename T>
-	void
 	ModelPartForClass<T>::registerClass()
 	{
-		initClassName();
-		ModelPartForComplexBase::registerClass(*className, typeName, &ModelPartForClass<T>::CreateModelPart);
+		ModelPartForComplexBase::registerClass(className, typeName, &ModelPartForClass<T>::CreateModelPart);
 	}
 
 	template<typename T>
 	void
 	ModelPartForClass<T>::unregisterClass()
 	{
-		BOOST_ASSERT(className);
-		ModelPartForComplexBase::unregisterClass(*className, typeName);
-		deleteClassName();
+		ModelPartForComplexBase::unregisterClass(className, typeName);
 	}
 
 	template<typename T>
@@ -530,7 +519,6 @@ namespace Slicer {
 	ModelPartForClass<T>::GetTypeId() const
 	{
 		BOOST_ASSERT(this->Model);
-		BOOST_ASSERT(className);
 		return ModelPartForComplexBase::getTypeId(
 				[this]() {
 					if constexpr (std::is_base_of_v<Ice::Object, T>) {
@@ -540,7 +528,7 @@ namespace Slicer {
 						return ModelPartForComplexBase::demangle(typeid(*this->Model->get()).name());
 					}
 				}(),
-				*className);
+				className);
 	}
 
 	// ModelPartForStruct

@@ -28,11 +28,11 @@ namespace Ice {
 
 namespace Slicer {
 	using ClassRefMap = std::map<std::string, ClassRef, std::less<>>;
-	using ClassNamePair = std::pair<std::string, std::string>;
+	using ClassNamePair = std::pair<std::string_view, std::string>;
 	using ClassNameMap = boost::multi_index_container<ClassNamePair,
 			boost::multi_index::indexed_by<
 					boost::multi_index::ordered_unique<
-							boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::first>,
+							boost::multi_index::member<ClassNamePair, const std::string_view, &ClassNamePair::first>,
 							std::less<>>,
 					boost::multi_index::ordered_unique<
 							boost::multi_index::member<ClassNamePair, const std::string, &ClassNamePair::second>,
@@ -52,7 +52,7 @@ namespace Slicer {
 		}
 	}
 
-	const std::string &
+	std::string_view
 	ModelPartForComplexBase::ToModelTypeName(const std::string & name)
 	{
 		const auto & right = names->get<1>();
@@ -196,7 +196,7 @@ namespace Slicer {
 
 	void
 	ModelPartForComplexBase::registerClass(
-			const std::string & className, const std::string * typeName, const ClassRef & cr)
+			const std::string_view className, const std::optional<std::string_view> typeName, const ClassRef & cr)
 	{
 		refs->emplace(className, cr);
 		if (typeName) {
@@ -205,9 +205,12 @@ namespace Slicer {
 	}
 
 	void
-	ModelPartForComplexBase::unregisterClass(const std::string & className, const std::string * typeName)
+	ModelPartForComplexBase::unregisterClass(
+			const std::string_view className, const std::optional<std::string_view> typeName)
 	{
-		refs->erase(className);
+		if (const auto i = refs->find(className); i != refs->end()) {
+			refs->erase(i);
+		}
 		if (typeName) {
 			names->get<0>().erase(className);
 		}
@@ -223,7 +226,7 @@ namespace Slicer {
 	}
 
 	TypeId
-	ModelPartForComplexBase::getTypeId(const std::string & id, const std::string & className)
+	ModelPartForComplexBase::getTypeId(const std::string & id, const std::string_view className)
 	{
 		return (id == className) ? TypeId() : ToExchangeTypeName(id);
 	}

@@ -139,13 +139,14 @@ namespace Slicer {
 	protected:
 		void onSubclass(const std::string & name, void * m, const ModelPartHandler &);
 
-		static void registerClass(const std::string & className, const std::string * typeName, const ClassRef &);
-		static void unregisterClass(const std::string & className, const std::string * typeName);
-		static TypeId getTypeId(const std::string & id, const std::string & className);
+		static void registerClass(
+				const std::string_view className, const std::optional<std::string_view> typeName, const ClassRef &);
+		static void unregisterClass(const std::string_view className, const std::optional<std::string_view> typeName);
+		static TypeId getTypeId(const std::string & id, const std::string_view className);
 		static std::string demangle(const char * mangled);
 
 		static const std::string & ToExchangeTypeName(const std::string &);
-		static const std::string & ToModelTypeName(const std::string &);
+		static std::string_view ToModelTypeName(const std::string &);
 	};
 
 	template<typename T> class Hooks;
@@ -192,14 +193,12 @@ namespace Slicer {
 		[[nodiscard]] std::optional<std::string> GetTypeIdProperty() const override;
 
 		static const std::string typeIdProperty;
-		static const std::string * className;
-		static const std::string * typeName;
+		constinit static const std::string_view className;
+		constinit static const std::optional<const std::string_view> typeName;
 
 		static void CreateModelPart(void *, const ModelPartHandler &);
 
 	private:
-		static void initClassName();
-		static void deleteClassName();
 		static void registerClass() __attribute__((constructor(210)));
 		static void unregisterClass() __attribute__((destructor(210)));
 	};

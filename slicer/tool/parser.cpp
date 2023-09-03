@@ -418,20 +418,14 @@ namespace Slicer {
 
 		auto typeName = md.value("slicer:typename:");
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::className = nullptr;\n", decl->typeId());
+		fprintbf(cpp, "const std::string_view ModelPartForClass< %s >::className{\"%s\"};\n", decl->typeId(),
+				c->scoped());
 		fprintbf(cpp, "template<>\n");
-		fprintbf(cpp, "const std::string * ModelPartForClass< %s >::typeName = nullptr;\n", decl->typeId());
-		fprintbf(cpp,
-				"template<>\nvoid ModelPartForClass< %s >::initClassName() {\n\tclassName = new "
-				"std::string(\"%s\");\n\t",
-				decl->typeId(), c->scoped());
+		fprintbf(cpp, "const std::optional<const std::string_view> ModelPartForClass< %s >::typeName{", decl->typeId());
 		if (typeName) {
-			fprintbf(cpp, "typeName = new std::string(\"%s\");", *typeName);
+			fprintbf(cpp, "\"%s\"", *typeName);
 		}
-		else {
-			fprintbf(cpp, "typeName = nullptr;");
-		}
-		fprintbf(cpp, "\n}\n");
+		fprintbf(cpp, "};\n");
 
 		defineGetMetadata(md, c, "ModelPartForComplex");
 
