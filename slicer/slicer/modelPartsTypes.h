@@ -1,5 +1,4 @@
-#ifndef SLICER_MODELPARTSTYPES_H
-#define SLICER_MODELPARTSTYPES_H
+#pragma once
 
 #include "modelParts.h"
 #include <Ice/Optional.h>
@@ -361,5 +360,3 @@ namespace Slicer {
 		const std::string & GetRootName() const override;
 	};
 }
-
-#endif

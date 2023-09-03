@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLINSERTSERIALIZER_H
-#define SLICER_DB_SQLINSERTSERIALIZER_H
+#pragma once
 
 #include <command_fwd.h>
 #include <ostream>
@@ -53,5 +52,3 @@ namespace Slicer {
 		void bindObjectAndExecute(ModelPartParam, DB::ModifyCommand *) const override;
 	};
 }
-
-#endif

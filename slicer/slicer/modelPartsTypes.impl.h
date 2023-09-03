@@ -1,5 +1,4 @@
-#ifndef SLICER_MODELPARTSTYPES_IMPL_H
-#define SLICER_MODELPARTSTYPES_IMPL_H
+#pragma once
 
 #include "common.h"
 #include "enumMap.h" // IWYU pragma: keep
@@ -745,6 +744,4 @@ namespace Slicer {
 }
 #ifdef __clang__
 #	pragma clang diagnostic pop
-#endif
-
 #endif

@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLTABLEPATCHSERIALIZER_H
-#define SLICER_DB_SQLTABLEPATCHSERIALIZER_H
+#pragma once
 
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
@@ -25,5 +24,3 @@ namespace Slicer {
 		DB::TablePatch & tablePatch;
 	};
 }
-
-#endif

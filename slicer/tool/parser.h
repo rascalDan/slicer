@@ -1,5 +1,4 @@
-#ifndef SLICER_PARSER_H
-#define SLICER_PARSER_H
+#pragma once
 
 #include "icemetadata.h"
 #include <Slice/Parser.h>
@@ -97,5 +96,3 @@ namespace Slicer {
 		unsigned int classNo;
 	};
 }
-
-#endif

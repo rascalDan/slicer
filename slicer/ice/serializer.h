@@ -1,5 +1,4 @@
-#ifndef SLICER_ICE_H
-#define SLICER_ICE_H
+#pragma once
 
 #include <Ice/BuiltinSequences.h>
 #include <Ice/CommunicatorF.h>
@@ -61,5 +60,3 @@ namespace Slicer {
 		Ice::ByteSeq blob;
 	};
 }
-
-#endif

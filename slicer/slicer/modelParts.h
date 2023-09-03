@@ -1,5 +1,4 @@
-#ifndef SLICER_MODELPARTS_H
-#define SLICER_MODELPARTS_H
+#pragma once
 
 #include "any_ptr.h"
 #include "metadata.h"
@@ -187,5 +186,3 @@ namespace Slicer {
 		ModelPartParam mp;
 	};
 }
-
-#endif

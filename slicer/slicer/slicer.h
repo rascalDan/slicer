@@ -1,5 +1,4 @@
-#ifndef SLICER_H
-#define SLICER_H
+#pragma once
 
 #include <memory>
 #include <slicer/modelParts.h>
@@ -40,5 +39,3 @@ namespace Slicer {
 		SerializeAnyWith(object, Serializer(std::forward<SerializerParams>(sp)...));
 	}
 }
-
-#endif

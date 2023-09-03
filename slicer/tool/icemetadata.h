@@ -1,5 +1,4 @@
-#ifndef SLICER_TOOL_METADATA_H
-#define SLICER_TOOL_METADATA_H
+#pragma once
 
 #include <Slice/Parser.h>
 #include <c++11Helpers.h>
@@ -42,5 +41,3 @@ namespace Slicer {
 		ContainerBase<> arr;
 	};
 }
-
-#endif

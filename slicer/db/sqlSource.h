@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLSOURCE_H
-#define SLICER_DB_SQLSOURCE_H
+#pragma once
 
 #include "slicer/modelParts.h"
 #include <Ice/Config.h>
@@ -39,5 +38,3 @@ namespace Slicer {
 		const DB::Column & column;
 	};
 }
-
-#endif

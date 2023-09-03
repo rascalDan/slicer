@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLBINDER_H
-#define SLICER_DB_SQLBINDER_H
+#pragma once
 
 #include <Ice/Config.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -35,5 +34,3 @@ namespace Slicer {
 		const unsigned int idx;
 	};
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef SLICER_JSON_H
-#define SLICER_JSON_H
+#pragma once
 
 #include <filesystem>
 #include <fstream>
@@ -71,5 +70,3 @@ namespace Slicer {
 		const json::Value & value;
 	};
 }
-
-#endif

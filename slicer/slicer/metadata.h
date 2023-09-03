@@ -1,5 +1,4 @@
-#ifndef SLICER_METADATA_H
-#define SLICER_METADATA_H
+#pragma once
 
 #include <algorithm>
 #include <array>
@@ -126,5 +125,3 @@ namespace Slicer {
 		Arr arr;
 	};
 }
-
-#endif

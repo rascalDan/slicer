@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLSELECTDESERIALIZER_H
-#define SLICER_DB_SQLSELECTDESERIALIZER_H
+#pragma once
 
 #include <optional>
 #include <slicer/modelParts.h>
@@ -36,5 +35,3 @@ namespace Slicer {
 		std::vector<const DB::Column *> orderedColumns;
 	};
 }
-
-#endif

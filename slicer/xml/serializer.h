@@ -1,5 +1,4 @@
-#ifndef SLICER_XML_H
-#define SLICER_XML_H
+#pragma once
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -77,5 +76,3 @@ namespace Slicer {
 		const xmlpp::Document * doc;
 	};
 }
-
-#endif

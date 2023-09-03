@@ -1,5 +1,4 @@
-#ifndef SLICER_ENUM_MAP_H
-#define SLICER_ENUM_MAP_H
+#pragma once
 
 #include <array>
 #include <cstddef>
@@ -56,5 +55,3 @@ namespace Slicer {
 		const Arr<N> arr;
 	};
 }
-
-#endif

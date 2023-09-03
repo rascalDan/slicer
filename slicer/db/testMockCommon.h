@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_MOCKDB_H
-#define SLICER_DB_MOCKDB_H
+#pragma once
 
 #include <connection_fwd.h>
 #include <mockDatabase.h>
@@ -23,5 +22,3 @@ public:
 	DB::ConnectionPtr _db;
 	DB::Connection * const db;
 };
-
-#endif

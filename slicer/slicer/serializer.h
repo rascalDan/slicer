@@ -1,5 +1,4 @@
-#ifndef SLICER_SERIALIZER_H
-#define SLICER_SERIALIZER_H
+#pragma once
 
 #include <c++11Helpers.h>
 #include <factory.h> // IWYU pragma: keep
@@ -41,5 +40,3 @@ namespace Slicer {
 	using FileSerializerFactory = AdHoc::Factory<Serializer, const std::filesystem::path &>;
 	using FileDeserializerFactory = AdHoc::Factory<Deserializer, const std::filesystem::path &>;
 }
-
-#endif

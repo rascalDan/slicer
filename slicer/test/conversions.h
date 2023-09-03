@@ -1,5 +1,4 @@
-#ifndef SLICER_TEST_CONVERSIONS_H
-#define SLICER_TEST_CONVERSIONS_H
+#pragma once
 
 #include "classtype.h"
 #include "structs.h"
@@ -43,5 +42,3 @@ namespace Slicer {
 	DLL_PUBLIC
 	boost::posix_time::ptime stringToPtime(const std::string &);
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLCOMMON_H
-#define SLICER_DB_SQLCOMMON_H
+#pragma once
 
 namespace Slicer {
 	class HookCommon;
@@ -10,5 +9,3 @@ namespace Slicer {
 	[[nodiscard]] bool isBind(const HookCommon *) noexcept;
 	[[nodiscard]] bool isValue(const HookCommon *) noexcept;
 }
-
-#endif

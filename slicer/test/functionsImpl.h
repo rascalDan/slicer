@@ -1,5 +1,4 @@
-#ifndef SLICER_TEST_FUNCITONSIMPL_H
-#define SLICER_TEST_FUNCITONSIMPL_H
+#pragma once
 
 #include <functions.h>
 
@@ -9,5 +8,3 @@ namespace Functions {
 		void func() override;
 	};
 }
-
-#endif

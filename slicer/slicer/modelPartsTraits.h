@@ -1,5 +1,4 @@
-#ifndef SLICER_MODELPARTSTRAITS_H
-#define SLICER_MODELPARTSTRAITS_H
+#pragma once
 
 #include <Ice/Optional.h>
 #include <cstddef>
@@ -103,5 +102,3 @@ namespace Slicer {
 		}
 	};
 }
-
-#endif

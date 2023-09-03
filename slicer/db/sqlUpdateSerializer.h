@@ -1,5 +1,4 @@
-#ifndef SLICER_DB_SQLUPDATESERIALIZER_H
-#define SLICER_DB_SQLUPDATESERIALIZER_H
+#pragma once
 
 #include <command_fwd.h>
 #include <slicer/modelParts.h>
@@ -29,5 +28,3 @@ namespace Slicer {
 		const std::string tableName;
 	};
 }
-
-#endif

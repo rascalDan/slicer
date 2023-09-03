@@ -1,5 +1,4 @@
-#ifndef SLICER_HOOK_MAP_H
-#define SLICER_HOOK_MAP_H
+#pragma once
 
 #include "modelParts.h"
 #include <array>
@@ -153,5 +152,3 @@ namespace Slicer {
 		const Arr<N> arr;
 	};
 }
-
-#endif
