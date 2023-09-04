@@ -62,281 +62,242 @@ namespace std {
 
 // LCOV_EXCL_STOP
 
-class FileBased {
-public:
-	template<typename T, typename DeserializerIn>
-	void
-	verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = nullptr)
-	{
-		verifyByFile<T, DeserializerIn>(infile, infile, check);
-	}
-
-	template<typename T, typename DeserializerIn>
-	void
-	verifyByFile(const fs::path & infile, const fs::path & expOutFile,
-			const std::function<void(const T &)> & check = nullptr)
-	{
-		const fs::path input = rootDir / "initial" / infile;
-		const fs::path expected = rootDir / "initial" / expOutFile;
-		const fs::path tmpf = binDir / "byFile";
-		fs::create_directory(tmpf);
-		const fs::path output = tmpf / infile;
-		const fs::path outputJson = tmpf / fs::path(infile).replace_extension("json");
-		const fs::path outputXml = tmpf / fs::path(infile).replace_extension("xml");
-
-		BOOST_TEST_CHECKPOINT("Deserialize: " << input);
-		T p = Slicer::DeserializeAny<DeserializerIn, T>(input);
-
-		if (check) {
-			BOOST_TEST_CHECKPOINT("Check1: " << input);
-			check(p);
+namespace {
+	class FileBased {
+	public:
+		template<typename T, typename DeserializerIn>
+		void
+		verifyByFile(const fs::path & infile, const std::function<void(const T &)> & check = nullptr)
+		{
+			verifyByFile<T, DeserializerIn>(infile, infile, check);
 		}
 
-		BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputJson);
-		Slicer::SerializeAny<Slicer::JsonFileSerializer>(p, outputJson);
+		template<typename T, typename DeserializerIn>
+		void
+		verifyByFile(const fs::path & infile, const fs::path & expOutFile,
+				const std::function<void(const T &)> & check = nullptr)
+		{
+			const fs::path input = rootDir / "initial" / infile;
+			const fs::path expected = rootDir / "initial" / expOutFile;
+			const fs::path tmpf = binDir / "byFile";
+			fs::create_directory(tmpf);
+			const fs::path output = tmpf / infile;
+			const fs::path outputJson = tmpf / fs::path(infile).replace_extension("json");
+			const fs::path outputXml = tmpf / fs::path(infile).replace_extension("xml");
 
-		BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputXml);
-		Slicer::SerializeAny<Slicer::XmlFileSerializer>(p, outputXml);
+			BOOST_TEST_CHECKPOINT("Deserialize: " << input);
+			T p = Slicer::DeserializeAny<DeserializerIn, T>(input);
 
-		if (check) {
-			BOOST_TEST_CHECKPOINT("Check2: " << input);
-			check(p);
+			if (check) {
+				BOOST_TEST_CHECKPOINT("Check1: " << input);
+				check(p);
+			}
+
+			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputJson);
+			Slicer::SerializeAny<Slicer::JsonFileSerializer>(p, outputJson);
+
+			BOOST_TEST_CHECKPOINT("Serialize " << input << " -> " << outputXml);
+			Slicer::SerializeAny<Slicer::XmlFileSerializer>(p, outputXml);
+
+			if (check) {
+				BOOST_TEST_CHECKPOINT("Check2: " << input);
+				check(p);
+			}
+
+			BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
+			diff(expected, output);
 		}
+	};
 
-		BOOST_TEST_CHECKPOINT("Checksum: " << input << " === " << output);
-		diff(expected, output);
+	void
+	checkBuiltIns_valuesCorrect(const TestModule::BuiltInsPtr & bt)
+	{
+		BOOST_REQUIRE_EQUAL(bt->mbool, true);
+		BOOST_REQUIRE_EQUAL(bt->mbyte, 4);
+		BOOST_REQUIRE_EQUAL(bt->mshort, 40);
+		BOOST_REQUIRE_EQUAL(bt->mint, 80);
+		BOOST_REQUIRE_EQUAL(bt->mlong, 800);
+		BOOST_REQUIRE_EQUAL(bt->mfloat, 3.125);
+		BOOST_REQUIRE_CLOSE(bt->mdouble, 3.0625, 1);
+		BOOST_REQUIRE_EQUAL(bt->mstring, "Sample text");
 	}
-};
 
-void
-checkBuiltIns_valuesCorrect(const TestModule::BuiltInsPtr & bt)
-{
-	BOOST_REQUIRE_EQUAL(bt->mbool, true);
-	BOOST_REQUIRE_EQUAL(bt->mbyte, 4);
-	BOOST_REQUIRE_EQUAL(bt->mshort, 40);
-	BOOST_REQUIRE_EQUAL(bt->mint, 80);
-	BOOST_REQUIRE_EQUAL(bt->mlong, 800);
-	BOOST_REQUIRE_EQUAL(bt->mfloat, 3.125);
-	BOOST_REQUIRE_CLOSE(bt->mdouble, 3.0625, 1);
-	BOOST_REQUIRE_EQUAL(bt->mstring, "Sample text");
-}
+	void
+	checkBuiltIns3_valuesCorrect(const TestModule::BuiltInsPtr & bt)
+	{
+		BOOST_REQUIRE_EQUAL(bt->mbool, false);
+		BOOST_REQUIRE_EQUAL(bt->mbyte, 255);
+		BOOST_REQUIRE_EQUAL(bt->mshort, -40);
+		BOOST_REQUIRE_EQUAL(bt->mint, -80);
+		BOOST_REQUIRE_EQUAL(bt->mlong, -800);
+		BOOST_REQUIRE_EQUAL(bt->mfloat, -3.125);
+		BOOST_REQUIRE_CLOSE(bt->mdouble, -3.0625, 1);
+		BOOST_REQUIRE_EQUAL(bt->mstring, "-Sample text-");
+	}
 
-void
-checkBuiltIns3_valuesCorrect(const TestModule::BuiltInsPtr & bt)
-{
-	BOOST_REQUIRE_EQUAL(bt->mbool, false);
-	BOOST_REQUIRE_EQUAL(bt->mbyte, 255);
-	BOOST_REQUIRE_EQUAL(bt->mshort, -40);
-	BOOST_REQUIRE_EQUAL(bt->mint, -80);
-	BOOST_REQUIRE_EQUAL(bt->mlong, -800);
-	BOOST_REQUIRE_EQUAL(bt->mfloat, -3.125);
-	BOOST_REQUIRE_CLOSE(bt->mdouble, -3.0625, 1);
-	BOOST_REQUIRE_EQUAL(bt->mstring, "-Sample text-");
-}
+	void
+	checkInherits_types(const TestModule::InheritanceContPtr & i)
+	{
+		BOOST_REQUIRE(i->b);
+		BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D1>(i->b));
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D1>(i->b)->a, 1);
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D1>(i->b)->b, 2);
+		BOOST_REQUIRE_EQUAL(i->bs.size(), 3);
+		BOOST_REQUIRE(i->bs[0]);
+		BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0]));
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0])->a, 1);
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0])->c, 100);
+		BOOST_REQUIRE(i->bs[1]);
+		BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1]));
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->a, 2);
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->c, 100);
+		BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->d, 200);
+		BOOST_REQUIRE(i->bs[2]);
+		BOOST_REQUIRE_EQUAL(i->bs[2]->a, 3);
+		BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D1>(i->bs[2]));
+		BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D2>(i->bs[2]));
+		BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D3>(i->bs[2]));
+		BOOST_REQUIRE_EQUAL(i->bm.size(), 3);
+		BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D1>(i->bm.find(10)->second));
+		BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D3>(i->bm.find(12)->second));
+		BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D1>(i->bm.find(14)->second));
+		BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D2>(i->bm.find(14)->second));
+		BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D3>(i->bm.find(14)->second));
+	}
 
-void
-checkInherits_types(const TestModule::InheritanceContPtr & i)
-{
-	BOOST_REQUIRE(i->b);
-	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D1>(i->b));
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D1>(i->b)->a, 1);
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D1>(i->b)->b, 2);
-	BOOST_REQUIRE_EQUAL(i->bs.size(), 3);
-	BOOST_REQUIRE(i->bs[0]);
-	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0]));
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0])->a, 1);
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D2>(i->bs[0])->c, 100);
-	BOOST_REQUIRE(i->bs[1]);
-	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1]));
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->a, 2);
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->c, 100);
-	BOOST_REQUIRE_EQUAL(std::dynamic_pointer_cast<TestModule::D3>(i->bs[1])->d, 200);
-	BOOST_REQUIRE(i->bs[2]);
-	BOOST_REQUIRE_EQUAL(i->bs[2]->a, 3);
-	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D1>(i->bs[2]));
-	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D2>(i->bs[2]));
-	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D3>(i->bs[2]));
-	BOOST_REQUIRE_EQUAL(i->bm.size(), 3);
-	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D1>(i->bm.find(10)->second));
-	BOOST_REQUIRE(std::dynamic_pointer_cast<TestModule::D3>(i->bm.find(12)->second));
-	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D1>(i->bm.find(14)->second));
-	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D2>(i->bm.find(14)->second));
-	BOOST_REQUIRE(!std::dynamic_pointer_cast<TestModule::D3>(i->bm.find(14)->second));
-}
+	void
+	checkOptionals_notset(const TestModule::OptionalsPtr & opts)
+	{
+		BOOST_REQUIRE(!opts->optSimple);
+		BOOST_REQUIRE(!opts->optStruct);
+		BOOST_REQUIRE(!opts->optClass);
+		BOOST_REQUIRE(!opts->optSeq);
+		BOOST_REQUIRE(!opts->optDict);
+	}
 
-void
-checkOptionals_notset(const TestModule::OptionalsPtr & opts)
-{
-	BOOST_REQUIRE(!opts->optSimple);
-	BOOST_REQUIRE(!opts->optStruct);
-	BOOST_REQUIRE(!opts->optClass);
-	BOOST_REQUIRE(!opts->optSeq);
-	BOOST_REQUIRE(!opts->optDict);
-}
+	void
+	checkOptionals_areset(const TestModule::OptionalsPtr & opts)
+	{
+		BOOST_REQUIRE(opts->optSimple);
+		BOOST_REQUIRE_EQUAL(opts->optSimple, 4);
+		BOOST_REQUIRE(opts->optStruct);
+		BOOST_REQUIRE_EQUAL(opts->optStruct->a, 1);
+		BOOST_REQUIRE_EQUAL(opts->optStruct->b, 2);
+		BOOST_REQUIRE(opts->optClass);
+		BOOST_REQUIRE(*opts->optClass);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.year, 2017);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.month, 9);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.day, 7);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.hour, 20);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.minute, 40);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.second, 30);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->date.year, 2017);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->date.month, 9);
+		BOOST_REQUIRE_EQUAL((*opts->optClass)->date.day, 7);
+		BOOST_REQUIRE_EQUAL(opts->optSeq->size(), 2);
+		BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->a, 3);
+		BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->b, 4);
+		BOOST_REQUIRE_EQUAL((*opts->optSeq)[1]->a, 5);
+		BOOST_REQUIRE_EQUAL((*opts->optSeq)[1]->b, 6);
+		BOOST_REQUIRE(opts->optDict);
+		BOOST_REQUIRE_EQUAL(opts->optDict->size(), 2);
+		BOOST_REQUIRE_EQUAL(opts->optDict->find(1), opts->optDict->end());
+		BOOST_REQUIRE(opts->optDict->find(10) != opts->optDict->end());
+		BOOST_REQUIRE_EQUAL(opts->optDict->find(10)->second->a, 11);
+		BOOST_REQUIRE_EQUAL(opts->optDict->find(10)->second->b, 12);
+		BOOST_REQUIRE(opts->optDict->find(13) != opts->optDict->end());
+		BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->a, 14);
+		BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->b, 15);
+	}
 
-void
-checkOptionals_areset(const TestModule::OptionalsPtr & opts)
-{
-	BOOST_REQUIRE(opts->optSimple);
-	BOOST_REQUIRE_EQUAL(opts->optSimple, 4);
-	BOOST_REQUIRE(opts->optStruct);
-	BOOST_REQUIRE_EQUAL(opts->optStruct->a, 1);
-	BOOST_REQUIRE_EQUAL(opts->optStruct->b, 2);
-	BOOST_REQUIRE(opts->optClass);
-	BOOST_REQUIRE(*opts->optClass);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.year, 2017);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.month, 9);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.day, 7);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.hour, 20);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.minute, 40);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->dt.second, 30);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->date.year, 2017);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->date.month, 9);
-	BOOST_REQUIRE_EQUAL((*opts->optClass)->date.day, 7);
-	BOOST_REQUIRE_EQUAL(opts->optSeq->size(), 2);
-	BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->a, 3);
-	BOOST_REQUIRE_EQUAL((*opts->optSeq)[0]->b, 4);
-	BOOST_REQUIRE_EQUAL((*opts->optSeq)[1]->a, 5);
-	BOOST_REQUIRE_EQUAL((*opts->optSeq)[1]->b, 6);
-	BOOST_REQUIRE(opts->optDict);
-	BOOST_REQUIRE_EQUAL(opts->optDict->size(), 2);
-	BOOST_REQUIRE_EQUAL(opts->optDict->find(1), opts->optDict->end());
-	BOOST_REQUIRE(opts->optDict->find(10) != opts->optDict->end());
-	BOOST_REQUIRE_EQUAL(opts->optDict->find(10)->second->a, 11);
-	BOOST_REQUIRE_EQUAL(opts->optDict->find(10)->second->b, 12);
-	BOOST_REQUIRE(opts->optDict->find(13) != opts->optDict->end());
-	BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->a, 14);
-	BOOST_REQUIRE_EQUAL(opts->optDict->find(13)->second->b, 15);
-}
+	void
+	checkSeqOfClass(const TestModule::Classes & seqOfClass)
+	{
+		BOOST_REQUIRE_EQUAL(seqOfClass.size(), 2);
+		BOOST_REQUIRE_EQUAL(seqOfClass[0]->a, 1);
+		BOOST_REQUIRE_EQUAL(seqOfClass[0]->b, 2);
+		BOOST_REQUIRE_EQUAL(seqOfClass[1]->a, 4);
+		BOOST_REQUIRE_EQUAL(seqOfClass[1]->b, 5);
+	}
 
-void
-checkSeqOfClass(const TestModule::Classes & seqOfClass)
-{
-	BOOST_REQUIRE_EQUAL(seqOfClass.size(), 2);
-	BOOST_REQUIRE_EQUAL(seqOfClass[0]->a, 1);
-	BOOST_REQUIRE_EQUAL(seqOfClass[0]->b, 2);
-	BOOST_REQUIRE_EQUAL(seqOfClass[1]->a, 4);
-	BOOST_REQUIRE_EQUAL(seqOfClass[1]->b, 5);
-}
+	void
+	checkStruct(const TestModule::StructType & st)
+	{
+		BOOST_REQUIRE_EQUAL(st.a, 10);
+		BOOST_REQUIRE_EQUAL(st.b, 13);
+	}
 
-void
-checkStruct(const TestModule::StructType & st)
-{
-	BOOST_REQUIRE_EQUAL(st.a, 10);
-	BOOST_REQUIRE_EQUAL(st.b, 13);
-}
+	void
+	checkEntityRef(const TestXml::EntityRef & er)
+	{
+		BOOST_REQUIRE_EQUAL(er.Id, 26);
+		BOOST_REQUIRE_EQUAL(er.Name, "Hull City");
+	}
 
-void
-checkEntityRef(const TestXml::EntityRef & er)
-{
-	BOOST_REQUIRE_EQUAL(er.Id, 26);
-	BOOST_REQUIRE_EQUAL(er.Name, "Hull City");
-}
+	void
+	checkBare(const TestXml::BareContainers & bc)
+	{
+		BOOST_REQUIRE_EQUAL(bc.bareSeq.size(), 2);
+		BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->a, 1);
+		BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->b, 2);
+		BOOST_REQUIRE_EQUAL(bc.bareSeq[1]->a, 3);
+		BOOST_REQUIRE_EQUAL(bc.bareSeq[1]->b, 4);
+		BOOST_REQUIRE_EQUAL(bc.bareMap.size(), 2);
+	}
 
-void
-checkBare(const TestXml::BareContainers & bc)
-{
-	BOOST_REQUIRE_EQUAL(bc.bareSeq.size(), 2);
-	BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->a, 1);
-	BOOST_REQUIRE_EQUAL(bc.bareSeq[0]->b, 2);
-	BOOST_REQUIRE_EQUAL(bc.bareSeq[1]->a, 3);
-	BOOST_REQUIRE_EQUAL(bc.bareSeq[1]->b, 4);
-	BOOST_REQUIRE_EQUAL(bc.bareMap.size(), 2);
-}
+	void
+	checkSomeEnums(const TestModule::SomeEnumsPtr & se)
+	{
+		BOOST_REQUIRE_EQUAL(se->one, TestModule::SomeNumbers::Ten);
+		BOOST_REQUIRE_EQUAL(se->two, TestModule::SomeNumbers::FiftyFive);
+	}
 
-void
-checkSomeEnums(const TestModule::SomeEnumsPtr & se)
-{
-	BOOST_REQUIRE_EQUAL(se->one, TestModule::SomeNumbers::Ten);
-	BOOST_REQUIRE_EQUAL(se->two, TestModule::SomeNumbers::FiftyFive);
-}
+	void
+	checkSomeNumbers(const TestModule::SomeNumbers & sn)
+	{
+		BOOST_REQUIRE_EQUAL(sn, TestModule::SomeNumbers::FiftyFive);
+	}
 
-void
-checkSomeNumbers(const TestModule::SomeNumbers & sn)
-{
-	BOOST_REQUIRE_EQUAL(sn, TestModule::SomeNumbers::FiftyFive);
-}
+	void
+	attributeMap(const TestXml::Maps & s)
+	{
+		BOOST_REQUIRE_EQUAL(3, s.amap.size());
+		BOOST_REQUIRE_EQUAL("one", s.amap.find("a")->second);
+		BOOST_REQUIRE_EQUAL("two", s.amap.find("b")->second);
+		BOOST_REQUIRE_EQUAL("three", s.amap.find("c")->second);
+	}
 
-void
-attributeMap(const TestXml::Maps & s)
-{
-	BOOST_REQUIRE_EQUAL(3, s.amap.size());
-	BOOST_REQUIRE_EQUAL("one", s.amap.find("a")->second);
-	BOOST_REQUIRE_EQUAL("two", s.amap.find("b")->second);
-	BOOST_REQUIRE_EQUAL("three", s.amap.find("c")->second);
-}
+	void
+	elementMap(const TestXml::Maps & s)
+	{
+		BOOST_REQUIRE_EQUAL(3, s.emap.size());
+		BOOST_REQUIRE_EQUAL("one", s.emap.find("a")->second);
+		BOOST_REQUIRE_EQUAL("two", s.emap.find("b")->second);
+		BOOST_REQUIRE_EQUAL("three", s.emap.find("c")->second);
+		BOOST_REQUIRE_EQUAL(3, s.rmap.size());
+		BOOST_REQUIRE_EQUAL(1, s.rmap.find("a")->second.Id);
+		BOOST_REQUIRE_EQUAL(2, s.rmap.find("b")->second.Id);
+		BOOST_REQUIRE_EQUAL(3, s.rmap.find("c")->second.Id);
+		BOOST_REQUIRE_EQUAL("one", s.rmap.find("a")->second.Name);
+		BOOST_REQUIRE_EQUAL("two", s.rmap.find("b")->second.Name);
+		BOOST_REQUIRE_EQUAL("three", s.rmap.find("c")->second.Name);
+	}
 
-void
-elementMap(const TestXml::Maps & s)
-{
-	BOOST_REQUIRE_EQUAL(3, s.emap.size());
-	BOOST_REQUIRE_EQUAL("one", s.emap.find("a")->second);
-	BOOST_REQUIRE_EQUAL("two", s.emap.find("b")->second);
-	BOOST_REQUIRE_EQUAL("three", s.emap.find("c")->second);
-	BOOST_REQUIRE_EQUAL(3, s.rmap.size());
-	BOOST_REQUIRE_EQUAL(1, s.rmap.find("a")->second.Id);
-	BOOST_REQUIRE_EQUAL(2, s.rmap.find("b")->second.Id);
-	BOOST_REQUIRE_EQUAL(3, s.rmap.find("c")->second.Id);
-	BOOST_REQUIRE_EQUAL("one", s.rmap.find("a")->second.Name);
-	BOOST_REQUIRE_EQUAL("two", s.rmap.find("b")->second.Name);
-	BOOST_REQUIRE_EQUAL("three", s.rmap.find("c")->second.Name);
-}
+	void
+	checkObjectMap(const TestJson::Properties & p)
+	{
+		BOOST_REQUIRE_EQUAL(3, p.size());
+		BOOST_REQUIRE_EQUAL(1, p.find("one")->second);
+		BOOST_REQUIRE_EQUAL(20, p.find("twenty")->second);
+		BOOST_REQUIRE_EQUAL(300, p.find("three hundred")->second);
+	}
 
-void
-checkObjectMap(const TestJson::Properties & p)
-{
-	BOOST_REQUIRE_EQUAL(3, p.size());
-	BOOST_REQUIRE_EQUAL(1, p.find("one")->second);
-	BOOST_REQUIRE_EQUAL(20, p.find("twenty")->second);
-	BOOST_REQUIRE_EQUAL(300, p.find("three hundred")->second);
-}
-
-void
-checkObjectMapMember(const TestJson::HasProperitiesPtr & p)
-{
-	BOOST_REQUIRE_EQUAL(p->name, "foo");
-	checkObjectMap(p->props);
-}
-
-xmlpp::Document *
-readXml(const fs::path & path)
-{
-	return new xmlpp::Document(xmlParseFile(path.string().c_str()));
-}
-
-void
-writeXml(xmlpp::Document * const & doc, const fs::path & path)
-{
-	doc->write_to_file_formatted(path.string());
-}
-
-void
-freeXml(xmlpp::Document *& doc)
-{
-	delete doc;
-}
-
-json::Value
-readJson(const fs::path & path)
-{
-	std::ifstream inFile(path.string());
-	std::stringstream buffer;
-	buffer << inFile.rdbuf();
-	Glib::ustring doc(buffer.str());
-	Glib::ustring::const_iterator itr = doc.begin();
-	return json::parseValue(itr);
-}
-
-void
-writeJson(const json::Value & value, const fs::path & path)
-{
-	std::ofstream outFile(path.string());
-	json::serializeValue(value, outFile, "utf-8");
-}
-
-void
-freeJson(json::Value &)
-{
+	void
+	checkObjectMapMember(const TestJson::HasProperitiesPtr & p)
+	{
+		BOOST_REQUIRE_EQUAL(p->name, "foo");
+		checkObjectMap(p->props);
+	}
 }
 
 BOOST_FIXTURE_TEST_SUITE(byFile, FileBased)
