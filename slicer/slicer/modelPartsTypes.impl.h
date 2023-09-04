@@ -1,4 +1,6 @@
 #pragma once
+// Keep this, there's a check its not defined in a test
+#define SLICER_MODELPARTSTYPES_IMPL_H
 
 #include "common.h"
 #include "enumMap.h" // IWYU pragma: keep
