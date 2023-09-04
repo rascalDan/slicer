@@ -148,16 +148,16 @@ namespace Slicer {
 		virtual bool OnChild(const SubPartHandler &, std::string_view memberName, const HookFilter & = HookFilter(),
 				MatchCase matchCase = MatchCase::Yes);
 		virtual void OnSubclass(const ModelPartHandler &, const std::string &);
-		virtual TypeId GetTypeId() const;
-		virtual std::optional<std::string> GetTypeIdProperty() const;
-		virtual ModelPartType GetType() const = 0;
+		[[nodiscard]] virtual TypeId GetTypeId() const;
+		[[nodiscard]] virtual std::optional<std::string> GetTypeIdProperty() const;
+		[[nodiscard]] virtual ModelPartType GetType() const = 0;
 		virtual void Create();
 		virtual void Complete();
 		virtual void SetValue(ValueSource &&);
 		virtual bool GetValue(ValueTarget &&);
-		virtual bool HasValue() const = 0;
-		virtual const Metadata & GetMetadata() const;
-		virtual bool IsOptional() const;
+		[[nodiscard]] virtual bool HasValue() const = 0;
+		[[nodiscard]] virtual const Metadata & GetMetadata() const;
+		[[nodiscard]] virtual bool IsOptional() const;
 		virtual void OnContained(const ModelPartHandler &);
 	};
 
@@ -172,13 +172,13 @@ namespace Slicer {
 	public:
 		explicit ModelPartForRootBase(ModelPartParam mp);
 
-		virtual const std::string & GetRootName() const = 0;
+		[[nodiscard]] virtual const std::string & GetRootName() const = 0;
 		bool OnAnonChild(const SubPartHandler &, const HookFilter &) override;
 		bool OnChild(const SubPartHandler &, std::string_view name, const HookFilter &,
 				MatchCase matchCase = MatchCase::Yes) override;
 		void OnEachChild(const ChildHandler & ch) override;
-		ModelPartType GetType() const override;
-		bool IsOptional() const override;
+		[[nodiscard]] ModelPartType GetType() const override;
+		[[nodiscard]] bool IsOptional() const override;
 		virtual void Write(::Ice::OutputStream &) const = 0;
 		virtual void Read(::Ice::InputStream &) = 0;
 		void OnContained(const ModelPartHandler &) override;

@@ -6,7 +6,7 @@
 
 namespace Slicer {
 	template<typename Object>
-	Object
+	[[nodiscard]] Object
 	DeserializeAnyWith(any_ptr<Deserializer> deserializer)
 	{
 		Object object {};
@@ -17,7 +17,7 @@ namespace Slicer {
 	}
 
 	template<typename Deserializer, typename Object, typename... SerializerParams>
-	Object
+	[[nodiscard]] Object
 	DeserializeAny(SerializerParams &&... sp)
 	{
 		return DeserializeAnyWith<Object>(Deserializer(std::forward<SerializerParams>(sp)...));

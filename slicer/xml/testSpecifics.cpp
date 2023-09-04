@@ -44,8 +44,8 @@ BOOST_DATA_TEST_CASE(bad_boolean_values,
 		in)
 {
 	parse_memory(in);
-	BOOST_CHECK_THROW(
-			(Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, bool>(get_document())), Slicer::BadBooleanValue);
+	BOOST_CHECK_THROW((std::ignore = Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, bool>(get_document())),
+			Slicer::BadBooleanValue);
 }
 
 BOOST_DATA_TEST_CASE(good_integer_values,
@@ -70,7 +70,7 @@ BOOST_DATA_TEST_CASE(bad_integer_values,
 		in)
 {
 	parse_memory(in);
-	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, Ice::Int>(get_document())),
+	BOOST_CHECK_THROW((std::ignore = Slicer::DeserializeAny<Slicer::XmlDocumentDeserializer, Ice::Int>(get_document())),
 			Slicer::BadNumericValue);
 }
 

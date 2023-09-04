@@ -590,12 +590,12 @@ BOOST_AUTO_TEST_CASE(xml_streams)
 BOOST_AUTO_TEST_CASE(invalid_enum)
 {
 	Slicer::JsonFileDeserializer jdeserializer {rootDir / "initial" / "invalidEnum.json"};
-	BOOST_REQUIRE_THROW(
-			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer), Slicer::InvalidEnumerationSymbol);
+	BOOST_REQUIRE_THROW(std::ignore = Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(jdeserializer),
+			Slicer::InvalidEnumerationSymbol);
 
 	Slicer::XmlFileDeserializer xdeserializer {rootDir / "initial" / "invalidEnum.xml"};
-	BOOST_REQUIRE_THROW(
-			Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer), Slicer::InvalidEnumerationSymbol);
+	BOOST_REQUIRE_THROW(std::ignore = Slicer::DeserializeAnyWith<TestModule::SomeNumbers>(xdeserializer),
+			Slicer::InvalidEnumerationSymbol);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -603,7 +603,8 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_CASE(missingConversion)
 {
 	auto in = json::parseValue(R"J({"conv": "2016-06-30 12:34:56"})J");
-	BOOST_REQUIRE_THROW((Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)),
+	BOOST_REQUIRE_THROW(
+			(std::ignore = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, TestModule2::MissingConvPtr>(in)),
 			Slicer::NoConversionFound);
 
 	auto obj = std::make_shared<TestModule2::MissingConv>("2016-06-30 12:34:56");
@@ -631,7 +632,7 @@ BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractEmpty)
 BOOST_AUTO_TEST_CASE(DeserializeJsonAbstractDefault)
 {
 	auto in = json::parseValue(R"J({ "obj": {} })J");
-	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::JsonValueDeserializer, Functions::SFuncs>(in)),
+	BOOST_CHECK_THROW((std::ignore = Slicer::DeserializeAny<Slicer::JsonValueDeserializer, Functions::SFuncs>(in)),
 			Slicer::AbstractClassException);
 }
 
@@ -655,7 +656,7 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractEmpty)
 BOOST_AUTO_TEST_CASE(DeserializeXmlAbstractDefault)
 {
 	std::stringstream in("<SFuncs><obj/></SFuncs>");
-	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, Functions::SFuncs>(in)),
+	BOOST_CHECK_THROW((std::ignore = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, Functions::SFuncs>(in)),
 			Slicer::AbstractClassException);
 }
 
@@ -692,7 +693,7 @@ BOOST_AUTO_TEST_CASE(DeserializeXmlIncorrectSeqElementName)
 			<Classes>
 				<obj/>
 			</Classes>)X");
-	BOOST_CHECK_THROW((Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::BuiltInSeq>(in)),
+	BOOST_CHECK_THROW((std::ignore = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::BuiltInSeq>(in)),
 			Slicer::IncorrectElementName);
 }
 

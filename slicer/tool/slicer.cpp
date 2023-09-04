@@ -23,27 +23,29 @@
 namespace po = boost::program_options;
 using namespace AdHoc::literals;
 
-static std::string
-defaultPostProcessor()
-{
-	constexpr std::array<const std::pair<std::string_view, std::string_view>, 1> pps {{
-			{"clang-format", "-i"},
-	}};
-	const auto path {[]() -> std::string_view {
-		if (auto p = getenv("PATH")) {
-			return p;
-		}
-		return "";
-	}()};
-	const auto pathBegin = make_split_iterator(path, first_finder(":", boost::is_equal()));
-	for (const auto & [cmd, opts] : pps) {
-		for (auto p = pathBegin; p != decltype(pathBegin) {}; ++p) {
-			if (std::filesystem::exists(std::filesystem::path(p->begin(), p->end()) / cmd)) {
-				return "%? %?"_fmt(cmd, opts);
+namespace {
+	[[nodiscard]] std::string
+	defaultPostProcessor()
+	{
+		constexpr std::array<const std::pair<std::string_view, std::string_view>, 1> pps {{
+				{"clang-format", "-i"},
+		}};
+		const auto path {[]() -> std::string_view {
+			if (auto p = getenv("PATH")) {
+				return p;
+			}
+			return "";
+		}()};
+		const auto pathBegin = make_split_iterator(path, first_finder(":", boost::is_equal()));
+		for (const auto & [cmd, opts] : pps) {
+			for (auto p = pathBegin; p != decltype(pathBegin) {}; ++p) {
+				if (std::filesystem::exists(std::filesystem::path(p->begin(), p->end()) / cmd)) {
+					return "%? %?"_fmt(cmd, opts);
+				}
 			}
 		}
+		return "";
 	}
-	return "";
 }
 
 int
