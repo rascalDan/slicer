@@ -74,32 +74,20 @@ namespace Slicer {
 		return name;
 	}
 
-	template<> const std::string Slicer::ModelPartForRoot<std::string>::rootName = "String";
-	template<> const std::string Slicer::ModelPartForRoot<bool>::rootName = "Boolean";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::Float>::rootName = "Float";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::Double>::rootName = "Double";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::Byte>::rootName = "Byte";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::Short>::rootName = "Short";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::Int>::rootName = "Int";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::Long>::rootName = "Long";
+#define Roots(Type, Name) \
+	template<> constinit const std::string Slicer::ModelPartForRoot<Type>::rootName {#Name}; \
+	template<> constinit const std::string Slicer::ModelPartForRoot<Ice::optional<Type>>::rootName {"Optional" #Name}; \
+	MODELPARTFOR(Type, ModelPartForSimple)
 
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<std::string>>::rootName = "OptionalString";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<bool>>::rootName = "OptionalBoolean";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Float>>::rootName = "OptionalFloat";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Double>>::rootName = "OptionalDouble";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Byte>>::rootName = "OptionalByte";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Short>>::rootName = "OptionalShort";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Int>>::rootName = "OptionalInt";
-	template<> const std::string Slicer::ModelPartForRoot<Ice::optional<Ice::Long>>::rootName = "OptionalLong";
-
-	MODELPARTFOR(std::string, ModelPartForSimple)
-	MODELPARTFOR(bool, ModelPartForSimple)
-	MODELPARTFOR(Ice::Float, ModelPartForSimple)
-	MODELPARTFOR(Ice::Double, ModelPartForSimple)
-	MODELPARTFOR(Ice::Byte, ModelPartForSimple)
-	MODELPARTFOR(Ice::Short, ModelPartForSimple)
-	MODELPARTFOR(Ice::Int, ModelPartForSimple)
-	MODELPARTFOR(Ice::Long, ModelPartForSimple)
+	Roots(std::string, String);
+	Roots(bool, Boolean);
+	Roots(Ice::Float, Float);
+	Roots(Ice::Double, Double);
+	Roots(Ice::Byte, Byte);
+	Roots(Ice::Short, Short);
+	Roots(Ice::Int, Int);
+	Roots(Ice::Long, Long);
+#undef RootNames
 
 	bool
 	optionalCaseEq(std::string_view a, std::string_view b, bool matchCase)
