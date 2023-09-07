@@ -125,8 +125,6 @@ namespace Slicer {
 		const std::string * nameStr;
 	};
 
-	template<typename T> struct DLL_PUBLIC Default { };
-
 	class DLL_PUBLIC ModelPart {
 	public:
 		ModelPart() = default;
@@ -139,8 +137,7 @@ namespace Slicer {
 		ModelPart & operator=(ModelPart &&) = delete;
 
 		template<typename MP> static void Make(typename MP::element_type * t, const ModelPartHandler &);
-		template<typename T> static void CreateFor(T & t, const ModelPartHandler &);
-		template<typename T> static void CreateFor(Default<T> &&, const ModelPartHandler &);
+		template<typename T> static void CreateFor(T * t, const ModelPartHandler &);
 		template<typename T> static void OnRootFor(T & t, const ModelPartRootHandler &);
 
 		virtual void OnEachChild(const ChildHandler &);

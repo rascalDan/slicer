@@ -25,7 +25,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 
 #define TypeTest(Var, Expr, Explicit, Expected, ...) \
 	Var obj = Expr; \
-	Slicer::ModelPart::CreateFor(obj, [](auto && mpp) { \
+	Slicer::ModelPart::CreateFor(&obj, [](auto && mpp) { \
 		BOOST_REQUIRE_EQUAL(Slicer::Expected, mpp->GetType()); \
 \
 		BOOST_TEST_CONTEXT(#Var) { \
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(normalClassTypeId)
 {
 	TestModule::BasePtr base = std::make_shared<TestModule::Base>(1);
 	BOOST_REQUIRE(base);
-	Slicer::ModelPart::CreateFor(base, [](auto && a) {
+	Slicer::ModelPart::CreateFor(&base, [](auto && a) {
 		BOOST_REQUIRE(a);
 		auto baseType = a->GetTypeId();
 		BOOST_REQUIRE(!baseType);
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(normalSubClassTypeId)
 {
 	TestModule::BasePtr base = std::make_shared<TestModule::D1>(1, 2);
 	BOOST_REQUIRE(base);
-	Slicer::ModelPart::CreateFor(base, [](auto && a) {
+	Slicer::ModelPart::CreateFor(&base, [](auto && a) {
 		BOOST_REQUIRE(a);
 		auto baseType = a->GetTypeId();
 		BOOST_REQUIRE(baseType);
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(normalSubSubClassTypeId)
 {
 	TestModule::BasePtr base = std::make_shared<TestModule::D3>(1, 2, 3);
 	BOOST_REQUIRE(base);
-	Slicer::ModelPart::CreateFor(base, [](auto && a) {
+	Slicer::ModelPart::CreateFor(&base, [](auto && a) {
 		BOOST_REQUIRE(a);
 		auto baseType = a->GetTypeId();
 		BOOST_REQUIRE(baseType);
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(localClassTypeId)
 {
 	Locals::LocalClassPtr base = std::make_shared<Locals::LocalClass>(1, "One");
 	BOOST_REQUIRE(base);
-	Slicer::ModelPart::CreateFor(base, [](auto && a) {
+	Slicer::ModelPart::CreateFor(&base, [](auto && a) {
 		BOOST_REQUIRE(a);
 		auto baseType = a->GetTypeId();
 		BOOST_REQUIRE(!baseType);
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(localSubClassTypeId)
 {
 	Locals::LocalClassPtr base = std::make_shared<Locals::LocalSubClass>(1, "One", 3.1);
 	BOOST_REQUIRE(base);
-	Slicer::ModelPart::CreateFor(base, [](auto && a) {
+	Slicer::ModelPart::CreateFor(&base, [](auto && a) {
 		BOOST_REQUIRE(a);
 		auto baseType = a->GetTypeId();
 		BOOST_REQUIRE(baseType);
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(localSubSubClassTypeId)
 {
 	Locals::LocalClassPtr base = std::make_shared<Locals::LocalSub2Class>(1, "One", 3.1, 1);
 	BOOST_REQUIRE(base);
-	Slicer::ModelPart::CreateFor(base, [](auto && a) {
+	Slicer::ModelPart::CreateFor(&base, [](auto && a) {
 		BOOST_REQUIRE(a);
 		auto baseType = a->GetTypeId();
 		BOOST_REQUIRE(baseType);
