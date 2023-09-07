@@ -128,13 +128,9 @@ namespace Slicer {
 	class DLL_PUBLIC ModelPart {
 	public:
 		ModelPart() = default;
-		ModelPart(const ModelPart &) = delete;
-		ModelPart(ModelPart &&) = delete;
-
 		virtual ~ModelPart() = default;
 
-		ModelPart & operator=(const ModelPart &) = delete;
-		ModelPart & operator=(ModelPart &&) = delete;
+		SPECIAL_MEMBERS_DEFAULT(ModelPart);
 
 		template<typename MP> static void Make(typename MP::element_type * t, const ModelPartHandler &);
 		template<typename T> static void CreateFor(T * t, const ModelPartHandler &);
