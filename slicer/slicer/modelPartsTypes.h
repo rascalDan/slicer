@@ -106,6 +106,7 @@ namespace Slicer {
 		bool OnChild(const SubPartHandler &, std::string_view name, const HookFilter & flt,
 				MatchCase matchCase = MatchCase::Yes) override;
 		void SetValue(ValueSource && s) override;
+		bool GetValue(ValueTarget && s) override;
 		[[nodiscard]] bool HasValue() const override;
 		[[nodiscard]] bool IsOptional() const override;
 		[[nodiscard]] const Metadata & GetMetadata() const override;
@@ -123,7 +124,6 @@ namespace Slicer {
 		using element_type = Ice::optional<typename T::element_type>;
 		explicit ModelPartForOptional(element_type * h);
 		void Create() override;
-		bool GetValue(ValueTarget && s) override;
 		[[nodiscard]] ModelPartType GetType() const override;
 
 	protected:

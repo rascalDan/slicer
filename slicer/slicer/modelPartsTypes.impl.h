@@ -324,17 +324,6 @@ namespace Slicer {
 	}
 
 	template<typename T>
-	bool
-	ModelPartForOptional<T>::GetValue(ValueTarget && s)
-	{
-		BOOST_ASSERT(this->Model);
-		if (*this->Model) {
-			return modelPart->GetValue(std::move(s));
-		}
-		return false;
-	}
-
-	template<typename T>
 	ModelPartType
 	ModelPartForOptional<T>::GetType() const
 	{

@@ -271,6 +271,15 @@ namespace Slicer {
 	}
 
 	bool
+	ModelPartForOptionalBase::GetValue(ValueTarget && s)
+	{
+		if (this->hasModel()) {
+			return modelPart->GetValue(std::move(s));
+		}
+		return false;
+	}
+
+	bool
 	ModelPartForOptionalBase::HasValue() const
 	{
 		return this->hasModel() && modelPart->HasValue();
