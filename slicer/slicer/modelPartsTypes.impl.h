@@ -134,12 +134,8 @@ namespace Slicer {
 	typeWrite(::Ice::OutputStream & s, const ::Ice::optional<T> & m)
 	{
 		if constexpr (!isLocal<T>::value) {
-			using traits = Ice::StreamableTraits<T>;
-			using SOH = Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>;
 			s.startEncapsulation();
-			if (m && s.writeOptional(0, SOH::optionalFormat)) {
-				SOH::write(&s, *m);
-			}
+			s.write(0, m);
 			s.endEncapsulation();
 		}
 		else {
@@ -164,16 +160,8 @@ namespace Slicer {
 	typeRead(::Ice::InputStream & s, ::Ice::optional<T> & m)
 	{
 		if constexpr (!isLocal<T>::value) {
-			using traits = Ice::StreamableTraits<T>;
-			using SOH = Ice::StreamOptionalHelper<T, traits::helper, traits::fixedLength>;
 			s.startEncapsulation();
-			if (s.readOptional(0, SOH::optionalFormat)) {
-				m = T();
-				SOH::read(&s, *m);
-			}
-			else {
-				m = IceUtil::None;
-			}
+			s.read(0, m);
 			s.endEncapsulation();
 		}
 		else {
