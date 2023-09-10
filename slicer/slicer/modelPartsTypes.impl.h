@@ -16,6 +16,8 @@
 #include <Ice/StreamHelpers.h>
 #include <IceUtil/Config.h>
 #include <boost/assert.hpp>
+#include <boost/preprocessor/comparison/less_equal.hpp>
+#include <boost/preprocessor/if.hpp>
 #include <c++11Helpers.h>
 #include <cstddef>
 #include <memory>
@@ -704,3 +706,10 @@ namespace Slicer {
 #ifdef __clang__
 #	pragma clang diagnostic pop
 #endif
+
+#ifndef CONSTINIT_STRING_MAX
+#	define CONSTINIT_STRING_MAX 15
+#endif
+
+#define CONSTSTR(L) \
+	BOOST_PP_IF(BOOST_PP_LESS_EQUAL(L, CONSTINIT_STRING_MAX), constinit const std::string, const std::string)
