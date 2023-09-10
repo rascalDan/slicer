@@ -74,19 +74,21 @@ namespace Slicer {
 		return name;
 	}
 
-#define Roots(Type, Name) \
-	template<> constinit const std::string Slicer::ModelPartForRoot<Type>::rootName {#Name}; \
-	template<> constinit const std::string Slicer::ModelPartForRoot<Ice::optional<Type>>::rootName {"Optional" #Name}; \
+#define Roots(Type, Name, NameLen) \
+	template<> CONSTSTR(NameLen) Slicer::ModelPartForRoot<Type>::rootName {#Name}; \
+	template<> \
+	CONSTSTR(BOOST_PP_ADD(8, NameLen)) \
+	Slicer::ModelPartForRoot<Ice::optional<Type>>::rootName {"Optional" #Name}; \
 	MODELPARTFOR(Type, ModelPartForSimple)
 
-	Roots(std::string, String);
-	Roots(bool, Boolean);
-	Roots(Ice::Float, Float);
-	Roots(Ice::Double, Double);
-	Roots(Ice::Byte, Byte);
-	Roots(Ice::Short, Short);
-	Roots(Ice::Int, Int);
-	Roots(Ice::Long, Long);
+	Roots(std::string, String, 6);
+	Roots(bool, Boolean, 8);
+	Roots(Ice::Float, Float, 5);
+	Roots(Ice::Double, Double, 6);
+	Roots(Ice::Byte, Byte, 4);
+	Roots(Ice::Short, Short, 5);
+	Roots(Ice::Int, Int, 3);
+	Roots(Ice::Long, Long, 4);
 #undef RootNames
 
 	bool
