@@ -137,10 +137,10 @@ namespace Slicer {
 		static const ModelPartType type;
 
 	protected:
-		void onSubclass(const std::string & name, void * m, const ModelPartHandler &);
+		const ClassRefBase * getSubclassRef(const std::string & name);
 
 		static void registerClass(
-				const std::string_view className, const std::optional<std::string_view> typeName, const ClassRef &);
+				const std::string_view className, const std::optional<std::string_view> typeName, const ClassRefBase *);
 		static void unregisterClass(const std::string_view className, const std::optional<std::string_view> typeName);
 		static TypeId getTypeId(const std::string & id, const std::string_view className);
 		static std::string demangle(const char * mangled);
@@ -196,11 +196,18 @@ namespace Slicer {
 		constinit static const std::string_view className;
 		constinit static const std::optional<const std::string_view> typeName;
 
-		static void CreateModelPart(void *, const ModelPartHandler &);
-
 	private:
+		static const ClassRefBase * const classref;
 		static void registerClass() __attribute__((constructor(210)));
 		static void unregisterClass() __attribute__((destructor(210)));
+	};
+
+	template<typename T> struct ClassRef {
+		consteval ClassRef() = default;
+		virtual ~ClassRef() = default;
+		SPECIAL_MEMBERS_DEFAULT(ClassRef);
+
+		virtual void onSubClass(std::shared_ptr<T> &, const ModelPartHandler &) const = 0;
 	};
 
 	template<typename T> class ModelPartForStruct : public ModelPartForComplex<T>, protected ModelPartModel<T> {
