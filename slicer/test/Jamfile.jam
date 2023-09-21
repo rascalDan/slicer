@@ -1,4 +1,5 @@
 import ./slicer.jam ;
+import sequence ;
 
 lib dl ;
 lib stdc++fs ;
@@ -81,7 +82,7 @@ run compilation.cpp
 
 run serializers.cpp
 	helpers.cpp
-	: : :
+	: -- : [ sequence.insertion-sort [ glob-tree-ex initial included expected : *.json *.xml ] ] :
 	<library>types
 	<implicit-dependency>types
 	<library>common
@@ -128,7 +129,7 @@ run
 		<use>../xml//slicer-xml
 		<use>../json//slicer-json
 	]
-	: : :
+	: -- : [ sequence.insertion-sort [ glob-tree-ex initial included expected : *.json *.xml ] ] :
 	<library>benchmark
 	<library>stdc++fs
 	<library>common
