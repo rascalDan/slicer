@@ -415,6 +415,16 @@ namespace Slicer {
 
 		auto name = md.value("slicer:root:");
 		defineRoot(typeToString(decl), name ? *name : c->name(), decl);
+		fprintbf(cpp, "static constexpr ClassRefImplImpl<%s", decl->typeId());
+		for (const auto & base : decl->definition()->allBases()) {
+			if (decl != base->declaration()) {
+				fprintbf(cpp, ", %s", base->declaration()->typeId());
+			}
+		}
+		fprintbf(cpp, "> ref%d;\n", components);
+		fprintbf(cpp, "template<>\n");
+		fprintbf(cpp, "constinit const ClassRefBase * const ModelPartForClass<%s>::classref{ &ref%d };\n",
+				decl->typeId(), components);
 
 		auto typeName = md.value("slicer:typename:");
 		fprintbf(cpp, "template<>\n");

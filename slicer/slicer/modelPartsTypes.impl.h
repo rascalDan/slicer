@@ -448,7 +448,13 @@ namespace Slicer {
 	ModelPartForClass<T>::OnSubclass(const ModelPartHandler & h, const std::string & name)
 	{
 		BOOST_ASSERT(this->Model);
-		return ModelPartForComplexBase::onSubclass(name, this->Model, h);
+		if (const ClassRefBase * refbase = ModelPartForComplexBase::getSubclassRef(name);
+				auto ref = dynamic_cast<const ClassRef<T> *>(refbase)) [[likely]] {
+			ref->onSubClass(*this->Model, h);
+		}
+		else {
+			ModelPartForComplexBase::throwIncorrectType(name, typeid(T));
+		}
 	}
 
 	template<typename T>
@@ -468,17 +474,37 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	ModelPartForClass<T>::CreateModelPart(void * p, const ModelPartHandler & h)
-	{
-		return ::Slicer::ModelPart::CreateFor(static_cast<element_type *>(p), h);
-	}
-
-	template<typename T>
-	void
 	ModelPartForClass<T>::registerClass()
 	{
-		ModelPartForComplexBase::registerClass(className, typeName, &ModelPartForClass<T>::CreateModelPart);
+		ModelPartForComplexBase::registerClass(className, typeName, classref);
 	}
+
+	template<typename Inst, typename T> struct ClassRefImpl : public ClassRef<T> {
+		consteval ClassRefImpl() = default;
+
+		void
+		onSubClass(std::shared_ptr<T> & model, const ModelPartHandler & h) const override
+		{
+			if constexpr (std::is_same_v<T, Inst>) {
+				ModelPart::CreateFor(&model, h);
+			}
+			else {
+				auto p = std::move(std::dynamic_pointer_cast<Inst>(model));
+				ModelPart::CreateFor(&p, h);
+				model = std::move(p);
+			}
+		}
+	};
+
+	template<typename Inst, typename... Bases>
+	struct ClassRefImplImpl :
+		public ClassRefBase,
+		public ClassRefImpl<Inst, Inst>,
+		public ClassRefImpl<Inst, Bases>... {
+		consteval ClassRefImplImpl() = default;
+		~ClassRefImplImpl() override = default;
+		SPECIAL_MEMBERS_DEFAULT(ClassRefImplImpl);
+	};
 
 	template<typename T>
 	void

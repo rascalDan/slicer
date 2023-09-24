@@ -1,4 +1,5 @@
 #define BOOST_TEST_MODULE execute_serializers
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "classes.h"
@@ -36,7 +37,6 @@
 #include <string>
 #include <types.h>
 #include <utility>
-#include <variant>
 #include <vector>
 #include <xml.h>
 // IWYU pragma: no_forward_declare Slicer::InvalidEnumerationSymbol
@@ -676,4 +676,36 @@ BOOST_AUTO_TEST_CASE(sequence_element_in_same_slice_link_bug)
 			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr, [](auto &&) {}));
 	BOOST_CHECK_NO_THROW(
 			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr, [](auto &&) {}));
+}
+
+BOOST_AUTO_TEST_CASE(typeid_specifies_same)
+{
+	std::ifstream in {rootDir / "initial/inherit-same.xml"};
+	auto d1 = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::D1Ptr>(in);
+	BOOST_REQUIRE(d1);
+	BOOST_CHECK_EQUAL(d1->a, 3);
+	BOOST_CHECK_EQUAL(typeid(*d1).name(), typeid(TestModule::D1).name());
+}
+
+BOOST_DATA_TEST_CASE(typeid_specifies_bad,
+		boost::unit_test::data::make<std::filesystem::path>({
+				"inherit-base.xml",
+				"inherit-wronghier.xml",
+		}),
+		path)
+{
+	std::ifstream in {rootDir / "initial" / path};
+	BOOST_CHECK_THROW(std::ignore = (Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::D12Ptr>(in)),
+			Slicer::IncorrectType);
+}
+
+BOOST_DATA_TEST_CASE(typeid_specifies_no_such_type,
+		boost::unit_test::data::make<std::filesystem::path>({
+				"inherit-nosuchtype.xml",
+		}),
+		path)
+{
+	std::ifstream in {rootDir / "initial" / path};
+	BOOST_CHECK_THROW(std::ignore = (Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::D12Ptr>(in)),
+			Slicer::UnknownType);
 }

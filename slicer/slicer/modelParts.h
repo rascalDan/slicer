@@ -77,6 +77,12 @@ namespace Slicer {
 	class ModelPartForRootBase;
 	class HookCommon;
 
+	struct ClassRefBase {
+		constexpr ClassRefBase() = default;
+		virtual ~ClassRefBase() = default;
+		SPECIAL_MEMBERS_DEFAULT(ClassRefBase);
+	};
+
 	using ModelPartParam = any_ptr<ModelPart>;
 	using ModelPartForRootParam = any_ptr<ModelPartForRootBase>;
 	using TypeId = std::optional<std::string>;
@@ -85,7 +91,6 @@ namespace Slicer {
 	using ModelPartHandler = std::function<void(ModelPartParam)>;
 	using ModelPartRootHandler = std::function<void(ModelPartForRootParam)>;
 	using SubPartHandler = std::function<void(ModelPartParam, const Metadata &)>;
-	using ClassRef = std::function<void(void *, const ModelPartHandler &)>;
 	using HookFilter = std::function<bool(const HookCommon *)>;
 	constexpr Metadata emptyMetadata;
 

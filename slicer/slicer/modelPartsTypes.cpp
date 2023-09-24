@@ -27,7 +27,7 @@ namespace Ice {
 }
 
 namespace Slicer {
-	using ClassRefMap = std::map<std::string, ClassRef, std::less<>>;
+	using ClassRefMap = std::map<std::string, const ClassRefBase *, std::less<>>;
 	using ClassNamePair = std::pair<std::string_view, std::string>;
 	using ClassNameMap = boost::multi_index_container<ClassNamePair,
 			boost::multi_index::indexed_by<
@@ -72,6 +72,12 @@ namespace Slicer {
 			return mapped->second;
 		}
 		return name;
+	}
+
+	[[noreturn]] void
+	ModelPartForComplexBase::throwIncorrectType(const std::string & name, const std::type_info & target)
+	{
+		throw IncorrectType(name, demangle(target.name()));
 	}
 
 #define Roots(Type, Name, NameLen) \
@@ -186,7 +192,7 @@ namespace Slicer {
 
 	void
 	ModelPartForComplexBase::registerClass(
-			const std::string_view className, const std::optional<std::string_view> typeName, const ClassRef & cr)
+			const std::string_view className, const std::optional<std::string_view> typeName, const ClassRefBase * cr)
 	{
 		refs->emplace(className, cr);
 		if (typeName) {
@@ -206,11 +212,11 @@ namespace Slicer {
 		}
 	}
 
-	void
-	ModelPartForComplexBase::onSubclass(const std::string & name, void * m, const ModelPartHandler & h)
+	const ClassRefBase *
+	ModelPartForComplexBase::getSubclassRef(const std::string & name)
 	{
 		if (const auto ref = refs->find(ToModelTypeName(name)); ref != refs->end()) {
-			return ref->second(m, h);
+			return ref->second;
 		}
 		throw UnknownType(name);
 	}
