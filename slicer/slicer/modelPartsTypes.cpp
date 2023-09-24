@@ -27,6 +27,10 @@ namespace Ice {
 }
 
 namespace Slicer {
+	static_assert(!isOptional<int>::value);
+	static_assert(isOptional<::Ice::optional<int>>::value);
+	static_assert(isOptional<::IceUtil::Optional<int>>::value);
+
 	using ClassRefMap = std::map<std::string, const ClassRefBase *, std::less<>>;
 	using ClassNamePair = std::pair<std::string_view, std::string>;
 	using ClassNameMap = boost::multi_index_container<ClassNamePair,

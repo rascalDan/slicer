@@ -21,6 +21,18 @@ namespace Slicer {
 		static constexpr bool value = false;
 	};
 
+	template<typename T> struct isLocal<::Ice::optional<T>> {
+		static constexpr bool value = isLocal<T>::value;
+	};
+
+	template<typename T> struct isOptional {
+		static constexpr bool value = false;
+	};
+
+	template<typename T> struct isOptional<::Ice::optional<T>> {
+		static constexpr bool value = true;
+	};
+
 	DLL_PUBLIC bool optionalCaseEq(std::string_view a, std::string_view b, bool matchCase);
 
 	template<typename T> class ModelPartForRoot : public ModelPartForRootBase {
