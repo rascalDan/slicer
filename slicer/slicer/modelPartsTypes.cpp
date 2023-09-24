@@ -357,6 +357,12 @@ namespace Slicer {
 
 	const ModelPartType ModelPartForDictionaryBase::type = ModelPartType::Dictionary;
 
+	void
+	ModelPartForDictionaryBase::throwIncorrectElementName(const std::string_view name)
+	{
+		throw IncorrectElementName(std::string {name});
+	}
+
 	// Streams
 	ModelPartType
 	ModelPartForStreamBase::GetType() const

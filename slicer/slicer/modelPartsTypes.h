@@ -297,6 +297,9 @@ namespace Slicer {
 		[[nodiscard]] bool HasValue() const override;
 		[[nodiscard]] ModelPartType GetType() const override;
 		static const ModelPartType type;
+
+	protected:
+		[[noreturn]] static void throwIncorrectElementName(const std::string_view);
 	};
 
 	template<typename T> class ModelPartForDictionary : public ModelPartForDictionaryBase, protected ModelPartModel<T> {

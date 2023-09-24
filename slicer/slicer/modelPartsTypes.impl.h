@@ -681,8 +681,8 @@ namespace Slicer {
 			const SubPartHandler & ch, std::string_view name, const HookFilter &, MatchCase matchCase)
 	{
 		BOOST_ASSERT(this->Model);
-		if (!optionalCaseEq(name, pairName, matchCase == MatchCase::Yes)) {
-			throw IncorrectElementName(std::string {name});
+		if (!optionalCaseEq(name, pairName, matchCase == MatchCase::Yes)) [[unlikely]] {
+			ModelPartForDictionaryBase::throwIncorrectElementName(name);
 		}
 		ch(ModelPartForDictionaryElementInserter<T>(this->Model), emptyMetadata);
 		return true;
