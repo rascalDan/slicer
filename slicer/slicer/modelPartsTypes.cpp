@@ -80,6 +80,12 @@ namespace Slicer {
 		throw IncorrectType(name, demangle(target.name()));
 	}
 
+	[[noreturn]] void
+	ModelPartForComplexBase::throwAbstractClassException(const std::type_info & target)
+	{
+		throw AbstractClassException(demangle(target.name()));
+	}
+
 #define Roots(Type, Name, NameLen) \
 	template<> CONSTSTR(NameLen) Slicer::ModelPartForRoot<Type>::rootName {#Name}; \
 	template<> \

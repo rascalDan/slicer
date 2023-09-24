@@ -429,7 +429,7 @@ namespace Slicer {
 	{
 		BOOST_ASSERT(this->Model);
 		if constexpr (std::is_abstract_v<T>) {
-			throw AbstractClassException(ModelPartForComplexBase::demangle(typeid(T).name()));
+			ModelPartForComplexBase::throwAbstractClassException(typeid(T));
 		}
 		else {
 			*this->Model = std::make_shared<T>();

@@ -148,6 +148,7 @@ namespace Slicer {
 		static const std::string & ToExchangeTypeName(const std::string &);
 		static std::string_view ToModelTypeName(const std::string &);
 		[[noreturn]] static void throwIncorrectType(const std::string & name, const std::type_info & target);
+		[[noreturn]] static void throwAbstractClassException(const std::type_info & target);
 	};
 
 	template<typename T> class Hooks;
