@@ -74,6 +74,12 @@ namespace Slicer {
 		return name;
 	}
 
+	[[noreturn]] void
+	ModelPartForComplexBase::throwIncorrectType(const std::string & name, const std::type_info & target)
+	{
+		throw IncorrectType(name, demangle(target.name()));
+	}
+
 #define Roots(Type, Name, NameLen) \
 	template<> CONSTSTR(NameLen) Slicer::ModelPartForRoot<Type>::rootName {#Name}; \
 	template<> \

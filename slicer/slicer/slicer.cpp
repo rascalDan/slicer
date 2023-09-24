@@ -13,6 +13,14 @@ namespace Slicer {
 		InvalidEnumerationSymbolMsg::write(s, symbol, type);
 	}
 
+	AdHocFormatter(IncorrectTypeMsg, "Type [%?] cannot be used as a [%?]");
+
+	void
+	IncorrectType::ice_print(std::ostream & s) const
+	{
+		IncorrectTypeMsg::write(s, type, target);
+	}
+
 	AdHocFormatter(InvalidEnumerationValueMsg, "Invalid enumeration symbol [%?] for type [%?]");
 
 	void

@@ -448,11 +448,12 @@ namespace Slicer {
 	ModelPartForClass<T>::OnSubclass(const ModelPartHandler & h, const std::string & name)
 	{
 		BOOST_ASSERT(this->Model);
-		const ClassRefBase * refbase = ModelPartForComplexBase::getSubclassRef(name);
-		BOOST_ASSERT(refbase);
-		BOOST_ASSERT(dynamic_cast<const ClassRef<T> *>(refbase));
-		if (auto ref = dynamic_cast<const ClassRef<T> *>(refbase)) {
+		if (const ClassRefBase * refbase = ModelPartForComplexBase::getSubclassRef(name);
+				auto ref = dynamic_cast<const ClassRef<T> *>(refbase)) [[likely]] {
 			ref->onSubClass(*this->Model, h);
+		}
+		else {
+			ModelPartForComplexBase::throwIncorrectType(name, typeid(T));
 		}
 	}
 

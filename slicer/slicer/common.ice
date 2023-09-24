@@ -29,6 +29,11 @@ module Slicer {
 		string type;
 	};
 	["cpp:ice_print"]
+	exception IncorrectType extends DeserializerError {
+		string type;
+		string target;
+	};
+	["cpp:ice_print"]
 	exception InvalidEnumerationValue extends SerializerError {
 		int value;
 		string type;
