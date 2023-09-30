@@ -133,68 +133,40 @@ namespace Slicer {
 
 	template<typename T>
 	void
-	typeWrite(::Ice::OutputStream & s, const ::Ice::optional<T> & m)
-	{
-		if constexpr (!isLocal<T>::value) {
-			s.startEncapsulation();
-			s.write(0, m);
-			s.endEncapsulation();
-		}
-		else {
-			throw LocalTypeException();
-		}
-	}
-
-	template<typename T>
-	void
-	typeWrite(::Ice::OutputStream & s, const T & m)
-	{
-		if constexpr (!isLocal<T>::value) {
-			s.write(m);
-		}
-		else {
-			throw LocalTypeException();
-		}
-	}
-
-	template<typename T>
-	void
-	typeRead(::Ice::InputStream & s, ::Ice::optional<T> & m)
-	{
-		if constexpr (!isLocal<T>::value) {
-			s.startEncapsulation();
-			s.read(0, m);
-			s.endEncapsulation();
-		}
-		else {
-			throw LocalTypeException();
-		}
-	}
-
-	template<typename T>
-	void
-	typeRead(::Ice::InputStream & s, T & m)
-	{
-		if constexpr (!isLocal<T>::value) {
-			s.read(m);
-		}
-		else {
-			throw LocalTypeException();
-		}
-	}
-
-	template<typename T>
-	void
 	ModelPartForRoot<T>::Write(::Ice::OutputStream & s) const
 	{
-		typeWrite(s, *ModelObject);
+		if constexpr (!isLocal<T>::value) {
+			if constexpr (isOptional<T>::value) {
+				s.startEncapsulation();
+				s.write(0, *ModelObject);
+				s.endEncapsulation();
+			}
+			else {
+				s.write(*ModelObject);
+			}
+		}
+		else {
+			ModelPartForRootBase::throwLocalTypeException(typeid(T));
+		}
 	}
 
 	template<typename T>
 	void
 	ModelPartForRoot<T>::Read(::Ice::InputStream & s)
 	{
-		typeRead(s, *ModelObject);
+		if constexpr (!isLocal<T>::value) {
+			if constexpr (isOptional<T>::value) {
+				s.startEncapsulation();
+				s.read(0, *ModelObject);
+				s.endEncapsulation();
+			}
+			else {
+				s.read(*ModelObject);
+			}
+		}
+		else {
+			ModelPartForRootBase::throwLocalTypeException(typeid(T));
+		}
 	}
 
 	// ModelPartForSimple

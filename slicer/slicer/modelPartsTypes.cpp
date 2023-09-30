@@ -157,6 +157,12 @@ namespace Slicer {
 		return mp->OnContained(h);
 	}
 
+	void
+	ModelPartForRootBase::throwLocalTypeException(const std::type_info & type)
+	{
+		throw LocalTypeException(ModelPartForComplexBase::demangle(type.name()));
+	}
+
 	bool
 	ModelPartForSimpleBase::HasValue() const
 	{

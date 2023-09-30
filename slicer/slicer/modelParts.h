@@ -185,5 +185,8 @@ namespace Slicer {
 		void OnContained(const ModelPartHandler &) override;
 
 		ModelPartParam mp;
+
+	protected:
+		[[noreturn]] static void throwLocalTypeException(const std::type_info &);
 	};
 }

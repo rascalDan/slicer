@@ -19,7 +19,9 @@ module Slicer {
 	["cpp:ice_print"]
 	exception UnsupportedModelType extends RuntimeError { };
 	["cpp:ice_print"]
-	exception LocalTypeException extends RuntimeError { };
+	exception LocalTypeException extends RuntimeError {
+		string type;
+	};
 	["cpp:ice_print"]
 	exception NoConversionFound extends RuntimeError {
 		string type;
