@@ -492,7 +492,7 @@ namespace Slicer {
 		BOOST_ASSERT(this->Model);
 		return ModelPartForComplexBase::getTypeId(
 				[this]() {
-					if constexpr (std::is_base_of_v<Ice::Object, T>) {
+					if constexpr (requires { (*this->Model)->ice_id(); }) {
 						return (*this->Model)->ice_id();
 					}
 					else {
