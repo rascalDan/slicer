@@ -8,7 +8,6 @@
 #include <command_fwd.h>
 #include <compileTimeFormatter.h>
 #include <connection.h>
-#include <functional>
 #include <memory>
 #include <modifycommand.h>
 #include <slicer/modelParts.h>

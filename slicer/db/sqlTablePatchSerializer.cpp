@@ -3,7 +3,6 @@
 #include "sqlInsertSerializer.h"
 #include <compileTimeFormatter.h>
 #include <connection.h>
-#include <memory>
 #include <scopeExit.h>
 #include <slicer/modelParts.h>
 #include <string>

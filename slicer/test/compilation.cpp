@@ -11,7 +11,6 @@
 #include "structs.h"
 #include <Ice/Config.h>
 #include <memory>
-#include <optional>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -52,15 +51,17 @@ BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_class)
 			ModelPartType::Complex, { BOOST_CHECK_THROW(mpp->OnContained(DontCall), std::logic_error); });
 }
 
-static void
-hookHandler(std::vector<std::string> * names, const std::string & name, Slicer::ModelPartParam mpp,
-		const Slicer::HookCommon * h)
-{
-	names->push_back(name);
-	BOOST_REQUIRE(mpp);
-	BOOST_CHECK_THROW(mpp->OnContained(DontCall), std::logic_error);
-	BOOST_REQUIRE(h);
-	BOOST_REQUIRE_EQUAL(h->name, name);
+namespace {
+	void
+	hookHandler(std::vector<std::string> * names, const std::string & name, Slicer::ModelPartParam mpp,
+			const Slicer::HookCommon * h)
+	{
+		names->push_back(name);
+		BOOST_REQUIRE(mpp);
+		BOOST_CHECK_THROW(mpp->OnContained(DontCall), std::logic_error);
+		BOOST_REQUIRE(h);
+		BOOST_REQUIRE_EQUAL(h->name, name);
+	}
 }
 
 BOOST_AUTO_TEST_CASE(compile_auto_modelpart_type_sequenceclasses)

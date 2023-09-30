@@ -1,9 +1,7 @@
 #include "metadata.h"
 #include <array>
 #include <optional>
-#include <string>
 #include <string_view>
-#include <utility>
 
 namespace test {
 	constexpr auto rc = [](std::string_view sv) {

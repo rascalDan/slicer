@@ -15,7 +15,6 @@
 #pragma GCC diagnostic pop
 #include <slicer/serializer.h>
 #include <slicer/slicer.h>
-#include <typeinfo>
 #include <xmlExceptions.h>
 
 // IWYU pragma: no_forward_declare Slicer::BadBooleanValue

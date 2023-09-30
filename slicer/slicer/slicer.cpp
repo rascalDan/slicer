@@ -1,8 +1,5 @@
-#include "slicer.h"
-#include "slicer/modelParts.h"
 #include <common.h>
 #include <compileTimeFormatter.h>
-#include <utility>
 
 namespace Slicer {
 	AdHocFormatter(InvalidEnumerationSymbolMsg, "Invalid enumeration symbol [%?] for type [%?]");

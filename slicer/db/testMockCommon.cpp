@@ -2,7 +2,6 @@
 #include <connection_fwd.h>
 #include <definedDirs.h>
 #include <filesystem>
-#include <memory>
 #include <mockDatabase.h>
 #include <pq-mock.h>
 

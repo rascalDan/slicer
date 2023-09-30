@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 

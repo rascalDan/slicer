@@ -5,7 +5,6 @@
 #include <Ice/Config.h>
 #include <c++11Helpers.h>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>

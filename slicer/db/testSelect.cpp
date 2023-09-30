@@ -17,7 +17,6 @@
 #include <connection.h>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 // IWYU pragma: no_forward_declare Slicer::NoRowsReturned
 // IWYU pragma: no_forward_declare Slicer::TooManyRowsReturned

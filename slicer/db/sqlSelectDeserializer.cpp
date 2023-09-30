@@ -2,7 +2,6 @@
 #include "sqlExceptions.h"
 #include "sqlSource.h"
 #include <column.h>
-#include <memory>
 #include <selectcommand.h>
 #include <slicer/common.h>
 #include <slicer/hookMap.h>

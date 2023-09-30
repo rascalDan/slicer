@@ -1,8 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 namespace Slicer {
 	template<typename T> struct any_ptr {
 		// cppcheck-suppress noExplicitConstructor
@@ -14,7 +11,7 @@ namespace Slicer {
 		inline constexpr any_ptr(T & p) noexcept : ptr {&p} { }
 
 		// cppcheck-suppress noExplicitConstructor
-		// NOLINTNEXTLINE(hicpp-explicit-conversions)
+		// NOLINTNEXTLINE(hicpp-explicit-conversions,cppcoreguidelines-rvalue-reference-param-not-moved)
 		inline constexpr any_ptr(T && p) noexcept : ptr {&p} { }
 
 		template<typename S>
@@ -43,7 +40,8 @@ namespace Slicer {
 			return *ptr;
 		}
 
-		inline constexpr explicit operator bool() const noexcept
+		inline constexpr explicit
+		operator bool() const noexcept
 		{
 			return ptr;
 		}

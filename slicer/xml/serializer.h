@@ -12,7 +12,6 @@
 #include <fstream>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
-#include <string>
 #include <visibility.h>
 
 namespace Glib {

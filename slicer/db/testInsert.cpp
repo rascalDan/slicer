@@ -15,7 +15,6 @@
 #include <memory>
 #include <slicer/slicer.h>
 #include <string>
-#include <string_view>
 #include <vector>
 // IWYU pragma: no_forward_declare Slicer::UnsupportedModelType
 

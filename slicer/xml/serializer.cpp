@@ -21,7 +21,6 @@
 #include <factory.h>
 #include <lazyPointer.h>
 #include <list>
-#include <memory>
 #include <optional>
 #include <slicer/metadata.h>
 #include <slicer/modelParts.h>

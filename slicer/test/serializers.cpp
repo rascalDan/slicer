@@ -684,7 +684,8 @@ BOOST_AUTO_TEST_CASE(typeid_specifies_same)
 	auto d1 = Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::D1Ptr>(in);
 	BOOST_REQUIRE(d1);
 	BOOST_CHECK_EQUAL(d1->a, 3);
-	BOOST_CHECK_EQUAL(typeid(*d1).name(), typeid(TestModule::D1).name());
+	auto d1i = *d1;
+	BOOST_CHECK_EQUAL(typeid(d1i).name(), typeid(TestModule::D1).name());
 }
 
 BOOST_DATA_TEST_CASE(typeid_specifies_bad,

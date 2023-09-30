@@ -5,12 +5,13 @@
 // IWYU pragma: no_include <list>
 
 namespace Slicer {
-	IceMetaData::IceMetaData(Slice::StringList && as)
+	IceMetaData::IceMetaData(Slice::StringList as)
 	{
 		arr.reserve(as.size());
-		std::for_each(as.begin(), as.end(), [this](auto && a) {
-			auto & md = arr.emplace_back(a, std::string_view {});
+		std::transform(as.begin(), as.end(), std::back_inserter(arr), [](auto && a) {
+			decltype(arr)::value_type md {std::forward<decltype(a)>(a), std::string_view {}};
 			md.second = std::string_view(md.first).substr(0, md.first.rfind(':'));
+			return md;
 		});
 		_begin = arr.begin();
 		_end = arr.end();

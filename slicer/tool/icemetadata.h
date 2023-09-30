@@ -6,7 +6,6 @@
 #include <slicer/metadata.h>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 #include <visibility.h>
 
@@ -16,10 +15,10 @@ namespace Slicer {
 		static constexpr std::string_view slicer_prefix {"slicer"};
 
 		explicit IceMetaData() = default;
-		explicit IceMetaData(Slice::StringList && arr);
+		explicit IceMetaData(Slice::StringList arr);
 		~IceMetaData() = default;
 
-		SPECIAL_MEMBERS_DELETE(IceMetaData);
+		SPECIAL_MEMBERS_DEFAULT(IceMetaData);
 
 		[[nodiscard]] static std::vector<std::string_view> split(std::string_view metaData);
 

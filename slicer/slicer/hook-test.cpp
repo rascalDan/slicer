@@ -1,7 +1,6 @@
 #include "hookMap.h"
 #include "modelPartsTypes.h"
 #include "modelPartsTypes.impl.h"
-#include <array>
 #include <iterator>
 #include <string>
 #include <string_view>

@@ -2,7 +2,6 @@
 
 #include "slicer/modelParts.h"
 #include <Ice/Config.h>
-#include <memory>
 #include <string>
 
 namespace DB {

@@ -3,10 +3,8 @@
 #include <boost/date_time/gregorian_calendar.hpp>
 #include <boost/date_time/time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <cstdint>
 #include <cstdio>
 #include <ctime>
-#include <memory>
 #include <slicer/modelParts.h>
 #include <slicer/modelPartsTypes.h>
 #include <stdexcept>

@@ -6,7 +6,6 @@
 #include <factory.h>
 #include <istream>
 #include <iterator>
-#include <memory>
 #include <slicer/modelParts.h>
 #include <slicer/serializer.h>
 

@@ -5,7 +5,6 @@
 #include <Ice/Config.h>
 #include <Ice/Optional.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <optional>
 #include <slicer/modelPartsTypes.h>
 #include <string>
 #include <visibility.h>
