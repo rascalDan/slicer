@@ -21,11 +21,12 @@ namespace test {
 	static_assert(!Slicer::MetaData<>::in_scope("scope:sub2:subsub", "scope:sub"));
 	static_assert(!Slicer::MetaData<>::in_scope("scope:sub:subsub", "scope:sub2"));
 
-	constexpr Slicer::MetaDataImpl<4> md {{{
+	constexpr Slicer::MetaDataImpl<5> md {{{
 			"slicer:yes",
 			"slicer:no",
 			"slicer:sub:scope",
 			"notslicer:dontcare",
+			"slicer:key:id",
 	}}};
 
 	static_assert(md.arr[0].first == "slicer:yes");
@@ -45,4 +46,8 @@ namespace test {
 	static_assert(md.value("slicer:sub").has_value());
 	static_assert(md.value("slicer:sub").value() == "scope");
 	static_assert(!md.value("nope:").has_value());
+	static_assert(md.value("slicer:key:").has_value());
+	static_assert(md.value("slicer:key:").value() == "id");
+	static_assert(md.value("slicer:key").has_value());
+	static_assert(md.value("slicer:key").value() == "id");
 }

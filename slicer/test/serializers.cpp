@@ -710,3 +710,10 @@ BOOST_DATA_TEST_CASE(typeid_specifies_no_such_type,
 	BOOST_CHECK_THROW(std::ignore = (Slicer::DeserializeAny<Slicer::XmlStreamDeserializer, TestModule::D12Ptr>(in)),
 			Slicer::UnknownType);
 }
+
+BOOST_AUTO_TEST_CASE(dict_with_name_overrides)
+{
+	auto res = Slicer::DeserializeAny<Slicer::XmlFileDeserializer, TestModule::StructMapNamed>(
+			rootDir / "initial/dictNamed.xml");
+	BOOST_REQUIRE_EQUAL(res.size(), 2);
+}

@@ -8,10 +8,9 @@ namespace Slicer {
 	IceMetaData::IceMetaData(Slice::StringList as)
 	{
 		arr.reserve(as.size());
-		std::transform(as.begin(), as.end(), std::back_inserter(arr), [](auto && a) {
-			decltype(arr)::value_type md {std::forward<decltype(a)>(a), std::string_view {}};
+		std::for_each(as.begin(), as.end(), [this](auto a) {
+			auto & md = arr.emplace_back(std::move(a), std::string_view {});
 			md.second = std::string_view(md.first).substr(0, md.first.rfind(':'));
-			return md;
 		});
 		_begin = arr.begin();
 		_end = arr.end();
