@@ -157,6 +157,9 @@ namespace Slicer {
 		[[nodiscard]] virtual const Metadata & GetMetadata() const;
 		[[nodiscard]] virtual bool IsOptional() const;
 		virtual void OnContained(const ModelPartHandler &);
+
+	protected:
+		static std::string demangle(const char * mangled);
 	};
 
 	template<typename T> class DLL_PUBLIC ModelPartModel {

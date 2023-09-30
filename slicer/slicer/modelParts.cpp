@@ -1,4 +1,5 @@
 #include "modelParts.h"
+#include <cxxabi.h>
 
 namespace Slicer {
 	void
@@ -73,6 +74,14 @@ namespace Slicer {
 	ModelPart::OnContained(const ModelPartHandler &)
 	{
 		throw std::logic_error {"OnContained not supported on this ModelPart"};
+	}
+
+	std::string
+	ModelPart::demangle(const char * mangled)
+	{
+		auto buf = std::unique_ptr<char, decltype(free) *>(
+				abi::__cxa_demangle(mangled, nullptr, nullptr, nullptr), std::free);
+		return "::" + std::string(buf.get());
 	}
 
 	bool

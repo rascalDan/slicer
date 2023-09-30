@@ -155,7 +155,6 @@ namespace Slicer {
 				const std::string_view className, const std::optional<std::string_view> typeName, const ClassRefBase *);
 		static void unregisterClass(const std::string_view className, const std::optional<std::string_view> typeName);
 		static TypeId getTypeId(const std::string & id, const std::string_view className);
-		static std::string demangle(const char * mangled);
 
 		static const std::string & ToExchangeTypeName(const std::string &);
 		static std::string_view ToModelTypeName(const std::string &);

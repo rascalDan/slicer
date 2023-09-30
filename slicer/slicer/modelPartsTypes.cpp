@@ -10,7 +10,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index_container.hpp>
 #include <cstdlib>
-#include <cxxabi.h>
 #include <functional>
 #include <map>
 #include <memory>
@@ -235,14 +234,6 @@ namespace Slicer {
 	ModelPartForComplexBase::getTypeId(const std::string & id, const std::string_view className)
 	{
 		return (id == className) ? TypeId() : ToExchangeTypeName(id);
-	}
-
-	std::string
-	ModelPartForComplexBase::demangle(const char * mangled)
-	{
-		auto buf = std::unique_ptr<char, decltype(free) *>(
-				abi::__cxa_demangle(mangled, nullptr, nullptr, nullptr), std::free);
-		return "::" + std::string(buf.get());
 	}
 
 	void
