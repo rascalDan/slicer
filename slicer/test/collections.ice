@@ -10,6 +10,8 @@ module TestModule {
 	local sequence<StructType> Structs;
 	dictionary<int, ClassType> ClassMap;
 	local dictionary<int, StructType> StructMap;
+	["slicer:value:res","slicer:key:id","slicer:item:thing"]
+	local dictionary<long, StructType> StructMapNamed;
 };
 
 #endif

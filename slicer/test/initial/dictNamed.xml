@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<StructMapNamed>
+  <thing>
+    <id>1</id>
+    <res>
+      <a>1</a>
+      <b>2</b>
+    </res>
+  </thing>
+  <thing>
+    <id>2</id>
+    <res>
+      <a>3</a>
+      <b>4</b>
+    </res>
+  </thing>
+</StructMapNamed>
