@@ -461,7 +461,7 @@ namespace Slicer {
 				ModelPart::CreateFor(&model, h);
 			}
 			else {
-				auto p = std::move(std::dynamic_pointer_cast<Inst>(model));
+				auto p = std::dynamic_pointer_cast<Inst>(model);
 				ModelPart::CreateFor(&p, h);
 				model = std::move(p);
 			}
