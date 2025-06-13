@@ -22,6 +22,9 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(std::type_info)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 // LCOV_EXCL_STOP
 
+// Nesting BOOST_TEST_CONTEXT causes shadowing
+#pragma clang diagnostic ignored "-Wshadow"
+
 #define TypeTest(Var, Expr, Explicit, Expected, ...) \
 	Var obj = Expr; \
 	Slicer::ModelPart::CreateFor(&obj, [](auto && mpp) { \
