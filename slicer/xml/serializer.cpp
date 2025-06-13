@@ -326,7 +326,7 @@ namespace Slicer {
 								}
 								DocumentTreeIterateElement(element, smp, md);
 							},
-							element->get_name().raw(),
+							element->get_name(),
 							[](const auto & h) {
 								return h->GetMetadata().flagNotSet(md_attribute);
 							});
@@ -338,7 +338,7 @@ namespace Slicer {
 								smp->SetValue(XmlValueSource(attribute));
 								smp->Complete();
 							},
-							attribute->get_name().raw(),
+							attribute->get_name(),
 							[](const auto & h) {
 								return h->GetMetadata().flagSet(md_attribute);
 							});

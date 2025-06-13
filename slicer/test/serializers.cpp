@@ -21,7 +21,14 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#ifndef __clang__
+#	pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 #include <glibmm/ustring.h>
+#pragma GCC diagnostic pop
 #include <json.h>
 #include <json/serializer.h>
 #include <jsonpp.h>
@@ -673,9 +680,9 @@ BOOST_AUTO_TEST_CASE(sequence_element_in_same_slice_link_bug)
 {
 	// Link error when sequence element type defined in same slice.
 	BOOST_CHECK_NO_THROW(
-			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr, [](auto &&) {}));
+			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Classes>>(nullptr, [](auto &&) { }));
 	BOOST_CHECK_NO_THROW(
-			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr, [](auto &&) {}));
+			Slicer::ModelPart::Make<Slicer::ModelPartForSequence<TestModule::Dates>>(nullptr, [](auto &&) { }));
 }
 
 BOOST_AUTO_TEST_CASE(typeid_specifies_same)

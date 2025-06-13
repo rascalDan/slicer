@@ -78,6 +78,6 @@ project slicer : requirements
 
 build-project slicer ;
 
-pkg-config.import libxmlpp : : <name>libxml++-3.0 ;
+pkg-config.import libxmlpp : : <name>libxml++-5.0 ;
 pkg-config.import glibmm : : <name>glibmm-2.4 ;
 

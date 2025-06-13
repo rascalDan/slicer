@@ -10,6 +10,7 @@ lib slicer-xml :
 	<library>stdc++fs
 	<library>..//Ice
 	<library>../..//libxmlpp
+	<library>../..//glibmm
 	<library>..//adhocutil
 	<library>../slicer//slicer
 	<implicit-dependency>../slicer//slicer
@@ -17,6 +18,7 @@ lib slicer-xml :
 	<dependency>../slicer//install-headers-local
 	: :
 	<library>../..//libxmlpp
+	<library>../..//glibmm
 	<implicit-dependency>xmlExceptions
 	;
 
