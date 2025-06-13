@@ -792,7 +792,7 @@ namespace Slicer {
 		if (cpp && !cppPath.empty()) {
 			throw CompilerError("Both file handle and path provided.");
 		}
-		auto cppfile = std::unique_ptr<FILE, decltype(&fclose)>(
+		auto cppfile = std::unique_ptr<FILE, int (*)(FILE *)>(
 				cpp || cppPath.empty() ? cpp : fopen(cppPath.c_str(), "w"), cppPath.empty() ? fflush : fclose);
 		if (!cppfile && !cppPath.empty()) {
 			throw CompilerError("Failed to open output file");
