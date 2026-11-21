@@ -219,10 +219,12 @@ namespace Slicer {
 	ModelPartForComplexBase::unregisterClass(
 			const std::string_view className, const std::optional<std::string_view> typeName)
 	{
-		if (const auto i = refs->find(className); i != refs->end()) {
-			refs->erase(i);
+		if (refs) {
+			if (const auto i = refs->find(className); i != refs->end()) {
+				refs->erase(i);
+			}
 		}
-		if (typeName) {
+		if (names && typeName) {
 			names->get<0>().erase(className);
 		}
 	}
