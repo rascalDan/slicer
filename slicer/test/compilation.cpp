@@ -23,7 +23,8 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 // LCOV_EXCL_STOP
 
 // Nesting BOOST_TEST_CONTEXT causes shadowing
-#pragma clang diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 
 #define TypeTest(Var, Expr, Explicit, Expected, ...) \
 	Var obj = Expr; \
@@ -41,6 +42,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(Slicer::ModelPartType)
 		} \
 		__VA_ARGS__ \
 	});
+#pragma GCC diagnostic pop
 
 #define StackTypeTest(Var, Explicit, Expected, ...) TypeTest(Var, Var(), Explicit, Expected, __VA_ARGS__)
 
